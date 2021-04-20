@@ -1,3 +1,6 @@
+// eslint-disable-next-line nuxt/no-cjs-in-config
+require('./config.js')
+
 export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
@@ -59,9 +62,9 @@ export default {
     fullPathRedirect: true,
     redirect: {
       login: `${process.env.NUXT_ENV_AUTH_SERVER}?redirect=${encodeURIComponent(process.env.NUXT_ENV_FRONTEND_URL)}/callback`,
-      logout: '/',
+      logout: '/callback',
       callback: '/callback',
-      home: '/user'
+      home: '/'
     },
     plugins: [
       { src: '~/plugins/axios.js' }
