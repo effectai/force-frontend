@@ -1,0 +1,56 @@
+/* Import Bulma Utilities */
+@import '~bulma/sass/utilities/initial-variables';
+@import '~bulma/sass/utilities/functions';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://use.typekit.net/kej5qyk.css');
+
+$family-sans-serif: 'Inter', sans-serif;
+$family-secondary: 'p22-mackinac-pro',serif;
+
+// Colors
+$primary: #101D56;
+$secondary: #1148EB;
+$secondary-alt: #5158fa;
+
+$secondary-invert: findColorInvert($secondary) !default;
+$secondary-alt-invert: findColorInvert($secondary-alt) !default;
+$accent: #FFAE0D;
+$accent-invert: findColorInvert($accent) !default;
+$yellow-light: #FFFDF7;
+
+$custom-colors: (
+  "secondary":($secondary, $secondary-invert),
+  "secondary-alt":($secondary-alt, $secondary-alt-invert),
+  "accent":($accent, $accent-invert),
+);
+
+$text: #363636;
+// $body-background-color: #FFFDF7;
+
+$link: $secondary;
+$link-hover: lighten($secondary, 20%);
+$link-focus: lighten($secondary, 20%);
+$link-active: lighten($secondary, 20%);
+
+$title-weight: 400;
+$title-color: $primary;
+//$subtitle-color: $secondary;
+$title-family: $family-secondary;
+$subtitle-family: $family-sans-serif;
+
+$body-line-height: 1.7;
+$button-padding-horizontal: 1.7em;
+
+$network-color: #5158fa;
+$translate-color: #00c165;
+$force-color: #057cff;
+$socials-color: #06c6c6;
+$pieces-color: #999999;
+$dao-color: #d7ac00;
+$captions-color: #e06375;
+
+$box-shadow: 0 0 38px 10px rgba(49,71,168,0.12);
+$card-shadow: 0 0 38px 10px rgba(49,71,168,0.12);
+
+$light: #F6F7FF;
