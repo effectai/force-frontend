@@ -1,5 +1,4 @@
-const qs = require('qs')
-
+// const qs = require('qs')
 const API_BASE = process.env.NUXT_ENV_BACKEND_URL
 
 export default {
@@ -20,15 +19,8 @@ export default {
     async getCampaigns ({ commit, state }, filters) {
       commit('SET_LOADING', true)
       try {
-        const campaigns = await this.$axios.get(`${API_BASE}/worker/campaigns`, {
-          params: {
-            ...filters
-          },
-          paramsSerializer: (params) => {
-            return qs.stringify(params)
-          }
-        })
-        commit('SET_CAMPAIGNS', campaigns.data.results)
+        const campaigns = await this.$axios.$get(`${API_BASE}/worker/campaigns`)
+        commit('SET_CAMPAIGNS', campaigns.results)
       } catch (e) {
         console.error(e)
         alert('error')
