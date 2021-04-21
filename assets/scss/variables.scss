@@ -3,10 +3,10 @@
 @import '~bulma/sass/utilities/functions';
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-@import url('https://use.typekit.net/kej5qyk.css');
+// @import url('https://use.typekit.net/kej5qyk.css');
 
 $family-sans-serif: 'Inter', sans-serif;
-$family-secondary: 'p22-mackinac-pro',serif;
+$family-secondary: 'Inter', sans-serif; // 'p22-mackinac-pro',serif;
 
 // Colors
 $primary: #101D56;
