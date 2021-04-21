@@ -1,22 +1,23 @@
 <template>
   <div>
-    <nav class="navbar" role="navigation" aria-label="main navigation">
+    <nav class="navbar is-fixed-top is-transparent" role="navigation" aria-label="main navigation">
       <div class="container">
         <div class="navbar-brand">
           <nuxt-link class="navbar-item navbar-item navbar-title" to="/">
-            <img src="@/assets/img/logo.png" class="logo">
+            <img src="@/assets/img/logo.svg" class="logo">
           </nuxt-link>
 
           <a
             role="button"
-             class="navbar-burger burger"
-             aria-label="menu"
-             aria-expanded="false"
-             data-target="navbar"
-             @click="mobileMenu = !mobileMenu">
-            <span aria-hidden="true"/>
-            <span aria-hidden="true"/>
-            <span aria-hidden="true"/>
+            class="navbar-burger burger"
+            aria-label="menu"
+            aria-expanded="false"
+            data-target="navbar"
+            @click="mobileMenu = !mobileMenu"
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
           </a>
         </div>
         <div id="navbar" class="navbar-menu is-align-items-center" :class="{'is-active': mobileMenu}">
@@ -39,7 +40,6 @@
 </template>
 
 <script>
-
 export default {
   components: {},
 
@@ -55,6 +55,7 @@ export default {
 
 <style lang="scss" scoped>
 .navbar {
+  border-bottom: 2px solid $lightblue;
   .navbar-brand {
     .logo {
       height: 45px;
