@@ -52,7 +52,15 @@
       </div>
     </nav>
     <div class="drawer-backdrop" v-if="showNotifications" @click="showNotifications = false"></div>
-    <notifications :class="{'is-active': showNotifications}" />
+    <aside class="drawer is-marginless" :class="{'is-active': showNotifications}">
+      <header class="drawer-header">
+        <p class="subtitle mb-0">
+          Notifications
+        </p>
+        <span class="delete" @click="showNotifications = false" />
+      </header>
+      <notifications v-if="showNotifications" />
+    </aside>
   </div>
 </template>
 

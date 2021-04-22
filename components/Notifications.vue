@@ -1,89 +1,88 @@
 <template>
-  <aside class="drawer is-marginless">
-    <header class="drawer-header">
-      <p class="subtitle mb-0">Notifications</p>
-      <span class="delete" @click="$parent.showNotifications = false" />
-    </header>
-
-    <div class="drawer-body" id="notifications">
-      <div class="drawer-block">
-        <div v-if="false" class="notification-list">
-          <div
-            v-for="(notification, index) in notifications"
-            :key="index"
-            class="notification-card"
-            :class="{'clickable': notification.submission_id}"
-            @click="notificationAction(notification)"
+  <div id="notifications" class="drawer-body">
+    <div class="notification-list">
+      <div
+        v-for="(notification, index) in notifications"
+        :key="index"
+        class="notification-card"
+        :class="{'clickable': notification.submission_id}"
+        @click="notificationAction(notification)"
+      >
+        <div class="notification-type" :class="'notification-type-' + getNotificationTypeName(notification.type)">
+          <span class="notification-icon"/>
+          <span v-if="notification.type === 'WORK_MESSAGE'">Comment on Task</span>
+          <span v-else-if="notification.type === 'TASK_GROUP_ACCEPTED'">Accepted</span>
+          <span v-else-if="notification.type === 'TASK_GROUP_REJECTED'">Rejected</span>
+          <span v-else-if="notification.type === 'PUBLIC_SKILL_ASSIGNED'">Qualification received</span>
+          <span v-else-if="notification.type === 'PUBLIC_QUALIFICATION_ASSIGNED'">Badge received</span>
+          <span v-else>Notification</span>
+        </div>
+        <div class="has-text-grey-light is-size-7 is-pulled-right">
+          {{ getTimeAgo(notification.createdAt) }}
+        </div>
+        <span class="is-clearfix"/>
+        <div v-if="notification.requesterName" class="notification-requester is-size-7">
+          <span>&nbsp;by</span>
+          {{ notification.requesterName }}
+        </div>
+        <div v-if="notification.taskGroupName" class="notification-campaign is-size-7">
+          <span>for</span>
+          {{ notification.taskGroupName }}
+        </div>
+        <div
+          v-if="notification.qualificationId && notification.qualificationType !== 'SKILL'"
+          class="notification-qualification"
+        >
+          <img
+            v-if="notification.qualificationImage"
+            :src="notification.qualificationImage"
+            class="badge-icon"
+            onerror="this.onerror=null;this.src='/static/badges/default.svg'"
           >
-            <div class="notification-type" :class="'notification-type-' + getNotificationTypeName(notification.type)">
-              <span class="notification-icon" />
-              {{ getNotificationTranslation('notifications.type.' + getNotificationTypeName(notification.type)) }}
-            </div>
-            <div class="notification-date">
-              {{ getTimeAgo(notification.createdAt) }}
-            </div>
-            <span class="clearfix" />
-            <div v-if="notification.requesterName" class="notification-requester">
-              <span>by</span>
-              {{ notification.requesterName }}
-            </div>
-            <div v-if="notification.taskGroupName" class="notification-campaign">
-              <span>for</span>
-              {{ notification.taskGroupName }}
-            </div>
-            <div
-              v-if="notification.qualificationId && notification.qualificationType !== 'SKILL'"
-              class="notification-qualification"
-            >
-              <img
-                v-if="notification.qualificationImage"
-                :src="notification.qualificationImage"
-                class="badge-icon"
-                onerror="this.onerror=null;this.src='/static/badges/default.svg'"
-              >
-              <img
-                v-else
-                src="/static/badges/default.svg"
-                class="badge-icon"
-              >
-            </div>
-            <div
-              v-if="notification.type === 'PUBLIC_QUALIFICATION_ASSIGNED'"
-              class="notification-message"
-              v-html="'test'"
-            />
-            <div
-              v-else-if="notification.type === 'PUBLIC_SKILL_ASSIGNED'"
-              class="notification-message"
-              v-html="'test2'"
-            />
-            <div v-if="notification.message" class="notification-message">
-              {{ notification.message }}
-            </div>
+          <img
+            v-else
+            src="/static/badges/default.svg"
+            class="badge-icon"
+          >
+        </div>
+        <div
+          v-if="notification.type === 'PUBLIC_QUALIFICATION_ASSIGNED'"
+          class="notification-message"
+        >
+          You have a new badge! Qualification: <b>{{notification.qualificationName}}</b>. You can find your badges in your profile page
           </div>
-        </div>
-        <div v-if="loading">
-          Loading..
-        </div>
-        <div v-if="allNotificationsLoaded" class="text-center no-more-tasks">
-          No more notifications
+        <div
+          v-else-if="notification.type === 'PUBLIC_SKILL_ASSIGNED'"
+          class="notification-message"
+        >
+          You have a new skill! Qualification: <b>{{notification.qualificationName}}</b>. You can find your qualifications in your profile page
+          </div>
+        <div v-if="notification.message" class="notification-message">
+          {{ notification.message }}
         </div>
       </div>
     </div>
-  </aside>
+    <div v-if="loading" class="p-2 has-text-centered">
+      Loading..
+    </div>
+    <div v-if="allNotificationsLoaded" class="has-text-centered p-2">
+      No more notifications
+    </div>
+  </div>
 </template>
 
 <script>
+import kebabCase from 'lodash/kebabCase'
+
 export default {
   name: 'Notifications',
   components: {},
   data () {
     return {
-      notifications: [],
+      notifications: null,
       loading: false,
       page: 0,
-      allNotificationsLoaded: false,
-      badgeBucket: process.env.BADGE_BUCKET
+      allNotificationsLoaded: false
     }
   },
   created () {
@@ -102,20 +101,11 @@ export default {
           name: 'submission-page',
           params: { campaignId: notification.task_group_id, submissionId: notification.submission_id }
         })
-        this.$parent.toggleNotifications(false)
+        this.$parent.showNotifications = false
       }
     },
-    getNotificationTranslation (type) {
-      // for some reason this is not executioning:
-      // this.$te(type) -- always returns false, even if key exists!
-      // so we use the following hack:
-      return this.$t(type) !== type
-        ? this.$t(type)
-        : this.$t('notifications.type.default')
-    },
     getNotificationTypeName (type) {
-      // return kebabCase(type)
-      return type
+      return kebabCase(type)
     },
     isInfiniteLoadingAllowed () {
       return !this.allNotificationsLoaded && !this.loading
@@ -123,21 +113,18 @@ export default {
     getTimeAgo (date) {
       return this.$moment(date).fromNow()
     },
-    getNotifications () {
+    async getNotifications () {
       this.loading = true
-      this.$axios.get(window.API_BASE_URL + '/user/notifications?page=' + this.page)
-        .then((response) => {
-          const notifications = response.data.notifications
-          if (!notifications || notifications.length === 0) {
-            this.allNotificationsLoaded = true
-          }
-          this.notifications = this.notifications.concat(notifications)
-          this.loading = false
-        }, (error) => {
-          console.error(error)
-          this.loading = false
-        })
+      const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications?page=' + this.page)
+      const notifications = response.notifications
+      if (!notifications || notifications.length === 0) {
+        this.allNotificationsLoaded = true
+      }
+
+      this.notifications = this.notifications ? this.notifications.concat(notifications) : notifications
+      this.loading = false
       this.page++
+      // TODO: error handling
     },
     handleScroll () {
       // Trigger get new notifications when almost at the bottom of scrolling through the notifications
@@ -150,48 +137,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.notification-title {
-  padding-left: 36px;
-  text-transform: uppercase;
-  color: $blue;
-  font-size: 14px;
-  background: $white-ter;
-  height: 28px;
-  display: flex;
-  letter-spacing: 1.1px;
-  align-items: center;
-  margin-bottom: 50px;
-}
-
-.notification-close {
-  margin-left: auto;
-  color: $black;
-  background: $light;
-  border-radius: 10px;
-  width: 20px;
-  height: 20px;
-  float: right;
-  font-size: 12px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 10px;
-  cursor: pointer;
-  transition: 0.2s;
-
-  &:hover {
-    background: $grey;
-  }
-}
-
 .notification-card {
   position: relative;
-  border-bottom: 1px solid $light;
+  border-bottom: 1px solid $lightblue;
   padding: 25px 36px 25px 68px;
 
   &.clickable:hover {
-    background: $lightblue;
+    background: $light;
+    cursor: pointer;
   }
 
   &:before {
@@ -201,11 +154,7 @@ export default {
     height: 100%;
     left: 43px;
     top: 0;
-    border-left: 1px solid $light;
-  }
-
-  &:nth-child(1) {
-    padding-top: 0;
+    border-left: 1px solid $lightblue;
   }
 
   .notification-type {
@@ -213,12 +162,12 @@ export default {
     float: left;
 
     .notification-icon {
-      $size: 15px;
+      $size: 16px;
       width: $size;
       height: $size;
       border: 1px solid $white-bis;
       box-shadow: -1px 1px 4px 0 rgba(55, 70, 95, 0.12);
-      left: -25px - $size/2;
+      left: -24px - $size/2;
       top: 2px;
       position: absolute;
       border-radius: 10px;
@@ -228,7 +177,7 @@ export default {
         height: $size - 2;
         content: "";
         display: block;
-        background: $light;
+        background: $grey-lighter;
         border-radius: 10px;
         border: 3px solid $white;
       }
@@ -255,13 +204,8 @@ export default {
     }
   }
 
-  .notification-date {
-    float: right;
-    color: $grey;
-  }
-
   .notification-campaign, .notification-requester {
-    color: $lightblue;
+    color: $primary;
 
     span {
       color: $grey;
