@@ -56,7 +56,7 @@ export default {
         endpoints: {
           login: { url: `${process.env.NUXT_ENV_AUTH_SERVER}/verify`, method: 'post', propertyName: 'token' },
           logout: { url: `${process.env.NUXT_ENV_AUTH_SERVER}/logout`, method: 'get', withCredentials: true },
-          user: { url: `${process.env.NUXT_ENV_AUTH_SERVER}/user`, method: 'get', propertyName: false }
+          user: { url: `${process.env.NUXT_ENV_BACKEND_URL}/user/me`, method: 'get', propertyName: false }
         }
       }
     },

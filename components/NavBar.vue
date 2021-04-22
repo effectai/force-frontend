@@ -4,12 +4,12 @@
       <div class="container">
         <div class="navbar-brand">
           <a class="navbar-item navbar-item navbar-title" @click="onLogo">
-            <img @click="mobileMenu = false" src="@/assets/img/logo.svg" class="logo">
+            <img src="@/assets/img/logo.svg" class="logo" @click="mobileMenu = false">
           </a>
           <div class="navbar-item is-hidden-desktop" style="margin-left: auto" @click="mobileMenu = false">
-            <div @click="showNotifications = true" class="mt-1 is-flex notification-icon" style="position: relative">
-              <span title="Badge top right" class="badge is-danger" v-if="newNotifications">{{newNotifications}}</span>
-              <img src="~assets/img/icons/notification.svg" style="height: 26px" />
+            <div class="mt-1 is-flex notification-icon" style="position: relative" @click="showNotifications = true">
+              <span v-if="newNotifications" title="Badge top right" class="badge is-danger">{{ newNotifications }}</span>
+              <img src="~assets/img/icons/notification.svg" style="height: 26px">
             </div>
           </div>
           <a
@@ -28,21 +28,23 @@
         </div>
         <div id="navbar" class="navbar-menu is-align-items-center" :class="{'is-active': mobileMenu}">
           <div class="navbar-start is-justify-content-center" style="width: 100%">
-            <div class="navbar-item">
-              <span class="is-flex is-align-items-center is-justify-content-center"><span><b>XXX</b> EFX</span> <span class="is-size-7 pl-2">| $<b>XX,XX</b></span></span>
-            </div>
+            <balance
+              v-if="$auth.loggedIn"
+              class="navbar-item"
+              :amount="($auth.user.username ? $auth.user.balance : ($auth.user.credit || 0)).toFixed(2)"
+            />
           </div>
           <div class="navbar-end">
             <div class="navbar-item is-hidden-mobile" @click="mobileMenu = false">
-              <div @click="showNotifications = true" class="mt-1 is-flex notification-icon" style="position: relative">
-                  <span title="Badge top right" class="badge is-danger" v-if="newNotifications">{{newNotifications}}</span>
-                  <img src="~assets/img/icons/notification.svg" style="height: 26px" />
+              <div class="mt-1 is-flex notification-icon" style="position: relative" @click="showNotifications = true">
+                <span v-if="newNotifications" title="Badge top right" class="badge is-danger">{{ newNotifications }}</span>
+                <img src="~assets/img/icons/notification.svg" style="height: 26px">
               </div>
             </div>
             <div class="navbar-item" @click="mobileMenu = false">
               <nuxt-link class="button is-text" :class="{'is-fullwidth': mobileMenu}" to="/profile" exact-active-class="is-active">
                 <span class="icon">
-                  <img src="~assets/img/icons/user.svg" style="height: 24px" />
+                  <img src="~assets/img/icons/user.svg" style="height: 24px">
                 </span>
                 <span v-if="mobileMenu">Profile</span>
               </nuxt-link>
@@ -51,7 +53,7 @@
         </div>
       </div>
     </nav>
-    <div class="drawer-backdrop" v-if="showNotifications" @click="showNotifications = false"></div>
+    <div v-if="showNotifications" class="drawer-backdrop" @click="showNotifications = false" />
     <aside class="drawer is-marginless" :class="{'is-active': showNotifications}">
       <header class="drawer-header">
         <p class="subtitle mb-0">
@@ -66,9 +68,11 @@
 
 <script>
 import Notifications from '@/components/Notifications'
+import Balance from '@/components/Balance'
 export default {
   components: {
-    Notifications
+    Notifications,
+    Balance
   },
 
   data () {

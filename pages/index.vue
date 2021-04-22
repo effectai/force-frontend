@@ -2,8 +2,9 @@
   <section class="section">
     <div class="container">
       <div class="text-center">
-        <h4 class="title">Welcome {{ $auth.user.name }}</h4>
+        <h4 class="title">Welcome</h4>
         <div class="subtitle">{{$auth.user.email}}</div>
+        {{$auth.user}}
         <br>
         <a class="button is-danger" @click="$auth.logout()">Logout</a>
         <br><br>
