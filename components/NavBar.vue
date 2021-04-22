@@ -3,9 +3,9 @@
     <nav class="navbar is-fixed-top is-transparent" role="navigation" aria-label="main navigation">
       <div class="container">
         <div class="navbar-brand">
-          <nuxt-link class="navbar-item navbar-item navbar-title" to="/">
+          <a class="navbar-item navbar-item navbar-title" @click="onLogo">
             <img @click="mobileMenu = false" src="@/assets/img/logo.svg" class="logo">
-          </nuxt-link>
+          </a>
           <div class="navbar-item is-hidden-desktop" style="margin-left: auto" @click="mobileMenu = false">
             <div @click="showNotifications = true" class="mt-1 is-flex notification-icon" style="position: relative">
               <span title="Badge top right" class="badge is-danger" v-if="newNotifications">{{newNotifications}}</span>
@@ -91,6 +91,13 @@ export default {
     async countNewNotifications () {
       const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications/new')
       this.newNotifications = +response.newNotifications
+    },
+    onLogo () {
+      if (this.$route.path === '/') {
+        location.reload()
+      } else {
+        this.$router.push('/')
+      }
     }
   }
 }
