@@ -6,10 +6,15 @@
           <nuxt-link class="navbar-item navbar-item navbar-title" to="/">
             <img @click="mobileMenu = false" src="@/assets/img/logo.svg" class="logo">
           </nuxt-link>
-
+          <div class="navbar-item is-hidden-desktop" style="margin-left: auto" @click="mobileMenu = false">
+            <div @click="showNotifications = true" class="mt-1 is-flex notification-icon" style="position: relative">
+              <span title="Badge top right" class="badge is-danger">8</span>
+              <img src="~assets/img/icons/notification.svg" style="height: 26px" />
+            </div>
+          </div>
           <a
             role="button"
-            class="navbar-burger burger"
+            class="navbar-burger burger ml-0"
             aria-label="menu"
             :class="{'is-active': mobileMenu}"
             aria-expanded="false"
@@ -28,11 +33,10 @@
             </div>
           </div>
           <div class="navbar-end">
-            <div class="navbar-item" @click="mobileMenu = false">
-              <div :class="{'is-fullwidth': mobileMenu}" class="mt-1 is-flex" style="position: relative">
+            <div class="navbar-item is-hidden-mobile" @click="mobileMenu = false">
+              <div @click="showNotifications = true" class="mt-1 is-flex notification-icon" style="position: relative">
                   <span title="Badge top right" class="badge is-danger">8</span>
                   <img src="~assets/img/icons/notification.svg" style="height: 26px" />
-                <span v-if="mobileMenu">Notifications</span>
               </div>
             </div>
             <div class="navbar-item" @click="mobileMenu = false">
@@ -47,16 +51,22 @@
         </div>
       </div>
     </nav>
+    <div class="drawer-backdrop" v-if="showNotifications" @click="showNotifications = false"></div>
+    <notifications :class="{'is-active': showNotifications}" />
   </div>
 </template>
 
 <script>
+import Notifications from '@/components/Notifications'
 export default {
-  components: {},
+  components: {
+    Notifications
+  },
 
   data () {
     return {
-      mobileMenu: false
+      mobileMenu: false,
+      showNotifications: false
     }
   },
 
@@ -65,6 +75,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@keyframes bellshake {
+  0% { transform: rotate(0); }
+  15% { transform: rotate(5deg); }
+  30% { transform: rotate(-5deg); }
+  45% { transform: rotate(4deg); }
+  60% { transform: rotate(-4deg); }
+  75% { transform: rotate(2deg); }
+  85% { transform: rotate(-2deg); }
+  92% { transform: rotate(1deg); }
+  100% { transform: rotate(0); }
+}
+.notification-icon {
+  cursor: pointer;
+  &:hover, &:focus {
+    animation: bellshake .5s cubic-bezier(.36,.07,.19,.97) both;
+    transform-origin: top center;
+  }
+}
 .navbar {
   border-bottom: 2px solid $lightblue;
   .navbar-brand {
