@@ -1,5 +1,5 @@
 <template>
-  <div id="notifications" class="drawer-body">
+  <div ref="notifications" class="drawer-body">
     <div class="notification-list">
       <div
         v-for="(notification, index) in notifications"
@@ -89,10 +89,10 @@ export default {
     this.getNotifications()
   },
   mounted () {
-    document.getElementById('notifications').addEventListener('scroll', this.handleScroll)
+    this.$refs.notifications.addEventListener('scroll', this.handleScroll)
   },
-  destroyed () {
-    document.getElementById('notifications').removeEventListener('scroll', this.handleScroll)
+  beforeDestroy () {
+    this.$refs.notifications.removeEventListener('scroll', this.handleScroll)
   },
   methods: {
     notificationAction (notification) {
@@ -124,6 +124,7 @@ export default {
       this.notifications = this.notifications ? this.notifications.concat(notifications) : notifications
       this.loading = false
       this.page++
+      this.$emit('get-notifications')
       // TODO: error handling
     },
     handleScroll () {

@@ -8,7 +8,7 @@
           </nuxt-link>
           <div class="navbar-item is-hidden-desktop" style="margin-left: auto" @click="mobileMenu = false">
             <div @click="showNotifications = true" class="mt-1 is-flex notification-icon" style="position: relative">
-              <span title="Badge top right" class="badge is-danger">8</span>
+              <span title="Badge top right" class="badge is-danger" v-if="newNotifications">{{newNotifications}}</span>
               <img src="~assets/img/icons/notification.svg" style="height: 26px" />
             </div>
           </div>
@@ -35,7 +35,7 @@
           <div class="navbar-end">
             <div class="navbar-item is-hidden-mobile" @click="mobileMenu = false">
               <div @click="showNotifications = true" class="mt-1 is-flex notification-icon" style="position: relative">
-                  <span title="Badge top right" class="badge is-danger">8</span>
+                  <span title="Badge top right" class="badge is-danger" v-if="newNotifications">{{newNotifications}}</span>
                   <img src="~assets/img/icons/notification.svg" style="height: 26px" />
               </div>
             </div>
@@ -59,7 +59,7 @@
         </p>
         <span class="delete" @click="showNotifications = false" />
       </header>
-      <notifications v-if="showNotifications" />
+      <notifications v-if="showNotifications" @get-notifications="countNewNotifications" />
     </aside>
   </div>
 </template>
@@ -74,11 +74,25 @@ export default {
   data () {
     return {
       mobileMenu: false,
+      newNotifications: null,
       showNotifications: false
     }
   },
 
-  computed: {}
+  computed: {},
+
+  created () {
+    if (this.$auth.loggedIn) {
+      this.countNewNotifications()
+    }
+  },
+
+  methods: {
+    async countNewNotifications () {
+      const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications/new')
+      this.newNotifications = +response.newNotifications
+    }
+  }
 }
 </script>
 
