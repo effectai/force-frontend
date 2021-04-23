@@ -4,7 +4,7 @@
       <div class="text-center">
         <h4 class="title">Welcome</h4>
         <div class="subtitle">{{$auth.user.email}}</div>
-        {{$auth.user}}
+<!--        {{$auth.user}}-->
         <br>
         <a class="button is-danger" @click="$auth.logout()">Logout</a>
         <br><br>
@@ -14,7 +14,7 @@
           Campaigns loading..
         </div>
         <div v-else-if="campaigns && campaigns.length" v-for="campaign in campaigns" :key="campaign.id">
-          {{campaign}}
+          {{campaign.name}}
         </div>
         <div v-else-if="campaigns && !campaigns.length">
           No campaigns :(
