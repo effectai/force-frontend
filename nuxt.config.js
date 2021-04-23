@@ -46,7 +46,20 @@ export default {
   modules: [
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
-    '@nuxtjs/auth'
+    '@nuxtjs/auth',
+    ['nuxt-twa-module', {
+      /* module options */
+      defaultUrl: 'https://work.effectai.org',
+      hostName: 'work.effectai.org',
+      sha256Fingerprints: ['/* your SHA-256 keys */'],
+      applicationId: 'com.effectai.force',
+      launcherName: 'Effect Force',
+      versionCode: 1,
+      versionName: '1.0',
+      statusBarColor: '#057cff',
+      /* Overwrite folder where to put .wellknown */
+      distFolder: '.nuxt/dist/client'
+    }]
   ],
 
   auth: {
