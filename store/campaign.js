@@ -19,8 +19,8 @@ export default {
     async getCampaigns ({ commit, state }, filters) {
       commit('SET_LOADING', true)
       try {
-        const campaigns = await this.$axios.$get(`${API_BASE}/worker/campaigns`)
-        commit('SET_CAMPAIGNS', campaigns.results)
+        const campaigns = await this.$axios.$get(`${API_BASE}/worker/taskGroups`)
+        commit('SET_CAMPAIGNS', campaigns.taskGroups)
       } catch (e) {
         console.error(e)
         alert('error')
