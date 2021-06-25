@@ -8,7 +8,7 @@
         <div class="subtitle">
           {{ $auth.user.address }}
         </div>
-        <!--        {{$auth.user}}-->
+        {{ $auth.user }}
         <br>
         <a class="button is-danger" @click="$auth.logout()">Logout</a>
         <br><br>

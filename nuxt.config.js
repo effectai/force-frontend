@@ -46,6 +46,7 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
+    '@nuxtjs/onesignal',
     '@nuxtjs/pwa',
     '@nuxtjs/auth',
     ['nuxt-twa-module', {
@@ -62,7 +63,15 @@ export default {
       distFolder: '.nuxt/dist/client'
     }]
   ],
-
+  oneSignal: {
+    init: {
+      appId: '5b1c7731-22c9-4113-b96b-b0168ed3e330',
+      allowLocalhostAsSecureOrigin: true,
+      welcomeNotification: {
+        disable: false
+      }
+    }
+  },
   auth: {
     strategies: {
       local: {
