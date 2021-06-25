@@ -30,6 +30,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    { src: '~/plugins/bsc.js' }
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -65,19 +66,17 @@ export default {
   auth: {
     strategies: {
       local: {
-        _scheme: '~/schemes/authScheme',
         endpoints: {
-          login: { url: `${process.env.NUXT_ENV_AUTH_SERVER}/verify`, method: 'post', propertyName: 'token' },
-          logout: { url: `${process.env.NUXT_ENV_AUTH_SERVER}/logout`, method: 'get', withCredentials: true },
-          user: { url: `${process.env.NUXT_ENV_BACKEND_URL}/user/me`, method: 'get', propertyName: false }
+          login: { url: `${process.env.NUXT_ENV_AUTH_SERVER}/user/login`, method: 'post', propertyName: 'token' },
+          logout: { url: `${process.env.NUXT_ENV_AUTH_SERVER}/user/logout`, method: 'get', withCredentials: true },
+          user: { url: `${process.env.NUXT_ENV_BACKEND_URL}/user`, method: 'get', propertyName: false }
         }
       }
     },
     fullPathRedirect: true,
     redirect: {
-      login: `${process.env.NUXT_ENV_AUTH_SERVER}?redirect=${encodeURIComponent(process.env.NUXT_ENV_FRONTEND_URL)}/callback`,
-      logout: '/callback',
-      callback: '/callback',
+      login: '/login',
+      logout: '/login',
       home: '/'
     },
     plugins: [

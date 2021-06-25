@@ -2,9 +2,13 @@
   <section class="section">
     <div class="container">
       <div class="text-center">
-        <h4 class="title">Welcome</h4>
-        <div class="subtitle">{{$auth.user.email}}</div>
-<!--        {{$auth.user}}-->
+        <h4 class="title">
+          Welcome
+        </h4>
+        <div class="subtitle">
+          {{ $auth.user.address }}
+        </div>
+        <!--        {{$auth.user}}-->
         <br>
         <a class="button is-danger" @click="$auth.logout()">Logout</a>
         <br><br>
@@ -13,8 +17,8 @@
         <div v-if="campaignsLoading">
           Campaigns loading..
         </div>
-        <div v-else-if="campaigns && campaigns.length" v-for="campaign in campaigns" :key="campaign.id">
-          {{campaign.name}}
+        <div v-for="campaign in campaigns" v-else-if="campaigns && campaigns.length" :key="campaign.id">
+          {{ campaign.name }}
         </div>
         <div v-else-if="campaigns && !campaigns.length">
           No campaigns :(

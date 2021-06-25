@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <bsc-wallet />
     <nav-bar />
     <div id="content">
       <Nuxt />
@@ -8,9 +9,11 @@
 </template>
 
 <script>
+import BscWallet from '@/components/BscWallet'
 import NavBar from '~/components/NavBar'
 export default {
   components: {
+    BscWallet,
     NavBar
   },
   data () {
