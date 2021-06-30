@@ -10,7 +10,7 @@
         </div>
         {{ $auth.user }}
         <br>
-        <a class="button is-danger" @click="$auth.logout()">Logout</a>
+        <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
       </div>
       <div>
@@ -46,6 +46,10 @@ export default {
     this.$store.dispatch('campaign/getCampaigns')
   },
   methods: {
+    async logout () {
+      this.$bsc.logout()
+      await this.$auth.logout()
+    }
   }
 }
 </script>

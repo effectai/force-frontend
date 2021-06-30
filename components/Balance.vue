@@ -1,7 +1,7 @@
 <template>
   <div>
     <span class="is-flex is-align-items-center is-justify-content-center"><span><b>{{ amount }}</b> EFX</span>
-    <span v-if="!manualPayout && efxPrice" class="is-size-7 pl-2">| $<b>{{ (amount * efxPrice).toFixed(2) }}</b></span></span>
+      <span v-if="!manualPayout && efxPrice" class="is-size-7 pl-2">| $<b>{{ (amount * efxPrice).toFixed(2) }}</b></span></span>
   </div>
 </template>
 
@@ -19,7 +19,7 @@ export default {
       userQualifications: state => state.auth.user.qualifications
     }),
     manualPayout () {
-      return this.userQualifications.includes(419)
+      return this.userQualifications && this.userQualifications.includes(419)
     }
   },
   name: 'Balance',

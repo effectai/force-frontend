@@ -6,10 +6,11 @@ import Vue from 'vue'
  */
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
+
 const web3 = new Web3()
 web3.setProvider(process.env.NUXT_ENV_BSC_RPC)
 
-const walletProvider = new WalletConnectProvider({
+const wcProvider = new WalletConnectProvider({
   chainId: process.env.NUXT_ENV_BSC_NETWORK_ID,
   rpc: {
     56: process.env.NUXT_ENV_BSC_RPC
@@ -23,25 +24,32 @@ export default (context, inject) => {
   const bsc = new Vue({
     data () {
       return {
-        explorer: process.env.NUXT_ENV_BLOCKEXPLORER,
+        currentProvider: null,
         wallet: null,
         loginModal: false,
-        tokenBalance: null,
-        bnbAvailable: null,
-        updater: null,
         transaction: null,
         transactionError: null,
         metamask: window.ethereum || null,
         binance: window.BinanceChain || null,
-        walletConnect: walletProvider || null, // connect to mobile wallet; trust, metamask, ...
-        walletConnected: null, // Does it make sense to do this at the beginning?
-        currentProvider: null
+        walletConnect: wcProvider || null, // connect to mobile wallet; trust, metamask, ...
+        walletConnected: null,
+        explorer: process.env.NUXT_ENV_BLOCKEXPLORER
       }
     },
     created () {
+      // this.currentProvider = context.$auth.$storage.getUniversal('currentProvider')
+      const provider = context.$auth.$storage.getUniversal('provider')
+      if (provider === 'metamask') {
+        this.onMetaMaskConnect()
+      } else if (provider === 'walletconnect') {
+        this.onWalletConnectWeb3()
+      } else if (provider === 'trustwallet') {
+        this.onTrustWalletConnect()
+      } else if (provider === 'bsc') {
+        this.onBinanceConnect()
+      }
     },
     beforeDestroy () {
-      clearInterval(this.updater)
     },
 
     methods: {
@@ -50,15 +58,13 @@ export default (context, inject) => {
           if (this.currentProvider === this.walletConnect) {
             // This method is only available for WalletConnect
             await this.walletConnect.disconnect()
-            this.wallet = null
           }
-          this.wallet = null
         }
+        context.$auth.$storage.setUniversal('provider', null)
         this.clear()
       },
 
       clear () {
-        this.clearTransaction()
         Object.assign(this.$data, this.$options.data.call(this))
       },
 
@@ -83,27 +89,6 @@ export default (context, inject) => {
         return signature
       },
 
-      /**
-       * Get Ether amount for this address
-       * @params address, look up the value for this address
-       */
-      async getNativeBalance (address) { // ETH
-        if (this.currentProvider && this.wallet) { // make sure that there is a wallet as well
-          try {
-            const response = await this.currentProvider.request({
-              method: 'eth_getBalance',
-              params: [
-                address
-              ]
-            })
-
-            if (response !== undefined) { this.bnbAvailable = web3.utils.fromWei(response.toString()) }
-          } catch (balanceError) {
-            console.error(balanceError)
-          }
-        }
-      },
-
       handleTransaction (actions) {
         this.clearTransaction()
 
@@ -125,10 +110,12 @@ export default (context, inject) => {
       },
       async onTrustWalletConnect () {
         try {
+          if (!this.metamask) { this.metamask = window.ethereum }
           this.registerProviderListener(this.metamask)
           this.wallet = await this.currentProvider.request({
             method: 'eth_requestAccounts'
           })
+          context.$auth.$storage.setUniversal('provider', 'trustwallet')
           this.checkBscFormat(this.wallet[0])
         } catch (mmError) {
           console.error(mmError)
@@ -139,10 +126,12 @@ export default (context, inject) => {
       },
       async onMetaMaskConnect () {
         try {
+          if (!this.metamask) { this.metamask = window.ethereum }
           this.registerProviderListener(this.metamask)
           this.wallet = await this.currentProvider.request({
             method: 'eth_requestAccounts'
           })
+          context.$auth.$storage.setUniversal('provider', 'metamask')
           this.checkBscFormat(this.wallet[0])
         } catch (mmError) {
           console.error(mmError)
@@ -154,11 +143,14 @@ export default (context, inject) => {
 
       async onBinanceConnect () {
         try {
-          if (!this.binance) { this.binance = window.BinanceChain }
+          if (!this.binance) {
+            this.binance = window.BinanceChain
+          }
           this.registerProviderListener(this.binance)
           this.wallet = await this.currentProvider.request({
             method: 'eth_requestAccounts'
           })
+          context.$auth.$storage.setUniversal('provider', 'bsc')
         } catch (bscError) {
           return Promise.reject(bscError)
         }
@@ -171,6 +163,7 @@ export default (context, inject) => {
 
           this.registerProviderListener(this.walletConnect)
           this.wallet = this.walletConnect.accounts
+          context.$auth.$storage.setUniversal('provider', 'walletconnect')
           this.walletConnect.updateRpcUrl(process.env.NUXT_ENV_BSC_NETWORK_ID, process.env.NUXT_ENV_BSC_RPC)
         } catch (walletConnectError) {
           return Promise.reject(walletConnectError)
@@ -183,6 +176,7 @@ export default (context, inject) => {
           // MetaMask is locked or the user has not connected any accounts
         } else if (accounts[0] !== this.wallet) {
           this.wallet = accounts[0]
+          context.$auth.$storage.setUniversal('wallet', this.wallet)
         }
       },
 
@@ -201,23 +195,23 @@ export default (context, inject) => {
           try {
             if (this.currentProvider === this.metamask) {
               // Create BSC network configuration object.
-              // const chainObject = {
-              //   chainId: process.env.NUXT_ENV_BSC_HEX_ID,
-              //   chainName: process.env.NUXT_ENV_CHAIN_NAME,
-              //   nativeCurrency: {
-              //     name: process.env.NUXT_ENV_TOKEN_NAME,
-              //     symbol: process.env.NUXT_ENV_TOKEN_SYMBOL,
-              //     decimals: 18
-              //   },
-              //   rpcUrls: [process.env.NUXT_ENV_BSC_RPC, 'https://bsc-dataseed1.binance.org'],
-              //   blockExplorerUrls: [process.env.NUXT_ENV_BLOCKEXPLORER]
-              // }
+              // Create BSC network configuration object.
+              const chainObject = {
+                chainId: process.env.NUXT_ENV_BSC_HEX_ID,
+                chainName: process.env.NUXT_ENV_CHAIN_NAME,
+                nativeCurrency: {
+                  name: process.env.NUXT_ENV_TOKEN_NAME,
+                  symbol: process.env.NUXT_ENV_TOKEN_SYMBOL,
+                  decimals: 18
+                },
+                rpcUrls: [process.env.NUXT_ENV_BSC_RPC],
+                blockExplorerUrls: [process.env.NUXT_ENV_BLOCKEXPLORER]
+              }
               // This method is only available for metamask right now.
-              // const updatedChainId = await this.currentProvider.request({
-              //   method: 'wallet_addEthereumChain',
-              //   params: [chainObject]
-              // })
-              // if (updatedChainId =! null) throw Error(`AddChainError: ${updatedChainId}`)
+              await this.currentProvider.request({
+                method: 'wallet_addEthereumChain',
+                params: [chainObject]
+              })
             } else {
               // Notify the user to change the chain they are on manually.
               alert('Please update the current chain in your wallet.')
@@ -259,6 +253,8 @@ export default (context, inject) => {
       registerProviderListener (provider) {
         // assign provider to this.currentProvider, there are differenct provider objects
         this.currentProvider = provider
+        console.log(provider)
+        // context.$auth.$storage.setUniversal('currentProvider', provider)
 
         // Change boolean of walletconnected status
         this.walletConnected = true
@@ -279,6 +275,7 @@ export default (context, inject) => {
         // Inform user of account change, only one account can be selected
         this.currentProvider.on('accountsChanged', (newWallet) => {
           this.wallet = newWallet
+          context.$auth.$storage.setUniversal('wallet', newWallet)
         })
 
         // Inform user of chain change

@@ -14,7 +14,6 @@
     "@creativebulma/bulma-badge": "^1.0.1",
     "@nuxtjs/auth": "^4.9.1",
     "@nuxtjs/axios": "^5.13.1",
-    "@nuxtjs/onesignal": "^3.0.0-beta.16",
     "@nuxtjs/pwa": "^3.3.5",
     "@walletconnect/web3-provider": "^1.4.1",
     "bulma": "^0.9.2",

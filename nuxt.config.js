@@ -30,7 +30,6 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    { src: '~/plugins/bsc.js' }
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -46,7 +45,6 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
-    '@nuxtjs/onesignal',
     '@nuxtjs/pwa',
     '@nuxtjs/auth',
     ['nuxt-twa-module', {
@@ -63,25 +61,17 @@ export default {
       distFolder: '.nuxt/dist/client'
     }]
   ],
-  oneSignal: {
-    init: {
-      appId: '5b1c7731-22c9-4113-b96b-b0168ed3e330',
-      allowLocalhostAsSecureOrigin: true,
-      welcomeNotification: {
-        disable: false
-      }
-    }
-  },
   auth: {
     strategies: {
       local: {
         endpoints: {
           login: { url: `${process.env.NUXT_ENV_AUTH_SERVER}/user/login`, method: 'post', propertyName: 'token' },
-          logout: { url: `${process.env.NUXT_ENV_AUTH_SERVER}/user/logout`, method: 'get', withCredentials: true },
           user: { url: `${process.env.NUXT_ENV_BACKEND_URL}/user`, method: 'get', propertyName: false }
         }
       }
     },
+    // localStorage: false,
+    // cookie: false,
     fullPathRedirect: true,
     redirect: {
       login: '/login',
@@ -89,7 +79,8 @@ export default {
       home: '/'
     },
     plugins: [
-      { src: '~/plugins/axios.js' }
+      { src: '~/plugins/axios.js' },
+      { src: '~/plugins/bsc.js' }
     ]
   },
 
