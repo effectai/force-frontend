@@ -1,31 +1,37 @@
 <template>
-  <div>
-    <div v-if="bscWallet">
-      <b>Selected account</b>
-      <a
-        :href="$bsc.explorer + '/address/'+ bscWallet[0]"
-        target="_blank"
-        class="blockchain-address"
-      >{{ bscWallet[0] }}</a>
-      <div class="has-text-centered">
-        <a class="button is-secondary is-wide" :disabled="!bscWallet" @click="login">
-          Login
-        </a>
+  <section class="section">
+    <div class="container">
+      <div v-if="bscWallet">
+        <b>Selected account</b>
+        <a
+          :href="$bsc.explorer + '/address/'+ bscWallet[0]"
+          target="_blank"
+          class="blockchain-address"
+        >{{ bscWallet[0] }}</a>
+        <div class="has-text-centered">
+          <a class="button is-secondary is-wide" :disabled="!bscWallet" @click="login">
+            Login
+          </a>
+        </div>
+        <div class="has-text-centered mt-2">
+          <a class="is-size-6  has-text-danger-dark" @click="$bsc.logout">switch wallet</a>
+        </div>
       </div>
-      <div class="has-text-centered mt-2">
-        <a class="is-size-6  has-text-danger-dark" @click="$bsc.logout">switch wallet</a>
+      <div v-else>
+        <button class="button is-primary" @click="$bsc.loginModal = true">
+          Connect BSC Wallet
+        </button>
       </div>
     </div>
-    <div v-else>
-      <button class="button is-primary" @click="$bsc.loginModal = true">
-        Connect BSC Wallet
-      </button>
-    </div>
-  </div>
+    {{ $route.path }}
+  </section>
 </template>
 
 <script>
 export default {
+  layout: 'login',
+  middleware: ['auth'],
+  auth: 'guest',
   data () {
     return {
       error: null
@@ -50,7 +56,7 @@ export default {
               signature
             }
         })
-        console.log(response)
+        console.log('Logged in!', response)
       } catch (error) {
         console.error('ERR', error)
         if (error.response && error.response.data) {

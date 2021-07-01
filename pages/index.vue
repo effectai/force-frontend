@@ -8,9 +8,8 @@
         <div class="subtitle">
           {{ $auth.user.address }}
         </div>
-        {{ $auth.user }}
         <br>
-        <a class="button is-danger" @click="logout">Logout</a>
+        <a class="button is-primary" @click="transaction">test transaction</a>
         <br><br>
       </div>
       <div>
@@ -46,9 +45,8 @@ export default {
     this.$store.dispatch('campaign/getCampaigns')
   },
   methods: {
-    async logout () {
-      this.$bsc.logout()
-      await this.$auth.logout()
+    transaction () {
+      this.$bsc.testTx()
     }
   }
 }

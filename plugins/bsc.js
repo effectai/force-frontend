@@ -37,22 +37,37 @@ export default (context, inject) => {
       }
     },
     created () {
-      // this.currentProvider = context.$auth.$storage.getUniversal('currentProvider')
       const provider = context.$auth.$storage.getUniversal('provider')
-      if (provider === 'metamask') {
-        this.onMetaMaskConnect()
-      } else if (provider === 'walletconnect') {
-        this.onWalletConnectWeb3()
-      } else if (provider === 'trustwallet') {
-        this.onTrustWalletConnect()
-      } else if (provider === 'bsc') {
-        this.onBinanceConnect()
+      if (provider) {
+        this.eagerLogin(provider)
       }
     },
     beforeDestroy () {
     },
 
     methods: {
+      async eagerLogin (provider) {
+        this.loginModal = true
+        try {
+          if (provider === 'metamask') {
+            await this.onMetaMaskConnect()
+          } else if (provider === 'walletconnect') {
+            await this.onWalletConnectWeb3()
+          } else if (provider === 'trustwallet') {
+            await this.onTrustWalletConnect()
+          } else if (provider === 'bsc') {
+            await this.onBinanceConnect()
+          } else {
+            this.logout()
+            context.$auth.logout()
+          }
+          this.loginModal = false
+        } catch (e) {
+          console.error(e)
+          this.logout()
+          context.$auth.logout()
+        }
+      },
       async logout () {
         if (this.currentProvider) {
           if (this.currentProvider === this.walletConnect) {
@@ -87,6 +102,19 @@ export default (context, inject) => {
           ]
         })
         return signature
+      },
+
+      testTx () {
+        const web32 = new Web3(this.currentProvider)
+        const receiver = '0x541209bd9C60cDb11A5076b785ba1BD44cd15768'
+        const sender = this.wallet[0]
+        web32.eth.sendTransaction({
+          to: receiver,
+          from: sender,
+          value: web32.utils.toWei('0.5', 'ether')
+        }
+        // eslint-disable-next-line node/handle-callback-err
+        , function (err, res) {})
       },
 
       handleTransaction (actions) {
@@ -170,16 +198,6 @@ export default (context, inject) => {
         }
       },
 
-      // Handle when the user changes their account number
-      handleAccountsChanged (accounts) {
-        if (accounts.length === 0) {
-          // MetaMask is locked or the user has not connected any accounts
-        } else if (accounts[0] !== this.wallet) {
-          this.wallet = accounts[0]
-          context.$auth.$storage.setUniversal('wallet', this.wallet)
-        }
-      },
-
       /**
        * Method to add the correct chain to the wallet of the user.
        * method `wallet_addEthereumChain` is not supported on the BinanceChain rpc provider.
@@ -253,7 +271,6 @@ export default (context, inject) => {
       registerProviderListener (provider) {
         // assign provider to this.currentProvider, there are differenct provider objects
         this.currentProvider = provider
-        console.log(provider)
         // context.$auth.$storage.setUniversal('currentProvider', provider)
 
         // Change boolean of walletconnected status
@@ -270,12 +287,23 @@ export default (context, inject) => {
         // Disconnected, requests can no longer be made with provider.
         this.currentProvider.on('disconnect', () => {
           this.walletConnected = false
+          this.logout()
+          context.$auth.logout()
         })
 
         // Inform user of account change, only one account can be selected
         this.currentProvider.on('accountsChanged', (newWallet) => {
-          this.wallet = newWallet
-          context.$auth.$storage.setUniversal('wallet', newWallet)
+          if (newWallet.length) {
+            this.wallet = newWallet
+            context.$auth.$storage.setUniversal('wallet', newWallet)
+            if (context.$auth.loggedIn && newWallet[0].toLowerCase() !== context.$auth.user.address.toLowerCase()) {
+              context.$auth.logout()
+            }
+          } else {
+            console.log('logging out..')
+            this.logout()
+            context.$auth.logout()
+          }
         })
 
         // Inform user of chain change

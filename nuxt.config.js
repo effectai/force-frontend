@@ -46,7 +46,7 @@ export default {
   modules: [
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
-    '@nuxtjs/auth',
+    '@nuxtjs/auth-next',
     ['nuxt-twa-module', {
       /* module options */
       defaultUrl: 'https://work.effectai.org',
@@ -66,10 +66,14 @@ export default {
       local: {
         endpoints: {
           login: { url: `${process.env.NUXT_ENV_AUTH_SERVER}/user/login`, method: 'post', propertyName: 'token' },
-          user: { url: `${process.env.NUXT_ENV_BACKEND_URL}/user`, method: 'get', propertyName: false }
+          user: { url: `${process.env.NUXT_ENV_BACKEND_URL}/user`, method: 'get', propertyName: '' }
+        },
+        user: {
+          property: ''
         }
       }
     },
+    watchLoggedIn: true,
     // localStorage: false,
     // cookie: false,
     fullPathRedirect: true,
@@ -96,7 +100,7 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: ['@nuxtjs/auth'],
+    transpile: ['@nuxtjs/auth-next'],
     loaders: {
       scss: {
         additionalData: "@import '~assets/scss/variables.scss';"

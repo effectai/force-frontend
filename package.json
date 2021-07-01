@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@creativebulma/bulma-badge": "^1.0.1",
-    "@nuxtjs/auth": "^4.9.1",
+    "@nuxtjs/auth-next": "^5.0.0-1624817847.21691f1",
     "@nuxtjs/axios": "^5.13.1",
     "@nuxtjs/pwa": "^3.3.5",
     "@walletconnect/web3-provider": "^1.4.1",
