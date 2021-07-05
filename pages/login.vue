@@ -57,6 +57,10 @@ export default {
             }
         })
         console.log('Logged in!', response)
+        // Needed because there is a redirect bug when going to a protected route from the login page
+        const path = this.$auth.$storage.getUniversal('redirect') || '/'
+        this.$auth.$storage.setUniversal('redirect', null)
+        this.$router.push(path)
       } catch (error) {
         console.error('ERR', error)
         if (error.response && error.response.data) {
