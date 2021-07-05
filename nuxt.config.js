@@ -80,7 +80,7 @@ export default {
     redirect: {
       login: '/login',
       logout: '/login',
-      home: '/'
+      home: false
     },
     plugins: [
       { src: '~/plugins/axios.js' },

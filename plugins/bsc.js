@@ -30,8 +30,9 @@ export default (context, inject) => {
         transaction: null,
         transactionError: null,
         metamask: window.ethereum || null,
+        metamaskConnected: false,
         binance: window.BinanceChain || null,
-        walletConnect: wcProvider || null, // connect to mobile wallet; trust, metamask, ...
+        walletConnect: wcProvider || null,
         walletConnected: null,
         explorer: process.env.NUXT_ENV_BLOCKEXPLORER
       }
@@ -68,6 +69,7 @@ export default (context, inject) => {
           context.$auth.logout()
         }
       },
+
       async logout () {
         if (this.currentProvider) {
           if (this.currentProvider === this.walletConnect) {
@@ -85,7 +87,7 @@ export default (context, inject) => {
 
       async sign (message) {
         if (this.currentProvider === this.binance) {
-          const signature = await this.currentProvider.request({
+          const signature = await this.currentProvider.call({
             method: 'eth_sign',
             params: [
               this.wallet[0],
@@ -94,7 +96,7 @@ export default (context, inject) => {
           })
           return signature
         }
-        const signature = await this.currentProvider.request({
+        const signature = await this.currentProvider.call({
           method: 'personal_sign',
           params: [
             message,
@@ -119,53 +121,50 @@ export default (context, inject) => {
 
       handleTransaction (actions) {
         this.clearTransaction()
-
-        // TODO: handle bsc transaction
       },
 
       checkBinanceInstalled () {
         return Boolean(this.binance)
       },
 
+      checkMetaMaskInstalled () {
+        return Boolean(this.metamask)
+      },
+
       checkBscFormat (bscAddress) {
-        const response = web3.utils.isAddress(bscAddress, process.NUXT_ENV_BSC_NETWORK_ID)
-        return response
+        return web3.utils.isAddress(bscAddress, process.NUXT_ENV_BSC_NETWORK_ID)
       },
 
       clearTransaction () {
         this.transaction = null
         this.transactionError = null
       },
+
       async onTrustWalletConnect () {
         try {
           if (!this.metamask) { this.metamask = window.ethereum }
           this.registerProviderListener(this.metamask)
-          this.wallet = await this.currentProvider.request({
-            method: 'eth_requestAccounts'
-          })
+          this.wallet = await this.currentProvider.eth.getAccounts()
+
           context.$auth.$storage.setUniversal('provider', 'trustwallet')
           this.checkBscFormat(this.wallet[0])
-        } catch (mmError) {
-          console.error(mmError)
-          if (mmError) {
-            return Promise.reject(mmError)
-          }
+        } catch (error) {
+          console.error(error)
+          return Promise.reject(error)
         }
       },
+
       async onMetaMaskConnect () {
         try {
           if (!this.metamask) { this.metamask = window.ethereum }
+          this.metamaskConnected = true
           this.registerProviderListener(this.metamask)
-          this.wallet = await this.currentProvider.request({
-            method: 'eth_requestAccounts'
-          })
+          this.wallet = await this.currentProvider.eth.getAccounts()
           context.$auth.$storage.setUniversal('provider', 'metamask')
           this.checkBscFormat(this.wallet[0])
-        } catch (mmError) {
-          console.error(mmError)
-          if (mmError) {
-            return Promise.reject(mmError)
-          }
+        } catch (error) {
+          console.error(error)
+          return Promise.reject(error)
         }
       },
 
@@ -175,12 +174,11 @@ export default (context, inject) => {
             this.binance = window.BinanceChain
           }
           this.registerProviderListener(this.binance)
-          this.wallet = await this.currentProvider.request({
-            method: 'eth_requestAccounts'
-          })
+          this.wallet = await this.currentProvider.eth.getAccounts()
           context.$auth.$storage.setUniversal('provider', 'bsc')
-        } catch (bscError) {
-          return Promise.reject(bscError)
+        } catch (error) {
+          console.error(error)
+          return Promise.reject(error)
         }
       },
 
@@ -193,8 +191,9 @@ export default (context, inject) => {
           this.wallet = this.walletConnect.accounts
           context.$auth.$storage.setUniversal('provider', 'walletconnect')
           this.walletConnect.updateRpcUrl(process.env.NUXT_ENV_BSC_NETWORK_ID, process.env.NUXT_ENV_BSC_RPC)
-        } catch (walletConnectError) {
-          return Promise.reject(walletConnectError)
+        } catch (error) {
+          console.error(error)
+          return Promise.reject(error)
         }
       },
 
@@ -207,12 +206,14 @@ export default (context, inject) => {
        * https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain
        */
       async addChain () {
+        console.log('Adding chain')
         const chainId = await this.getCurrentChainNetwork()
-
-        if (chainId !== process.env.NUXT_ENV_BSC_HEX_ID) {
+        if (chainId !== parseInt(process.env.NUXT_ENV_BSC_NETWORK_ID)) {
           try {
-            if (this.currentProvider === this.metamask) {
-              // Create BSC network configuration object.
+            // TODO How can we check if the currentProvider is derived from the metamask.
+            // if (this.currentProvider.currentProvider === this.metamask) {
+            if (this.metamaskConnected) {
+              console.log('isMetaMask')
               // Create BSC network configuration object.
               const chainObject = {
                 chainId: process.env.NUXT_ENV_BSC_HEX_ID,
@@ -226,13 +227,14 @@ export default (context, inject) => {
                 blockExplorerUrls: [process.env.NUXT_ENV_BLOCKEXPLORER]
               }
               // This method is only available for metamask right now.
-              await this.currentProvider.request({
+              this.currentProvider.eth.call({
                 method: 'wallet_addEthereumChain',
                 params: [chainObject]
               })
+              window.location.reload()
             } else {
               // Notify the user to change the chain they are on manually.
-              alert('Please update the current chain in your wallet.')
+              alert(`Please update the current chain in your wallet. Currenchain: ${await this.getCurrentChainNetwork()}`)
               return
             }
           } catch (addChainError) {
@@ -243,22 +245,20 @@ export default (context, inject) => {
 
       /**
        * Retrieve current network the wallet is listening to. can be testnet or mainnet of either bsc or ethereum for example.
-       * In what format does this method return the chain id?
+       * Return format is an integer
        */
       async getCurrentChainNetwork () {
         try {
-          return await this.currentProvider.request({ method: 'eth_chainId' })
+          return await this.currentProvider.eth.net.getId()
         } catch (error) {
-          console.error(error)
-          console.error('Error requesting currentChain')
+          console.error(`Error requesting currentchain, ${error}`)
         }
       },
 
       async onCorrectChain () {
         try {
           const currentChain = await this.getCurrentChainNetwork()
-          const bool = Boolean(currentChain === process.env.NUXT_ENV_BSC_HEX_ID)
-          return bool
+          return Boolean(currentChain === process.env.NUXT_ENV_BSC_NETWORK_ID)
         } catch (error) {
           console.error('Something went wrong retrieving chain.')
         }
@@ -270,7 +270,7 @@ export default (context, inject) => {
        */
       registerProviderListener (provider) {
         // assign provider to this.currentProvider, there are differenct provider objects
-        this.currentProvider = provider
+        this.currentProvider = new Web3(provider)
         // context.$auth.$storage.setUniversal('currentProvider', provider)
 
         // Change boolean of walletconnected status
@@ -280,19 +280,19 @@ export default (context, inject) => {
         // it just means that connection with provider is available and thus requests can be made to it.
 
         // Connected, requests can be made to provider.
-        this.currentProvider.on('connect', () => {
+        provider.on('connect', () => {
           this.walletConnected = true
         })
 
         // Disconnected, requests can no longer be made with provider.
-        this.currentProvider.on('disconnect', () => {
+        provider.on('disconnect', () => {
           this.walletConnected = false
           this.logout()
           context.$auth.logout()
         })
 
         // Inform user of account change, only one account can be selected
-        this.currentProvider.on('accountsChanged', (newWallet) => {
+        provider.on('accountsChanged', (newWallet) => {
           if (newWallet.length) {
             this.wallet = newWallet
             context.$auth.$storage.setUniversal('wallet', newWallet)
@@ -307,9 +307,11 @@ export default (context, inject) => {
         })
 
         // Inform user of chain change
-        this.currentProvider.on('chainChanged', (_chainId) => {
+        provider.on('chainChanged', (_chainId) => {
           if (_chainId !== process.env.NUXT_ENV_BSC_HEX_ID) {
-            alert(`Please switch to the correct chain: Binance Smart Chain, Mainnet, chainId: ${process.env.NUXT_ENV_BSC_NETWORK_ID}`)
+            alert(`Please switch to the correct chain: Binance Smart Chain, Mainnet, chainId: ${process.env.NUXT_ENV_BSC_NETWORK_ID}, currently on: ${_chainId}.`)
+            // It is recommended to reload the entire window, or to logout the user to make sure the user doesn't do any txs.
+            window.location.reload()
           }
         })
 
