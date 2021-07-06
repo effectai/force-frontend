@@ -1,15 +1,11 @@
 import Vue from 'vue'
-
-/**
- * When using the walletconnect protocol we need to make sure to use the custom requests.
- * https://docs.binance.org/walletconnect.html
- */
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
 
 const web3 = new Web3()
 web3.setProvider(process.env.NUXT_ENV_BSC_RPC)
 
+// Walletconnect config object
 const wcProvider = new WalletConnectProvider({
   chainId: process.env.NUXT_ENV_BSC_NETWORK_ID,
   rpc: {
@@ -19,6 +15,19 @@ const wcProvider = new WalletConnectProvider({
     mobileLinks: ['metamask', 'trust', 'rainbow', 'argent']
   }
 })
+
+// Used for add chain network functionality. only for metamask atm
+const chainObject = {
+  chainId: process.env.NUXT_ENV_BSC_HEX_ID,
+  chainName: process.env.NUXT_ENV_CHAIN_NAME,
+  nativeCurrency: {
+    name: process.env.NUXT_ENV_TOKEN_NAME,
+    symbol: process.env.NUXT_ENV_TOKEN_SYMBOL,
+    decimals: 18
+  },
+  rpcUrls: [process.env.NUXT_ENV_BSC_RPC],
+  blockExplorerUrls: [process.env.NUXT_ENV_BLOCKEXPLORER]
+}
 
 export default (context, inject) => {
   const bsc = new Vue({
@@ -32,6 +41,7 @@ export default (context, inject) => {
         metamask: window.ethereum || null,
         metamaskConnected: false,
         binance: window.BinanceChain || null,
+        trustWallet: window.ethereum.isTrust || null,
         walletConnect: wcProvider || null,
         walletConnected: null,
         explorer: process.env.NUXT_ENV_BLOCKEXPLORER
@@ -39,6 +49,9 @@ export default (context, inject) => {
     },
     created () {
       const provider = context.$auth.$storage.getUniversal('provider')
+      console.log(provider)
+      const w3 = new Web3(this.metamask)
+      console.log(w3.eth.givenProvider.isMetaMask)
       if (provider) {
         this.eagerLogin(provider)
       }
@@ -131,6 +144,10 @@ export default (context, inject) => {
         return Boolean(this.metamask)
       },
 
+      isTrustWalletDappBrowser () {
+        return Boolean(this.trustj)
+      },
+
       checkBscFormat (bscAddress) {
         return web3.utils.isAddress(bscAddress, process.NUXT_ENV_BSC_NETWORK_ID)
       },
@@ -199,46 +216,44 @@ export default (context, inject) => {
 
       /**
        * Method to add the correct chain to the wallet of the user.
-       * method `wallet_addEthereumChain` is not supported on the BinanceChain rpc provider.
-       * We cannot add or remove chains with the Binance Chain wallet.
-       *
-       * But it is currenlty implemented for Metamask
+       * method `wallet_addEthereumChain` is only supported for the Metamask wallet
        * https://docs.metamask.io/guide/rpc-api.html#wallet-addethereumchain
+       *
+       * Check the following links for updates
+       * https://eips.ethereum.org/EIPS/eip-3085, https://github.com/ethereum/EIPs/pull/3326
+       * When the proposal for the eips is finalized we need to update this.
        */
       async addChain () {
-        console.log('Adding chain')
         const chainId = await this.getCurrentChainNetwork()
         if (chainId !== parseInt(process.env.NUXT_ENV_BSC_NETWORK_ID)) {
-          try {
-            // TODO How can we check if the currentProvider is derived from the metamask.
-            // if (this.currentProvider.currentProvider === this.metamask) {
-            if (this.metamaskConnected) {
-              console.log('isMetaMask')
-              // Create BSC network configuration object.
-              const chainObject = {
-                chainId: process.env.NUXT_ENV_BSC_HEX_ID,
-                chainName: process.env.NUXT_ENV_CHAIN_NAME,
-                nativeCurrency: {
-                  name: process.env.NUXT_ENV_TOKEN_NAME,
-                  symbol: process.env.NUXT_ENV_TOKEN_SYMBOL,
-                  decimals: 18
-                },
-                rpcUrls: [process.env.NUXT_ENV_BSC_RPC],
-                blockExplorerUrls: [process.env.NUXT_ENV_BLOCKEXPLORER]
-              }
-              // This method is only available for metamask right now.
-              this.currentProvider.eth.call({
-                method: 'wallet_addEthereumChain',
-                params: [chainObject]
+          if (this.metamaskConnected) {
+            try {
+              await this.currentProvider.givenProvider.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: process.env.NUXT_ENV_BSC_HEX_ID }]
+              }, (error, result) => {
+                if (error) { console.error(error) }
               })
-              window.location.reload()
-            } else {
-              // Notify the user to change the chain they are on manually.
-              alert(`Please update the current chain in your wallet. Currenchain: ${await this.getCurrentChainNetwork()}`)
-              return
+            } catch (switchError) {
+              if (switchError.code === 4902) { // 4902 indicates that the chain has not been added yet.
+                try {
+                  console.log('isMetaMask')
+                  // This method is only available for metamask right now.
+                  await this.currentProvider.givenProvider.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [chainObject]
+                  }, (err, res) => {
+                    if (err) { console.error(err) }
+                  })
+                  window.location.reload()
+                } catch (addChainError) {
+                  console.error(addChainError)
+                }
+              }
             }
-          } catch (addChainError) {
-            console.error(addChainError)
+          } else {
+            // Notify the user to change the chain they are on manually.
+            alert(`Please update the current chain in your wallet. Currenchain: ${await this.getCurrentChainNetwork()}`)
           }
         }
       },
@@ -266,9 +281,10 @@ export default (context, inject) => {
 
       /**
        * Assign provider to currentProvider, and register eventlisteners.
+       * @
        *
        */
-      registerProviderListener (provider) {
+      async registerProviderListener (provider) {
         // assign provider to this.currentProvider, there are differenct provider objects
         this.currentProvider = new Web3(provider)
         // context.$auth.$storage.setUniversal('currentProvider', provider)
@@ -307,12 +323,23 @@ export default (context, inject) => {
         })
 
         // Inform user of chain change
-        provider.on('chainChanged', (_chainId) => {
+        const oldchain = await this.getCurrentChainNetwork()
+        provider.once('chainChanged', (_chainId) => {
           if (_chainId !== process.env.NUXT_ENV_BSC_HEX_ID) {
-            alert(`Please switch to the correct chain: Binance Smart Chain, Mainnet, chainId: ${process.env.NUXT_ENV_BSC_NETWORK_ID}, currently on: ${_chainId}.`)
+            alert(`Please switch to the correct chain: Binance Smart Chain, Mainnet, chainId: ${process.env.NUXT_ENV_BSC_NETWORK_ID}, currently on: ${web3.utils.hexToNumberString(_chainId)}. Logging out.`)
             // It is recommended to reload the entire window, or to logout the user to make sure the user doesn't do any txs.
-            window.location.reload()
+            this.logout()
+            context.$auth.logout() // Logout
+            // window.location.reload() // reload window aswell?
+          } else if (oldchain !== _chainId && _chainId === process.env.NUXT_ENV_BSC_HEX_ID) {
+            alert('Chain changed to the correct chain. Logging out, please log back in.')
+            this.logout()
+            context.$auth.logout()
           }
+        })
+
+        provider.on('message', (message) => {
+          console.log(message)
         })
 
         this.addChain()
