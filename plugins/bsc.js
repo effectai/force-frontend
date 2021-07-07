@@ -12,7 +12,7 @@ const wcProvider = new WalletConnectProvider({
     56: process.env.NUXT_ENV_BSC_RPC
   },
   qrcodeModalOptions: {
-    mobileLinks: ['metamask', 'trust', 'rainbow', 'argent']
+    mobileLinks: ['metamask', 'trust']
   }
 })
 
@@ -49,9 +49,6 @@ export default (context, inject) => {
     },
     created () {
       const provider = context.$auth.$storage.getUniversal('provider')
-      console.log(provider)
-      const w3 = new Web3(this.metamask)
-      console.log(w3.eth.givenProvider.isMetaMask)
       if (provider) {
         this.eagerLogin(provider)
       }
@@ -99,24 +96,33 @@ export default (context, inject) => {
       },
 
       async sign (message) {
-        if (this.currentProvider === this.binance) {
-          const signature = await this.currentProvider.call({
-            method: 'eth_sign',
-            params: [
-              this.wallet[0],
-              web3.utils.sha3(message, { encoding: 'hex' })
-            ]
+        try {
+          return await this.currentProvider.eth.personal.sign(message, this.wallet[0], (err, signature) => {
+            if (err) {
+              console.error(err)
+            } else {
+              console.log(signature)
+            }
           })
-          return signature
+        } catch (error) {
+          try {
+            return await this.currentProvider.eth.sign(message, this.wallet[0], (signError, signature) => {
+              if (signError) {
+                console.error(`
+                signError:: ${signError}
+                wallet:: ${this.wallet[0]}
+                `)
+              } else {
+                console.log(`
+                signature::: ${signature}
+                wallet:: ${this.wallet[0]}
+                `)
+              }
+            })
+          } catch (err) {
+            return Promise.reject(err || error)
+          }
         }
-        const signature = await this.currentProvider.call({
-          method: 'personal_sign',
-          params: [
-            message,
-            this.wallet[0]
-          ]
-        })
-        return signature
       },
 
       testTx () {
@@ -149,7 +155,11 @@ export default (context, inject) => {
       },
 
       checkBscFormat (bscAddress) {
-        return web3.utils.isAddress(bscAddress, process.NUXT_ENV_BSC_NETWORK_ID)
+        try {
+          return web3.utils.isAddress(bscAddress, process.NUXT_ENV_BSC_NETWORK_ID)
+        } catch (error) {
+          console.error(error)
+        }
       },
 
       clearTransaction () {
@@ -160,11 +170,9 @@ export default (context, inject) => {
       async onTrustWalletConnect () {
         try {
           if (!this.metamask) { this.metamask = window.ethereum }
-          this.registerProviderListener(this.metamask)
-          this.wallet = await this.currentProvider.eth.getAccounts()
-
+          await this.registerProvider(this.metamask)
           context.$auth.$storage.setUniversal('provider', 'trustwallet')
-          this.checkBscFormat(this.wallet[0])
+          // this.checkBscFormat(this.wallet[0])
         } catch (error) {
           console.error(error)
           return Promise.reject(error)
@@ -175,10 +183,8 @@ export default (context, inject) => {
         try {
           if (!this.metamask) { this.metamask = window.ethereum }
           this.metamaskConnected = true
-          this.registerProviderListener(this.metamask)
-          this.wallet = await this.currentProvider.eth.getAccounts()
+          await this.registerProvider(this.metamask)
           context.$auth.$storage.setUniversal('provider', 'metamask')
-          this.checkBscFormat(this.wallet[0])
         } catch (error) {
           console.error(error)
           return Promise.reject(error)
@@ -190,8 +196,7 @@ export default (context, inject) => {
           if (!this.binance) {
             this.binance = window.BinanceChain
           }
-          this.registerProviderListener(this.binance)
-          this.wallet = await this.currentProvider.eth.getAccounts()
+          await this.registerProvider(this.binance)
           context.$auth.$storage.setUniversal('provider', 'bsc')
         } catch (error) {
           console.error(error)
@@ -201,11 +206,8 @@ export default (context, inject) => {
 
       async onWalletConnectWeb3 () {
         try {
-          // Launches QR-Code Modal
-          await this.walletConnect.enable()
-
-          this.registerProviderListener(this.walletConnect)
-          this.wallet = this.walletConnect.accounts
+          await this.registerProvider(this.walletConnect)
+          // this.wallet = this.walletConnect.accounts
           context.$auth.$storage.setUniversal('provider', 'walletconnect')
           this.walletConnect.updateRpcUrl(process.env.NUXT_ENV_BSC_NETWORK_ID, process.env.NUXT_ENV_BSC_RPC)
         } catch (error) {
@@ -234,6 +236,7 @@ export default (context, inject) => {
               }, (error, result) => {
                 if (error) { console.error(error) }
               })
+              window.location.reload()
             } catch (switchError) {
               if (switchError.code === 4902) { // 4902 indicates that the chain has not been added yet.
                 try {
@@ -267,6 +270,15 @@ export default (context, inject) => {
           return await this.currentProvider.eth.net.getId()
         } catch (error) {
           console.error(`Error requesting currentchain, ${error}`)
+          return Promise.reject(error)
+        }
+      },
+
+      async getChainId () {
+        try {
+          return await this.currentProvider.eth.getChainId()
+        } catch (error) {
+          console.error(error)
         }
       },
 
@@ -276,6 +288,7 @@ export default (context, inject) => {
           return Boolean(currentChain === process.env.NUXT_ENV_BSC_NETWORK_ID)
         } catch (error) {
           console.error('Something went wrong retrieving chain.')
+          return Promise.reject(error)
         }
       },
 
@@ -284,13 +297,25 @@ export default (context, inject) => {
        * @
        *
        */
-      async registerProviderListener (provider) {
+      async registerProvider (provider) {
         // assign provider to this.currentProvider, there are differenct provider objects
         this.currentProvider = new Web3(provider)
         // context.$auth.$storage.setUniversal('currentProvider', provider)
 
+        await provider.enable()
+
+        try {
+          this.wallet = await this.currentProvider.eth.requestAccounts()
+        } catch (error) {
+          this.wallet = await this.currentProvider.eth.personal.getAccounts()
+        }
+        console.table(this.wallet)
+
+        // Does it have to be the first one in this list?
+        // this.checkBscFormat(this.wallet[0])
+
         // Change boolean of walletconnected status
-        this.walletConnected = true
+        // this.walletConnected = true
 
         // Connection status does not refer to connection with wallet
         // it just means that connection with provider is available and thus requests can be made to it.
@@ -324,7 +349,7 @@ export default (context, inject) => {
 
         // Inform user of chain change
         const oldchain = await this.getCurrentChainNetwork()
-        provider.once('chainChanged', (_chainId) => {
+        provider.on('chainChanged', (_chainId) => {
           if (_chainId !== process.env.NUXT_ENV_BSC_HEX_ID) {
             alert(`Please switch to the correct chain: Binance Smart Chain, Mainnet, chainId: ${process.env.NUXT_ENV_BSC_NETWORK_ID}, currently on: ${web3.utils.hexToNumberString(_chainId)}. Logging out.`)
             // It is recommended to reload the entire window, or to logout the user to make sure the user doesn't do any txs.
