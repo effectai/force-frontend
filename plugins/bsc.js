@@ -13,7 +13,8 @@ const wcProvider = new WalletConnectProvider({
   },
   qrcodeModalOptions: {
     mobileLinks: ['metamask', 'trust']
-  }
+  },
+  bridge: 'https://cryptono.de'
 })
 
 // Used for add chain network functionality. only for metamask atm
@@ -97,30 +98,25 @@ export default (context, inject) => {
 
       async sign (message) {
         try {
-          return await this.currentProvider.eth.personal.sign(message, this.wallet[0], (err, signature) => {
-            if (err) {
-              console.error(err)
-            } else {
-              console.log(signature)
-            }
-          })
+          alert('Signing, eth.personal.sign')
+          return await this.currentProvider.eth.personal.sign(message, this.wallet[0])
         } catch (error) {
           try {
-            return await this.currentProvider.eth.sign(message, this.wallet[0], (signError, signature) => {
-              if (signError) {
-                console.error(`
-                signError:: ${signError}
-                wallet:: ${this.wallet[0]}
-                `)
-              } else {
-                console.log(`
-                signature::: ${signature}
-                wallet:: ${this.wallet[0]}
-                `)
-              }
-            })
+            alert('Signing, eth.sign')
+            return await this.currentProvider.eth.sign(message, this.wallet[0])
           } catch (err) {
-            return Promise.reject(err || error)
+            try {
+              alert('Signing, binance.request')
+              return await this.binance.request({
+                method: 'eth_sign',
+                params: [
+                  this.wallet[0],
+                  web3.utils.sha3(message, { encoding: 'hex' })
+                ]
+              })
+            } catch (requestError) {
+              return Promise.reject(error || err || requestError)
+            }
           }
         }
       },
@@ -298,6 +294,8 @@ export default (context, inject) => {
        *
        */
       async registerProvider (provider) {
+        console.log('provider', provider)
+
         // assign provider to this.currentProvider, there are differenct provider objects
         this.currentProvider = new Web3(provider)
         // context.$auth.$storage.setUniversal('currentProvider', provider)
@@ -305,11 +303,26 @@ export default (context, inject) => {
         await provider.enable()
 
         try {
-          this.wallet = await this.currentProvider.eth.requestAccounts()
+          this.wallet = await this.currentProvider.eth.getAccounts()
+          console.log(`eth.getAccounts: ${this.wallet}`)
         } catch (error) {
-          this.wallet = await this.currentProvider.eth.personal.getAccounts()
+          try {
+            this.wallet = await this.currentProvider.eth.requestAccounts()
+            console.log(`eth.requestAccounts: ${this.wallet}`)
+            console.error(error)
+          } catch (accountError) {
+            try {
+              this.wallet = await this.currentProvider.eth.personal.getAccounts()
+              console.log(`eth.personal.getAccounts: ${this.wallet}`)
+              console.error(accountError)
+            } catch (requestAccountError) {
+              console.error(requestAccountError)
+            }
+          }
         }
+
         console.table(this.wallet)
+        console.log(this.currentProvider)
 
         // Does it have to be the first one in this list?
         // this.checkBscFormat(this.wallet[0])
