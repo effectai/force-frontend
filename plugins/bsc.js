@@ -5,18 +5,6 @@ import Web3 from 'web3'
 const web3 = new Web3()
 web3.setProvider(process.env.NUXT_ENV_BSC_RPC)
 
-// Walletconnect config object
-const wcProvider = new WalletConnectProvider({
-  chainId: process.env.NUXT_ENV_BSC_NETWORK_ID,
-  rpc: {
-    56: process.env.NUXT_ENV_BSC_RPC
-  },
-  qrcodeModalOptions: {
-    mobileLinks: ['metamask', 'trust']
-  },
-  bridge: 'https://cryptono.de'
-})
-
 // Used for add chain network functionality. only for metamask atm
 const chainObject = {
   chainId: process.env.NUXT_ENV_BSC_HEX_ID,
@@ -35,6 +23,7 @@ export default (context, inject) => {
     data () {
       return {
         currentProvider: null,
+        web3: null,
         wallet: null,
         loginModal: false,
         transaction: null,
@@ -43,7 +32,7 @@ export default (context, inject) => {
         metamaskConnected: false,
         binance: window.BinanceChain || null,
         trustWallet: window.ethereum.isTrust || null,
-        walletConnect: wcProvider || null,
+        walletConnect: null,
         walletConnected: null,
         explorer: process.env.NUXT_ENV_BLOCKEXPLORER
       }
@@ -51,7 +40,7 @@ export default (context, inject) => {
     created () {
       const provider = context.$auth.$storage.getUniversal('provider')
       if (provider) {
-        this.eagerLogin(provider)
+        // this.eagerLogin(provider)
       }
     },
     beforeDestroy () {
@@ -93,31 +82,33 @@ export default (context, inject) => {
       },
 
       clear () {
+        this.wallet = null
         Object.assign(this.$data, this.$options.data.call(this))
       },
 
       async sign (message) {
+        // BSC-Extensions only support 'eth_sign'
+        // https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#binancechain-request-method-eth_sign-params-address-message
+        this.web3.extend({
+          property: 'bsc',
+          methods: [{
+            name: 'sign',
+            call: 'eth_sign',
+            params: 2
+          }]
+        })
+
+        console.log(message, this.wallet[0], this.web3.eth.accounts.wallet)
+
         try {
-          alert('Signing, eth.personal.sign')
-          return await this.currentProvider.eth.personal.sign(message, this.wallet[0])
-        } catch (error) {
-          try {
-            alert('Signing, eth.sign')
-            return await this.currentProvider.eth.sign(message, this.wallet[0])
-          } catch (err) {
-            try {
-              alert('Signing, binance.request')
-              return await this.binance.request({
-                method: 'eth_sign',
-                params: [
-                  this.wallet[0],
-                  web3.utils.sha3(message, { encoding: 'hex' })
-                ]
-              })
-            } catch (requestError) {
-              return Promise.reject(error || err || requestError)
-            }
+          if (this.currentProvider === this.binance) {
+            return await this.web3.bsc.sign(this.wallet[0], message)
+          } else {
+            return await this.web3.eth.personal.sign(message, this.wallet[0])
           }
+        } catch (error) {
+          console.error(error)
+          return Promise.reject(error)
         }
       },
 
@@ -201,8 +192,21 @@ export default (context, inject) => {
       },
 
       async onWalletConnectWeb3 () {
+        const wcProvider = new WalletConnectProvider({
+          chainId: process.env.NUXT_ENV_BSC_NETWORK_ID,
+          rpc: {
+            56: process.env.NUXT_ENV_BSC_RPC
+          },
+          qrcodeModalOptions: {
+            mobileLinks: ['metamask', 'trust']
+          },
+          bridge: 'https://cryptono.de'
+        })
+
+        this.walletConnect = wcProvider
+
         try {
-          await this.registerProvider(this.walletConnect)
+          await this.registerProvider(wcProvider)
           // this.wallet = this.walletConnect.accounts
           context.$auth.$storage.setUniversal('provider', 'walletconnect')
           this.walletConnect.updateRpcUrl(process.env.NUXT_ENV_BSC_NETWORK_ID, process.env.NUXT_ENV_BSC_RPC)
@@ -224,9 +228,9 @@ export default (context, inject) => {
       async addChain () {
         const chainId = await this.getCurrentChainNetwork()
         if (chainId !== parseInt(process.env.NUXT_ENV_BSC_NETWORK_ID)) {
-          if (this.metamaskConnected) {
+          if (this.currentProvider === this.metamask) {
             try {
-              await this.currentProvider.givenProvider.request({
+              await this.web3.givenProvider.request({
                 method: 'wallet_switchEthereumChain',
                 params: [{ chainId: process.env.NUXT_ENV_BSC_HEX_ID }]
               }, (error, result) => {
@@ -238,7 +242,7 @@ export default (context, inject) => {
                 try {
                   console.log('isMetaMask')
                   // This method is only available for metamask right now.
-                  await this.currentProvider.givenProvider.request({
+                  await this.web3.givenProvider.request({
                     method: 'wallet_addEthereumChain',
                     params: [chainObject]
                   }, (err, res) => {
@@ -258,21 +262,35 @@ export default (context, inject) => {
       },
 
       /**
-       * Retrieve current network the wallet is listening to. can be testnet or mainnet of either bsc or ethereum for example.
-       * Return format is an integer
+       * Return the network
+       * @returns the network web3 is connected to as an integer
        */
       async getCurrentChainNetwork () {
         try {
-          return await this.currentProvider.eth.net.getId()
+          if (this.walletProvider === this.binance) {
+            return await this.binance.chainId()
+          } else {
+            return await this.web3.eth.net.getId()
+          }
         } catch (error) {
           console.error(`Error requesting currentchain, ${error}`)
           return Promise.reject(error)
         }
       },
 
+      /**
+       * Returns chainID in the hex format as a string (0x38)
+       * Binance is beign fussy again with how it incorporates with web3
+       * https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#chain-ids
+       * @returns
+       */
       async getChainId () {
         try {
-          return await this.currentProvider.eth.getChainId()
+          if (this.walletProvider === this.binance) {
+            return await this.binance.chainId()
+          } else {
+            return await this.web3.eth.getChainId()
+          }
         } catch (error) {
           console.error(error)
         }
@@ -288,51 +306,7 @@ export default (context, inject) => {
         }
       },
 
-      /**
-       * Assign provider to currentProvider, and register eventlisteners.
-       * @
-       *
-       */
-      async registerProvider (provider) {
-        console.log('provider', provider)
-
-        // assign provider to this.currentProvider, there are differenct provider objects
-        this.currentProvider = new Web3(provider)
-        // context.$auth.$storage.setUniversal('currentProvider', provider)
-
-        await provider.enable()
-
-        try {
-          this.wallet = await this.currentProvider.eth.getAccounts()
-          console.log(`eth.getAccounts: ${this.wallet}`)
-        } catch (error) {
-          try {
-            this.wallet = await this.currentProvider.eth.requestAccounts()
-            console.log(`eth.requestAccounts: ${this.wallet}`)
-            console.error(error)
-          } catch (accountError) {
-            try {
-              this.wallet = await this.currentProvider.eth.personal.getAccounts()
-              console.log(`eth.personal.getAccounts: ${this.wallet}`)
-              console.error(accountError)
-            } catch (requestAccountError) {
-              console.error(requestAccountError)
-            }
-          }
-        }
-
-        console.table(this.wallet)
-        console.log(this.currentProvider)
-
-        // Does it have to be the first one in this list?
-        // this.checkBscFormat(this.wallet[0])
-
-        // Change boolean of walletconnected status
-        // this.walletConnected = true
-
-        // Connection status does not refer to connection with wallet
-        // it just means that connection with provider is available and thus requests can be made to it.
-
+      async registerListener (provider) {
         // Connected, requests can be made to provider.
         provider.on('connect', () => {
           this.walletConnected = true
@@ -379,8 +353,47 @@ export default (context, inject) => {
         provider.on('message', (message) => {
           console.log(message)
         })
+      },
 
+      async getAccounts (w3, provider) {
+        // try {
+        //   if (provider === this.binance) {
+        //     w3.
+        //   } else {
+        //     return await w3.eth
+        //   }
+        // } catch (error) {
+
+        // }
+      },
+
+      /**
+       * Assign provider to currentProvider, instantiate web3, and register eventlisteners.
+       */
+      async registerProvider (provider) {
+        this.currentProvider = provider
+        this.wallet = null
+
+        this.web3 = new Web3(provider)
+        // context.$auth.$storage.setUniversal('web3', provider)
+
+        // Enable provider to instantiate connection with wallet
+        await this.currentProvider.enable()
+
+        try {
+          if (this.currentProvider === this.binance || this.currentProvider === this.walletConnect) {
+            this.wallet = await this.web3.eth.getAccounts()
+          } else {
+            this.wallet = await this.web3.eth.requestAccounts()
+          }
+        } catch (error) {
+          console.error(error)
+          return Promise.reject(error)
+        }
+
+        this.checkBscFormat(this.wallet[0])
         this.addChain()
+        this.registerListener(provider)
       }
     }
   })
