@@ -87,28 +87,32 @@ export default (context, inject) => {
       },
 
       async sign (message) {
-        // BSC-Extensions only support 'eth_sign'
-        // https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#binancechain-request-method-eth_sign-params-address-message
-        this.web3.extend({
-          property: 'bsc',
-          methods: [{
-            name: 'sign',
-            call: 'eth_sign',
-            params: 2
-          }]
-        })
+        // console.debug(`onCorrectChain:: ${await this.onCorrectChain()}`)
+        if (await this.onCorrectChain()) {
+          // BSC-Extensions only support 'eth_sign'
+          // https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#binancechain-request-method-eth_sign-params-address-message
+          this.web3.extend({
+            property: 'bsc',
+            methods: [{
+              name: 'sign',
+              call: 'eth_sign',
+              params: 2
+            }]
+          })
 
-        console.log(message, this.wallet[0], this.web3.eth.accounts.wallet)
-
-        try {
-          if (this.currentProvider === this.binance) {
-            return await this.web3.bsc.sign(this.wallet[0], message)
-          } else {
-            return await this.web3.eth.personal.sign(message, this.wallet[0])
+          try {
+            if (this.currentProvider === this.binance) {
+              return await this.web3.bsc.sign(this.wallet[0], message)
+            } else {
+              return await this.web3.eth.personal.sign(message, this.wallet[0])
+            }
+          } catch (error) {
+            console.error(error)
+            return Promise.reject(error)
           }
-        } catch (error) {
-          console.error(error)
-          return Promise.reject(error)
+        } else {
+          alert(`Please switch to the correct chain in your wallet:\n${process.env.NUXT_ENV_CHAIN_NAME}, ${process.env.NUXT_ENV_NETWORK_TYPE}, ${process.env.NUXT_ENV_BSC_NETWORK_ID}`)
+          return Promise.reject(new Error('Invalid chain'))
         }
       },
 
@@ -200,7 +204,7 @@ export default (context, inject) => {
           qrcodeModalOptions: {
             mobileLinks: ['metamask', 'trust']
           },
-          bridge: 'https://cryptono.de'
+          bridge: process.env.NUXT_ENV_BRIDGE
         })
 
         this.walletConnect = wcProvider
@@ -256,7 +260,7 @@ export default (context, inject) => {
             }
           } else {
             // Notify the user to change the chain they are on manually.
-            alert(`Please update the current chain in your wallet. Currenchain: ${await this.getCurrentChainNetwork()}`)
+            alert(`Please update the current chain in your wallet. Current-chain: ${await this.getCurrentChainNetwork()}`)
           }
         }
       },
@@ -267,39 +271,18 @@ export default (context, inject) => {
        */
       async getCurrentChainNetwork () {
         try {
-          if (this.walletProvider === this.binance) {
-            return await this.binance.chainId()
-          } else {
-            return await this.web3.eth.net.getId()
-          }
+          return await this.web3.eth.getChainId()
         } catch (error) {
           console.error(`Error requesting currentchain, ${error}`)
           return Promise.reject(error)
         }
       },
 
-      /**
-       * Returns chainID in the hex format as a string (0x38)
-       * Binance is beign fussy again with how it incorporates with web3
-       * https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#chain-ids
-       * @returns
-       */
-      async getChainId () {
-        try {
-          if (this.walletProvider === this.binance) {
-            return await this.binance.chainId()
-          } else {
-            return await this.web3.eth.getChainId()
-          }
-        } catch (error) {
-          console.error(error)
-        }
-      },
-
       async onCorrectChain () {
         try {
           const currentChain = await this.getCurrentChainNetwork()
-          return Boolean(currentChain === process.env.NUXT_ENV_BSC_NETWORK_ID)
+          // console.debug(`currentChain:: ${currentChain}, isHex:: ${this.web3.utils.isHex(currentChain)}`)
+          return Boolean(currentChain === parseInt(process.env.NUXT_ENV_BSC_NETWORK_ID) && this.web3.utils.isHex(currentChain))
         } catch (error) {
           console.error('Something went wrong retrieving chain.')
           return Promise.reject(error)
@@ -328,17 +311,25 @@ export default (context, inject) => {
               context.$auth.logout()
             }
           } else {
-            console.log('logging out..')
+            // console.log('logging out..')
             this.logout()
             context.$auth.logout()
           }
         })
 
         // Inform user of chain change
-        const oldchain = await this.getCurrentChainNetwork()
+        const oldchain = this.web3.utils.toHex(await this.getCurrentChainNetwork())
         provider.on('chainChanged', (_chainId) => {
-          if (_chainId !== process.env.NUXT_ENV_BSC_HEX_ID) {
-            alert(`Please switch to the correct chain: Binance Smart Chain, Mainnet, chainId: ${process.env.NUXT_ENV_BSC_NETWORK_ID}, currently on: ${web3.utils.hexToNumberString(_chainId)}. Logging out.`)
+          // console.log(`
+          //   oldchaind: ${oldchain}
+          //   _chainid: ${_chainId}
+          //   Nuxt env bsc hex id: ${process.env.NUXT_ENV_BSC_HEX_ID}
+          // `)
+          if (!this.web3.utils.isHex(oldchain)) {
+            alert('This chain is not supported, logging out.')
+            this.logout()
+          } else if (_chainId !== process.env.NUXT_ENV_BSC_HEX_ID) {
+            alert(`Please switch to the correct chain:\n${process.env.NUXT_ENV_CHAIN_NAME}, Mainnet, chainId: ${process.env.NUXT_ENV_BSC_NETWORK_ID}\n\nCurrently on: ${web3.utils.hexToNumberString(_chainId)}\n\nLogging out.`)
             // It is recommended to reload the entire window, or to logout the user to make sure the user doesn't do any txs.
             this.logout()
             context.$auth.logout() // Logout
@@ -356,15 +347,6 @@ export default (context, inject) => {
       },
 
       async getAccounts (w3, provider) {
-        // try {
-        //   if (provider === this.binance) {
-        //     w3.
-        //   } else {
-        //     return await w3.eth
-        //   }
-        // } catch (error) {
-
-        // }
       },
 
       /**
@@ -373,9 +355,12 @@ export default (context, inject) => {
       async registerProvider (provider) {
         this.currentProvider = provider
         this.wallet = null
-
         this.web3 = new Web3(provider)
         // context.$auth.$storage.setUniversal('web3', provider)
+
+        if (!this.onCorrectChain()) {
+          return Promise.reject(new Error('Wrong chain'))
+        }
 
         // Enable provider to instantiate connection with wallet
         await this.currentProvider.enable()
