@@ -62,13 +62,6 @@ export default {
       return this.$eos.providers
     }
   },
-  created () {
-    const provider = this.$auth.$storage.getUniversal('provider')
-    if (provider) {
-      this.$eos.loginModal = true
-      this.selectWallet(provider)
-    }
-  },
   methods: {
     async selectWallet (index) {
       this.loading = true

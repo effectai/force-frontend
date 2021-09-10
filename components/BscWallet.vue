@@ -88,13 +88,13 @@ export default {
       return Boolean(this.$bsc.binance != null)
     }
   },
-  created () {
-    const provider = this.$auth.$storage.getUniversal('provider')
-    if (provider) {
-      this.$bsc.loginModal = true
-      this.selectWallet(provider)
-    }
-  },
+  // created () {
+  //   const provider = this.$auth.$storage.getUniversal('provider')
+  //   if (provider) {
+  //     this.$bsc.loginModal = true
+  //     this.selectWallet(provider)
+  //   }
+  // },
   methods: {
     async selectWallet (provider) {
       this.loading = true

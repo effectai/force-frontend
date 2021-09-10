@@ -5,10 +5,7 @@
         <h4 class="title">
           Welcome
         </h4>
-        <div class="subtitle">
-          {{ $auth.user.address }}
-        </div>
-        {{ $auth.user }}
+        {{ $auth.user.blockchain }}
         <br>
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
@@ -24,10 +21,12 @@ export default {
   computed: {
   },
   created () {
+    console.log('user', this.$auth.user)
   },
   methods: {
     async logout () {
-      this.$bsc.logout()
+      await this.$eos.logout()
+      await this.$bsc.logout()
       await this.$auth.logout()
     }
   }

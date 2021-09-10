@@ -67,31 +67,43 @@ export default {
   methods: {
     async login () {
       try {
-        let address
-        let blockchainPlugin
-        if (this.bscWallet) {
-          address = this.bscWallet[0]
-          blockchainPlugin = this.$bsc
-        } else if (this.eosWallet) {
-          address = this.eosWallet.auth.accountName
-          blockchainPlugin = this.$eos
-        }
-        const response1 = await this.$axios.get(`${process.env.NUXT_ENV_BACKEND_URL}/user/login/${address}`)
-        const nonce = response1.data
-        const signature = await blockchainPlugin.sign(nonce)
-        const response = await this.$auth.loginWith('local', {
-          data:
-            {
-              address,
-              nonce,
-              signature
-            }
+        await this.$auth.loginWith('blockchain', {
+          account: {
+            eos:
+            this.eosWallet ? this.eosWallet.auth : null,
+            bsc:
+              this.bscWallet ? this.bscWallet[0] : null
+          }
         })
-        console.log('Logged in!', response)
         // Needed because there is a redirect bug when going to a protected route from the login page
         const path = this.$auth.$storage.getUniversal('redirect') || '/'
         this.$auth.$storage.setUniversal('redirect', null)
         this.$router.push(path)
+        // let address
+        // let blockchainPlugin
+        // if (this.bscWallet) {
+        //   address = this.bscWallet[0]
+        //   blockchainPlugin = this.$bsc
+        // } else if (this.eosWallet) {
+        //   address = this.eosWallet.auth.accountName
+        //   blockchainPlugin = this.$eos
+        // }
+        // const response1 = await this.$axios.get(`${process.env.NUXT_ENV_BACKEND_URL}/user/login/${address}`)
+        // const nonce = response1.data
+        // const signature = await blockchainPlugin.sign(nonce)
+        // const response = await this.$auth.loginWith('local', {
+        //   data:
+        //     {
+        //       address,
+        //       nonce,
+        //       signature
+        //     }
+        // })
+        // console.log('Logged in!', response)
+        // // Needed because there is a redirect bug when going to a protected route from the login page
+        // const path = this.$auth.$storage.getUniversal('redirect') || '/'
+        // this.$auth.$storage.setUniversal('redirect', null)
+        // this.$router.push(path)
       } catch (error) {
         console.error('ERR', error)
         if (error.response && error.response.data) {

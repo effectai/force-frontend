@@ -63,6 +63,9 @@ export default {
   ],
   auth: {
     strategies: {
+      blockchain: {
+        scheme: '~/schemes/blockchain'
+      },
       local: {
         endpoints: {
           login: { url: `${process.env.NUXT_ENV_BACKEND_URL}/user/login`, method: 'post', propertyName: 'token' },
@@ -110,7 +113,7 @@ export default {
   },
 
   server: {
-    host: "0.0.0.0",
+    host: '0.0.0.0',
     port: 3000
   }
 }

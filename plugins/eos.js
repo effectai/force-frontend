@@ -17,7 +17,7 @@ const accessContext = initAccessContext({
   },
   walletProviders: [
     scatter(),
-    anchor(appName, { verifyProofs: false }),
+    anchor(appName, { verifyProofs: true }),
     tp(),
     lynx()
   ]
@@ -44,22 +44,30 @@ export default (context, inject) => {
       }
     },
     created () {
+      const accountInfo = context.$auth.$storage.getUniversal('accountInfo')
+      if (accountInfo) {
+        this.login(accountInfo.provider, accountInfo.auth.accountName, accountInfo.auth.permission)
+      }
     },
     beforeDestroy () {
     },
 
     methods: {
-      async login (provider) {
+      async login (provider, accountName, permission) {
         const providers = accessContext.getWalletProviders()
         const selectedProvider = providers.find(r => r.id === provider)
-        const wallet = accessContext.initWallet(selectedProvider)
-        await wallet.connect()
-        await wallet.login()
-        console.log('login', wallet.auth)
-
-        this.wallet = wallet
-        context.$auth.$storage.setUniversal('provider', provider)
-        this.updateAccount()
+        if (selectedProvider) {
+          const wallet = accessContext.initWallet(selectedProvider)
+          await wallet.connect()
+          await wallet.login(accountName, permission)
+          context.$auth.$storage.setUniversal('accountInfo', JSON.stringify({
+            loggedIn: true,
+            provider,
+            auth: { accountName: wallet.auth.accountName, permission: wallet.auth.permission }
+          }))
+          this.wallet = wallet
+          this.updateAccount()
+        }
       },
 
       async sign (message) {
@@ -92,7 +100,7 @@ export default (context, inject) => {
         if (this.wallet) {
           await this.wallet.logout()
         }
-        context.$auth.$storage.setUniversal('provider', null)
+        context.$auth.$storage.setUniversal('accountInfo', null)
         this.clear()
       },
       updateAccount () {
