@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <bsc-wallet />
+    <eos-wallet />
     <div class="container">
       <div class="columns is-gapless is-vcentered is-multiline is-centered" style="min-height: 100vh">
         <div class="column is-5">
@@ -21,10 +22,12 @@
 
 <script>
 import BscWallet from '@/components/BscWallet'
+import EosWallet from '@/components/EosWallet'
 
 export default {
   components: {
-    BscWallet
+    BscWallet,
+    EosWallet
   }
 }
 </script>

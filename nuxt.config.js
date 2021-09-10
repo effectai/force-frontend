@@ -65,7 +65,7 @@ export default {
     strategies: {
       local: {
         endpoints: {
-          login: { url: `${process.env.NUXT_ENV_AUTH_SERVER}/user/login`, method: 'post', propertyName: 'token' },
+          login: { url: `${process.env.NUXT_ENV_BACKEND_URL}/user/login`, method: 'post', propertyName: 'token' },
           user: { url: `${process.env.NUXT_ENV_BACKEND_URL}/user`, method: 'get', propertyName: '' }
         },
         user: {
@@ -84,7 +84,8 @@ export default {
     },
     plugins: [
       { src: '~/plugins/axios.js' },
-      { src: '~/plugins/bsc.js' }
+      { src: '~/plugins/bsc.js' },
+      { src: '~/plugins/eos.js' }
     ]
   },
 

@@ -34,42 +34,16 @@ export default (context, inject) => {
         trustWallet: window.ethereum.isTrust || null,
         walletConnect: null,
         walletConnected: null,
-        explorer: process.env.NUXT_ENV_BLOCKEXPLORER
+        explorer: process.env.NUXT_ENV_BSC_EXPLORER_URL
       }
     },
     created () {
-      const provider = context.$auth.$storage.getUniversal('provider')
-      if (provider) {
-        // this.eagerLogin(provider)
-      }
+
     },
     beforeDestroy () {
     },
 
     methods: {
-      async eagerLogin (provider) {
-        this.loginModal = true
-        try {
-          if (provider === 'metamask') {
-            await this.onMetaMaskConnect()
-          } else if (provider === 'walletconnect') {
-            await this.onWalletConnectWeb3()
-          } else if (provider === 'trustwallet') {
-            await this.onTrustWalletConnect()
-          } else if (provider === 'bsc') {
-            await this.onBinanceConnect()
-          } else {
-            this.logout()
-            context.$auth.logout()
-          }
-          this.loginModal = false
-        } catch (e) {
-          console.error(e)
-          this.logout()
-          context.$auth.logout()
-        }
-      },
-
       async logout () {
         if (this.currentProvider) {
           if (this.currentProvider === this.walletConnect) {

@@ -17,13 +17,32 @@
           <a class="is-size-6  has-text-danger-dark" @click="$bsc.logout">switch wallet</a>
         </div>
       </div>
+      <div v-else-if="eosWallet">
+        <b>Selected account</b>
+        <a
+          :href="$eos.explorer + '/address/'+ eosWallet.auth.accountName"
+          target="_blank"
+          class="blockchain-address"
+        >{{ eosWallet.auth.accountName }}</a>
+        <div class="has-text-centered">
+          <a class="button is-secondary is-wide" :disabled="!eosWallet" @click="login">
+            Login
+          </a>
+        </div>
+        <div class="has-text-centered mt-2">
+          <a class="is-size-6  has-text-danger-dark" @click="$eos.logout">switch wallet</a>
+        </div>
+      </div>
       <div v-else>
         <button class="button is-primary" @click="$bsc.loginModal = true">
           Connect BSC Wallet
         </button>
+
+        <button class="button is-primary" @click="$eos.loginModal = true">
+          Connect EOS Wallet
+        </button>
       </div>
     </div>
-    {{ $route.path }}
   </section>
 </template>
 
@@ -40,18 +59,30 @@ export default {
   computed: {
     bscWallet () {
       return (this.$bsc) ? this.$bsc.wallet : null
+    },
+    eosWallet () {
+      return (this.$eos) ? this.$eos.wallet : null
     }
   },
   methods: {
     async login () {
       try {
-        const response1 = await this.$axios.get(`${process.env.NUXT_ENV_AUTH_SERVER}/user/login/${this.bscWallet[0]}`)
+        let address
+        let blockchainPlugin
+        if (this.bscWallet) {
+          address = this.bscWallet[0]
+          blockchainPlugin = this.$bsc
+        } else if (this.eosWallet) {
+          address = this.eosWallet.auth.accountName
+          blockchainPlugin = this.$eos
+        }
+        const response1 = await this.$axios.get(`${process.env.NUXT_ENV_BACKEND_URL}/user/login/${address}`)
         const nonce = response1.data
-        const signature = await this.$bsc.sign(nonce)
+        const signature = await blockchainPlugin.sign(nonce)
         const response = await this.$auth.loginWith('local', {
           data:
             {
-              address: this.bscWallet[0],
+              address,
               nonce,
               signature
             }

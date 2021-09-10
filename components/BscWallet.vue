@@ -88,6 +88,13 @@ export default {
       return Boolean(this.$bsc.binance != null)
     }
   },
+  created () {
+    const provider = this.$auth.$storage.getUniversal('provider')
+    if (provider) {
+      this.$bsc.loginModal = true
+      this.selectWallet(provider)
+    }
+  },
   methods: {
     async selectWallet (provider) {
       this.loading = true
@@ -104,9 +111,6 @@ export default {
             break
           case 'walletconnect':
             await this.$bsc.onWalletConnectWeb3()
-            break
-          case 'trust':
-            alert('Trust wallet coming soon')
             break
         }
         this.$bsc.loginModal = false
