@@ -106,5 +106,10 @@ export default {
         additionalData: "@import '~assets/scss/variables.scss';"
       }
     }
+  },
+
+  server: {
+    host: "0.0.0.0",
+    port: 3000
   }
 }
