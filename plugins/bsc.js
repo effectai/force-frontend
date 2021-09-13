@@ -38,7 +38,12 @@ export default (context, inject) => {
       }
     },
     created () {
-      async () => {
+      this.rememberLogin()
+    },
+    beforeDestroy () {
+    },
+    methods: {
+      async rememberLogin () {
         switch (context.$auth.$storage.getUniversal('provider')) {
           case 'metamask':
             await this.onMetaMaskConnect()
@@ -67,11 +72,7 @@ export default (context, inject) => {
         const path = context.$auth.$storage.getUniversal('redirect') || '/'
         context.$auth.$storage.setUniversal('redirect', null)
         context.$router.push(path)
-      }
-    },
-    beforeDestroy () {
-    },
-    methods: {
+      },
       async logout () {
         if (this.currentProvider) {
           if (this.currentProvider === this.walletConnect) {
