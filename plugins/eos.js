@@ -47,6 +47,19 @@ export default (context, inject) => {
       const accountInfo = context.$auth.$storage.getUniversal('accountInfo')
       if (accountInfo) {
         this.login(accountInfo.provider, accountInfo.auth.accountName, accountInfo.auth.permission)
+        context.$auth.loginWith('blockchain', {
+          account: {
+            eos: context.$auth.$storage.getUniversal('wallet') ? context.$auth.$storage.getUniversal('wallet').auth : null,
+            bsc: null
+          }
+        }).then(() => {
+          // Needed because there is a redirect bug when going to a protected route from the login page
+          const path = context.$auth.$storage.getUniversal('redirect') || '/'
+          context.$auth.$storage.setUniversal('redirect', null)
+          context.$router.push(path)
+        }).catch((err) => {
+          console.log('Error: ', err)
+        })
       }
     },
     beforeDestroy () {

@@ -38,11 +38,27 @@ export default (context, inject) => {
       }
     },
     created () {
-
+      switch (context.$auth.$storage.getUniversal('provider')) {
+        case 'metamask':
+          this.onMetaMaskConnect()
+          context.$auth.loginWith('blockchain', {
+            account: {
+              eos: null,
+              bsc:
+                context.$auth.$storage.getUniversal('wallet') ? context.$auth.$storage.getUniversal('wallet')[0] : null
+            }
+          }).then(() => {
+            // Needed because there is a redirect bug when going to a protected route from the login page
+            const path = context.$auth.$storage.getUniversal('redirect') || '/'
+            context.$auth.$storage.setUniversal('redirect', null)
+            context.$router.push(path)
+          }).catch((err) => {
+            console.log('Error: ', err)
+          })
+      }
     },
     beforeDestroy () {
     },
-
     methods: {
       async logout () {
         if (this.currentProvider) {
@@ -267,11 +283,13 @@ export default (context, inject) => {
         // Connected, requests can be made to provider.
         provider.on('connect', () => {
           this.walletConnected = true
+          console.log('connecting provider')
         })
 
         // Disconnected, requests can no longer be made with provider.
         provider.on('disconnect', () => {
           this.walletConnected = false
+          console.log('disconnecting provider')
           this.logout()
           context.$auth.logout()
         })
