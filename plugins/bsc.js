@@ -38,23 +38,35 @@ export default (context, inject) => {
       }
     },
     created () {
-      switch (context.$auth.$storage.getUniversal('provider')) {
-        case 'metamask':
-          this.onMetaMaskConnect()
-          context.$auth.loginWith('blockchain', {
-            account: {
-              eos: null,
-              bsc:
-                context.$auth.$storage.getUniversal('wallet') ? context.$auth.$storage.getUniversal('wallet')[0] : null
-            }
-          }).then(() => {
-            // Needed because there is a redirect bug when going to a protected route from the login page
-            const path = context.$auth.$storage.getUniversal('redirect') || '/'
-            context.$auth.$storage.setUniversal('redirect', null)
-            context.$router.push(path)
-          }).catch((err) => {
-            console.log('Error: ', err)
-          })
+      async () => {
+        switch (context.$auth.$storage.getUniversal('provider')) {
+          case 'metamask':
+            await this.onMetaMaskConnect()
+            break
+
+          case 'trustwallet':
+            await this.onTrustWalletConnect()
+            break
+
+          case 'bsc':
+            await this.onBinanceConnect()
+            break
+
+          case 'walletconnect':
+            await this.onWalletConnectWeb3()
+            break
+        }
+        await context.$auth.loginWith('blockchain', {
+          account: {
+            eos: null,
+            bsc:
+              context.$auth.$storage.getUniversal('wallet') ? context.$auth.$storage.getUniversal('wallet')[0] : null
+          }
+        })
+        // Needed because there is a redirect bug when going to a protected route from the login page
+        const path = context.$auth.$storage.getUniversal('redirect') || '/'
+        context.$auth.$storage.setUniversal('redirect', null)
+        context.$router.push(path)
       }
     },
     beforeDestroy () {
