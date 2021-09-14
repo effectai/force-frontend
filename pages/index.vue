@@ -2,13 +2,6 @@
   <section class="section">
     <div class="container">
       <div class="text-center">
-        <h4 class="title">
-          Welcome
-        </h4>
-        <div class="subtitle">
-          {{ $auth.user.address }}
-        </div>
-        <br>
         <a class="button is-primary" @click="transaction">test transaction</a>
         <br><br>
       </div>
