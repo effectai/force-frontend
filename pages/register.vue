@@ -1,7 +1,7 @@
 <template>
   <section class="section">
     <h2 class="subtitle has-text-centered">
-      Login to your Effect Account
+      Register your Effect Account
     </h2>
     <div class="container">
       <div v-if="bscWallet" class="has-text-centered">
@@ -20,16 +20,16 @@
       </div>
       <div v-else class="columns">
         <div class="column is-half has-text-centered">
-          <div class="button" style="height: auto; display:block" @click="$eos.loginModal = true">
-            <div class="subtitle has-text-weight-semibold mb-2">
+          <div class="button is-outlined" style="height: auto; display:block" @click="$eos.loginModal = true">
+            <div class="is-size-5 has-text-weight-semibold mb-2">
               <small class="is-size-7">connect with </small><br>EOS
             </div>
             <img src="~assets/img/providers/EOS-logo.svg" height="100">
           </div>
         </div>
         <div class="column is-half">
-          <div class="button" style="height: auto; display:block" @click="$bsc.loginModal = true">
-            <div class="subtitle has-text-weight-semibold mb-2">
+          <div class="button is-outlined" style="height: auto; display:block" @click="$bsc.loginModal = true">
+            <div class="is-size-5 has-text-weight-semibold mb-2">
               <small class="is-size-7">connect with </small><br>BSC
             </div>
             <img src="~assets/img/providers/BSC-logo.svg" height="100">
@@ -39,15 +39,15 @@
       <div class="columns is-flex-direction-row-reverse is-vcentered mt-5">
         <div class="column is-4">
           <div class="button is-secondary is-fullwidth" :disabled="!bscWallet && !eosWallet" @click="login">
-            Login
+            Register
           </div>
         </div>
         <div class="column is-8">
           <a v-if="eosWallet || bscWallet" class="is-size-6  has-text-danger-dark" @click="$bsc.logout(); $eos.logout()">switch wallet</a>
           <small v-else>
-            No Account?
-            <nuxt-link to="/register">
-              Create Effect Account
+            Already have an Account?
+            <nuxt-link to="/login">
+              Login
             </nuxt-link>
           </small>
         </div>
@@ -73,10 +73,6 @@ export default {
     eosWallet () {
       return (this.$eos) ? this.$eos.wallet : null
     }
-  },
-  mounted () {
-    this.$eos.rememberLogin()
-    this.$bsc.rememberLogin()
   },
   methods: {
     async login () {
