@@ -76,7 +76,7 @@ export default (context, inject) => {
           context.$auth.$storage.setUniversal('accountInfo', JSON.stringify({
             loggedIn: true,
             provider,
-            auth: { accountName: wallet.auth.accountName, permission: wallet.auth.permission }
+            auth: { accountName: wallet.auth.accountName, permission: wallet.auth.permission, publicKey: wallet.auth.publicKey }
           }))
           this.wallet = wallet
           this.updateAccount()
