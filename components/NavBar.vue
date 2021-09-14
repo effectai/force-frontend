@@ -35,7 +35,7 @@
             />
           </div>
           <div class="navbar-end">
-            <div class="navbar-item is-hidden-mobile" @click="mobileMenu = false">
+            <div class="navbar-item is-hidden-touch" @click="mobileMenu = false">
               <div class="mt-1 is-flex notification-icon" style="position: relative" @click="showNotifications = true">
                 <span v-if="newNotifications" title="Badge top right" class="badge is-danger">{{ newNotifications }}</span>
                 <img src="~assets/img/icons/notification.svg" style="height: 26px">

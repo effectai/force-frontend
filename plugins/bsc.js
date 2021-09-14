@@ -37,9 +37,6 @@ export default (context, inject) => {
         explorer: process.env.NUXT_ENV_BSC_EXPLORER_URL
       }
     },
-    created () {
-      this.rememberLogin()
-    },
     beforeDestroy () {
     },
     methods: {
@@ -364,7 +361,6 @@ export default (context, inject) => {
         this.currentProvider = provider
         this.wallet = null
         this.web3 = new Web3(provider)
-        // context.$auth.$storage.setUniversal('web3', provider)
 
         if (!this.onCorrectChain()) {
           return Promise.reject(new Error('Wrong chain'))

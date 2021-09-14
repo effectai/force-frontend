@@ -43,9 +43,6 @@ export default (context, inject) => {
         transactionError: null
       }
     },
-    created () {
-      this.rememberLogin()
-    },
     beforeDestroy () {
     },
 

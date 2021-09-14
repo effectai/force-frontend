@@ -74,6 +74,10 @@ export default {
       return (this.$eos) ? this.$eos.wallet : null
     }
   },
+  mounted () {
+    this.$eos.rememberLogin()
+    this.$bsc.rememberLogin()
+  },
   methods: {
     async login () {
       if (!this.bscWallet && !this.eosWallet) { return }
