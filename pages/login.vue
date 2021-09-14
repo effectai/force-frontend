@@ -33,14 +33,23 @@
           <a class="is-size-6  has-text-danger-dark" @click="$eos.logout">switch wallet</a>
         </div>
       </div>
-      <div v-else>
-        <button class="button is-primary" @click="$bsc.loginModal = true">
-          Connect BSC Wallet
-        </button>
-
-        <button class="button is-primary" @click="$eos.loginModal = true">
-          Connect EOS Wallet
-        </button>
+      <div v-else class="columns">
+        <div class="column is-half has-text-centered">
+          <div class="button" style="height: auto; display:block" @click="$eos.loginModal = true">
+            <div class="subtitle has-text-weight-semibold mb-2">
+              <small>Login with </small> EOS
+            </div>
+            <img src="~assets/img/providers/EOS-logo.svg" height="100">
+          </div>
+        </div>
+        <div class="column is-half">
+          <div class="button" style="height: auto; display:block" @click="$bsc.loginModal = true">
+            <div class="subtitle has-text-weight-semibold mb-2">
+              <small>Login with </small> BSC
+            </div>
+            <img src="~assets/img/providers/BSC-logo.svg" height="100">
+          </div>
+        </div>
       </div>
     </div>
   </section>
