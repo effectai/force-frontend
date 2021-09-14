@@ -44,27 +44,27 @@ export default (context, inject) => {
       }
     },
     created () {
-      const accountInfo = context.$auth.$storage.getUniversal('accountInfo')
-      if (accountInfo) {
-        this.rememberLogin()
-      }
+      this.rememberLogin()
     },
     beforeDestroy () {
     },
 
     methods: {
       async rememberLogin () {
-        await this.login(accountInfo.provider, accountInfo.auth.accountName, accountInfo.auth.permission)
-        await context.$auth.loginWith('blockchain', {
-          account: {
-            eos: context.$auth.$storage.getUniversal('wallet') ? context.$auth.$storage.getUniversal('wallet').auth : null,
-            bsc: null
-          }
-        })
-        // Needed because there is a redirect bug when going to a protected route from the login page
-        const path = context.$auth.$storage.getUniversal('redirect') || '/'
-        context.$auth.$storage.setUniversal('redirect', null)
-        context.$router.push(path)
+        const accountInfo = context.$auth.$storage.getUniversal('accountInfo')
+        if (accountInfo) {
+          await this.login(accountInfo.provider, accountInfo.auth.accountName, accountInfo.auth.permission)
+          await context.$auth.loginWith('blockchain', {
+            account: {
+              eos: accountInfo.auth,
+              bsc: null
+            }
+          })
+          // Needed because there is a redirect bug when going to a protected route from the login page
+          const path = context.$auth.$storage.getUniversal('redirect') || '/'
+          context.$auth.$storage.setUniversal('redirect', null)
+          context.app.router.push(path)
+        }
       },
       async login (provider, accountName, permission) {
         const providers = accessContext.getWalletProviders()

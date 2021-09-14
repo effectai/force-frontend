@@ -44,34 +44,37 @@ export default (context, inject) => {
     },
     methods: {
       async rememberLogin () {
-        switch (context.$auth.$storage.getUniversal('provider')) {
-          case 'metamask':
-            await this.onMetaMaskConnect()
-            break
+        const provider = context.$auth.$storage.getUniversal('provider')
+        if (provider) {
+          switch (provider) {
+            case 'metamask':
+              await this.onMetaMaskConnect()
+              break
 
-          case 'trustwallet':
-            await this.onTrustWalletConnect()
-            break
+            case 'trustwallet':
+              await this.onTrustWalletConnect()
+              break
 
-          case 'bsc':
-            await this.onBinanceConnect()
-            break
+            case 'bsc':
+              await this.onBinanceConnect()
+              break
 
-          case 'walletconnect':
-            await this.onWalletConnectWeb3()
-            break
-        }
-        await context.$auth.loginWith('blockchain', {
-          account: {
-            eos: null,
-            bsc:
-              context.$auth.$storage.getUniversal('wallet') ? context.$auth.$storage.getUniversal('wallet')[0] : null
+            case 'walletconnect':
+              await this.onWalletConnectWeb3()
+              break
           }
-        })
-        // Needed because there is a redirect bug when going to a protected route from the login page
-        const path = context.$auth.$storage.getUniversal('redirect') || '/'
-        context.$auth.$storage.setUniversal('redirect', null)
-        context.$router.push(path)
+          console.log('remember login', context)
+          await context.$auth.loginWith('blockchain', {
+            account: {
+              eos: null,
+              bsc: this.wallet[0]
+            }
+          })
+          // Needed because there is a redirect bug when going to a protected route from the login page
+          const path = context.$auth.$storage.getUniversal('redirect') || '/'
+          context.$auth.$storage.setUniversal('redirect', null)
+          context.app.router.push(path)
+        }
       },
       async logout () {
         if (this.currentProvider) {
@@ -311,8 +314,8 @@ export default (context, inject) => {
         provider.on('accountsChanged', (newWallet) => {
           if (newWallet.length) {
             this.wallet = newWallet
-            context.$auth.$storage.setUniversal('wallet', newWallet)
-            if (context.$auth.loggedIn && newWallet[0].toLowerCase() !== context.$auth.user.address.toLowerCase()) {
+            console.log(context.$auth.user)
+            if (context.$auth.loggedIn && newWallet[0].toLowerCase() !== context.$auth.user.blockchain.bsc.toLowerCase()) {
               context.$auth.logout()
             }
           } else {
