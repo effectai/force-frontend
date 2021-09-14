@@ -4,7 +4,7 @@
     <eos-wallet />
     <div class="container">
       <div class="columns is-gapless is-vcentered is-multiline is-centered" style="min-height: 100vh">
-        <div class="column is-5">
+        <div class="column is-6-tablet is-5-widescreen ">
           <div class="box is-paddingless">
             <div class="has-text-centered pt-6">
               <img src="~assets/img/logo.svg" class="logo" width="150px">

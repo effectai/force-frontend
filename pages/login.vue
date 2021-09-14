@@ -1,43 +1,28 @@
 <template>
   <section class="section">
+    <h2 class="subtitle has-text-centered">
+      Login to your Effect Account
+    </h2>
     <div class="container">
-      <div v-if="bscWallet">
-        <b>Selected account</b>
+      <div v-if="bscWallet" class="has-text-centered">
         <a
           :href="$bsc.explorer + '/address/'+ bscWallet[0]"
           target="_blank"
           class="blockchain-address"
         >{{ bscWallet[0] }}</a>
-        <div class="has-text-centered">
-          <a class="button is-secondary is-wide" :disabled="!bscWallet" @click="login">
-            Login
-          </a>
-        </div>
-        <div class="has-text-centered mt-2">
-          <a class="is-size-6  has-text-danger-dark" @click="$bsc.logout">switch wallet</a>
-        </div>
       </div>
-      <div v-else-if="eosWallet">
-        <b>Selected account</b>
+      <div v-else-if="eosWallet" class="has-text-centered subtitle">
         <a
           :href="$eos.explorer + '/address/'+ eosWallet.auth.accountName"
           target="_blank"
           class="blockchain-address"
         >{{ eosWallet.auth.accountName }}</a>
-        <div class="has-text-centered">
-          <a class="button is-secondary is-wide" :disabled="!eosWallet" @click="login">
-            Login
-          </a>
-        </div>
-        <div class="has-text-centered mt-2">
-          <a class="is-size-6  has-text-danger-dark" @click="$eos.logout">switch wallet</a>
-        </div>
       </div>
       <div v-else class="columns">
         <div class="column is-half has-text-centered">
           <div class="button" style="height: auto; display:block" @click="$eos.loginModal = true">
             <div class="subtitle has-text-weight-semibold mb-2">
-              <small>Login with </small> EOS
+              <small>with </small> EOS
             </div>
             <img src="~assets/img/providers/EOS-logo.svg" height="100">
           </div>
@@ -45,10 +30,26 @@
         <div class="column is-half">
           <div class="button" style="height: auto; display:block" @click="$bsc.loginModal = true">
             <div class="subtitle has-text-weight-semibold mb-2">
-              <small>Login with </small> BSC
+              <small>with </small> BSC
             </div>
             <img src="~assets/img/providers/BSC-logo.svg" height="100">
           </div>
+        </div>
+      </div>
+      <div class="columns is-flex-direction-row-reverse is-vcentered mt-5">
+        <div class="column is-4">
+          <div class="button is-secondary is-fullwidth" :disabled="!bscWallet && !eosWallet" @click="login">
+            Login
+          </div>
+        </div>
+        <div class="column is-8">
+          <a v-if="eosWallet || bscWallet" class="is-size-6  has-text-danger-dark" @click="$bsc.logout(); $eos.logout()">switch wallet</a>
+          <small v-else>
+            No Account?
+            <nuxt-link to="/register">
+              Create Effect Account
+            </nuxt-link>
+          </small>
         </div>
       </div>
     </div>
@@ -75,6 +76,7 @@ export default {
   },
   methods: {
     async login () {
+      if (!this.bscWallet && !this.eosWallet) { return }
       try {
         await this.$auth.loginWith('blockchain', {
           account: {
