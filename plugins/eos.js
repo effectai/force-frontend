@@ -1,10 +1,11 @@
-import { Api, JsonRpc } from 'eosjs'
+import { Api, JsonRpc, JsSignatureProvider } from 'eosjs'
 import { initAccessContext } from 'eos-transit'
 import scatter from 'eos-transit-scatter-provider'
 import anchor from 'eos-transit-anchorlink-provider'
 import tp from 'eos-transit-tokenpocket-provider'
 import lynx from 'eos-transit-lynx-provider'
 import Vue from 'vue'
+const effectSdk = require('@effectai/effect-js')
 
 const appName = 'therealforce'
 const accessContext = initAccessContext({
@@ -26,6 +27,7 @@ export default (context, inject) => {
   const eos = new Vue({
     data () {
       const rpc = new JsonRpc(`https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`)
+      const sdk = new effectSdk.EffectClient(this.sdkOptions)
 
       return {
         explorer: process.env.NUXT_ENV_EOS_EXPLORER_URL,
@@ -39,8 +41,16 @@ export default (context, inject) => {
         wallet: null,
         loginModal: false,
         efxAvailable: null,
+        vefxAvailable: null,
         transaction: null,
-        transactionError: null
+        transactionError: null,
+        signatureProvider: new JsSignatureProvider([process.env.NUXT_ENV_EOS_RELAYER_PRIV_KEY]),
+        sdkOptions: {
+          network: process.env.NUXT_ENV_EOS_NETWORK,
+          host: process.env.NUXT_ENV_EOS_NODE_URL,
+          signatureProvider: this.signatureProvider
+        },
+        sdk
       }
     },
     beforeDestroy () {
@@ -104,6 +114,42 @@ export default (context, inject) => {
 
         console.log(response)
         return response
+      },
+
+      async openVAccount (address) {
+        await this.sdk.account.openAccount(address)
+      },
+
+      async getVBalance (address) {
+        const balanceRow = await this.sdk.account.getBalance(address)
+        if (balanceRow) {
+          this.vefxAvailable = parseFloat(balanceRow.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+        }
+      },
+
+      async deposit (fromAccount, toAccount, amount) {
+        try {
+          // todo: create new sdk instance with signatureprovider of from account
+          return await this.sdk.account.deposit(fromAccount, toAccount, amount)
+        } catch (error) {
+          throw new Error(error)
+        }
+      },
+
+      async withdraw (fromAccount, toAccount, amount, memo) {
+        try {
+          return await this.sdk.account.withdraw(fromAccount, toAccount, amount, memo)
+        } catch (error) {
+          throw new Error(error)
+        }
+      },
+
+      async vTransfer (fromAccount, toAccount, amount) {
+        try {
+          return await this.sdk.account.vtransfer(fromAccount, toAccount, amount)
+        } catch (error) {
+          throw new Error(error)
+        }
       },
 
       async logout () {

@@ -90,15 +90,18 @@ export default {
         const path = this.$auth.$storage.getUniversal('redirect') || '/'
         this.$auth.$storage.setUniversal('redirect', null)
         this.$router.push(path)
-        // let address
-        // let blockchainPlugin
-        // if (this.bscWallet) {
-        //   address = this.bscWallet[0]
-        //   blockchainPlugin = this.$bsc
-        // } else if (this.eosWallet) {
-        //   address = this.eosWallet.auth.accountName
-        //   blockchainPlugin = this.$eos
-        // }
+        let address
+        let blockchainPlugin
+        if (this.bscWallet) {
+          address = this.bscWallet[0]
+          blockchainPlugin = this.$bsc
+        } else if (this.eosWallet) {
+          address = this.eosWallet.auth.accountName
+          blockchainPlugin = this.$eos
+        }
+        await blockchainPlugin.openVAccount(address)
+        console.log('vaccount created: ', address)
+
         // const response1 = await this.$axios.get(`${process.env.NUXT_ENV_BACKEND_URL}/user/login/${address}`)
         // const nonce = response1.data
         // const signature = await blockchainPlugin.sign(nonce)
