@@ -1,12 +1,11 @@
 import { Api, JsonRpc } from 'eosjs'
-import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import { initAccessContext } from 'eos-transit'
 import scatter from 'eos-transit-scatter-provider'
 import anchor from 'eos-transit-anchorlink-provider'
 import tp from 'eos-transit-tokenpocket-provider'
 import lynx from 'eos-transit-lynx-provider'
 import Vue from 'vue'
-const effectSdk = require('@effectai/effect-js')
+const effectSdk = require('../../effect-js')
 
 const appName = 'therealforce'
 const accessContext = initAccessContext({
@@ -29,12 +28,6 @@ export default (context, inject) => {
     data () {
       const host = `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
       const rpc = new JsonRpc(host)
-      const signatureProvider = new JsSignatureProvider([process.env.NUXT_ENV_EOS_RELAYER_PRIV_KEY])
-      const sdkOptions = {
-        network: process.env.NUXT_ENV_EOS_NETWORK,
-        host,
-        signatureProvider
-      }
       return {
         explorer: process.env.NUXT_ENV_EOS_EXPLORER_URL,
         api: new Api({ rpc }),
@@ -50,7 +43,7 @@ export default (context, inject) => {
         vefxAvailable: null,
         transaction: null,
         transactionError: null,
-        sdk: new effectSdk.EffectClient(sdkOptions)
+        sdk: null
       }
     },
     beforeDestroy () {
@@ -86,6 +79,7 @@ export default (context, inject) => {
             auth: { accountName: wallet.auth.accountName, permission: wallet.auth.permission, publicKey: wallet.auth.publicKey }
           }))
           this.wallet = wallet
+          this.initSdk()
           this.updateAccount()
         }
       },
@@ -208,6 +202,15 @@ export default (context, inject) => {
           console.error('account not found', e)
           return false
         })
+      },
+
+      initSdk () {
+        const sdkOptions = {
+          network: process.env.NUXT_ENV_EOS_NETWORK,
+          host: `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`,
+          signatureProvider: this.wallet.provider.signatureProvider
+        }
+        this.sdk = new effectSdk.EffectClient(sdkOptions)
       }
     }
   })
