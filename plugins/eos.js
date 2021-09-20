@@ -27,7 +27,12 @@ export default (context, inject) => {
   const eos = new Vue({
     data () {
       const rpc = new JsonRpc(`https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`)
-
+      const signatureProvider = new JsSignatureProvider([process.env.NUXT_ENV_EOS_RELAYER_PRIV_KEY])
+      const sdkOptions = {
+        network: process.env.NUXT_ENV_EOS_NETWORK,
+        host: process.env.NUXT_ENV_EOS_NODE_URL,
+        signatureProvider
+      }
       return {
         explorer: process.env.NUXT_ENV_EOS_EXPLORER_URL,
         api: new Api({ rpc }),
@@ -43,12 +48,7 @@ export default (context, inject) => {
         vefxAvailable: null,
         transaction: null,
         transactionError: null,
-        signatureProvider: new JsSignatureProvider([process.env.NUXT_ENV_EOS_RELAYER_PRIV_KEY]),
-        sdk: new effectSdk.EffectClient({
-          network: process.env.NUXT_ENV_EOS_NETWORK,
-          host: process.env.NUXT_ENV_EOS_NODE_URL,
-          signatureProvider: this.signatureProvider
-        })
+        sdk: new effectSdk.EffectClient(sdkOptions)
       }
     },
     beforeDestroy () {
