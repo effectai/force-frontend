@@ -1,4 +1,5 @@
-import { Api, JsonRpc, JsSignatureProvider } from 'eosjs'
+import { Api, JsonRpc } from 'eosjs'
+import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import { initAccessContext } from 'eos-transit'
 import scatter from 'eos-transit-scatter-provider'
 import anchor from 'eos-transit-anchorlink-provider'
@@ -26,11 +27,12 @@ const accessContext = initAccessContext({
 export default (context, inject) => {
   const eos = new Vue({
     data () {
-      const rpc = new JsonRpc(`https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`)
+      const host = `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
+      const rpc = new JsonRpc(host)
       const signatureProvider = new JsSignatureProvider([process.env.NUXT_ENV_EOS_RELAYER_PRIV_KEY])
       const sdkOptions = {
         network: process.env.NUXT_ENV_EOS_NETWORK,
-        host: process.env.NUXT_ENV_EOS_NODE_URL,
+        host,
         signatureProvider
       }
       return {
