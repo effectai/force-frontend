@@ -5,7 +5,7 @@ import anchor from 'eos-transit-anchorlink-provider'
 import tp from 'eos-transit-tokenpocket-provider'
 import lynx from 'eos-transit-lynx-provider'
 import Vue from 'vue'
-const effectSdk = require('../../effect-js')
+const effectSdk = require('@effectai/effect-js')
 
 const appName = 'therealforce'
 const accessContext = initAccessContext({
