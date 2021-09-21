@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
+const effectSdk = require('@effectai/effect-js')
 
 const web3 = new Web3()
 web3.setProvider(process.env.NUXT_ENV_BSC_RPC)
