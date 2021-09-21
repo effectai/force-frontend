@@ -38,18 +38,13 @@
       </div>
       <div class="columns is-flex-direction-row-reverse is-vcentered mt-5">
         <div class="column is-4">
-          <div class="button is-secondary is-fullwidth" :disabled="!bscWallet && !eosWallet" @click="login">
-            Login
+          <div class="button is-secondary is-fullwidth" v-if="existingAccount !== null" :disabled="!bscWallet && !eosWallet" @click="login">
+            <span v-if="existingAccount">Login</span>
+            <span v-else>Register</span>
           </div>
         </div>
         <div class="column is-8">
           <a v-if="eosWallet || bscWallet" class="is-size-6  has-text-danger-dark" @click="$bsc.logout(); $eos.logout()">switch wallet</a>
-          <!-- <small v-else>
-            No Account?
-            <nuxt-link to="/register">
-              Create Effect Account
-            </nuxt-link>
-          </small> -->
         </div>
       </div>
     </div>
@@ -63,7 +58,7 @@ export default {
   auth: 'guest',
   data () {
     return {
-      existingAccount: false,
+      existingAccount: null,
       error: null
     }
   },
@@ -106,17 +101,21 @@ export default {
         const path = this.$auth.$storage.getUniversal('redirect') || '/'
         this.$auth.$storage.setUniversal('redirect', null)
         this.$router.push(path)
-        let address
-        let blockchainPlugin
-        if (this.bscWallet) {
-          address = this.bscWallet[0]
-          blockchainPlugin = this.$bsc
-        } else if (this.eosWallet) {
-          address = this.eosWallet.auth.accountName
-          blockchainPlugin = this.$eos
+
+        // if account doesnt exists yet add it
+        if (!this.existingAccount) {
+          let address
+          let blockchainPlugin
+          if (this.bscWallet) {
+            address = this.bscWallet[0]
+            blockchainPlugin = this.$bsc
+          } else if (this.eosWallet) {
+            address = this.eosWallet.auth.accountName
+            blockchainPlugin = this.$eos
+          }
+          await blockchainPlugin.openVAccount(address)
+          console.log('vaccount created: ', address)
         }
-        await blockchainPlugin.openVAccount(address)
-        console.log('vaccount created: ', address)
         // const response1 = await this.$axios.get(`${process.env.NUXT_ENV_BACKEND_URL}/user/login/${address}`)
         // const nonce = response1.data
         // const signature = await blockchainPlugin.sign(nonce)
