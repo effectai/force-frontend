@@ -44,12 +44,12 @@
         </div>
         <div class="column is-8">
           <a v-if="eosWallet || bscWallet" class="is-size-6  has-text-danger-dark" @click="$bsc.logout(); $eos.logout()">switch wallet</a>
-          <small v-else>
+          <!-- <small v-else>
             No Account?
             <nuxt-link to="/register">
               Create Effect Account
             </nuxt-link>
-          </small>
+          </small> -->
         </div>
       </div>
     </div>
@@ -63,6 +63,7 @@ export default {
   auth: 'guest',
   data () {
     return {
+      existingAccount: false,
       error: null
     }
   },
@@ -74,11 +75,22 @@ export default {
       return (this.$eos) ? this.$eos.wallet : null
     }
   },
+  watch: {
+    bscWallet () {
+      this.accountExists()
+    },
+    eosWallet () {
+      this.accountExists()
+    }
+  },
   mounted () {
     this.$eos.rememberLogin()
     this.$bsc.rememberLogin()
   },
   methods: {
+    // watch eosWallet and bscWallet, if change then check if account exists
+    // if it does exist, then call loginWith,
+    // if it does not exist, first openAccount
     async login () {
       if (!this.bscWallet && !this.eosWallet) { return }
       try {
@@ -94,15 +106,17 @@ export default {
         const path = this.$auth.$storage.getUniversal('redirect') || '/'
         this.$auth.$storage.setUniversal('redirect', null)
         this.$router.push(path)
-        // let address
-        // let blockchainPlugin
-        // if (this.bscWallet) {
-        //   address = this.bscWallet[0]
-        //   blockchainPlugin = this.$bsc
-        // } else if (this.eosWallet) {
-        //   address = this.eosWallet.auth.accountName
-        //   blockchainPlugin = this.$eos
-        // }
+        let address
+        let blockchainPlugin
+        if (this.bscWallet) {
+          address = this.bscWallet[0]
+          blockchainPlugin = this.$bsc
+        } else if (this.eosWallet) {
+          address = this.eosWallet.auth.accountName
+          blockchainPlugin = this.$eos
+        }
+        await blockchainPlugin.openVAccount(address)
+        console.log('vaccount created: ', address)
         // const response1 = await this.$axios.get(`${process.env.NUXT_ENV_BACKEND_URL}/user/login/${address}`)
         // const nonce = response1.data
         // const signature = await blockchainPlugin.sign(nonce)
@@ -132,6 +146,26 @@ export default {
         } else {
           this.error = error
         }
+      }
+    },
+    async accountExists () {
+      let address
+      let blockchainPlugin
+      if (this.bscWallet) {
+        address = this.bscWallet[0]
+        blockchainPlugin = this.$bsc
+      } else if (this.eosWallet) {
+        address = this.eosWallet.auth.accountName
+        blockchainPlugin = this.$eos
+      }
+      // check if account exists
+      await blockchainPlugin.getVBalance(address)
+      if (blockchainPlugin.vefxAvailable !== null) {
+        // account exists
+        this.existingAccount = true
+      } else {
+        this.existingAccount = false
+        // account doesnt exist
       }
     }
   }

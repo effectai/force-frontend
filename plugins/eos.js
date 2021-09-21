@@ -115,9 +115,13 @@ export default (context, inject) => {
       },
 
       async getVBalance (address) {
-        const balanceRow = await this.sdk.account.getBalance(address)
-        if (balanceRow) {
-          this.vefxAvailable = parseFloat(balanceRow.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+        const balanceRows = await this.sdk.account.getBalance(address)
+        if (balanceRows) {
+          balanceRows.forEach((row) => {
+            if (row.balance.contract === process.env.NUXT_ENV_EOS_TOKEN_CONTRACT) {
+              this.vefxAvailable = parseFloat(row.balance.quantity.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+            }
+          })
         }
       },
 
