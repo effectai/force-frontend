@@ -34,7 +34,9 @@ export default (context, inject) => {
         trustWallet: window.ethereum.isTrust || null,
         walletConnect: null,
         walletConnected: null,
-        explorer: process.env.NUXT_ENV_BSC_EXPLORER_URL
+        explorer: process.env.NUXT_ENV_BSC_EXPLORER_URL,
+        sdk: null,
+        vefxAvailable: null
       }
     },
     beforeDestroy () {
@@ -383,6 +385,35 @@ export default (context, inject) => {
         this.checkBscFormat(this.wallet[0])
         this.addChain()
         this.registerListener(provider)
+        this.initSdk()
+      },
+
+      /**
+       * Effect Account SDK
+       */
+      initSdk () {
+        // TODO correct provider
+        const sdkOptions = {
+          network: process.env.NUXT_ENV_EOS_NETWORK,
+          host: `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`,
+          signatureProvider: this.currentProvider
+        }
+        this.sdk = new effectSdk.EffectClient(sdkOptions)
+      },
+
+      async openVAccount (address) {
+        await this.sdk.account.openAccount(address)
+      },
+
+      async getVBalance (address) {
+        const balanceRows = await this.sdk.account.getBalance(address)
+        if (balanceRows) {
+          balanceRows.forEach((row) => {
+            if (row.balance.contract === process.env.NUXT_ENV_EOS_TOKEN_CONTRACT) {
+              this.vefxAvailable = parseFloat(row.balance.quantity.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+            }
+          })
+        }
       }
     }
   })
