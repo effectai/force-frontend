@@ -4,6 +4,9 @@
       <div class="text-center">
         <a class="button is-primary" @click="transaction">test transaction</a>
         <br><br>
+        <a class="button is-primary" @click="deposit('1.0000')">test deposit</a>
+        <br><br>
+        <a class="button is-primary" @click="withdraw('1.0000')">test withdraw</a>
       </div>
       <div>
         <div v-if="campaignsLoading">
@@ -58,6 +61,18 @@ export default {
       } else {
         console.log(this.$auth.user)
         alert('Something went wrong!')
+      }
+    },
+    async deposit (amount) {
+      if (this.$auth.user.blockchain.eos) {
+        const result = await this.$eos.deposit(this.$auth.user.blockchain.eos.accountName, this.$auth.user.blockchain.eos.accountName, amount)
+        console.log(result)
+      }
+    },
+    async withdraw (amount) {
+      if (this.$auth.user.blockchain.eos) {
+        const result = await this.$eos.withdraw(this.$auth.user.blockchain.eos.accountName, this.$auth.user.blockchain.eos.accountName, amount)
+        console.log(result)
       }
     }
   }

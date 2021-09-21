@@ -31,7 +31,7 @@
             <balance
               v-if="$auth.loggedIn"
               class="navbar-item"
-              :amount="(eosWallet ? $eos.vefxAvailable.toFixed(2) : $bsc.vefxAvailable.toFixed(2) )"
+              :amount="($eos.vefxAvailable ? $eos.vefxAvailable.toFixed(2) : $bsc.vefxAvailable.toFixed(2))"
             />
           </div>
           <div class="navbar-end">

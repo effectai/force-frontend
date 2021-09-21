@@ -39,7 +39,7 @@ export default (context, inject) => {
         },
         wallet: null,
         loginModal: false,
-        efxAvailable: null,
+        efxAvailable: 0,
         vefxAvailable: null,
         transaction: null,
         transactionError: null,

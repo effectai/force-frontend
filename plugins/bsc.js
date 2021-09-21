@@ -37,7 +37,7 @@ export default (context, inject) => {
         walletConnected: null,
         explorer: process.env.NUXT_ENV_BSC_EXPLORER_URL,
         sdk: null,
-        vefxAvailable: null
+        vefxAvailable: 0
       }
     },
     beforeDestroy () {
