@@ -31,7 +31,7 @@
             <balance
               v-if="$auth.loggedIn"
               class="navbar-item"
-              :amount="($eos.vefxAvailable ? $eos.vefxAvailable.toFixed(2) : $bsc.vefxAvailable.toFixed(2))"
+              :amount="($blockchain.vefxAvailable ? $blockchain.vefxAvailable.toFixed(2) : 0)"
             />
           </div>
           <div class="navbar-end">
@@ -80,15 +80,6 @@ export default {
       mobileMenu: false,
       newNotifications: null,
       showNotifications: false
-    }
-  },
-
-  computed: {
-    bscWallet () {
-      return (this.$bsc) ? this.$bsc.wallet : null
-    },
-    eosWallet () {
-      return (this.$eos) ? this.$eos.wallet : null
     }
   },
 

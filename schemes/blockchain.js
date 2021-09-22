@@ -33,7 +33,7 @@ export default class BlockchainScheme extends BaseScheme {
     if (!this.check().valid) {
       return Promise.resolve()
     }
-    this.$auth.setUser({ blockchain: account })
+    this.$auth.setUser(account)
     return Promise.resolve()
   }
 
