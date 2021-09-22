@@ -19,8 +19,6 @@ export default (context, inject) => {
         sdk: null
       }
     },
-    beforeDestroy () {
-    },
 
     methods: {
       async rememberLogin () {
@@ -53,7 +51,6 @@ export default (context, inject) => {
           account.blockchain = blockchain
           account.provider = providerName
           this.account = account
-          this.updateAccount()
           return true
         }
         return false
@@ -105,11 +102,6 @@ export default (context, inject) => {
         context.$auth.$storage.setUniversal('rememberAccount', null)
         this.clear()
       },
-      updateAccount () {
-        if (this.account) {
-          // this.getAccountBalance()
-        }
-      },
 
       clear () {
         Object.assign(this.$data, this.$options.data.call(this))
@@ -128,7 +120,7 @@ export default (context, inject) => {
         const sdkOptions = {
           network: process.env.NUXT_ENV_EOS_NETWORK,
           host: `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`,
-          // TODO: use relayer as signatureProvider when using BSC
+          // TODO: use web3 wallet as signatureProvider when using BSC
           signatureProvider: this.eos.wallet ? this.eos.wallet.provider.signatureProvider : null
         }
         this.sdk = new effectSdk.EffectClient(sdkOptions)
