@@ -7,12 +7,23 @@
       Loading..
     </div>
     <div v-else class="container">
-      <div v-if="$blockchain.account" class="has-text-centered" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
-        <a
-          :href="($blockchain.account.blockchain === 'bsc' ? $blockchain.bsc.explorer : $blockchain.eos.explorer) + '/address/'+ $blockchain.account.accountName"
-          target="_blank"
-          class="blockchain-address"
-        >{{ $blockchain.account.accountName }}</a><span v-if="$blockchain.account.permission">@{{ $blockchain.account.permission }}</span>
+      <div v-if="$blockchain.account">
+        <div class="has-text-centered mb-2" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
+          <a
+            :href="($blockchain.account.blockchain === 'bsc' ? $blockchain.bsc.explorer : $blockchain.eos.explorer) + '/address/'+ $blockchain.account.accountName"
+            target="_blank"
+            class="blockchain-address"
+          >{{ $blockchain.account.accountName }}</a><span v-if="$blockchain.account.permission">@{{ $blockchain.account.permission }}</span>
+        </div>
+        <div style="min-height: 67px">
+          <div v-if="error" class="notification is-danger">
+            <button class="delete" @click="error = null" />
+            {{ error }}
+          </div>
+          <div v-if="loadingLogin" class="is-size-7 has-text-centered">
+            ..retrieving blockchain Effect Account info..
+          </div>
+        </div>
       </div>
       <div v-else class="columns">
         <div class="column is-half has-text-centered">
@@ -32,11 +43,7 @@
           </div>
         </div>
       </div>
-      <div v-if="error" class="notification is-danger">
-        <button class="delete" @click="error = null" />
-        {{ error }}
-      </div>
-      <div class="columns is-flex-direction-row-reverse is-vcentered mt-5">
+      <div class="columns is-flex-direction-row-reverse is-vcentered mt-1">
         <div class="column is-4">
           <div v-if="$blockchain.account" class="button is-secondary is-fullwidth" :class="{'is-loading': loadingLogin || existingAccount === null}" :disabled="!$blockchain.account || loadingLogin || existingAccount === null" @click="login">
             <span v-if="existingAccount">Login</span>
@@ -53,6 +60,9 @@
 </template>
 
 <script>
+const retry = require('async-retry')
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 export default {
   layout: 'box',
   middleware: ['auth'],
@@ -92,15 +102,25 @@ export default {
         // if account doesnt exists yet add it
         if (this.existingAccount === false) {
           await this.$blockchain.openVAccount()
-          // TODO: verify account creation
+          await sleep(2000)
         }
-        await this.$auth.loginWith('blockchain', {
-          account: this.$blockchain.account
+        await retry(async () => {
+          await this.$auth.loginWith('blockchain', {
+            account: this.$blockchain.account,
+            $blockchain: this.$blockchain
+          })
+        }, {
+          retries: 5,
+          onRetry: (error, number) => {
+            console.log('attempt', number, error)
+          }
         })
         this.$auth.$storage.setUniversal('rememberAccount', JSON.stringify(this.$blockchain.account))
         // Needed because there is a redirect bug when going to a protected route from the login page
         const path = this.$auth.$storage.getUniversal('redirect') || '/'
         this.$auth.$storage.setUniversal('redirect', null)
+        console.log('logged in!! go to', path)
+        console.log(this.$router)
         this.$router.push(path)
         // const response1 = await this.$axios.get(`${process.env.NUXT_ENV_BACKEND_URL}/user/login/${address}`)
         // const nonce = response1.data
@@ -142,8 +162,8 @@ export default {
     async accountExists () {
       // check if account exists
       try {
-        await this.$blockchain.getVBalance()
-        if (this.$blockchain.vefxAvailable !== null) {
+        const vAccountRows = await this.$blockchain.getVAccount()
+        if (vAccountRows && vAccountRows.length) {
           // account exists
           this.existingAccount = true
         } else {

@@ -11,6 +11,7 @@
             target="_blank"
             class="blockchain-address"
           >{{ $auth.user.accountName }}</a>
+          {{ $auth.user }}
         </div>
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>

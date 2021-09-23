@@ -7,6 +7,7 @@ const DEFAULTS = {
 export default class BlockchainScheme extends BaseScheme {
   constructor ($auth, options, ...defaults) {
     super($auth, options, ...defaults, DEFAULTS)
+    this.$blockchain = null
   }
 
   check () {
@@ -20,19 +21,38 @@ export default class BlockchainScheme extends BaseScheme {
   mounted () {
   }
 
-  async login ({ account = {}, reset = true } = {}) {
+  async login ({ account = {}, reset = true, $blockchain } = {}) {
     if (reset) {
       this.$auth.reset()
     }
+    this.$blockchain = $blockchain
 
     await this.fetchUser(account)
     return true
   }
 
-  fetchUser (account) {
+  async fetchUser (account) {
+    if (!account) {
+      account = this.$auth.user
+    }
     if (!this.check().valid) {
       return Promise.resolve()
     }
+    let vAccountRows = []
+    try {
+      vAccountRows = await this.$blockchain.getVAccount()
+      if (!vAccountRows || !vAccountRows.length) {
+        // account does not exists
+        throw new Error('Cannot find Effect Account')
+      }
+    } catch (error) {
+      alert('Cannot check if account exist, assuming it exists for now..')
+    }
+
+    account.vAccountRows = vAccountRows
+    // if (this.$auth.user) {
+    //   account.vAccountRows[0].balance.quantity = '3.0000 UTL'
+    // }
     this.$auth.setUser(account)
     return Promise.resolve()
   }

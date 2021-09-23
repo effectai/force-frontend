@@ -13,10 +13,23 @@ export default (context, inject) => {
         provider: null,
         loginModal: false,
         efxAvailable: 0,
-        vefxAvailable: null,
         eos,
         bsc,
         sdk: null
+      }
+    },
+    computed: {
+      vefxAvailable () {
+        let balance
+        const vAccountRows = context.$auth.user.vAccountRows
+        if (vAccountRows) {
+          vAccountRows.forEach((row) => {
+            if (row.balance.contract === process.env.NUXT_ENV_EOS_TOKEN_CONTRACT) {
+              balance = parseFloat(row.balance.quantity.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+            }
+          })
+        }
+        return balance
       }
     },
 
@@ -27,7 +40,8 @@ export default (context, inject) => {
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
           if (loggedIn) {
             await context.$auth.loginWith('blockchain', {
-              account: this.account
+              account: this.account,
+              $blockchain: this
             })
             // Needed because there is a redirect bug when going to a protected route from the login page
             const path = context.$auth.$storage.getUniversal('redirect') || '/'
@@ -59,16 +73,8 @@ export default (context, inject) => {
       async openVAccount () {
         await this.sdk.account.openAccount(this.account.accountName, this.account.permission)
       },
-
-      async getVBalance () {
-        const balanceRows = await this.sdk.account.getBalance(this.account.accountName)
-        if (balanceRows) {
-          balanceRows.forEach((row) => {
-            if (row.balance.contract === process.env.NUXT_ENV_EOS_TOKEN_CONTRACT) {
-              this.vefxAvailable = parseFloat(row.balance.quantity.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
-            }
-          })
-        }
+      async getVAccount () {
+        return await this.sdk.account.getBalance(this.account.accountName)
       },
 
       async deposit (fromAccount, toAccount, amount) {

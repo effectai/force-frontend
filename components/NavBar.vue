@@ -31,7 +31,7 @@
             <balance
               v-if="$auth.loggedIn"
               class="navbar-item"
-              :amount="($blockchain.vefxAvailable ? $blockchain.vefxAvailable.toFixed(2) : 0)"
+              :amount="($blockchain.vefxAvailable !== null ? $blockchain.vefxAvailable.toFixed(2) : -1)"
             />
           </div>
           <div class="navbar-end">

@@ -36,7 +36,7 @@ export default {
       this.refreshInterval = setInterval(() => {
         console.log('refreshing user..')
         if (this.$auth.loggedIn) {
-          // this.$auth.fetchUser()
+          this.$auth.fetchUser()
         }
       }, parseInt(process.env.NUXT_ENV_BLOCKCHAIN_UPDATE_RATE, 10))
     }
