@@ -2,7 +2,7 @@ import Vue from 'vue'
 import eos from '../services/eos'
 import bsc from '../services/bsc'
 // const effectSdk = require('@effectai/effect-js')
-const effectSdk = require('../../../effect-js')
+const effectSdk = require('../../effect-js')
 
 export default (context, inject) => {
   const blockchain = new Vue({
@@ -126,8 +126,8 @@ export default (context, inject) => {
         const sdkOptions = {
           network: process.env.NUXT_ENV_EOS_NETWORK,
           host: `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`,
-          // TODO: use web3 wallet as signatureProvider when using BSC
-          signatureProvider: this.eos.wallet ? this.eos.wallet.provider.signatureProvider : null
+          signatureProvider: this.eos.wallet ? this.eos.wallet.provider.signatureProvider : null,
+          web3: this.bsc.wallet ? this.bsc.web3 : null
         }
         this.sdk = new effectSdk.EffectClient(sdkOptions)
       }
