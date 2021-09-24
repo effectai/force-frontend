@@ -78,29 +78,16 @@ export default (context, inject) => {
         return await this.sdk.account.getBalance(this.account.accountName)
       },
 
-      async deposit (fromAccount, toAccount, amount) {
-        try {
-          // todo: create new sdk instance with signatureprovider of from account
-          return await this.sdk.account.deposit(fromAccount, toAccount, amount)
-        } catch (error) {
-          this.handleError(error)
-        }
+      async deposit (amount) {
+        return await this.sdk.account.deposit(this.account.accountName, this.account.accountName, amount, this.account.permission)
       },
 
-      async withdraw (fromAccount, toAccount, amount, memo) {
-        try {
-          return await this.sdk.account.withdraw(fromAccount, toAccount, amount, memo)
-        } catch (error) {
-          this.handleError(error)
-        }
+      async withdraw (toAccount, amount, memo) {
+        return await this.sdk.account.withdraw(this.account.accountName, toAccount, amount, this.account.permission, memo)
       },
 
-      async vTransfer (fromAccount, toAccount, amount) {
-        try {
-          return await this.sdk.account.vtransfer(fromAccount, toAccount, amount)
-        } catch (error) {
-          this.handleError(error)
-        }
+      async vTransfer (toAccount, amount) {
+        return await this.sdk.account.vtransfer(this.account.accountName, toAccount, amount, this.account.permission)
       },
 
       async logout () {
