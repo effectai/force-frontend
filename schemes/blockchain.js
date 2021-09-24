@@ -33,7 +33,7 @@ export default class BlockchainScheme extends BaseScheme {
 
   async fetchUser (account) {
     if (!account) {
-      account = this.$auth.user
+      account = { ...this.$auth.user }
     }
     if (!this.check().valid) {
       return Promise.resolve()
@@ -50,9 +50,6 @@ export default class BlockchainScheme extends BaseScheme {
     }
 
     account.vAccountRows = vAccountRows
-    // if (this.$auth.user) {
-    //   account.vAccountRows[0].balance.quantity = '3.0000 UTL'
-    // }
     this.$auth.setUser(account)
     return Promise.resolve()
   }
