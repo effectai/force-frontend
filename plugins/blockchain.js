@@ -15,7 +15,8 @@ export default (context, inject) => {
         efxAvailable: 0,
         eos,
         bsc,
-        sdk: null
+        sdk: null,
+        error: null
       }
     },
     computed: {
@@ -82,7 +83,7 @@ export default (context, inject) => {
           // todo: create new sdk instance with signatureprovider of from account
           return await this.sdk.account.deposit(fromAccount, toAccount, amount)
         } catch (error) {
-          throw new Error(error)
+          this.handleError(error)
         }
       },
 
@@ -90,7 +91,7 @@ export default (context, inject) => {
         try {
           return await this.sdk.account.withdraw(fromAccount, toAccount, amount, memo)
         } catch (error) {
-          throw new Error(error)
+          this.handleError(error)
         }
       },
 
@@ -98,7 +99,7 @@ export default (context, inject) => {
         try {
           return await this.sdk.account.vtransfer(fromAccount, toAccount, amount)
         } catch (error) {
-          throw new Error(error)
+          this.handleError(error)
         }
       },
 
@@ -130,6 +131,22 @@ export default (context, inject) => {
           web3: this.bsc.wallet ? this.bsc.web3 : null
         }
         this.sdk = new effectSdk.EffectClient(sdkOptions)
+      },
+      handleError (error) {
+        console.error(error)
+        if (error.response && error.response.data) {
+          if (error.response.data.error) {
+            this.error = error.response.data.error
+          } else if (error.response.data.message) {
+            this.error = error.response.data.message
+          } else {
+            this.error = error.response.data
+          }
+        } else if (error.message) {
+          this.error = error.message
+        } else {
+          this.error = error
+        }
       }
     }
   })

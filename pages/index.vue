@@ -40,15 +40,19 @@ export default {
   },
   methods: {
     async deposit (amount) {
-      if (this.$auth.user.blockchain.eos) {
-        const result = await this.$eos.deposit(this.$auth.user.blockchain.eos.accountName, this.$auth.user.blockchain.eos.accountName, amount)
+      if (this.$auth.user.blockchain === 'eos') {
+        const result = await this.$blockchain.deposit(this.$auth.user.accountName, this.$auth.user.accountName, amount)
         console.log(result)
+      } else {
+        alert('no support yet for bsc')
       }
     },
     async withdraw (amount) {
-      if (this.$auth.user.blockchain.eos) {
-        const result = await this.$eos.withdraw(this.$auth.user.blockchain.eos.accountName, this.$auth.user.blockchain.eos.accountName, amount)
+      if (this.$auth.user.blockchain === 'eos') {
+        const result = await this.$blockchain.withdraw(this.$auth.user.accountName, this.$auth.user.accountName, amount)
         console.log(result)
+      } else {
+        alert('no support yet for bsc')
       }
     }
   }

@@ -4,6 +4,12 @@
     <eos-wallet />
     <nav-bar />
     <div id="content">
+        <div class="container">
+          <div v-if="$blockchain.error" class="notification is-danger mt-2">
+            <button class="delete" @click="$blockchain.error = null" />
+            {{ $blockchain.error }}
+          </div>
+        </div>
       <Nuxt />
     </div>
   </div>
