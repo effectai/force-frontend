@@ -2,14 +2,9 @@
   <div id="app">
     <bsc-wallet />
     <eos-wallet />
+    <error-modal />
     <nav-bar />
     <div id="content">
-        <div class="container">
-          <div v-if="$blockchain.error" class="notification is-danger mt-2">
-            <button class="delete" @click="$blockchain.error = null" />
-            {{ $blockchain.error }}
-          </div>
-        </div>
       <Nuxt />
     </div>
   </div>
@@ -18,9 +13,11 @@
 <script>
 import BscWallet from '@/components/BscWallet'
 import EosWallet from '@/components/EosWallet'
-import NavBar from '~/components/NavBar'
+import NavBar from '@/components/NavBar'
+import ErrorModal from '@/components/ErrorModal'
 export default {
   components: {
+    ErrorModal,
     BscWallet,
     EosWallet,
     NavBar
