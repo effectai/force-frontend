@@ -30,7 +30,6 @@ export default {
   },
   methods: {
     async logout () {
-      await this.$blockchain.logout()
       await this.$auth.logout()
     }
   }

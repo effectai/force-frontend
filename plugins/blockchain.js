@@ -2,7 +2,7 @@ import Vue from 'vue'
 import eos from '../services/eos'
 import bsc from '../services/bsc'
 // const effectSdk = require('@effectai/effect-js')
-const effectSdk = require('../../effect-js')
+const effectSdk = require('../../../effect-js')
 
 export default (context, inject) => {
   const blockchain = new Vue({
@@ -58,7 +58,7 @@ export default (context, inject) => {
           account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, publicKey: wallet.auth.publicKey }
         } else if (blockchain === 'bsc') {
           const provider = await this.bsc.login(providerName)
-          await this.bsc.registerListener(provider, context.$auth)
+          this.registerBscListeners(provider)
           account = { accountName: this.bsc.wallet[0], publicKey: this.bsc.wallet[0] }
         }
         if (account) {
@@ -69,6 +69,52 @@ export default (context, inject) => {
           return true
         }
         return false
+      },
+      switchBscAccountBeforeLogin (address) {
+        const account = { ...this.account }
+        account.accountName = address
+        account.publicKey = address
+        this.account = account
+        this.initSdk()
+      },
+      registerBscListeners (provider) {
+        // Disconnected, requests can no longer be made with provider.
+        provider.on('disconnect', () => {
+          console.log('disconnecting provider')
+          this.logout()
+          context.$auth.logout()
+        })
+
+        // Inform user of account change, only one account can be selected
+        provider.on('accountsChanged', (newWallet) => {
+          this.bsc.wallet = newWallet
+          if (newWallet.length) {
+            if (context.$auth.loggedIn) {
+              if (newWallet[0].toLowerCase() !== context.$auth.user.accountName.toLowerCase()) {
+                context.$auth.logout()
+              }
+            } else {
+              this.switchBscAccountBeforeLogin(newWallet[0])
+            }
+          } else {
+            this.logout()
+            context.$auth.logout()
+          }
+        })
+
+        // Inform user of chain change
+        provider.on('chainChanged', (_chainId) => {
+          if (!this.bsc.web3.utils.isHex(_chainId)) {
+            alert('This chain is not supported, logging out.')
+            this.logout()
+          } else if (_chainId !== process.env.NUXT_ENV_BSC_HEX_ID) {
+            alert(`Please switch to the correct chain:\n${process.env.NUXT_ENV_BSC_CHAIN_NAME}, Mainnet, chainId: ${process.env.NUXT_ENV_BSC_NETWORK_ID}\n\nCurrently on: ${this.bsc.web3.utils.hexToNumberString(_chainId)}\n\nLogging out.`)
+            // It is recommended to reload the entire window, or to logout the user to make sure the user doesn't do any txs.
+            this.logout()
+            context.$auth.logout() // Logout
+            // window.location.reload() // reload window aswell?
+          }
+        })
       },
 
       async openVAccount () {

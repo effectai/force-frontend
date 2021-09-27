@@ -77,6 +77,7 @@ export default {
   },
   watch: {
     '$blockchain.account' (account) {
+      this.existingAccount = null
       if (account) {
         this.accountExists()
       }

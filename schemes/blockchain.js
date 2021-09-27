@@ -54,7 +54,10 @@ export default class BlockchainScheme extends BaseScheme {
     return Promise.resolve()
   }
 
-  logout (endpoint = {}) {
+  async logout (endpoint = {}) {
+    if (this.$blockchain) {
+      await this.$blockchain.logout()
+    }
     return this.$auth.reset()
   }
 
