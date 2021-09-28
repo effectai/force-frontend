@@ -93,10 +93,28 @@ a.card {
 
 .button {
   &.is-wide {
+    min-width: 150px;
+  }
+  &.is-wider {
     min-width: 200px;
   }
 }
-
+@media screen and (max-width: 768px), print {
+  .button {
+    &.is-fullwidth-mobile {
+      display: flex;
+      width: 100%;
+    }
+  }
+}
+.box {
+  border: 1px solid transparent;
+}
+a.box {
+  &:hover, &:focus {
+    border: 1px solid $link-hover;
+  }
+}
 .has-radius {
   border-radius: 7px;
 }
