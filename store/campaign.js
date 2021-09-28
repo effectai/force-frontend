@@ -1,5 +1,4 @@
-// const qs = require('qs')
-const API_BASE = process.env.NUXT_ENV_BACKEND_URL
+// const API_BASE = process.env.NUXT_ENV_BACKEND_URL
 
 export default {
   namespaced: true,
@@ -16,15 +15,25 @@ export default {
 
   },
   actions: {
-    async getCampaigns ({ commit, state }, filters) {
+    async getCampaigns ({ dispatch, commit, state }, nextKey) {
       commit('SET_LOADING', true)
       try {
-        const campaigns = await this.$axios.$get(`${API_BASE}/worker/campaigns`)
-        commit('SET_CAMPAIGNS', campaigns.results)
-      } catch (e) {
-        console.error(e)
-        alert('error')
-      } finally {
+        const data = await this.$blockchain.getCampaigns(nextKey)
+        let campaigns = state.campaigns
+        if (!nextKey) {
+          campaigns = data.rows
+        } else {
+          campaigns = campaigns.concat(data.rows)
+        }
+        commit('SET_CAMPAIGNS', campaigns)
+        if (data.more) {
+          dispatch('getCampaigns', data.next_key)
+        } else {
+          // No more campaigns, we are done
+          commit('SET_LOADING', false)
+        }
+      } catch (error) {
+        this.$blockchain.handleError(error)
         commit('SET_LOADING', false)
       }
     }

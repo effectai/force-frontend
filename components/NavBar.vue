@@ -91,8 +91,12 @@ export default {
 
   methods: {
     async countNewNotifications () {
-      const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications/new')
-      this.newNotifications = +response.newNotifications
+      try {
+        const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications/new')
+        this.newNotifications = +response.newNotifications
+      } catch (error) {
+        console.error('Could not get notifications count', error) // eslint-disable-line no-console
+      }
     },
     onLogo () {
       if (this.$route.path === '/') {

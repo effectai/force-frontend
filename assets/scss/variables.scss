@@ -50,7 +50,12 @@ $pieces-color: #999999;
 $dao-color: #d7ac00;
 $captions-color: #e06375;
 
-$box-shadow: 0 0 38px 10px rgba(49,71,168,0.12);
+//$box-shadow: 0 0 38px 10px rgba(49,71,168,0.12);
+//$box-link-hover-shadow: 0 0 38px 10px rgba($link,0.12);
+//$box-link-active-shadow:  0 0 38px 10px rgba($link,0.12);
+$box-shadow: 0 5px 10px 0 rgba(31,41,51,0.1);
+$box-link-hover-shadow: 0 5px 10px 0 rgba($link,0.1);
+$box-link-active-shadow: 0 5px 10px 0 rgba($link,0.1);
 $card-shadow: 0 0 38px 10px rgba(49,71,168,0.12);
 
 $light: #F6F7FF;
@@ -61,3 +66,5 @@ $drawer-header-height: 63px;
 $drawer-shadow: -5px 0px 12px 0 rgba($primary, 0.10);
 
 $navbar-height: 3.9rem;
+
+$control-border-width: 2px;

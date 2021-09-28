@@ -1,49 +1,31 @@
 <template>
   <section class="section">
     <div class="container">
-      <div class="text-center">
+      <div class="text-center mb-4">
         <a class="button is-primary" @click="deposit('1.0000')">test deposit</a>
         <br><br>
         <a class="button is-primary" @click="withdraw('1.0000')">test withdraw</a>
       </div>
-      <div>
-        <div v-if="campaignsLoading">
-          Campaigns loading..
-        </div>
-        <div v-for="campaign in campaigns" v-else-if="campaigns && campaigns.length" :key="campaign.id">
-          {{ campaign.name }}
-        </div>
-        <div v-else-if="campaigns && !campaigns.length">
-          No campaigns :(
-        </div>
-        <div v-else>
-          Could not retrieve campaigns
-        </div>
-      </div>
+      <campaign-list />
     </div>
   </section>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
+import CampaignList from '@/components/CampaignList'
 export default {
-  middleware: ['auth'],
-  computed: {
-    ...mapState({
-      campaigns: state => state.campaign.campaigns,
-      campaignsLoading: state => state.campaign.loading
-    })
+  components: {
+    CampaignList
   },
+  middleware: ['auth'],
   created () {
-    // this.$store.dispatch('campaign/getCampaigns')
   },
   methods: {
     async deposit (amount) {
       try {
         if (this.$auth.user.blockchain === 'eos') {
           const result = await this.$blockchain.deposit(amount)
-          console.log(result)
+          return result
         } else {
           alert('no support yet for bsc')
         }
@@ -55,7 +37,7 @@ export default {
       try {
         if (this.$auth.user.blockchain === 'eos') {
           const result = await this.$blockchain.withdraw(this.$auth.user.accountName, amount)
-          console.log(result)
+          return result
         } else {
           const result = await this.$blockchain.withdraw('testjairtest', amount)
           console.log(result)
