@@ -39,14 +39,10 @@ export default class BlockchainScheme extends BaseScheme {
       return Promise.resolve()
     }
     let vAccountRows = []
-    try {
-      vAccountRows = await this.$blockchain.getVAccount()
-      if (!vAccountRows || !vAccountRows.length) {
-        // account does not exists
-        throw new Error('Cannot find Effect Account')
-      }
-    } catch (error) {
-      alert('Cannot check if account exist, assuming it exists for now..')
+    vAccountRows = await this.$blockchain.getVAccount()
+    if (!vAccountRows || !vAccountRows.length) {
+      // account does not exists
+      throw new Error('Cannot find Effect Account')
     }
 
     account.vAccountRows = vAccountRows

@@ -44,7 +44,6 @@
             >View on explorer</a>
           </div>
         </div>
-        {{ $auth.user }}
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
       </div>

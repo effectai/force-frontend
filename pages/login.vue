@@ -171,8 +171,8 @@ export default {
         }
       } catch (error) {
         this.handleError(error)
-        alert('Cannot check if account exist, skipping registration for now..')
-        this.existingAccount = true
+        alert('Cannot check if account exist, assuming it does not')
+        this.existingAccount = false
       }
     }
   }
