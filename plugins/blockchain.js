@@ -62,9 +62,19 @@ export default (context, inject) => {
           account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, publicKey: wallet.auth.publicKey }
         } else if (blockchain === 'bsc') {
           const provider = await this.bsc.login(providerName)
-          const publicKey = await this.bsc.recoverPublicKey()
+          let accountAddress
+          if (rememberAccount) {
+            accountAddress = rememberAccount.accountName
+            // Make sure we still have the same connection as our stored account
+            if (rememberAccount.publicKey !== this.bsc.wallet[0]) {
+              await this.logout()
+              return false
+            }
+          } else {
+            accountAddress = await this.bsc.recoverPublicKey()
+          }
           this.registerBscListeners(provider)
-          account = { accountName: publicKey, publicKey: this.bsc.wallet[0] }
+          account = { accountName: accountAddress, publicKey: this.bsc.wallet[0] }
         }
         if (account) {
           this.initSdk()

@@ -10,7 +10,14 @@
       <div v-if="$blockchain.account">
         <div class="has-text-centered mb-2" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
           <a
-            :href="($blockchain.account.blockchain === 'bsc' ? $blockchain.bsc.explorer : $blockchain.eos.explorer) + '/address/'+ $blockchain.account.accountName"
+            v-if="$blockchain.account.blockchain === 'bsc'"
+            :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.account.publicKey"
+            target="_blank"
+            class="blockchain-address"
+          >{{ $blockchain.account.publicKey }}</a>
+          <a
+            v-else
+            :href="$blockchain.eos.explorer + '/address/'+ $blockchain.account.accountName"
             target="_blank"
             class="blockchain-address"
           >{{ $blockchain.account.accountName }}</a><span v-if="$blockchain.account.permission">@{{ $blockchain.account.permission }}</span>

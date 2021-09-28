@@ -11,10 +11,17 @@
           </div>
           <div class="subtitle">
             <a
-              :href="($auth.user.blockchain === 'bsc' ? $blockchain.bsc.explorer : $blockchain.eos.explorer) + '/address/'+ $auth.user.accountName"
+              v-if="$auth.user.blockchain === 'bsc'"
+              :href="$blockchain.bsc.explorer + '/address/'+ $auth.user.publicKey"
               target="_blank"
               class="blockchain-address"
-            >{{ $auth.user.accountName }}</a><span v-if="$blockchain.account.permission">@{{ $blockchain.account.permission }}</span>
+            >{{ $auth.user.publicKey }}</a>
+            <a
+              v-else
+              :href="$blockchain.eos.explorer + '/address/'+ $auth.user.accountName"
+              target="_blank"
+              class="blockchain-address"
+            >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
           </div>
         </div>
         <div class="block">
