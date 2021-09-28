@@ -130,7 +130,7 @@ export default (context, inject) => {
       },
 
       async withdraw (toAccount, amount, memo) {
-        return await this.sdk.account.withdraw(this.account.accountName, toAccount, amount, this.account.permission, memo)
+        return await this.sdk.account.withdraw(this.account.publicKey, toAccount, amount, this.account.permission, memo)
       },
 
       async vTransfer (toAccount, amount) {

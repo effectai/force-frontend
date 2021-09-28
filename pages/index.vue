@@ -57,6 +57,8 @@ export default {
           const result = await this.$blockchain.withdraw(this.$auth.user.accountName, amount)
           console.log(result)
         } else {
+          const result = await this.$blockchain.withdraw('testjairtest', amount)
+          console.log(result)
           alert('no support yet for bsc')
         }
       } catch (error) {
