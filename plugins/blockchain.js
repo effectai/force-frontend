@@ -33,6 +33,10 @@ export default (context, inject) => {
         return balance
       }
     },
+    created () {
+      // Initialize empty SDK, reinitialize when connecting wallet
+      this.initSdk()
+    },
 
     methods: {
       async rememberLogin () {
@@ -80,7 +84,7 @@ export default (context, inject) => {
       registerBscListeners (provider) {
         // Disconnected, requests can no longer be made with provider.
         provider.on('disconnect', () => {
-          console.log('disconnecting provider')
+          console.log('disconnecting provider') // eslint-disable-line no-console
           this.logout()
           context.$auth.logout()
         })
@@ -155,6 +159,9 @@ export default (context, inject) => {
           }
         }
       },
+      async getCampaigns (nextKey, limit = 20) {
+        return await this.sdk.account.getCampaigns(nextKey, limit)
+      },
 
       initSdk () {
         const sdkOptions = {
@@ -166,7 +173,7 @@ export default (context, inject) => {
         this.sdk = new effectSdk.EffectClient(sdkOptions)
       },
       handleError (error) {
-        console.error(error)
+        console.error(error) // eslint-disable-line no-console
         if (error.response && error.response.data) {
           if (error.response.data.error) {
             this.error = error.response.data.error
