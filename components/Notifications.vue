@@ -9,7 +9,7 @@
         @click="notificationAction(notification)"
       >
         <div class="notification-type" :class="'notification-type-' + getNotificationTypeName(notification.type)">
-          <span class="notification-icon"/>
+          <span class="notification-icon" />
           <span v-if="notification.type === 'WORK_MESSAGE'">Comment on Task</span>
           <span v-else-if="notification.type === 'TASK_GROUP_ACCEPTED'">Accepted</span>
           <span v-else-if="notification.type === 'TASK_GROUP_REJECTED'">Rejected</span>
@@ -20,7 +20,7 @@
         <div class="has-text-grey-light is-size-7 is-pulled-right">
           {{ getTimeAgo(notification.createdAt) }}
         </div>
-        <span class="is-clearfix"/>
+        <span class="is-clearfix" />
         <div v-if="notification.requesterName" class="notification-requester is-size-7">
           <span>&nbsp;by</span>
           {{ notification.requesterName }}
@@ -49,14 +49,14 @@
           v-if="notification.type === 'PUBLIC_QUALIFICATION_ASSIGNED'"
           class="notification-message"
         >
-          You have a new badge! Qualification: <b>{{notification.qualificationName}}</b>. You can find your badges in your profile page
-          </div>
+          You have a new badge! Qualification: <b>{{ notification.qualificationName }}</b>. You can find your badges in your profile page
+        </div>
         <div
           v-else-if="notification.type === 'PUBLIC_SKILL_ASSIGNED'"
           class="notification-message"
         >
-          You have a new skill! Qualification: <b>{{notification.qualificationName}}</b>. You can find your qualifications in your profile page
-          </div>
+          You have a new skill! Qualification: <b>{{ notification.qualificationName }}</b>. You can find your qualifications in your profile page
+        </div>
         <div v-if="notification.message" class="notification-message">
           {{ notification.message }}
         </div>
@@ -64,6 +64,9 @@
     </div>
     <div v-if="loading" class="p-2 has-text-centered">
       Loading..
+    </div>
+    <div v-else-if="!notifications" class="p-2 has-text-centered">
+      Could not retrieve notifications
     </div>
     <div v-if="allNotificationsLoaded" class="has-text-centered p-2">
       No more notifications
@@ -114,18 +117,21 @@ export default {
       return this.$moment(date).fromNow()
     },
     async getNotifications () {
-      this.loading = true
-      const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications?page=' + this.page)
-      const notifications = response.notifications
-      if (!notifications || notifications.length === 0) {
-        this.allNotificationsLoaded = true
-      }
+      try {
+        this.loading = true
+        const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications?page=' + this.page)
+        const notifications = response.notifications
+        if (!notifications || notifications.length === 0) {
+          this.allNotificationsLoaded = true
+        }
 
-      this.notifications = this.notifications ? this.notifications.concat(notifications) : notifications
+        this.notifications = this.notifications ? this.notifications.concat(notifications) : notifications
+        this.page++
+        this.$emit('get-notifications')
+      } catch (error) {
+        this.$blockchain.handleError(error)
+      }
       this.loading = false
-      this.page++
-      this.$emit('get-notifications')
-      // TODO: error handling
     },
     handleScroll () {
       // Trigger get new notifications when almost at the bottom of scrolling through the notifications

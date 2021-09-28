@@ -6,9 +6,9 @@
     <h1 v-else class="title has-text-danger-dark">
       An error occurred
     </h1>
-    <nuxt-link to="/" class="button">
+    <a class="button" @click.prevent="forceHomepage">
       Home page
-    </nuxt-link>
+    </a>
   </div>
 </template>
 
@@ -26,6 +26,9 @@ export default {
   },
 
   methods: {
+    forceHomepage () {
+      window.location.href = '/'
+    }
   }
 }
 </script>

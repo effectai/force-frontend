@@ -1,7 +1,7 @@
 <template>
   <span>
-    <div class="modal" :class="{ 'is-active': $bsc.loginModal }">
-      <div class="modal-background" @click="$bsc.loginModal = false" />
+    <div class="modal" :class="{ 'is-active': $blockchain.loginModal === 'bsc' }">
+      <div class="modal-background" @click="$blockchain.loginModal = false" />
       <div class="modal-card">
         <div v-if="error" class="notification is-danger">
           <button class="delete" @click="error = null" />
@@ -11,7 +11,7 @@
           <p class="modal-card-title">
             Select your BSC wallet
           </p>
-          <button class="delete" aria-label="close" @click="$bsc.loginModal = false" />
+          <button class="delete" aria-label="close" @click="$blockchain.loginModal = false" />
         </header>
         <section class="modal-card-body">
           <div v-if="loading" class="loader-wrapper is-active">
@@ -29,7 +29,7 @@
               </a>
             </div>
             <div class="column is-half">
-              <div v-if="this.$bsc.checkBinanceInstalled" class="provider has-radius" @click="selectWallet('bsc')">
+              <div v-if="this.$blockchain.bsc.checkBinanceInstalled" class="provider has-radius" @click="selectWallet('bsc')">
                 <img src="@/assets/img/providers/bsc.svg">
                 Binance Chain
               </div>
@@ -78,42 +78,22 @@ export default {
   },
   computed: {
     isMetaMaskInstalled () {
-      return Boolean(this.$bsc.metamask && this.$bsc.metamask.isMetaMask)
+      return Boolean(this.$blockchain.bsc.metamask && this.$blockchain.bsc.metamask.isMetaMask)
     },
     isTrustInstalled () {
-      return Boolean(this.$bsc.metamask && this.$bsc.metamask.isTrust)
+      return Boolean(this.$blockchain.bsc.metamask && this.$blockchain.bsc.metamask.isTrust)
     },
 
     isBinanceInstalled () {
-      return Boolean(this.$bsc.binance != null)
+      return Boolean(this.$blockchain.bsc.binance != null)
     }
   },
-  // created () {
-  //   const provider = this.$auth.$storage.getUniversal('provider')
-  //   if (provider) {
-  //     this.$bsc.loginModal = true
-  //     this.selectWallet(provider)
-  //   }
-  // },
   methods: {
     async selectWallet (provider) {
       this.loading = true
       try {
-        switch (provider) {
-          case 'trustwallet':
-            await this.$bsc.onTrustWalletConnect()
-            break
-          case 'metamask':
-            await this.$bsc.onMetaMaskConnect()
-            break
-          case 'bsc':
-            await this.$bsc.onBinanceConnect()
-            break
-          case 'walletconnect':
-            await this.$bsc.onWalletConnectWeb3()
-            break
-        }
-        this.$bsc.loginModal = false
+        await this.$blockchain.login(provider, 'bsc')
+        this.$blockchain.loginModal = false
       } catch (error) {
         console.error(error)
         if (error.response && error.response.data) {

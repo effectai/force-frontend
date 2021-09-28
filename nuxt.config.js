@@ -87,8 +87,7 @@ export default {
     },
     plugins: [
       { src: '~/plugins/axios.js' },
-      { src: '~/plugins/bsc.js' },
-      { src: '~/plugins/eos.js' }
+      { src: '~/plugins/blockchain.js' }
     ]
   },
 

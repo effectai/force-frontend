@@ -1,7 +1,7 @@
 <template>
   <span>
-    <div class="modal" :class="{ 'is-active': $eos.loginModal }">
-      <div class="modal-background" @click="$eos.loginModal = false" />
+    <div class="modal" :class="{ 'is-active': $blockchain.loginModal === 'eos' }">
+      <div class="modal-background" @click="$blockchain.loginModal = false" />
       <div class="modal-card">
         <div v-if="error" class="notification is-danger">
           <button class="delete" @click="error = null" />
@@ -11,7 +11,7 @@
           <p class="modal-card-title">
             Select your EOS wallet
           </p>
-          <button class="delete" aria-label="close" @click="$eos.loginModal = false" />
+          <button class="delete" aria-label="close" @click="$blockchain.loginModal = false" />
         </header>
         <section class="modal-card-body">
           <div v-if="loading" class="loader-wrapper is-active">
@@ -59,15 +59,15 @@ export default {
   },
   computed: {
     providers () {
-      return this.$eos.providers
+      return this.$blockchain.eos.providers
     }
   },
   methods: {
-    async selectWallet (index) {
+    async selectWallet (provider) {
       this.loading = true
       try {
-        await this.$eos.login(index)
-        this.$eos.loginModal = false
+        await this.$blockchain.login(provider, 'eos')
+        this.$blockchain.loginModal = false
       } catch (error) {
         this.error = error
       }

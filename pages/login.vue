@@ -3,24 +3,31 @@
     <h2 class="subtitle has-text-centered">
       Login to your Effect Account
     </h2>
-    <div class="container">
-      <div v-if="bscWallet" class="has-text-centered">
-        <a
-          :href="$bsc.explorer + '/address/'+ bscWallet[0]"
-          target="_blank"
-          class="blockchain-address"
-        >{{ bscWallet[0] }}</a>
-      </div>
-      <div v-else-if="eosWallet" class="has-text-centered subtitle">
-        <a
-          :href="$eos.explorer + '/address/'+ eosWallet.auth.accountName"
-          target="_blank"
-          class="blockchain-address"
-        >{{ eosWallet.auth.accountName }}</a>
+    <div v-if="loading" class="container">
+      Loading..
+    </div>
+    <div v-else class="container">
+      <div v-if="$blockchain.account">
+        <div class="has-text-centered mb-2" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
+          <a
+            :href="($blockchain.account.blockchain === 'bsc' ? $blockchain.bsc.explorer : $blockchain.eos.explorer) + '/address/'+ $blockchain.account.accountName"
+            target="_blank"
+            class="blockchain-address"
+          >{{ $blockchain.account.accountName }}</a><span v-if="$blockchain.account.permission">@{{ $blockchain.account.permission }}</span>
+        </div>
+        <div style="min-height: 67px">
+          <div v-if="error" class="notification is-danger">
+            <button class="delete" @click="error = null" />
+            {{ error }}
+          </div>
+          <div v-if="loadingLogin" class="is-size-7 has-text-centered">
+            ..retrieving blockchain Effect Account info..
+          </div>
+        </div>
       </div>
       <div v-else class="columns">
         <div class="column is-half has-text-centered">
-          <div class="button" style="height: auto; display:block" @click="$eos.loginModal = true">
+          <div class="button" style="height: auto; display:block" @click="$blockchain.loginModal = 'eos'">
             <div class="subtitle has-text-weight-semibold mb-2">
               <small class="is-size-7">connect with </small><br>EOS
             </div>
@@ -28,7 +35,7 @@
           </div>
         </div>
         <div class="column is-half">
-          <div class="button" style="height: auto; display:block" @click="$bsc.loginModal = true">
+          <div class="button" style="height: auto; display:block" @click="$blockchain.loginModal = 'bsc'">
             <div class="subtitle has-text-weight-semibold mb-2">
               <small class="is-size-7">connect with </small><br>BSC
             </div>
@@ -36,20 +43,16 @@
           </div>
         </div>
       </div>
-      <div class="columns is-flex-direction-row-reverse is-vcentered mt-5">
+      <div class="columns is-flex-direction-row-reverse is-vcentered mt-1">
         <div class="column is-4">
-          <div class="button is-secondary is-fullwidth" :disabled="!bscWallet && !eosWallet" @click="login">
-            Login
+          <div v-if="$blockchain.account" class="button is-secondary is-fullwidth" :class="{'is-loading': loadingLogin || existingAccount === null}" :disabled="!$blockchain.account || loadingLogin || existingAccount === null" @click="login">
+            <span v-if="existingAccount">Login</span>
+            <span v-else>Register</span>
           </div>
         </div>
         <div class="column is-8">
-          <a v-if="eosWallet || bscWallet" class="is-size-6  has-text-danger-dark" @click="$bsc.logout(); $eos.logout()">switch wallet</a>
-          <small v-else>
-            No Account?
-            <nuxt-link to="/register">
-              Create Effect Account
-            </nuxt-link>
-          </small>
+          <a v-if="$blockchain.account" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout()">switch wallet</a>
+          <span v-else>No wallet? <a target="_blank" class="is-size-6" href="https://medium.com/effect-ai">Create a wallet</a></span>
         </div>
       </div>
     </div>
@@ -57,52 +60,67 @@
 </template>
 
 <script>
+const retry = require('async-retry')
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 export default {
   layout: 'box',
   middleware: ['auth'],
   auth: 'guest',
   data () {
     return {
-      error: null
+      existingAccount: null,
+      error: null,
+      loadingLogin: false,
+      loading: false
     }
   },
-  computed: {
-    bscWallet () {
-      return (this.$bsc) ? this.$bsc.wallet : null
-    },
-    eosWallet () {
-      return (this.$eos) ? this.$eos.wallet : null
+  watch: {
+    '$blockchain.account' (account) {
+      this.existingAccount = null
+      if (account) {
+        this.accountExists()
+      }
     }
   },
-  mounted () {
-    this.$eos.rememberLogin()
-    this.$bsc.rememberLogin()
+  created () {
+    this.rememberLogin()
   },
   methods: {
-    async login () {
-      if (!this.bscWallet && !this.eosWallet) { return }
+    async rememberLogin () {
+      this.loading = true
       try {
-        await this.$auth.loginWith('blockchain', {
-          account: {
-            eos:
-            this.eosWallet ? this.eosWallet.auth : null,
-            bsc:
-              this.bscWallet ? this.bscWallet[0] : null
+        await this.$blockchain.rememberLogin()
+      } catch (e) {
+        console.error('rememberLogin', e)
+      }
+      this.loading = false
+    },
+    async login () {
+      this.loadingLogin = true
+      if (!this.$blockchain.account) { return }
+      try {
+        // if account doesnt exists yet add it
+        if (this.existingAccount === false) {
+          await this.$blockchain.openVAccount()
+          await sleep(2000)
+        }
+        await retry(async () => {
+          await this.$auth.loginWith('blockchain', {
+            account: this.$blockchain.account,
+            $blockchain: this.$blockchain
+          })
+        }, {
+          retries: 5,
+          onRetry: (error, number) => {
+            console.log('attempt', number, error)
           }
         })
+        this.$auth.$storage.setUniversal('rememberAccount', JSON.stringify(this.$blockchain.account))
         // Needed because there is a redirect bug when going to a protected route from the login page
         const path = this.$auth.$storage.getUniversal('redirect') || '/'
         this.$auth.$storage.setUniversal('redirect', null)
         this.$router.push(path)
-        // let address
-        // let blockchainPlugin
-        // if (this.bscWallet) {
-        //   address = this.bscWallet[0]
-        //   blockchainPlugin = this.$bsc
-        // } else if (this.eosWallet) {
-        //   address = this.eosWallet.auth.accountName
-        //   blockchainPlugin = this.$eos
-        // }
         // const response1 = await this.$axios.get(`${process.env.NUXT_ENV_BACKEND_URL}/user/login/${address}`)
         // const nonce = response1.data
         // const signature = await blockchainPlugin.sign(nonce)
@@ -120,18 +138,41 @@ export default {
         // this.$auth.$storage.setUniversal('redirect', null)
         // this.$router.push(path)
       } catch (error) {
-        console.error('ERR', error)
-        if (error.response && error.response.data) {
-          if (error.response.data.error) {
-            this.error = error.response.data.error
-          } else {
-            this.error = error.response.data
-          }
-        } else if (error.message) {
-          this.error = error.message
+        this.handleError(error)
+      }
+      this.loadingLogin = false
+    },
+    handleError (error) {
+      console.error(error)
+      if (error.response && error.response.data) {
+        if (error.response.data.error) {
+          this.error = error.response.data.error
+        } else if (error.response.data.message) {
+          this.error = error.response.data.message
         } else {
-          this.error = error
+          this.error = error.response.data
         }
+      } else if (error.message) {
+        this.error = error.message
+      } else {
+        this.error = error
+      }
+    },
+    async accountExists () {
+      // check if account exists
+      try {
+        const vAccountRows = await this.$blockchain.getVAccount()
+        if (vAccountRows && vAccountRows.length) {
+          // account exists
+          this.existingAccount = true
+        } else {
+          this.existingAccount = false
+          // account doesnt exist
+        }
+      } catch (error) {
+        this.handleError(error)
+        alert('Cannot check if account exist, assuming it does not')
+        this.existingAccount = false
       }
     }
   }

@@ -31,7 +31,7 @@
             <balance
               v-if="$auth.loggedIn"
               class="navbar-item"
-              :amount="($auth.user.username ? $auth.user.balance : ($auth.user.credit || 0)).toFixed(2)"
+              :amount="($blockchain.vefxAvailable !== null ? $blockchain.vefxAvailable.toFixed(2) : -1)"
             />
           </div>
           <div class="navbar-end">
@@ -83,8 +83,6 @@ export default {
     }
   },
 
-  computed: {},
-
   created () {
     if (this.$auth.loggedIn) {
       this.countNewNotifications()
@@ -93,8 +91,12 @@ export default {
 
   methods: {
     async countNewNotifications () {
-      const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications/new')
-      this.newNotifications = +response.newNotifications
+      try {
+        const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications/new')
+        this.newNotifications = +response.newNotifications
+      } catch (error) {
+        console.error('Could not get notifications count', error) // eslint-disable-line no-console
+      }
     },
     onLogo () {
       if (this.$route.path === '/') {
