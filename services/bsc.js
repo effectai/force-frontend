@@ -1,5 +1,11 @@
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
+import { Serialize } from 'eosjs'
+import RIPEMD160 from 'eosjs/dist/ripemd'
+import { utils } from 'ethers'
+
+const EC = require('elliptic').ec
+const ec = new EC('secp256k1')
 
 const web3 = new Web3()
 web3.setProvider(process.env.NUXT_ENV_BSC_RPC)
@@ -75,6 +81,24 @@ const bsc = {
       console.error(error)
       return Promise.reject(error)
     }
+  },
+
+  recoverPublicKey: async () => {
+    const message = 'Effect Account'
+    const signature = await bsc.sign(message)
+
+    // recover public key
+    const hashedMsg = utils.hashMessage(message)
+    const sigAddress = utils.recoverPublicKey(utils.arrayify(hashedMsg), signature.trim())
+
+    // compress public key
+    const keypair = ec.keyFromPublic(sigAddress.substring(2), 'hex')
+    const compressed = keypair.getPublic().encodeCompressed('hex')
+
+    // RIPEMD160 hash public key
+    const ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
+    const address = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
+    return address
   },
 
   testTx: () => {

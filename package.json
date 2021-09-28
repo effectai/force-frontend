@@ -26,6 +26,7 @@
     "eos-transit-scatter-provider": "^4.0.7",
     "eos-transit-tokenpocket-provider": "^4.0.7",
     "eosjs": "^22.0.0",
+    "ethers": "^5.4.7",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "nuxt": "^2.15.3",
