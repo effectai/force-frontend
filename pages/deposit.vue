@@ -23,20 +23,18 @@
       <b>Address</b>
       <div class="copy-wrapper">
         <pre class="text">{{ account }}</pre>
-        <button class="button custom-button has-tooltip-primary" type="button" @click.prevent="copyToClipboard(account)" :data-tooltip="copy_message">
+        <button class="button custom-button has-tooltip has-tooltip-fade" type="button" :data-tooltip="copy_message" @click.prevent="copyToClipboard(account)" @mouseout="copy_message = 'Copy to clipboard'">
           <img src="https://icongr.am/clarity/copy.svg" alt="Icon">
         </button>
       </div>
       <b>Memo</b>
       <div class="copy-wrapper">
         <pre class="text">{{ memo }}</pre>
-        <button class="button custom-button has-tooltip-primary" type="button" @click.prevent="copyToClipboard(memo)" :data-tooltip="copy_message">
+        <button class="button custom-button has-tooltip-fade" type="button" :data-tooltip="copy_message" @click.prevent="copyToClipboard(memo)" @mouseout="copy_message = 'Copy to clipboard'">
           <img src="https://icongr.am/clarity/copy.svg" alt="Icon">
         </button>
       </div>
     </div>
-    <pre>{{ copy_message }}</pre>
-    <!-- <pre>{{ this.$blockchain.sdk.account.config.ACCOUNT_CONTRACT }}</pre> -->
   </section>
 </template>
 
@@ -47,7 +45,7 @@ export default {
   data () {
     return {
       loading: true,
-      copy_message: null,
+      copy_message: 'Copy to clipboard',
       modal_confirmation: false,
       memo: this.$auth.$storage.getUniversal('rememberAccount').vAccountRows[0].id,
       account: this.$blockchain.sdk.account.config.ACCOUNT_CONTRACT,
@@ -65,8 +63,7 @@ export default {
     },
     copyToClipboard (content) {
       navigator.clipboard.writeText(content).then(() => {
-        this.copied = true
-        this.copy_message = content
+        this.copy_message = 'Copied!'
       })
     }
   }
@@ -102,29 +99,6 @@ export default {
 
     &:focus {
       outline: none;
-    }
-    &:before {
-      content: "Copied";
-      position: absolute;
-      top: -45px;
-      right: 0px;
-      background: #5c81dc;
-      padding: 8px 10px;
-      border-radius: 20px;
-      font-size: 15px;
-      display: none;
-    }
-
-    &:after {
-      content: "";
-      position: absolute;
-      top: -20px;
-      right: 25px;
-      width: 10px;
-      height: 10px;
-      background: #5c81dc;
-      transform: rotate(45deg);
-      display: none;
     }
 
     & img {
