@@ -1,7 +1,8 @@
 <template>
   <section class="section">
     <h2 class="subtitle has-text-centered">
-      Login to your Effect Account
+      <span v-if="$blockchain.waitForSignatureFrom">Account Switched. Re-verify Signature</span>
+      <span v-else>Login to your Effect Account</span>
     </h2>
     <div v-if="loading" class="container">
       Loading..
@@ -10,7 +11,14 @@
       <div v-if="$blockchain.account">
         <div class="has-text-centered mb-2" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
           <a
-            :href="($blockchain.account.blockchain === 'bsc' ? $blockchain.bsc.explorer : $blockchain.eos.explorer) + '/address/'+ $blockchain.account.accountName"
+            v-if="$blockchain.account.blockchain === 'bsc'"
+            :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey"
+            target="_blank"
+            class="blockchain-address"
+          >{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey }}</a>
+          <a
+            v-else
+            :href="$blockchain.eos.explorer + '/address/'+ $blockchain.account.accountName"
             target="_blank"
             class="blockchain-address"
           >{{ $blockchain.account.accountName }}</a><span v-if="$blockchain.account.permission">@{{ $blockchain.account.permission }}</span>
@@ -45,7 +53,10 @@
       </div>
       <div class="columns is-flex-direction-row-reverse is-vcentered mt-1">
         <div class="column is-4">
-          <div v-if="$blockchain.account" class="button is-secondary is-fullwidth" :class="{'is-loading': loadingLogin || existingAccount === null}" :disabled="!$blockchain.account || loadingLogin || existingAccount === null" @click="login">
+          <div v-if="$blockchain.waitForSignatureFrom" class="button is-secondary is-fullwidth" :class="{'is-loading': $blockchain.waitForSignature}" @click="$blockchain.switchBscAccountBeforeLogin">
+            Sign
+          </div>
+          <div v-else-if="$blockchain.account" class="button is-secondary is-fullwidth" :class="{'is-loading': loadingLogin || existingAccount === null}" :disabled="!$blockchain.account || loadingLogin || existingAccount === null" @click="login">
             <span v-if="existingAccount">Login</span>
             <span v-else>Register</span>
           </div>

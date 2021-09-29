@@ -4,7 +4,7 @@
       <div class="text-center mb-4">
         <a class="button is-primary" @click="deposit('1.0000')">test deposit</a>
         <br><br>
-        <a class="button is-primary" @click="withdraw('1.0000')">test withdraw</a>
+        <a class="button is-primary" @click="withdraw('0.0100')">test withdraw</a>
       </div>
       <campaign-list />
     </div>
@@ -39,6 +39,8 @@ export default {
           const result = await this.$blockchain.withdraw(this.$auth.user.accountName, amount)
           return result
         } else {
+          const result = await this.$blockchain.withdraw('testjairtest', amount)
+          console.log(result)
           alert('no support yet for bsc')
         }
       } catch (error) {
