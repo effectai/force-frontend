@@ -85,20 +85,22 @@ const bsc = {
 
   recoverPublicKey: async () => {
     const message = 'Effect Account'
+    console.log('signing message', message)
     const signature = await bsc.sign(message)
 
     // recover public key
     const hashedMsg = utils.hashMessage(message)
-    const sigAddress = utils.recoverPublicKey(utils.arrayify(hashedMsg), signature.trim())
+    const pk = utils.recoverPublicKey(utils.arrayify(hashedMsg), signature.trim())
+    const address = utils.computeAddress(utils.arrayify(pk))
 
     // compress public key
-    const keypair = ec.keyFromPublic(sigAddress.substring(2), 'hex')
+    const keypair = ec.keyFromPublic(pk.substring(2), 'hex')
     const compressed = keypair.getPublic().encodeCompressed('hex')
 
     // RIPEMD160 hash public key
     const ripemd16 = RIPEMD160.RIPEMD160.hash(Serialize.hexToUint8Array(compressed))
-    const address = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
-    return address
+    const accountAddress = Serialize.arrayToHex(new Uint8Array(ripemd16)).toLowerCase()
+    return { address, accountAddress }
   },
 
   testTx: () => {

@@ -16,7 +16,9 @@ export default (context, inject) => {
         eos,
         bsc,
         sdk: null,
-        error: null
+        error: null,
+        waitForSignatureFrom: null,
+        waitForSignature: 0
       }
     },
     computed: {
@@ -71,26 +73,39 @@ export default (context, inject) => {
               return false
             }
           } else {
-            accountAddress = await this.bsc.recoverPublicKey()
+            accountAddress = (await this.bsc.recoverPublicKey()).accountAddress
           }
           this.registerBscListeners(provider)
           account = { accountName: accountAddress, publicKey: this.bsc.wallet[0] }
         }
         if (account) {
-          this.initSdk()
           account.blockchain = blockchain
           account.provider = providerName
           this.account = account
+          this.initSdk()
           return true
         }
         return false
       },
-      switchBscAccountBeforeLogin (address) {
-        const account = { ...this.account }
-        account.accountName = address
-        account.publicKey = address
-        this.account = account
-        this.initSdk()
+      async switchBscAccountBeforeLogin () {
+        this.waitForSignature++
+        try {
+          const account = { ...this.account }
+          // Make sure address matches with the public key we get from bsc wallet
+          const addresses = await this.bsc.recoverPublicKey()
+          // Check if this is the signature we are currently waiting for, as we could have multiple signature requests..
+          if (addresses.address.toLowerCase() === this.waitForSignatureFrom.toLowerCase() && addresses.address.toLowerCase() === this.bsc.wallet[0].toLowerCase()) {
+            this.waitForSignatureFrom = null
+            account.accountName = addresses.accountAddress
+            account.publicKey = this.bsc.wallet[0]
+
+            this.account = account
+            this.initSdk()
+          }
+        } catch (error) {
+          this.handleError(error)
+        }
+        this.waitForSignature--
       },
       registerBscListeners (provider) {
         // Disconnected, requests can no longer be made with provider.
@@ -109,7 +124,7 @@ export default (context, inject) => {
                 context.$auth.logout()
               }
             } else {
-              this.switchBscAccountBeforeLogin(newWallet[0])
+              this.waitForSignatureFrom = newWallet[0]
             }
           } else {
             this.logout()
@@ -144,7 +159,7 @@ export default (context, inject) => {
       },
 
       async withdraw (toAccount, amount, memo) {
-        return await this.sdk.account.withdraw(this.account.publicKey, toAccount, amount, this.account.permission, memo)
+        return await this.sdk.account.withdraw(this.account.accountName, this.account.publicKey, toAccount, amount, this.account.permission, memo)
       },
 
       async vTransfer (toAccount, amount) {
@@ -152,10 +167,10 @@ export default (context, inject) => {
       },
 
       async logout () {
-        await this.eos.logout()
-        await this.bsc.logout()
         context.$auth.$storage.setUniversal('rememberAccount', null)
         this.clear()
+        await this.eos.logout()
+        await this.bsc.logout()
       },
 
       clear () {
