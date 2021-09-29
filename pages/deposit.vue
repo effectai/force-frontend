@@ -23,20 +23,24 @@
       <b>Address</b>
       <div class="copy-wrapper">
         <pre class="text">{{ account }}</pre>
-        <button class="button custom-button has-tooltip-primary" type="button" @click.prevent="copyToClipboard(account)" :data-tooltip="copy_message">
-          <img src="https://icongr.am/clarity/copy.svg" alt="Icon">
-        </button>
+        <div class="tooltip">
+          <button class="button custom-button" type="button" @click.prevent="copyToClipboard(account, 'address')" @mouseout="clearTooltip('address')">
+            <span class="tooltiptext" id="tooltip-address">Copy to clipboard</span>
+            <img src="https://icongr.am/clarity/copy.svg" alt="Icon">
+          </button>
+        </div>
       </div>
       <b>Memo</b>
       <div class="copy-wrapper">
         <pre class="text">{{ memo }}</pre>
-        <button class="button custom-button has-tooltip-primary" type="button" @click.prevent="copyToClipboard(memo)" :data-tooltip="copy_message">
-          <img src="https://icongr.am/clarity/copy.svg" alt="Icon">
-        </button>
+        <div class="tooltip">
+          <button class="button custom-button" type="button" @click.prevent="copyToClipboard(memo, 'memo')" @mouseout="clearTooltip('memo')">
+            <span class="tooltiptext" id="tooltip-memo">Copy to clipboard</span>
+            <img src="https://icongr.am/clarity/copy.svg" alt="Icon">
+          </button>
+        </div>
       </div>
     </div>
-    <pre>{{ copy_message }}</pre>
-    <!-- <pre>{{ this.$blockchain.sdk.account.config.ACCOUNT_CONTRACT }}</pre> -->
   </section>
 </template>
 
@@ -47,7 +51,6 @@ export default {
   data () {
     return {
       loading: true,
-      copy_message: null,
       modal_confirmation: false,
       memo: this.$auth.$storage.getUniversal('rememberAccount').vAccountRows[0].id,
       account: this.$blockchain.sdk.account.config.ACCOUNT_CONTRACT,
@@ -63,11 +66,16 @@ export default {
         this.loading = false
       }
     },
-    copyToClipboard (content) {
+    copyToClipboard (content, type) {
       navigator.clipboard.writeText(content).then(() => {
         this.copied = true
-        this.copy_message = content
+        const tooltip = document.getElementById('tooltip-' + type)
+        tooltip.innerHTML = 'Copied!'
       })
+    },
+    clearTooltip (type) {
+      const tooltip = document.getElementById('tooltip-' + type)
+      tooltip.innerHTML = 'Copy to clipboard'
     }
   }
 }
@@ -103,32 +111,48 @@ export default {
     &:focus {
       outline: none;
     }
-    &:before {
-      content: "Copied";
-      position: absolute;
-      top: -45px;
-      right: 0px;
-      background: #5c81dc;
-      padding: 8px 10px;
-      border-radius: 20px;
-      font-size: 15px;
-      display: none;
-    }
-
-    &:after {
-      content: "";
-      position: absolute;
-      top: -20px;
-      right: 25px;
-      width: 10px;
-      height: 10px;
-      background: #5c81dc;
-      transform: rotate(45deg);
-      display: none;
-    }
 
     & img {
       width: 25px;
     }
   }
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+
+  & .tooltiptext {
+    visibility: hidden;
+    width: 140px;
+    background-color: #555;
+    color: $light;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    font-size: 14px;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #555 transparent transparent transparent;
+    }
+  }
+  &:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
 </style>
