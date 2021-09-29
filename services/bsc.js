@@ -22,7 +22,7 @@ const chainObject = {
     decimals: 18
   },
   rpcUrls: [process.env.NUXT_ENV_BSC_RPC],
-  blockExplorerUrls: [process.env.NUXT_ENV_BLOCKEXPLORER]
+  blockExplorerUrls: [process.env.NUXT_ENV_BSC_EXPLORER_URL]
 }
 
 const bsc = {
