@@ -15,10 +15,10 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 // Used for add chain network functionality. only for metamask atm
 const chainObject = {
   chainId: process.env.NUXT_ENV_BSC_HEX_ID,
-  chainName: process.env.NUXT_ENV_CHAIN_NAME,
+  chainName: process.env.NUXT_ENV_BSC_CHAIN_NAME,
   nativeCurrency: {
-    name: process.env.NUXT_ENV_TOKEN_NAME,
-    symbol: process.env.NUXT_ENV_TOKEN_SYMBOL,
+    name: process.env.NUXT_ENV_BSC_TOKEN_NAME,
+    symbol: process.env.NUXT_ENV_BSC_TOKEN_SYMBOL,
     decimals: 18
   },
   rpcUrls: [process.env.NUXT_ENV_BSC_RPC],
