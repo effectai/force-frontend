@@ -23,22 +23,16 @@
       <b>Address</b>
       <div class="copy-wrapper">
         <pre class="text">{{ account }}</pre>
-        <div class="tooltip">
-          <button class="button custom-button" type="button" @click.prevent="copyToClipboard(account, 'address')" @mouseout="clearTooltip('address')">
-            <span class="tooltiptext" id="tooltip-address">Copy to clipboard</span>
-            <img src="https://icongr.am/clarity/copy.svg" alt="Icon">
-          </button>
-        </div>
+        <button class="button custom-button has-tooltip has-tooltip-fade" type="button" :data-tooltip="copy_message" @click.prevent="copyToClipboard(account)" @mouseout="copy_message = 'Copy to clipboard'">
+          <img src="https://icongr.am/clarity/copy.svg" alt="Icon">
+        </button>
       </div>
       <b>Memo</b>
       <div class="copy-wrapper">
         <pre class="text">{{ memo }}</pre>
-        <div class="tooltip">
-          <button class="button custom-button" type="button" @click.prevent="copyToClipboard(memo, 'memo')" @mouseout="clearTooltip('memo')">
-            <span class="tooltiptext" id="tooltip-memo">Copy to clipboard</span>
-            <img src="https://icongr.am/clarity/copy.svg" alt="Icon">
-          </button>
-        </div>
+        <button class="button custom-button has-tooltip-fade" type="button" :data-tooltip="copy_message" @click.prevent="copyToClipboard(memo)" @mouseout="copy_message = 'Copy to clipboard'">
+          <img src="https://icongr.am/clarity/copy.svg" alt="Icon">
+        </button>
       </div>
     </div>
   </section>
@@ -51,6 +45,7 @@ export default {
   data () {
     return {
       loading: true,
+      copy_message: 'Copy to clipboard',
       modal_confirmation: false,
       memo: this.$auth.$storage.getUniversal('rememberAccount').vAccountRows[0].id,
       account: this.$blockchain.sdk.account.config.ACCOUNT_CONTRACT,
@@ -66,16 +61,10 @@ export default {
         this.loading = false
       }
     },
-    copyToClipboard (content, type) {
+    copyToClipboard (content) {
       navigator.clipboard.writeText(content).then(() => {
-        this.copied = true
-        const tooltip = document.getElementById('tooltip-' + type)
-        tooltip.innerHTML = 'Copied!'
+        this.copy_message = 'Copied!'
       })
-    },
-    clearTooltip (type) {
-      const tooltip = document.getElementById('tooltip-' + type)
-      tooltip.innerHTML = 'Copy to clipboard'
     }
   }
 }
@@ -116,43 +105,4 @@ export default {
       width: 25px;
     }
   }
-
-.tooltip {
-  position: relative;
-  display: inline-block;
-
-  & .tooltiptext {
-    visibility: hidden;
-    width: 140px;
-    background-color: #555;
-    color: $light;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 150%;
-    font-size: 14px;
-    left: 50%;
-    margin-left: -75px;
-    opacity: 0;
-    transition: opacity 0.3s;
-
-    &::after {
-      content: "";
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: #555 transparent transparent transparent;
-    }
-  }
-  &:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-  }
-}
-
 </style>
