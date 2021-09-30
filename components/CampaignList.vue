@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a v-for="campaign in campaigns" :key="campaign.id" class="box p-4" :class="{'is-disabled': campaign.id === 1}">
+    <nuxt-link v-for="campaign in campaigns" :key="campaign.id" :to="'/campaigns/'+campaign.id" class="box p-4" :class="{'is-disabled': campaign.id === 1}">
       <div class="columns is-vcentered is-multiline is-mobile">
         <div class="column is-narrow is-mobile-1">
           <p class="image has-radius" style="width: 52px; height: 52px">
@@ -47,7 +47,7 @@
           </button>
         </div>
       </div>
-    </a>
+    </nuxt-link>
     <div v-if="campaignsLoading">
       Campaigns loading..
     </div>
@@ -72,7 +72,8 @@ export default {
   computed: {
     ...mapState({
       campaigns: state => state.campaign.campaigns,
-      campaignsLoading: state => state.campaign.loading
+      campaignsLoading: state => state.campaign.loading,
+      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded
     })
   },
   created () {
@@ -80,7 +81,7 @@ export default {
   },
   methods: {
     async getCampaigns () {
-      if (!this.campaigns) {
+      if (!this.campaigns || !this.allCampaignsLoaded) {
         await this.$store.dispatch('campaign/getCampaigns')
       }
     }
