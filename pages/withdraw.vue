@@ -50,15 +50,13 @@ export default {
     }
   },
   methods: {
-    onSubmit () {
-      const result = this.withdraw(this.account, this.amount)
-      if (result) {
-        this.loading = false
-      }
+    async onSubmit () {
+      this.loading = true
+      await this.withdraw(this.account, this.amount)
+      this.loading = false
     },
     async withdraw (account, amount) {
       try {
-        this.loading = true
         if (this.$auth.user.blockchain === 'eos') {
           const result = await this.$blockchain.withdraw(account, amount)
           return result
