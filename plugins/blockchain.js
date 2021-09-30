@@ -155,7 +155,7 @@ export default (context, inject) => {
       },
 
       async deposit (amount) {
-        return await this.sdk.account.deposit(this.account.accountName, this.account.accountName, amount, this.account.permission)
+        return await this.sdk.account.deposit(this.account.accountName, this.account.vAccountRows[0].id, amount, this.account.permission)
       },
 
       async withdraw (toAccount, amount, memo) {
@@ -186,7 +186,7 @@ export default (context, inject) => {
         }
       },
       async getCampaigns (nextKey, limit = 20) {
-        return await this.sdk.account.getCampaigns(nextKey, limit)
+        return await this.sdk.force.getCampaigns(nextKey, limit)
       },
 
       initSdk () {
