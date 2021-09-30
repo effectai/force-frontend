@@ -9,7 +9,9 @@
         </div>
         <div class="column is-4-desktop is-5-widescreen is-12-touch">
           <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-            #{{ campaign.id }} Campaign title comes here
+            #{{ campaign.id }}
+            <span v-if="campaign.info">{{ campaign.info.title }}</span>
+            <span v-else>Loading..</span>
           </h2>
           <p class="has-text-grey is-size-7">
             This will be the place for the short campaign description...
