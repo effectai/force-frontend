@@ -61,7 +61,7 @@
               <span v-if="randomNumber !== undefined">{{ randomNumber }}</span>
               <span v-else>...</span>
               <span>/ 300 left</span>
-              <progress class="progress is-secondary" :value="randomNumber" max="300">
+              <progress class="progress is-secondary" :value="300 - randomNumber" max="300">
                 Left
               </progress>
             </div>
@@ -73,7 +73,7 @@
             <div class="block">
               <b>Content hash</b>
               <br>
-              <a target="_blank" :href="'https://ipfs.effect.ai/ipfs/' + campaign.content_hash">{{ campaign.content_hash.substring(0, 22) }}...</a>
+              <a target="_blank" :href="'https://ipfs.effect.ai/ipfs/' + campaign.content_hash" class="blockchain-address">{{ campaign.content_hash }}</a>
             </div>
             <div class="block">
               <b>Blockchain</b>

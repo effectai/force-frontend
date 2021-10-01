@@ -24,7 +24,6 @@ export default {
   },
   data () {
     return {
-      refreshInterval: null
     }
   },
   head () {
@@ -35,17 +34,6 @@ export default {
     }
   },
   created () {
-    if (!this.refreshInterval) {
-      this.refreshInterval = setInterval(() => {
-        console.log('refreshing user..')
-        if (this.$auth.loggedIn) {
-          this.$auth.fetchUser()
-        }
-      }, parseInt(process.env.NUXT_ENV_BLOCKCHAIN_UPDATE_RATE, 10))
-    }
-  },
-  beforeDestroy () {
-    clearInterval(this.refreshInterval)
   }
 }
 </script>

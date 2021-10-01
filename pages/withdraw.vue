@@ -1,12 +1,14 @@
 <template>
   <section class="section">
     <div class="container is-max-widescreen">
-      <div class="notification is-light" v-if="submitted" :class="{'is-danger': err === true, 'is-success': err === false}">
+      <h1 class="title mt-5">
+        Transfer tokens
+      </h1>
+      <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
         {{ message }}
         <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
       </div>
-      <form class="column is-6" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount)">
-        <h1 class="title mt-5">Transfer tokens</h1>
+      <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount)">
         <div class="field">
           <label class="label">Destination Account</label>
           <div class="control">
@@ -15,19 +17,20 @@
         </div>
 
         <div class="field">
-          <label class="label">Quantity</label>
+          <label class="label">vAccount Contract Balance</label>
           <div class="field has-addons">
-            <div class="control">
+            <div class="control is-expanded">
               <input
                 v-model="tokenAmount"
                 required
                 class="input"
                 type="number"
-                min=0
+                min="0"
                 :max="amount"
                 :disabled="amount == -1"
                 placeholder="0.0001"
-                step="0.0001">
+                step="0.0001"
+              >
             </div>
             <p class="control">
               <span class="button is-primary" :disabled="amount == -1" @click.prevent="tokenAmount = amount">{{ amount }} EFX</span>
@@ -35,12 +38,16 @@
           </div>
         </div>
 
-        <div class="field is-grouped">
+        <div class="field is-grouped is-grouped-right">
           <div class="control">
-            <button :disabled="!tokenAmount || !account" type="submit" class="button is-link" :class="{'is-loading': loading}">Withdraw</button>
+            <button class="button is-link is-light" @click.prevent="clearFields()">
+              Clear fields
+            </button>
           </div>
           <div class="control">
-            <button class="button is-link is-light" @click.prevent="clearFields()">Clear fields</button>
+            <button :disabled="!tokenAmount || !account" type="submit" class="button is-link" :class="{'is-loading': loading}">
+              Withdraw
+            </button>
           </div>
         </div>
       </form>
@@ -53,7 +60,7 @@ export default {
   data () {
     return {
       loading: false,
-      account: null,
+      account: this.$auth.user.blockchain === 'eos' ? this.$auth.user.accountName : null,
       submitted: false,
       message: null,
       err: false,
@@ -82,8 +89,8 @@ export default {
           this.message = 'Withdrawing has been successful. Check your transaction here: '
 
           setTimeout(() => {
-            this.$auth.fetchUser()
-          }, 1000)
+            this.$blockchain.updateBlockchainInfo()
+          }, 1500)
         }
       } catch (error) {
         this.$blockchain.handleError(error)
