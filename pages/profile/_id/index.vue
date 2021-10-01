@@ -5,7 +5,6 @@
         <h4 class="title is-spaced">
           Effect Account
         </h4>
-        <balance />
         <div v-if="account" class="block">
           <div class="has-text-weight-bold is-size-6">
             {{ account[0].address[0] === 'address' ? 'BSC Address' : 'Account Name' }}:
