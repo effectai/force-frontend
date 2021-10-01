@@ -37,7 +37,6 @@ export default {
       try {
         if (!state.campaigns || !state.campaigns.find(c => c.id === id)) {
           const data = await this.$blockchain.getCampaigns(id, 1)
-          console.log(data)
 
           if (data.rows.length > 0) {
             commit('ADD_CAMPAIGN', data.rows[0])
@@ -87,9 +86,12 @@ export default {
       }
     },
     async processCampaign ({ commit }, campaign) {
-      console.log(campaign.content_hash)
-      const info = await this.$blockchain.sdk.getIpfsContent(campaign.content_hash)
-      commit('SET_CAMPAIGN_INFO', { id: campaign.id, info })
+      try {
+        const info = await this.$blockchain.sdk.getIpfsContent(campaign.content_hash)
+        commit('SET_CAMPAIGN_INFO', { id: campaign.id, info })
+      } catch (e) {
+        commit('SET_CAMPAIGN_INFO', { id: campaign.id, info: null })
+      }
     }
   },
   state: {
