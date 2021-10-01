@@ -28,11 +28,10 @@
         </div>
         <div id="navbar" class="navbar-menu is-align-items-center" :class="{'is-active': mobileMenu}">
           <div class="navbar-start is-justify-content-center" style="width: 100%">
-            <balance
-              v-if="$auth.loggedIn"
-              class="navbar-item"
-              :amount="($blockchain.vefxAvailable !== null ? $blockchain.vefxAvailable.toFixed(2) : -1)"
-            />
+            <nuxt-link v-if="$auth.loggedIn" to="/balance" class="is-flex is-align-items-center navbar-item is-justify-content-center">
+              <span><b>{{ ($blockchain.efxTotal !== null ? $blockchain.efxTotal.toFixed(2) : '...') }}</b><span v-if="$blockchain.efxLoading">..</span> EFX</span>
+              <span v-if="$blockchain.efxTotal !== null && $blockchain.efxPrice" class="is-size-7 pl-2">| $<b>{{ ($blockchain.efxTotal * $blockchain.efxPrice).toFixed(2) }}</b></span>
+            </nuxt-link>
           </div>
           <div class="navbar-end">
             <div class="navbar-item is-hidden-touch" @click="mobileMenu = false">
@@ -68,11 +67,9 @@
 
 <script>
 import Notifications from '@/components/Notifications'
-import Balance from '@/components/Balance'
 export default {
   components: {
-    Notifications,
-    Balance
+    Notifications
   },
 
   data () {
