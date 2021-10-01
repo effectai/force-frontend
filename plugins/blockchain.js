@@ -7,6 +7,11 @@ const effectSdk = require('../../../effect-js')
 export default (context, inject) => {
   const blockchain = new Vue({
     data () {
+      // Initialize empty SDK, reinitialize when connecting wallet
+      const sdkOptions = {
+        network: process.env.NUXT_ENV_EOS_NETWORK,
+        host: `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
+      }
       return {
         account: null,
         blockchain: null,
@@ -16,7 +21,7 @@ export default (context, inject) => {
         efxPending: 0,
         eos,
         bsc,
-        sdk: null,
+        sdk: new effectSdk.EffectClient(sdkOptions),
         error: null,
         waitForSignatureFrom: null,
         waitForSignature: 0,
@@ -45,8 +50,6 @@ export default (context, inject) => {
       }
     },
     created () {
-      // Initialize empty SDK, reinitialize when connecting wallet
-      this.initSdk()
       this.updateBlockchainInfo()
       if (!this.refreshInterval) {
         this.refreshInterval = setInterval(this.updateBlockchainInfo, parseInt(process.env.NUXT_ENV_BLOCKCHAIN_UPDATE_RATE, 10))
@@ -221,8 +224,8 @@ export default (context, inject) => {
       },
 
       async getAccountBalance () {
-        if (this.account) {
-          const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, this.account.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
+        if (context.$auth.loggedIn && context.$auth.user.blockchain === 'eos') {
+          const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, context.$auth.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
           if (efxRow) {
             this.efxAvailable = parseFloat(efxRow.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
           }

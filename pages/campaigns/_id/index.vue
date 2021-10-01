@@ -73,7 +73,7 @@
             <div class="block">
               <b>Content hash</b>
               <br>
-              <a target="_blank" :href="'https://ipfs.effect.ai/ipfs/' + campaign.content_hash">{{ campaign.content_hash.substring(0, 22) }}...</a>
+              <a target="_blank" :href="'https://ipfs.effect.ai/ipfs/' + campaign.content_hash" class="blockchain-address">{{ campaign.content_hash }}</a>
             </div>
             <div class="block">
               <b>Blockchain</b>

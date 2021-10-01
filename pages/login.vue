@@ -20,7 +20,6 @@
             v-else
             :href="$blockchain.eos.explorer + '/address/'+ $blockchain.account.accountName"
             target="_blank"
-            class="blockchain-address"
           >{{ $blockchain.account.accountName }}</a><span v-if="$blockchain.account.permission">@{{ $blockchain.account.permission }}</span>
         </div>
         <div style="min-height: 67px">

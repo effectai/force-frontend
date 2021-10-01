@@ -8,7 +8,7 @@
         <balance />
         <div class="block">
           <div class="has-text-weight-bold is-size-6">
-            {{ $auth.user.blockchain === 'bsc' ? 'BSC Address' : 'EOS Account Name' }}:
+            {{ $auth.user.blockchain === 'bsc' ? 'BSC Address' : 'Account Name' }}:
           </div>
           <div class="subtitle">
             <a
@@ -21,8 +21,26 @@
               v-else
               :href="$blockchain.eos.explorer + '/address/'+ $auth.user.accountName"
               target="_blank"
-              class="blockchain-address"
             >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
+          </div>
+        </div>
+        <div class="block">
+          <div class="has-text-weight-bold is-size-6">
+            {{ $auth.user.blockchain === 'bsc' ? 'Account Address' : 'Public Key' }}:
+          </div>
+          <div class="subtitle">
+            <div
+              v-if="$auth.user.blockchain === 'bsc'"
+              class="blockchain-address"
+            >
+              {{ $auth.user.accountName }}
+            </div>
+            <a
+              v-else
+              :href="$blockchain.eos.explorer + '/address/'+ $auth.user.publicKey"
+              target="_blank"
+              class="blockchain-address"
+            >{{ $auth.user.publicKey }}</a>
           </div>
         </div>
         <div class="block">
