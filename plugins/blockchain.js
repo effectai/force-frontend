@@ -73,7 +73,7 @@ export default (context, inject) => {
               return false
             }
           } else {
-            accountAddress = (await this.bsc.recoverPublicKey()).accountAddress
+            accountAddress = (await this.recoverPublicKey(this.bsc.wallet[0])).accountAddress
           }
           this.registerBscListeners(provider)
           account = { accountName: accountAddress, publicKey: this.bsc.wallet[0] }
@@ -92,7 +92,7 @@ export default (context, inject) => {
         try {
           const account = { ...this.account }
           // Make sure address matches with the public key we get from bsc wallet
-          const addresses = await this.bsc.recoverPublicKey()
+          const addresses = await this.recoverPublicKey(this.bsc.wallet[0])
           // Check if this is the signature we are currently waiting for, as we could have multiple signature requests..
           if (addresses.address.toLowerCase() === this.waitForSignatureFrom.toLowerCase() && addresses.address.toLowerCase() === this.bsc.wallet[0].toLowerCase()) {
             this.waitForSignatureFrom = null
@@ -155,7 +155,7 @@ export default (context, inject) => {
       },
 
       async deposit (amount) {
-        return await this.sdk.account.deposit(this.account.accountName, this.account.accountName, amount, this.account.permission)
+        return await this.sdk.account.deposit(this.account.accountName, this.account.vAccountRows[0].id, amount, this.account.permission)
       },
 
       async withdraw (toAccount, amount, memo) {
@@ -186,7 +186,7 @@ export default (context, inject) => {
         }
       },
       async getCampaigns (nextKey, limit = 20) {
-        return await this.sdk.account.getCampaigns(nextKey, limit)
+        return await this.sdk.force.getCampaigns(nextKey, limit)
       },
 
       initSdk () {
@@ -198,6 +198,13 @@ export default (context, inject) => {
         }
         this.sdk = new effectSdk.EffectClient(sdkOptions)
       },
+
+      async recoverPublicKey () {
+        const message = 'Effect Account'
+        const signature = await bsc.sign(message)
+        return this.sdk.account.recoverPublicKey(message, signature)
+      },
+
       handleError (error) {
         console.error(error) // eslint-disable-line no-console
         if (error.response && error.response.data) {
