@@ -2,7 +2,7 @@ import Vue from 'vue'
 import eos from '../services/eos'
 import bsc from '../services/bsc'
 // const effectSdk = require('@effectai/effect-js')
-const effectSdk = require('../../effect-js')
+const effectSdk = require('../../../effect-js')
 
 export default (context, inject) => {
   const blockchain = new Vue({
@@ -12,16 +12,25 @@ export default (context, inject) => {
         blockchain: null,
         provider: null,
         loginModal: false,
-        efxAvailable: 0,
+        efxAvailable: null,
+        efxPending: 0,
         eos,
         bsc,
         sdk: null,
         error: null,
         waitForSignatureFrom: null,
-        waitForSignature: 0
+        waitForSignature: 0,
+        efxPrice: null,
+        refreshInterval: null
       }
     },
     computed: {
+      efxLoading () {
+        return this.vefxAvailable === null || this.efxAvailable === null || this.efxPending === null
+      },
+      efxTotal () {
+        return this.efxAvailable + this.vefxAvailable + this.efxPending
+      },
       vefxAvailable () {
         let balance
         const vAccountRows = context.$auth.user.vAccountRows
@@ -38,9 +47,39 @@ export default (context, inject) => {
     created () {
       // Initialize empty SDK, reinitialize when connecting wallet
       this.initSdk()
+      this.updateBlockchainInfo()
+      if (!this.refreshInterval) {
+        this.refreshInterval = setInterval(this.updateBlockchainInfo, parseInt(process.env.NUXT_ENV_BLOCKCHAIN_UPDATE_RATE, 10))
+      }
+    },
+
+    beforeDestroy () {
+      clearInterval(this.refreshInterval)
     },
 
     methods: {
+      updateBlockchainInfo () {
+        console.log('refreshing:')
+        console.log('refreshing price..')
+        this.getEfxPrice()
+        if (context.$auth.loggedIn) {
+          console.log('refreshing user..')
+          context.$auth.fetchUser()
+          console.log('refreshing user balance..')
+          this.getAccountBalance()
+        }
+      },
+      async getEfxPrice (currency = 'usd') {
+        this.efxPrice = await fetch(
+          'https://api.coingecko.com/api/v3/coins/effect-network/tickers'
+        )
+          .then(data => data.json())
+          .then((data) => {
+            if (data.tickers) {
+              return data.tickers[0].converted_last[currency]
+            }
+          })
+      },
       async rememberLogin () {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
         if (rememberAccount) {
@@ -50,6 +89,7 @@ export default (context, inject) => {
               account: this.account,
               $blockchain: this
             })
+            this.getAccountBalance()
             // Needed because there is a redirect bug when going to a protected route from the login page
             const path = context.$auth.$storage.getUniversal('redirect') || '/'
             context.$auth.$storage.setUniversal('redirect', null)
@@ -182,7 +222,7 @@ export default (context, inject) => {
 
       async getAccountBalance () {
         if (this.account) {
-          const efxRow = (await this.eos.wallet.eosApi.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, this.account.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
+          const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, this.account.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
           if (efxRow) {
             this.efxAvailable = parseFloat(efxRow.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
           }

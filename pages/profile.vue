@@ -5,6 +5,7 @@
         <h4 class="title is-spaced">
           Your Effect Account
         </h4>
+        <balance />
         <div class="block">
           <div class="has-text-weight-bold is-size-6">
             {{ $auth.user.blockchain === 'bsc' ? 'BSC Address' : 'EOS Account Name' }}:
@@ -60,7 +61,9 @@
 
 <script>
 
+import Balance from '@/components/Balance'
 export default {
+  components: { Balance },
   middleware: ['auth'],
   computed: {
   },
