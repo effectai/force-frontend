@@ -14,11 +14,10 @@ export default {
     SET_ALL_CAMPAIGNS_LOADED (state, allCampaignsLoaded) {
       state.allCampaignsLoaded = allCampaignsLoaded
     },
-    SET_CAMPAIGN_INFO (state, { id, info, authorId }) {
+    SET_CAMPAIGN_INFO (state, { id, info }) {
       const index = state.campaigns.findIndex(campaign => campaign.id === id)
       const campaign = state.campaigns[index]
       campaign.info = info
-      campaign.authorId = authorId
       Vue.set(state.campaigns, index, campaign)
     },
     ADD_CAMPAIGN (state, campaign) {
@@ -89,12 +88,9 @@ export default {
     async processCampaign ({ commit }, campaign) {
       try {
         const info = await this.$blockchain.sdk.getIpfsContent(campaign.content_hash)
-        const account = await this.$blockchain.getVAccount(campaign.author)
-
-        commit('SET_CAMPAIGN_INFO', { id: campaign.id, authorId: account[0].id, info })
+        commit('SET_CAMPAIGN_INFO', { id: campaign.id, info })
       } catch (e) {
-        console.log('ERROR')
-        commit('SET_CAMPAIGN_INFO', { id: campaign.id, authorId: null, info: null })
+        commit('SET_CAMPAIGN_INFO', { id: campaign.id, info: null })
       }
     }
   },
