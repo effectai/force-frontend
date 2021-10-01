@@ -58,7 +58,7 @@
               <span v-if="randomNumber !== undefined">{{ randomNumber }}</span>
               <span v-else>...</span>
               <span>/ 300 left</span>
-              <progress class="progress is-secondary" :value="randomNumber" max="300">
+              <progress class="progress is-secondary" :value="300 - randomNumber" max="300">
                 Left
               </progress>
             </div>

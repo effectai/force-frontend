@@ -29,7 +29,7 @@
           <div class="column is-half">
             <div class="box">
               <h2 class="has-text-weight-bold">
-                vAccount
+                vAccount Contract Balance
               </h2>
               <span v-if="$blockchain.vefxAvailable !== null">{{ $blockchain.vefxAvailable.toFixed(2) }}</span>
               <span v-else>.....</span><span>  EFX</span>

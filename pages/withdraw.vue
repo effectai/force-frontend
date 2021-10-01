@@ -1,14 +1,14 @@
 <template>
   <section class="section">
     <div class="container is-max-widescreen">
+      <h1 class="title mt-5">
+        Transfer tokens
+      </h1>
       <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
         {{ message }}
         <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
       </div>
-      <form class="column is-6" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount)">
-        <h1 class="title mt-5">
-          Transfer tokens
-        </h1>
+      <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount)">
         <div class="field">
           <label class="label">Destination Account</label>
           <div class="control">
@@ -17,9 +17,9 @@
         </div>
 
         <div class="field">
-          <label class="label">Quantity</label>
+          <label class="label">vAccount Contract Balance</label>
           <div class="field has-addons">
-            <div class="control">
+            <div class="control is-expanded">
               <input
                 v-model="tokenAmount"
                 required
@@ -38,15 +38,15 @@
           </div>
         </div>
 
-        <div class="field is-grouped">
-          <div class="control">
-            <button :disabled="!tokenAmount || !account" type="submit" class="button is-link" :class="{'is-loading': loading}">
-              Withdraw
-            </button>
-          </div>
+        <div class="field is-grouped is-grouped-right">
           <div class="control">
             <button class="button is-link is-light" @click.prevent="clearFields()">
               Clear fields
+            </button>
+          </div>
+          <div class="control">
+            <button :disabled="!tokenAmount || !account" type="submit" class="button is-link" :class="{'is-loading': loading}">
+              Withdraw
             </button>
           </div>
         </div>
