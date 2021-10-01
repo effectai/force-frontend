@@ -28,11 +28,12 @@
         </div>
         <div id="navbar" class="navbar-menu is-align-items-center" :class="{'is-active': mobileMenu}">
           <div class="navbar-start is-justify-content-center" style="width: 100%">
-            <balance
-              v-if="$auth.loggedIn"
-              class="navbar-item"
-              :amount="($blockchain.vefxAvailable !== null ? $blockchain.vefxAvailable.toFixed(2) : -1)"
-            />
+            <div class="navbar-item" @click="mobileMenu = false">
+              <nuxt-link v-if="$auth.loggedIn" to="/balance" class="button is-white is-flex is-align-items-center is-justify-content-center" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
+                <span><b>{{ ($blockchain.efxTotal !== null ? $blockchain.efxTotal.toFixed(2) : '...') }}</b><span v-if="$blockchain.efxLoading">..</span> EFX</span>
+                <span v-if="$blockchain.efxTotal !== null && $blockchain.efxPrice" class="is-size-7 pl-2">| $<b>{{ ($blockchain.efxTotal * $blockchain.efxPrice).toFixed(2) }}</b></span>
+              </nuxt-link>
+            </div>
           </div>
           <div class="navbar-end">
             <div class="navbar-item is-hidden-touch" @click="mobileMenu = false">
@@ -42,7 +43,7 @@
               </div>
             </div>
             <div class="navbar-item" @click="mobileMenu = false">
-              <nuxt-link class="button is-text" :class="{'is-fullwidth': mobileMenu}" to="/profile" exact-active-class="is-active">
+              <nuxt-link class="button is-white" :class="{'is-fullwidth': mobileMenu}" to="/profile" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/user.svg" style="height: 24px">
                 </span>
@@ -68,11 +69,9 @@
 
 <script>
 import Notifications from '@/components/Notifications'
-import Balance from '@/components/Balance'
 export default {
   components: {
-    Notifications,
-    Balance
+    Notifications
   },
 
   data () {
