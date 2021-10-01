@@ -2,26 +2,45 @@
   <section class="section">
     <div class="container">
       <div class="text-center">
-        <h4 class="title is-spaced">
+        <h4 v-if="loggedIn" class="title is-spaced">
           Your Effect Account
+        </h4>
+        <h4 v-else class="title is-spaced">
+          Effect Account
         </h4>
         <balance />
         <div class="block">
-          <div class="has-text-weight-bold is-size-6">
-            {{ $auth.user.blockchain === 'bsc' ? 'BSC Address' : 'Account Name' }}:
+          <pre>{{ account }}</pre>
+          <div v-if="account" class="has-text-weight-bold is-size-6">
+            {{ account[0].address[0] === 'address' ? 'BSC Address' : 'Account Name' }}:
           </div>
           <div class="subtitle">
-            <a
-              v-if="$auth.user.blockchain === 'bsc'"
-              :href="$blockchain.bsc.explorer + '/address/'+ $auth.user.publicKey"
-              target="_blank"
-              class="blockchain-address"
-            >{{ $auth.user.publicKey }}</a>
-            <a
-              v-else
-              :href="$blockchain.eos.explorer + '/address/'+ $auth.user.accountName"
-              target="_blank"
-            >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
+            <div v-if="loggedIn">
+              <a
+                v-if="$auth.user.blockchain === 'bsc'"
+                :href="$blockchain.bsc.explorer + '/address/'+ $auth.user.publicKey"
+                target="_blank"
+                class="blockchain-address"
+              >{{ $auth.user.publicKey }}</a>
+              <a
+                v-else
+                :href="$blockchain.eos.explorer + '/address/'+ $auth.user.accountName"
+                target="_blank"
+              >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
+            </div>
+            <!-- <div v-else>
+              <a
+                v-if="account[0].address[0] === 'address'"
+                :href="$blockchain.bsc.explorer + '/address/'+ account[0].address[1]"
+                target="_blank"
+                class="blockchain-address"
+              >{{ $auth.user.publicKey }}</a>
+              <a
+                v-else
+                :href="$blockchain.eos.explorer + '/address/'+ account[0].address[1]"
+                target="_blank"
+              >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
+            </div> -->
           </div>
         </div>
         <div class="block">
@@ -76,20 +95,30 @@
     </div>
   </section>
 </template>
-
 <script>
 
-import Balance from '@/components/Balance'
 export default {
-  components: { Balance },
   middleware: ['auth'],
+  data () {
+    return {
+      id: parseInt(this.$route.params.id),
+      account: null
+    }
+  },
   computed: {
+    loggedIn () {
+      return this.$auth.user.vAccountRows[0].id === this.id
+    }
   },
   created () {
+    this.getProfile()
   },
   methods: {
     async logout () {
       await this.$auth.logout()
+    },
+    async getProfile () {
+      this.account = await this.$blockchain.getVAccountById(this.id)
     }
   }
 }

@@ -43,7 +43,7 @@
               </div>
             </div>
             <div class="navbar-item" @click="mobileMenu = false">
-              <nuxt-link class="button is-white" :class="{'is-fullwidth': mobileMenu}" to="/profile" exact-active-class="is-active">
+              <nuxt-link :key="$auth.user.vAccountRows[0].id" class="button is-white" :class="{'is-fullwidth': mobileMenu}" :to="'/profile/' + $auth.user.vAccountRows[0].id" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/user.svg" style="height: 24px">
                 </span>

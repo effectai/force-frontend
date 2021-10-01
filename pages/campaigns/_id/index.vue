@@ -48,12 +48,9 @@
             <div class="block">
               <b>Requester</b>
               <br>
-              <a
-                target="_blank"
-                :href="`https://kylin.bloks.io/account/acckylin1111?loadContract=true&tab=Tables&table=account&account=acckylin1111&scope=acckylin1111&limit=1&lower_bound=${campaign.authorId}&upper_bound=${campaign.authorId}`"
-              >
-                {{ campaign.author }}
-              </a>
+              <nuxt-link :to="'/profile/' + randomAuthorId">
+                {{ randomAuthorId }}
+              </nuxt-link>
             </div>
             <div class="block">
               <b>Tasks</b>
@@ -102,7 +99,10 @@ export default {
     ...mapState({
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading
-    })
+    }),
+    randomAuthorId () {
+      return Math.ceil(Math.random() * 12)
+    }
   },
   mounted () {
     setTimeout(() => {
