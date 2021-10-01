@@ -48,7 +48,10 @@
             <div class="block">
               <b>Requester</b>
               <br>
-              <a href="#">
+              <a
+                target="_blank"
+                :href="`https://kylin.bloks.io/account/acckylin1111?loadContract=true&tab=Tables&table=account&account=acckylin1111&scope=acckylin1111&limit=1&lower_bound=${campaign.authorId}&upper_bound=${campaign.authorId}`"
+              >
                 {{ campaign.author }}
               </a>
             </div>
@@ -73,9 +76,9 @@
               <a target="_blank" :href="'https://ipfs.effect.ai/ipfs/' + campaign.content_hash">{{ campaign.content_hash.substring(0, 22) }}...</a>
             </div>
             <div class="block">
-              <b>Block Explorer</b>
+              <b>Blockchain</b>
               <br>
-              <a target="_blank" :href="`https://kylin.bloks.io/account/propsonkylin?loadContract=true&tab=Tables&table=proposal&account=propsonkylin&scope=propsonkylin&limit=1&lower_bound=${id}&upper_bound=${id}`">View on Block Explorer</a>
+              <a target="_blank" :href="`https://kylin.bloks.io/account/propsonkylin?loadContract=true&tab=Tables&table=proposal&account=propsonkylin&scope=propsonkylin&limit=1&lower_bound=${id}&upper_bound=${id}`">View on Explorer</a>
             </div>
           </div>
         </div>
