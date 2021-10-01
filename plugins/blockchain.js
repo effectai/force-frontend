@@ -150,11 +150,14 @@ export default (context, inject) => {
       async openVAccount () {
         await this.sdk.account.openAccount(this.account.accountName, this.account.permission)
       },
-      async getVAccount (accountName) {
-        if (accountName) {
-          return await this.sdk.account.getBalance(accountName)
+      async getVAccountByName (accountName) {
+        if (!accountName) {
+          accountName = this.account.accountName
         }
-        return await this.sdk.account.getBalance(this.account.accountName)
+        return await this.sdk.account.getVAccountByName(accountName)
+      },
+      async getVAccountById (id) {
+        return await this.sdk.account.getVAccountById(id)
       },
 
       async deposit (amount) {

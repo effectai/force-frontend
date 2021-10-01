@@ -172,7 +172,7 @@ export default {
     async accountExists () {
       // check if account exists
       try {
-        const vAccountRows = await this.$blockchain.getVAccount()
+        const vAccountRows = await this.$blockchain.getVAccountByName()
         if (vAccountRows && vAccountRows.length) {
           // account exists
           this.existingAccount = true
