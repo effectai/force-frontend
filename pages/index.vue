@@ -4,7 +4,7 @@
       <div class="text-center mb-4">
         <a class="button is-primary" @click="deposit('1.0000')">test deposit</a>
         <br><br>
-        <a class="button is-primary" @click="withdraw('0.0100')">test withdraw</a>
+        <a class="button is-primary" @click="withdraw('0.01')">test withdraw</a>
       </div>
       <campaign-list />
     </div>
