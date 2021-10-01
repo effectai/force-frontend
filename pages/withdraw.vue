@@ -17,22 +17,22 @@
         <div class="field">
           <label class="label">Quantity</label>
           <div class="field has-addons">
-          <div class="control">
-            <input
-              v-model="tokenAmount"
-              required
-              class="input"
-              type="number"
-              min=0
-              :max="amount"
-              :disabled="amount == -1"
-              placeholder="0.0001"
-              step="0.0001">
+            <div class="control">
+              <input
+                v-model="tokenAmount"
+                required
+                class="input"
+                type="number"
+                min=0
+                :max="amount"
+                :disabled="amount == -1"
+                placeholder="0.0001"
+                step="0.0001">
+            </div>
+            <p class="control">
+              <span class="button is-primary" :disabled="amount == -1" @click.prevent="tokenAmount = amount">{{ amount }} EFX</span>
+            </p>
           </div>
-          <p class="control">
-            <span class="button is-primary" :disabled="amount == -1" @click.prevent="tokenAmount = amount">{{ amount }} EFX</span>
-          </p>
-        </div>
         </div>
 
         <div class="field is-grouped">
