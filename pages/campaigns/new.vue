@@ -9,6 +9,60 @@
             <input v-model="campaignIpfs.title" required class="input" type="text" placeholder="My Campaign Title">
           </div>
         </div>
+        <div class="field">
+          <label class="label">Description</label>
+          <div class="control">
+            <textarea class="textarea" v-model="campaignIpfs.description"></textarea>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Instructions</label>
+          <div class="control">
+            <textarea class="textarea" v-model="campaignIpfs.instructions"></textarea>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Template</label>
+          <div class="control">
+            <textarea class="textarea" v-model="campaignIpfs.template"></textarea>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Attachments</label>
+          <div class="control">
+            <div class="file has-name is-fullwidth">
+              <label class="file-label">
+                <input class="file-input" type="file" id="file" ref="file" @change="getSelectedFile">
+                <span class="file-cta">
+                  <span class="file-icon">
+                    <i class="fa fa-upload"></i>
+                  </span>
+                  <span class="file-label">
+                    Choose a file…
+                  </span>
+                </span>
+                <span class="file-name">
+                  <span v-if="selectedFile">{{selectedFile.name}}</span>
+                </span>
+                <span>
+                  <button :class="{'is-loading': uploadingFile}" :disabled="!selectedFile" @click.prevent="uploadFile" class="button is-primary">Upload File</button>
+                </span>
+              </label>
+            </div>
+          </div>
+          <table class="table">
+            <tbody v-if="campaignIpfs.image">
+              <td><a :href="ipfsExplorer + '/ipfs/' + campaignIpfs.image.Hash" target="_blank">{{ campaignIpfs.image.Name }}</a></td>
+              <td>{{ campaignIpfs.image.Size | formatBytes }}</td>
+              <td class="has-text-right"><button @click.prevent="removeImage" class="button is-danger is-small">Remove</button></td>
+            </tbody>
+            <tbody v-else>
+              <tr>
+                <td colspan="3">No files uploaded</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
             <nuxt-link class="button is-light" to="/">Cancel</nuxt-link>
@@ -17,6 +71,7 @@
             <button type="submit" class="button is-primary is-wide" :class="{'is-loading': loading}">Save Campaign</button>
           </div>
         </div>
+        {{campaignIpfs}}
       </form>
     </div>
   </section>
@@ -25,6 +80,19 @@
 <script>
 export default {
   components: {
+  },
+
+  filters: {
+    formatBytes (bytes, decimals = 2) {
+      if (bytes === 0) {
+        return '0 Bytes'
+      }
+      const k = 1024
+      const dm = decimals < 0 ? 0 : decimals
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+    }
   },
   beforeRouteLeave (to, from, next) {
     if (this.checkClose()) {
@@ -46,21 +114,28 @@ export default {
       campaignIpfs = JSON.parse(campaignIpfs)
     } else {
       campaignIpfs = {
-        title: ''
+        title: '',
+        description: '',
+        instructions: '',
+        template: '',
+        image: {},
+        category: '',
+        version: 1
       }
     }
     return {
       advanced: false,
       success: false,
-      ipfsExplorer: process.env.ipfsExplorer,
+      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       loading: false,
       preview: false,
       campaignIpfs,
       campaign,
-      cachedFormData: null
+      cachedFormData: null,
+      uploadingFile: false,
+      selectedFile: null
     }
   },
-
   computed: {
     // Compares cached user data to live data
     hasChanged () {
@@ -72,14 +147,12 @@ export default {
     campaign: {
       deep: true,
       handler (campaign) {
-        console.log('caching campaign..')
         window.localStorage.setItem('cached_campaign', JSON.stringify(campaign))
       }
     },
     campaignIpfs: {
       deep: true,
       handler (campaignIpfs) {
-        console.log('caching campaignIpfs..')
         window.localStorage.setItem('cached_campaignIpfs', JSON.stringify(campaignIpfs))
       }
     }
@@ -100,7 +173,8 @@ export default {
       this.loading = true
       const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
       if (hash) {
-        this.$blockchain.createCampaign()
+        console.log(hash)
+        // this.$blockchain.createCampaign()
       }
       this.loading = false
     },
@@ -119,6 +193,39 @@ export default {
         return true
       }
       return true
+    },
+    getSelectedFile () {
+      this.selectedFile = this.$refs.file.files[0]
+    },
+    async uploadFile () {
+      if (this.selectedFile) {
+        this.uploadingFile = true
+        const formData = new FormData()
+        formData.append('file', this.selectedFile)
+        if (this.selectedFile.size > 10000000) {
+          alert('Max file size allowed is 10 MB')
+          this.selectedFile = null
+          this.$refs.file.value = ''
+        } else {
+          try {
+            const response = await fetch(`${process.env.NUXT_ENV_IPFS_NODE}/api/v0/add?pin=true`,
+              {
+                method: 'POST',
+                body: formData
+              })
+            const file = await response.json()
+            this.campaignIpfs.image = file
+            this.selectedFile = null
+            this.$refs.file.value = ''
+          } catch (e) {
+            console.log(e)
+          }
+        }
+        this.uploadingFile = false
+      }
+    },
+    removeImage () {
+      this.campaignIpfs.image = {}
     }
   }
 }
