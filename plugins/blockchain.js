@@ -189,6 +189,14 @@ export default (context, inject) => {
         return await this.sdk.force.getCampaigns(nextKey, limit)
       },
 
+      async uploadCampaign (content) {
+        return await this.sdk.force.uploadCampaign(content)
+      },
+
+      async createCampaign (hash) {
+        return await this.sdk.force.createCampaign(hash)
+      },
+
       initSdk () {
         const sdkOptions = {
           network: process.env.NUXT_ENV_EOS_NETWORK,
