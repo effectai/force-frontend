@@ -69,6 +69,12 @@
               </nuxt-link>
             </div>
             <div class="block">
+              <b>Reward</b>
+              <br>
+              <span v-if="campaign.quantity">{{ campaign.quantity }}</span>
+              <span v-else class="tag is-info is-light is-medium">...</span>
+            </div>
+            <div class="block">
               <b>Tasks</b>
               <br>
               <span v-if="randomNumber !== undefined">{{ randomNumber }}</span>
@@ -137,6 +143,7 @@ export default {
         template: '<script> //set var vueOptions = {...} for custom vue options <\\/script> <div id=\'task\'> <fc-media> In element #task you can use Force Components! </fc-media> ${test} </div>',
         image: 'http://via.placeholder.com/150',
         category: 'translation',
+        quantity: '0.0000 EFX',
         version: 1
       }
     },
