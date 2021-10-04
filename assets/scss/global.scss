@@ -150,3 +150,11 @@ a.box {
     z-index: 10;
   }
 }
+
+.blockchain-address {
+  font-family: monospace;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}

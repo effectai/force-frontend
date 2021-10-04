@@ -127,6 +127,7 @@ export default {
             console.log('attempt', number, error)
           }
         })
+        this.$blockchain.getAccountBalance()
         this.$auth.$storage.setUniversal('rememberAccount', JSON.stringify(this.$blockchain.account))
         // Needed because there is a redirect bug when going to a protected route from the login page
         const path = this.$auth.$storage.getUniversal('redirect') || '/'

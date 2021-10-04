@@ -11,17 +11,48 @@ export default {
     SET_LOADING (state, loading) {
       state.loading = loading
     },
+    SET_ALL_CAMPAIGNS_LOADED (state, allCampaignsLoaded) {
+      state.allCampaignsLoaded = allCampaignsLoaded
+    },
     SET_CAMPAIGN_INFO (state, { id, info }) {
       const index = state.campaigns.findIndex(campaign => campaign.id === id)
       const campaign = state.campaigns[index]
       campaign.info = info
       Vue.set(state.campaigns, index, campaign)
+    },
+    ADD_CAMPAIGN (state, campaign) {
+      if (state.campaigns) {
+        state.campaigns.push(campaign)
+      } else {
+        state.campaigns = [campaign]
+      }
     }
   },
   getters: {
 
   },
   actions: {
+    async getCampaign ({ dispatch, commit, state }, id) {
+      commit('SET_LOADING', true)
+      try {
+        if (!state.campaigns || !state.campaigns.find(c => c.id === id)) {
+          const data = await this.$blockchain.getCampaigns(id, 1)
+
+          if (data.rows.length > 0) {
+            commit('ADD_CAMPAIGN', data.rows[0])
+            await dispatch('processCampaign', data.rows[0])
+          } else {
+            throw new Error('Cannot find campaign with the given id.')
+          }
+        }
+
+        // No more campaign, we are done
+        commit('SET_LOADING', false)
+      } catch (error) {
+        this.$blockchain.handleError(error)
+        commit('SET_LOADING', false)
+      }
+    },
     async getCampaigns ({ dispatch, commit, state }, nextKey) {
       commit('SET_LOADING', true)
       try {
@@ -46,6 +77,7 @@ export default {
           await dispatch('getCampaigns', data.next_key)
         } else {
           // No more campaigns, we are done
+          commit('SET_ALL_CAMPAIGNS_LOADED', true)
           commit('SET_LOADING', false)
         }
       } catch (error) {
@@ -54,13 +86,17 @@ export default {
       }
     },
     async processCampaign ({ commit }, campaign) {
-      console.log(campaign.content_hash)
-      const info = await this.$blockchain.sdk.getIpfsContent(campaign.content_hash)
-      commit('SET_CAMPAIGN_INFO', { id: campaign.id, info })
+      try {
+        const info = await this.$blockchain.sdk.getIpfsContent(campaign.content_hash)
+        commit('SET_CAMPAIGN_INFO', { id: campaign.id, info })
+      } catch (e) {
+        commit('SET_CAMPAIGN_INFO', { id: campaign.id, info: null })
+      }
     }
   },
   state: {
     campaigns: null,
-    loading: false
+    loading: false,
+    allCampaignsLoaded: false
   }
 }
