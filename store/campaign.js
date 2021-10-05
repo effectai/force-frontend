@@ -8,11 +8,20 @@ export default {
     SET_CAMPAIGNS (state, campaigns) {
       state.campaigns = campaigns
     },
+    SET_BATCHES (state, batches) {
+      state.batches = batches
+    },
     SET_LOADING (state, loading) {
       state.loading = loading
     },
+    SET_LOADING_BATCH (state, loading) {
+      state.loadingBatch = loading
+    },
     SET_ALL_CAMPAIGNS_LOADED (state, allCampaignsLoaded) {
       state.allCampaignsLoaded = allCampaignsLoaded
+    },
+    SET_ALL_BATCHES_LOADED (state, allBatchesLoaded) {
+      state.allBatchesLoaded = allBatchesLoaded
     },
     SET_CAMPAIGN_INFO (state, { id, info }) {
       const index = state.campaigns.findIndex(campaign => campaign.id === id)
@@ -26,12 +35,62 @@ export default {
       } else {
         state.campaigns = [campaign]
       }
+    },
+    ADD_BATCH (state, batch) {
+      if (state.batches) {
+        state.batches.push(batch)
+      } else {
+        state.batches = [batch]
+      }
     }
   },
   getters: {
-
+    campaignById (state) {
+      return id => state.campaigns ? state.campaigns.find(c => c.id === id) : null
+    }
   },
   actions: {
+    async getBatches ({ dispatch, commit, state }, nextKey) {
+      commit('SET_LOADING_BATCH', true)
+      try {
+        const data = await this.$blockchain.getBatches(nextKey)
+        let batches = state.batches
+        if (!nextKey) {
+          batches = data.rows
+        } else {
+          batches = batches.concat(data.rows)
+        }
+        commit('SET_BATCHES', batches)
+
+        if (data.more) {
+          await dispatch('getBatches', data.next_key)
+        } else {
+          // No more campaigns, we are done
+          commit('SET_ALL_BATCHES_LOADED', true)
+          commit('SET_LOADING_BATCH', false)
+        }
+      } catch (error) {
+        this.$blockchain.handleError(error)
+        commit('SET_LOADING_BATCH', false)
+      }
+    },
+    async getBatch ({ dispatch, commit, state }, id) {
+      commit('SET_LOADING_BATCH', true)
+      try {
+        if (!state.batches || !state.batches.find(c => c.id === id)) {
+          const data = await this.$blockchain.getBatches(id, 1)
+
+          if (data.rows.length > 0) {
+            commit('ADD_BATCH', data.rows[0])
+          } else {
+            throw new Error('Cannot find batch with the given id.')
+          }
+        }
+      } catch (error) {
+        this.$blockchain.handleError(error)
+      }
+      commit('SET_LOADING_BATCH', false)
+    },
     async getCampaign ({ dispatch, commit, state }, id) {
       commit('SET_LOADING', true)
       try {
@@ -100,8 +159,11 @@ export default {
     }
   },
   state: {
+    batches: null,
     campaigns: null,
     loading: false,
-    allCampaignsLoaded: false
+    loadingBatch: false,
+    allCampaignsLoaded: false,
+    allBatchesLoaded: false
   }
 }

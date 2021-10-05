@@ -10,16 +10,16 @@
       <h2 class="title">
         Campaigns
       </h2>
-      <batch-list />
+      <campaign-list />
     </div>
   </section>
 </template>
 
 <script>
-import BatchList from '@/components/BatchList'
+import CampaignList from '@/components/CampaignList'
 export default {
   components: {
-    BatchList
+    CampaignList
   },
   middleware: ['auth'],
   created () {

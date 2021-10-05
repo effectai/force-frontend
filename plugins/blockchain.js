@@ -258,7 +258,9 @@ export default (context, inject) => {
           this.handleError(error)
         }
       },
-
+      async getBatches (nextKey, limit = 20) {
+        return await this.sdk.force.getBatches(nextKey, limit)
+      },
       async getCampaigns (nextKey, limit = 20) {
         return await this.sdk.force.getCampaigns(nextKey, limit)
       },
