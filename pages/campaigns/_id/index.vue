@@ -45,7 +45,12 @@
             <p v-else>
               ...
             </p>
-            <pre>{{ campaign.template }}</pre>
+            <template-media
+              :html="renderTemplate(
+                campaign.template,
+                {name: 'World'})"
+              @submit="submitTask"
+            />
           </div>
           <div v-if="body === 'instruction'" class="block">
             <p v-if="campaign.instructions">
@@ -103,8 +108,13 @@
 </template>
 <script>
 import { mapState } from 'vuex'
+import TemplateMedia from '@/components/Template'
+import { Template } from '../../../../effect-js'
 
 export default {
+  components: {
+    'template-media': TemplateMedia
+  },
   middleware: ['auth'],
   data () {
     return {
@@ -132,6 +142,12 @@ export default {
     this.getCampaign()
   },
   methods: {
+    submitTask (values) {
+      console.log('Task submitted!', values)
+    },
+    renderTemplate (template, placeholders = {}, options = {}) {
+      return new Template(template, placeholders, options).render()
+    },
     getCampaign () {
       // await this.$store.dispatch('campaign/getCampaign', this.id)
       // this.campaign = this.campaigns.find(c => c.id === this.id)
@@ -139,8 +155,8 @@ export default {
         title: 'Campaign title',
         description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque congue quam in tortor hendrerit feugiat. Etiam auctor interdum lectus, quis viverra sem lobortis ut.',
         instructions: '## Campaign instructions. <br /> Pellentesque erat justo, interdum sit amet dapibus in, lobortis condimentum enim. Maecenas lectus ex, blandit quis ipsum id, fringilla sodales mi.',
-        // eslint-disable-next-line no-template-curly-in-string
-        template: '<script> //set var vueOptions = {...} for custom vue options <\\/script> <div id=\'task\'> <fc-media> In element #task you can use Force Components! </fc-media> ${test} </div>',
+        // eslint-disable-next-line
+        template: '<b>Hello ${name}</b><input name="test" id="test" type="text" /> <input type="submit" /><script>console.log("test if javascripts works from iframe template")<\/script>',
         image: 'http://via.placeholder.com/150',
         category: 'translation',
         quantity: '0.0000 EFX',
