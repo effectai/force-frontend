@@ -26,7 +26,7 @@
       </h1>
 
       <div class="notification is-danger is-light mt-3" role="alert">
-        When depositing to this address, you must enter the "memo" in the message field of the transaction. <b>DO NOT ENCRYPT THE MESSAGE!</b> Forgetting this will result in funds not arriving at your address.
+        When depositing to this address, you must enter the "memo" in the message field of the transaction. Forgetting this will result in funds not arriving at your address.
       </div>
       <div class="box has-limited-width is-horizontal-centered">
         <div class="field">

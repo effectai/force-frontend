@@ -5,40 +5,41 @@
       :key="batch.id"
       :to="'/campaigns/'+batch.campaign_id"
       class="box p-4"
+      :set="campaign = campaignById(batch.campaign_id)"
       :class="{'is-disabled': false}"
     >
       <div class="columns is-vcentered is-multiline is-mobile">
         <div class="column is-narrow is-mobile-1">
           <p class="image has-radius" style="width: 52px; height: 52px">
-            <img v-if="campaignById(batch.campaign_id) && campaignById(batch.campaign_id).info && campaignById(batch.campaign_id).info.image" :src="campaignById(batch.campaign_id).info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaignById(batch.campaign_id).info.image.Hash : campaignById(batch.campaign_id).info.image">
+            <img v-if="campaign && campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
           </p>
         </div>
         <div class="column is-4-desktop is-5-widescreen is-12-touch">
           <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
             <div>
-              <small class="blockchain-address">#<template v-if="campaignById(batch.campaign_id)">{{ campaignById(batch.campaign_id).id }}.</template>{{ batch.id }}</small>
+              <small class="blockchain-address">#<template v-if="campaign">{{ campaign.id }}.</template>{{ batch.id }}</small>
               <span
-                v-if="campaignById(batch.campaign_id) && campaignById(batch.campaign_id).info && campaignById(batch.campaign_id).info.category"
+                v-if="campaign && campaign.info && campaign.info.category"
                 class="tag is-light"
-                :class="{'is-secondary': campaignById(batch.campaign_id).info.category === 'translation'}"
-              >{{ campaignById(batch.campaign_id).info.category }}</span>
+                :class="{'is-secondary': campaign.info.category === 'translation'}"
+              >{{ campaign.info.category }}</span>
             </div>
 
-            <span v-if="campaignById(batch.campaign_id) && campaignById(batch.campaign_id).info">
-              <span v-if="campaignById(batch.campaign_id).info.title">{{ campaignById(batch.campaign_id).info.title }}</span>
+            <span v-if="campaign && campaign.info">
+              <span v-if="campaign.info.title">{{ campaign.info.title }}</span>
               <i v-else>- Untitled -</i>
             </span>
-            <span v-else-if="!campaignById(batch.campaign_id) || campaignById(batch.campaign_id).info !== null">Loading..</span>
+            <span v-else-if="!campaign || campaign.info !== null">Loading..</span>
             <span v-else class="has-text-danger-dark">Could not load campaign info</span>
           </h2>
           <div class="has-text-grey is-size-7">
-            <div v-if="campaignById(batch.campaign_id) && campaignById(batch.campaign_id).info">
-              <div v-if="campaignById(batch.campaign_id).info.description" class="is-ellipsis">
-                {{ campaignById(batch.campaign_id).info.description }}
+            <div v-if="campaign && campaign.info">
+              <div v-if="campaign.info.description" class="is-ellipsis">
+                {{ campaign.info.description }}
               </div>
               <i v-else>- no description -</i>
             </div>
-            <div v-else-if="!campaignById(batch.campaign_id) || campaignById(batch.campaign_id).info !== null">
+            <div v-else-if="!campaign || campaign.info !== null">
               ........
             </div>
           </div>
@@ -48,7 +49,7 @@
             Requester
           </p>
           <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-            <span v-if="campaignById(batch.campaign_id)">{{ campaignById(batch.campaign_id).owner[1] }}</span>
+            <span v-if="campaign">{{ campaign.owner[1] }}</span>
             <span v-else>.....</span>
           </h2>
         </div>
@@ -57,7 +58,7 @@
             Reward
           </p>
           <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-            <span v-if="campaignById(batch.campaign_id)">{{ campaignById(batch.campaign_id).reward.quantity }}</span>
+            <span v-if="campaign">{{ campaign.reward.quantity }}</span>
             <span v-else>.....</span>
           </h2>
         </div>
@@ -70,8 +71,8 @@
           </h2>
         </div>
         <div class="column has-text-right is-12-mobile">
-          <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :class="{'is-loading': !campaignById(batch.campaign_id) || typeof campaignById(batch.campaign_id).info === 'undefined', 'is-accent': campaignById(batch.campaign_id) && campaignById(batch.campaign_id).info === null, 'is-outlined': campaignById(batch.campaign_id) && campaignById(batch.campaign_id).info === null}">
-            <span class="">{{ campaignById(batch.campaign_id) && campaignById(batch.campaign_id).info === null ? 'Qualify' : 'View' }}</span>
+          <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :class="{'is-loading': !campaign || typeof campaign.info === 'undefined', 'is-accent': campaign && campaign.info === null, 'is-outlined': campaign && campaign.info === null}">
+            <span class="">{{ campaign && campaign.info === null ? 'Qualify' : 'View' }}</span>
           </button>
         </div>
       </div>
@@ -105,9 +106,7 @@ export default {
     ...mapState({
       batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
-      campaignsLoading: state => state.campaign.loading,
       batchesLoading: state => state.campaign.loadingBatch,
-      allBatchesLoaded: state => state.campaign.allBatchesLoaded,
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded
     })
   },
