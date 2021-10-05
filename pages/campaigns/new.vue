@@ -101,6 +101,7 @@ export default {
   },
   middleware: ['auth'],
   data () {
+    // save this in the store instead?
     let campaign = window.localStorage.getItem('cached_campaign')
     let campaignIpfs = window.localStorage.getItem('cached_campaignIpfs')
     if (campaign) {
@@ -172,10 +173,7 @@ export default {
     async createCampaign () {
       this.loading = true
       const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
-      if (hash) {
-        console.log(hash)
-        // this.$blockchain.createCampaign()
-      }
+      await this.$blockchain.createCampaign(hash)
       this.loading = false
     },
     // Helper method that generates JSON for string comparison

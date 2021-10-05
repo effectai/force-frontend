@@ -2,7 +2,7 @@ import Vue from 'vue'
 import eos from '../services/eos'
 import bsc from '../services/bsc'
 // const effectSdk = require('@effectai/effect-js')
-const effectSdk = require('../../../effect-js')
+const effectSdk = require('../../effect-js')
 
 export default (context, inject) => {
   const blockchain = new Vue({
@@ -234,7 +234,8 @@ export default (context, inject) => {
       },
 
       async createCampaign (hash) {
-        return await this.sdk.force.createCampaign(hash)
+        // how is the reward determined?
+        return await this.sdk.force.createCampaign(this.account.accountName, hash, '10.00', this.account.permission)
       },
 
       initSdk () {
