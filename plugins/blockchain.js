@@ -263,6 +263,15 @@ export default (context, inject) => {
         return await this.sdk.force.getCampaigns(nextKey, limit)
       },
 
+      async uploadCampaign (content) {
+        return await this.sdk.force.uploadCampaign(content)
+      },
+
+      async createCampaign (hash) {
+        // how is the reward determined?
+        return await this.sdk.force.createCampaign(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, hash, '10.00', this.account.permission)
+      },
+
       initSdk () {
         const sdkOptions = {
           network: process.env.NUXT_ENV_EOS_NETWORK,
