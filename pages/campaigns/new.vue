@@ -12,19 +12,19 @@
         <div class="field">
           <label class="label">Description</label>
           <div class="control">
-            <textarea class="textarea" v-model="campaignIpfs.description"></textarea>
+            <textarea class="textarea" required v-model="campaignIpfs.description"></textarea>
           </div>
         </div>
         <div class="field">
           <label class="label">Instructions</label>
           <div class="control">
-            <textarea class="textarea" v-model="campaignIpfs.instructions"></textarea>
+            <textarea class="textarea" required v-model="campaignIpfs.instructions"></textarea>
           </div>
         </div>
         <div class="field">
           <label class="label">Template</label>
           <div class="control">
-            <textarea class="textarea" v-model="campaignIpfs.template"></textarea>
+            <textarea class="textarea" required v-model="campaignIpfs.template"></textarea>
           </div>
         </div>
         <div class="field">
@@ -32,7 +32,12 @@
           <div class="control">
             <div class="file has-name is-fullwidth">
               <label class="file-label">
-                <input class="file-input" type="file" id="file" ref="file" @change="getSelectedFile">
+                <input
+                  class="file-input"
+                  type="file"
+                  id="file"
+                  ref="file"
+                  @change="getSelectedFile">
                 <span class="file-cta">
                   <span class="file-icon">
                     <i class="fa fa-upload"></i>
@@ -71,7 +76,12 @@
             <button type="submit" class="button is-primary is-wide" :class="{'is-loading': loading}">Save Campaign</button>
           </div>
         </div>
-        {{campaignIpfs}}
+        <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
+          {{ message }}
+          <span v-if="transactionUrl">
+            <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
+          </span>
+        </div>
       </form>
     </div>
   </section>
@@ -119,7 +129,7 @@ export default {
         description: '',
         instructions: '',
         template: '',
-        image: {},
+        image: null,
         category: '',
         version: 1
       }
@@ -134,7 +144,10 @@ export default {
       campaign,
       cachedFormData: null,
       uploadingFile: false,
-      selectedFile: null
+      selectedFile: null,
+      submitted: false,
+      message: null,
+      err: false
     }
   },
   computed: {
@@ -172,9 +185,28 @@ export default {
   methods: {
     async createCampaign () {
       this.loading = true
-      const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
-      await this.$blockchain.createCampaign(hash)
+      try {
+        const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
+        const result = await this.$blockchain.createCampaign(hash)
+        this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+        this.message = 'Campaign created successfully! Check your transaction here: '
+
+        // reset campaign
+        this.campaignIpfs = {
+          title: '',
+          description: '',
+          instructions: '',
+          template: '',
+          image: null,
+          category: '',
+          version: 1
+        }
+      } catch (error) {
+        this.message = error
+        this.err = true
+      }
       this.loading = false
+      this.submitted = true
     },
     // Helper method that generates JSON for string comparison
     formDataForComparison () {
@@ -223,7 +255,7 @@ export default {
       }
     },
     removeImage () {
-      this.campaignIpfs.image = {}
+      this.campaignIpfs.image = null
     }
   }
 }

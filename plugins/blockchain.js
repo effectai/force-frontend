@@ -269,7 +269,7 @@ export default (context, inject) => {
 
       async createCampaign (hash) {
         // how is the reward determined?
-        return await this.sdk.force.createCampaign(this.account.accountName, hash, '10.00', this.account.permission)
+        return await this.sdk.force.createCampaign(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, hash, '10.00', this.account.permission)
       },
 
       initSdk () {
