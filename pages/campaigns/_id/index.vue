@@ -25,32 +25,54 @@
         <div class="column is-two-thirds">
           <div class="title">
             <span>#{{ id }}: </span>
-            <span v-if="campaign.info">{{ campaign.info.title }}</span>
+            <span v-if="campaign.title">{{ campaign.title }}</span>
             <span v-else>Campaign Title loading...</span>
           </div>
-          <div class="block">
-            <p v-if="campaign.info">
-              {{ campaign.info.body }}. Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque iste ipsa reiciendis laborum autem nesciunt assumenda? Debitis, mollitia nisi corrupti, amet id officiis nobis eaque magni, modi eligendi atque facilis?
-              Vitae deleniti, iure modi cupiditate corporis quod asperiores. Quae minus quisquam facere amet exercitationem similique deleniti eum veritatis praesentium nisi eos sunt placeat enim tempora deserunt, laudantium numquam fugiat animi.
-              Obcaecati accusamus maiores eveniet aut natus, nostrum reiciendis commodi enim cumque omnis dolores temporibus, aliquam similique autem. Tenetur dolor necessitatibus laudantium quam, provident reprehenderit libero, nam eligendi iure, eos inventore.
+          <div class="tabs">
+            <ul>
+              <li :class="{'is-active': body === 'description'}">
+                <a @click.prevent="body = 'description'">Description</a>
+              </li>
+              <li :class="{'is-active': body === 'instruction'}">
+                <a @click.prevent="body = 'instruction'">Instructions</a>
+              </li>
+            </ul>
+          </div>
+          <div v-if="body === 'description'" class="block">
+            <p v-if="campaign.description">
+              {{ campaign.description }}
+            </p>
+            <p v-else>
+              ...
+            </p>
+            <pre>{{ campaign.template }}</pre>
+          </div>
+          <div v-if="body === 'instruction'" class="block">
+            <p v-if="campaign.instructions">
+              {{ campaign.instructions }}
             </p>
             <p v-else>
               ...
             </p>
           </div>
-          <pre>{{ campaign }}</pre>
         </div>
         <div class="column is-one-thirds">
           <div class="box">
-            <h5 class="box-title">
+            <h4 class="box-title is-size-4">
               <b>Information</b>
-            </h5>
+            </h4>
             <div class="block">
               <b>Requester</b>
               <br>
-              <a href="#">
-                {{ campaign.author }}
-              </a>
+              <nuxt-link :to="'/profile/' + randomAuthorId">
+                {{ randomAuthorId }}
+              </nuxt-link>
+            </div>
+            <div class="block">
+              <b>Reward</b>
+              <br>
+              <span v-if="campaign.quantity">{{ campaign.quantity }}</span>
+              <span v-else class="tag is-info is-light is-medium">...</span>
             </div>
             <div class="block">
               <b>Tasks</b>
@@ -63,19 +85,15 @@
               </progress>
             </div>
             <div class="block">
-              <b>Reward</b>
+              <b>Category</b>
               <br>
-              <span>{{ campaign.pay[0].field_0.quantity }}</span>
+              <span v-if="campaign.category" class="tag is-info is-light is-medium">{{ campaign.category }}</span>
+              <span v-else class="tag is-info is-light is-medium">...</span>
             </div>
             <div class="block">
-              <b>Content hash</b>
+              <b>Blockchain</b>
               <br>
-              <a target="_blank" :href="'https://ipfs.effect.ai/ipfs/' + campaign.content_hash">{{ campaign.content_hash.substring(0, 22) }}...</a>
-            </div>
-            <div class="block">
-              <b>Block Explorer</b>
-              <br>
-              <a target="_blank" :href="`https://kylin.bloks.io/account/propsonkylin?loadContract=true&tab=Tables&table=proposal&account=propsonkylin&scope=propsonkylin&limit=1&lower_bound=${id}&upper_bound=${id}`">View on Block Explorer</a>
+              <a target="_blank" :href="`https://kylin.bloks.io/account/propsonkylin?loadContract=true&tab=Tables&table=proposal&account=propsonkylin&scope=propsonkylin&limit=1&lower_bound=${id}&upper_bound=${id}`">View on Explorer</a>
             </div>
           </div>
         </div>
@@ -92,27 +110,45 @@ export default {
     return {
       id: parseInt(this.$route.params.id),
       campaign: undefined,
-      randomNumber: undefined
+      randomNumber: undefined,
+      body: 'description'
     }
   },
   computed: {
     ...mapState({
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading
-    })
+    }),
+    randomAuthorId () {
+      return this.generateRandomNumber(12)
+    }
   },
   mounted () {
     setTimeout(() => {
-      this.randomNumber = Math.ceil(Math.random() * 300)
+      this.randomNumber = this.generateRandomNumber(300)
     }, 3000)
   },
   created () {
     this.getCampaign()
   },
   methods: {
-    async getCampaign () {
-      await this.$store.dispatch('campaign/getCampaign', this.id)
-      this.campaign = this.campaigns.find(c => c.id === this.id)
+    getCampaign () {
+      // await this.$store.dispatch('campaign/getCampaign', this.id)
+      // this.campaign = this.campaigns.find(c => c.id === this.id)
+      this.campaign = {
+        title: 'Campaign title',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque congue quam in tortor hendrerit feugiat. Etiam auctor interdum lectus, quis viverra sem lobortis ut.',
+        instructions: '## Campaign instructions. <br /> Pellentesque erat justo, interdum sit amet dapibus in, lobortis condimentum enim. Maecenas lectus ex, blandit quis ipsum id, fringilla sodales mi.',
+        // eslint-disable-next-line no-template-curly-in-string
+        template: '<script> //set var vueOptions = {...} for custom vue options <\\/script> <div id=\'task\'> <fc-media> In element #task you can use Force Components! </fc-media> ${test} </div>',
+        image: 'http://via.placeholder.com/150',
+        category: 'translation',
+        quantity: '0.0000 EFX',
+        version: 1
+      }
+    },
+    generateRandomNumber (maxNum) {
+      return Math.ceil(Math.random() * maxNum)
     }
   }
 }
@@ -121,7 +157,7 @@ export default {
 .box-title {
   text-align: center;
   border-bottom: 2px solid #cdd4e6;
-  padding-bottom: 20px;
+  padding-bottom: 31px;
   margin: 10px 0 15px 0;
 }
 .progress::-webkit-progress-value {
