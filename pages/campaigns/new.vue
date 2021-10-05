@@ -184,6 +184,10 @@ export default {
 
   methods: {
     async createCampaign () {
+      if (this.$auth.user.blockchain === 'bsc') {
+        alert('Not supported yet')
+        return
+      }
       this.loading = true
       try {
         const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
