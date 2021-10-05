@@ -16,12 +16,12 @@
                 :href="$blockchain.bsc.explorer + '/address/'+ account[0].address[1]"
                 target="_blank"
                 class="blockchain-address"
-              >{{ $auth.user.publicKey }}</a>
+              >{{ account[0].address[1] }}</a>
               <a
                 v-else
                 :href="$blockchain.eos.explorer + '/address/'+ account[0].address[1]"
                 target="_blank"
-              >{{ $auth.user.accountName }}</a><span v-if="account[0].address[0] === 'name'">@{{ $auth.user.permission }}</span>
+              >{{ account[0].address[1] }}</a>
             </div>
           </div>
         </div>
