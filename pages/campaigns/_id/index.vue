@@ -25,8 +25,9 @@
         <div class="column is-two-thirds">
           <div class="title">
             <span>#{{ id }}: </span>
-            <span v-if="campaign.title">{{ campaign.title }}</span>
-            <span v-else>Campaign Title loading...</span>
+            <span v-if="campaign.info">{{ campaign.info.title }}</span>
+            <span v-else-if="campaign.info !== null">Loading..</span>
+            <span v-else class="has-text-danger-dark">Could not load campaign info</span>
           </div>
           <div class="tabs">
             <ul>
@@ -39,22 +40,23 @@
             </ul>
           </div>
           <div v-if="body === 'description'" class="block">
-            <p v-if="campaign.description">
-              {{ campaign.description }}
+            <p v-if="campaign.info">
+              {{ campaign.info.description }}
             </p>
             <p v-else>
               ...
             </p>
             <template-media
+              v-if="campaign.info"
               :html="renderTemplate(
-                campaign.template,
+                campaign.info.template || 'No template found..',
                 {name: 'World'})"
               @submit="submitTask"
             />
           </div>
           <div v-if="body === 'instruction'" class="block">
-            <p v-if="campaign.instructions">
-              {{ campaign.instructions }}
+            <p v-if="campaign.info">
+              {{ campaign.info.instructions }}
             </p>
             <p v-else>
               ...
@@ -69,15 +71,14 @@
             <div class="block">
               <b>Requester</b>
               <br>
-              <nuxt-link :to="'/profile/' + randomAuthorId">
-                {{ randomAuthorId }}
+              <nuxt-link :to="'/profile/0'">
+                {{ campaign.owner[1] }}
               </nuxt-link>
             </div>
             <div class="block">
               <b>Reward</b>
               <br>
-              <span v-if="campaign.quantity">{{ campaign.quantity }}</span>
-              <span v-else class="tag is-info is-light is-medium">...</span>
+              <span>{{ campaign.reward.quantity }}</span>
             </div>
             <div class="block">
               <b>Tasks</b>
@@ -92,7 +93,7 @@
             <div class="block">
               <b>Category</b>
               <br>
-              <span v-if="campaign.category" class="tag is-info is-light is-medium">{{ campaign.category }}</span>
+              <span v-if="campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
               <span v-else class="tag is-info is-light is-medium">...</span>
             </div>
             <div class="block">
@@ -128,10 +129,7 @@ export default {
     ...mapState({
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading
-    }),
-    randomAuthorId () {
-      return this.generateRandomNumber(12)
-    }
+    })
   },
   mounted () {
     setTimeout(() => {
@@ -148,20 +146,9 @@ export default {
     renderTemplate (template, placeholders = {}, options = {}) {
       return new Template(template, placeholders, options).render()
     },
-    getCampaign () {
-      // await this.$store.dispatch('campaign/getCampaign', this.id)
-      // this.campaign = this.campaigns.find(c => c.id === this.id)
-      this.campaign = {
-        title: 'Campaign title',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque congue quam in tortor hendrerit feugiat. Etiam auctor interdum lectus, quis viverra sem lobortis ut.',
-        instructions: '## Campaign instructions. <br /> Pellentesque erat justo, interdum sit amet dapibus in, lobortis condimentum enim. Maecenas lectus ex, blandit quis ipsum id, fringilla sodales mi.',
-        // eslint-disable-next-line
-        template: '<b>Hello ${name}</b><input name="test" id="test" type="text" /> <input type="submit" /><script>console.log("test if javascripts works from iframe template")<\/script>',
-        image: 'http://via.placeholder.com/150',
-        category: 'translation',
-        quantity: '0.0000 EFX',
-        version: 1
-      }
+    async getCampaign () {
+      await this.$store.dispatch('campaign/getCampaign', this.id)
+      this.campaign = this.campaigns.find(c => c.id === this.id)
     },
     generateRandomNumber (maxNum) {
       return Math.ceil(Math.random() * maxNum)

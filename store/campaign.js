@@ -87,8 +87,13 @@ export default {
     },
     async processCampaign ({ commit }, campaign) {
       try {
-        const info = await this.$blockchain.sdk.getIpfsContent(campaign.content_hash)
-        commit('SET_CAMPAIGN_INFO', { id: campaign.id, info })
+        // field_0 represents the content type where:
+        // 0: IPFS
+        if (campaign.content.field_0 === 0) {
+          // field_1 represents the IPFS hash
+          const info = await this.$blockchain.sdk.getIpfsContent(campaign.content.field_1)
+          commit('SET_CAMPAIGN_INFO', { id: campaign.id, info })
+        }
       } catch (e) {
         commit('SET_CAMPAIGN_INFO', { id: campaign.id, info: null })
       }

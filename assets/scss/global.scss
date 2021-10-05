@@ -151,6 +151,50 @@ a.box {
   }
 }
 
+.is-ellipsis {
+  display: block;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.is-ellipsis-1 {
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  white-space: normal;
+}
+.is-ellipsis-2 {
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  display: -webkit-box;
+}
+.is-ellipsis-3 {
+  -webkit-line-clamp: 3;
+  white-space: normal;
+  display: -webkit-box;
+}
+.is-ellipsis-4 {
+  -webkit-line-clamp: 4;
+  white-space: normal;
+  display: -webkit-box;
+}
+.is-ellipsis-5 {
+  -webkit-line-clamp: 5;
+  white-space: normal;
+  display: -webkit-box;
+}
+.is-ellipsis-6 {
+  -webkit-line-clamp: 6;
+  white-space: normal;
+  display: -webkit-box;
+}
+
+.is-ellipsis-7 {
+  -webkit-line-clamp: 7;
+  white-space: normal;
+  display: -webkit-box;
+}
+
 .blockchain-address {
   font-family: monospace;
   text-overflow: ellipsis;

@@ -1,28 +1,55 @@
 <template>
   <div>
-    <nuxt-link v-for="campaign in campaigns" :key="campaign.id" :to="'/campaigns/'+campaign.id" class="box p-4" :class="{'is-disabled': campaign.id === 1}">
+    <nuxt-link
+      v-for="campaign in campaigns"
+      :key="campaign.id"
+      :to="'/campaigns/'+campaign.id"
+      class="box p-4"
+      :class="{'is-disabled': campaign.info === null}"
+    >
       <div class="columns is-vcentered is-multiline is-mobile">
         <div class="column is-narrow is-mobile-1">
           <p class="image has-radius" style="width: 52px; height: 52px">
-            <img src="https://bulma.io/images/placeholders/128x128.png">
+            <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
           </p>
         </div>
         <div class="column is-4-desktop is-5-widescreen is-12-touch">
           <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-            #{{ campaign.id }}
-            <span v-if="campaign.info">{{ campaign.info.title }}</span>
-            <span v-else>Loading..</span>
+            <div>
+              <small class="blockchain-address">#{{ campaign.id }}</small>
+              <span
+                v-if="campaign.info && campaign.info.category"
+                class="tag is-light"
+                :class="{'is-secondary': campaign.info.category === 'translation'}"
+              >{{ campaign.info.category }}</span>
+            </div>
+
+            <span v-if="campaign.info">
+              <span v-if="campaign.info.title">{{ campaign.info.title }}</span>
+              <i v-else>- Untitled -</i>
+            </span>
+            <span v-else-if="campaign.info !== null">Loading..</span>
+            <span v-else class="has-text-danger-dark">Could not load campaign info</span>
           </h2>
-          <p class="has-text-grey is-size-7">
-            This will be the place for the short campaign description...
-          </p>
+          <div class="has-text-grey is-size-7">
+            <div v-if="campaign.info">
+              <div v-if="campaign.info.description" class="is-ellipsis">
+                {{ campaign.info.description }}
+              </div>
+              <i v-else>- no description -</i>
+            </div>
+            <div v-else-if="campaign.info !== null">
+              ........
+            </div>
+          </div>
         </div>
         <div class="column">
           <p class="has-text-grey is-size-7">
             Requester
           </p>
+          <!--          {{ campaign }}-->
           <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-            {{ campaign.author }}
+            {{ campaign.owner[1] }}
           </h2>
         </div>
         <div class="column">
@@ -30,7 +57,7 @@
             Reward
           </p>
           <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-            {{ campaign.pay[0].field_0.quantity }}
+            {{ campaign.reward.quantity }}
           </h2>
         </div>
         <div class="column">
@@ -42,8 +69,8 @@
           </h2>
         </div>
         <div class="column has-text-right is-12-mobile">
-          <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :class="{'is-accent': campaign.id === 1, 'is-outlined': campaign.id === 1}">
-            <span class="">{{ campaign.id === 1 ? 'Qualify' : 'View' }}</span>
+          <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null, 'is-outlined': campaign.info === null}">
+            <span class="">{{ campaign.info === null ? 'Qualify' : 'View' }}</span>
           </button>
         </div>
       </div>
@@ -67,6 +94,7 @@ export default {
   name: 'CampaignList',
   data () {
     return {
+      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER
     }
   },
   computed: {
