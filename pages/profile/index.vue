@@ -60,7 +60,6 @@
 </template>
 
 <script>
-
 import Balance from '@/components/Balance'
 export default {
   components: { Balance },

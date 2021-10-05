@@ -20,7 +20,6 @@
             v-else
             :href="$blockchain.eos.explorer + '/address/'+ $blockchain.account.accountName"
             target="_blank"
-            class="blockchain-address"
           >{{ $blockchain.account.accountName }}</a><span v-if="$blockchain.account.permission">@{{ $blockchain.account.permission }}</span>
         </div>
         <div style="min-height: 67px">
@@ -173,7 +172,7 @@ export default {
     async accountExists () {
       // check if account exists
       try {
-        const vAccountRows = await this.$blockchain.getVAccount()
+        const vAccountRows = await this.$blockchain.getVAccountByName()
         if (vAccountRows && vAccountRows.length) {
           // account exists
           this.existingAccount = true

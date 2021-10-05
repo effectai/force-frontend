@@ -7,6 +7,11 @@ const effectSdk = require('../../effect-js')
 export default (context, inject) => {
   const blockchain = new Vue({
     data () {
+      // Initialize empty SDK, reinitialize when connecting wallet
+      const sdkOptions = {
+        network: process.env.NUXT_ENV_EOS_NETWORK,
+        host: `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
+      }
       return {
         account: null,
         blockchain: null,
@@ -16,7 +21,7 @@ export default (context, inject) => {
         efxPending: 0,
         eos,
         bsc,
-        sdk: null,
+        sdk: new effectSdk.EffectClient(sdkOptions),
         error: null,
         waitForSignatureFrom: null,
         waitForSignature: 0,
@@ -45,8 +50,6 @@ export default (context, inject) => {
       }
     },
     created () {
-      // Initialize empty SDK, reinitialize when connecting wallet
-      this.initSdk()
       this.updateBlockchainInfo()
       if (!this.refreshInterval) {
         this.refreshInterval = setInterval(this.updateBlockchainInfo, parseInt(process.env.NUXT_ENV_BLOCKCHAIN_UPDATE_RATE, 10))
@@ -190,8 +193,14 @@ export default (context, inject) => {
       async openVAccount () {
         await this.sdk.account.openAccount(this.account.accountName, this.account.permission)
       },
-      async getVAccount () {
-        return await this.sdk.account.getBalance(this.account.accountName)
+      async getVAccountByName (accountName) {
+        if (!accountName) {
+          accountName = this.account.accountName
+        }
+        return await this.sdk.account.getVAccountByName(accountName)
+      },
+      async getVAccountById (id) {
+        return await this.sdk.account.getVAccountById(id)
       },
 
       async deposit (amount) {
