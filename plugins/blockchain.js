@@ -2,7 +2,7 @@ import Vue from 'vue'
 import eos from '../services/eos'
 import bsc from '../services/bsc'
 // const effectSdk = require('@effectai/effect-js')
-const effectSdk = require('../../../effect-js')
+const effectSdk = require('../../effect-js')
 
 export default (context, inject) => {
   const blockchain = new Vue({
@@ -225,15 +225,40 @@ export default (context, inject) => {
       clear () {
         Object.assign(this.$data, this.$options.data.call(this))
       },
-
       async getAccountBalance () {
-        if (context.$auth.loggedIn && context.$auth.user.blockchain === 'eos') {
-          const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, context.$auth.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
-          if (efxRow) {
-            this.efxAvailable = parseFloat(efxRow.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+        if (context.$auth.loggedIn) {
+          if (context.$auth.user.blockchain === 'bsc') {
+            const balance = await this.getBscEFXBalance(context.$auth.user.publicKey)
+            this.efxAvailable = parseFloat(balance)
+          } else {
+            const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, context.$auth.user.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
+            if (efxRow) {
+              this.efxAvailable = parseFloat(efxRow.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+            }
           }
         }
       },
+      async getBscEFXBalance (address) {
+        // balanceOf && decimals
+        const erc20JsonInterface = [
+          {
+            constant: true,
+            inputs: [{ name: '_owner', type: 'address' }],
+            name: 'balanceOf',
+            outputs: [{ name: 'balance', type: 'uint256' }],
+            type: 'function'
+          }
+        ]
+        const efxAddress = process.env.NUXT_ENV_BSC_EFX_TOKEN_CONTRACT // Token contract address
+        const contract = new this.bsc.web3.eth.Contract(erc20JsonInterface, efxAddress)
+        try {
+          const balance = await contract.methods.balanceOf(address).call()
+          return this.bsc.web3.utils.fromWei(balance.toString())
+        } catch (error) {
+          this.handleError(error)
+        }
+      },
+
       async getCampaigns (nextKey, limit = 20) {
         return await this.sdk.force.getCampaigns(nextKey, limit)
       },
