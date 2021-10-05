@@ -71,7 +71,7 @@
             <div class="block">
               <b>Requester</b>
               <br>
-              <nuxt-link :to="'/profile/0'">
+              <nuxt-link :to="'/profile/' + campaign.owner[1]">
                 {{ campaign.owner[1] }}
               </nuxt-link>
             </div>
