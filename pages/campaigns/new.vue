@@ -22,51 +22,33 @@
           </div>
         </div>
         <div class="field">
+          <label class="label">Reward per task (EFX)</label>
+          <div class="control">
+            <input v-model="campaignIpfs.reward" required class="input" type="number" placeholder="Reward per task (EFX)">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Category</label>
+          <div class="select">
+            <select required v-model="campaignIpfs.category">
+              <option>---</option>
+              <!-- TODO: add correct categories -->
+              <option value="translation">translation</option>
+              <option value="image_classification">image classification</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Image</label>
+          <div class="control">
+            <input v-model="campaignIpfs.image" class="input" type="text" placeholder="Image URL">
+          </div>
+        </div>
+        <div class="field">
           <label class="label">Template</label>
           <div class="control">
             <textarea class="textarea" required v-model="campaignIpfs.template"></textarea>
           </div>
-        </div>
-        <div class="field">
-          <label class="label">Attachments</label>
-          <div class="control">
-            <div class="file has-name is-fullwidth">
-              <label class="file-label">
-                <input
-                  class="file-input"
-                  type="file"
-                  id="file"
-                  ref="file"
-                  @change="getSelectedFile">
-                <span class="file-cta">
-                  <span class="file-icon">
-                    <i class="fa fa-upload"></i>
-                  </span>
-                  <span class="file-label">
-                    Choose a file…
-                  </span>
-                </span>
-                <span class="file-name">
-                  <span v-if="selectedFile">{{selectedFile.name}}</span>
-                </span>
-                <span>
-                  <button :class="{'is-loading': uploadingFile}" :disabled="!selectedFile" @click.prevent="uploadFile" class="button is-primary">Upload File</button>
-                </span>
-              </label>
-            </div>
-          </div>
-          <table class="table">
-            <tbody v-if="campaignIpfs.image">
-              <td><a :href="ipfsExplorer + '/ipfs/' + campaignIpfs.image.Hash" target="_blank">{{ campaignIpfs.image.Name }}</a></td>
-              <td>{{ campaignIpfs.image.Size | formatBytes }}</td>
-              <td class="has-text-right"><button @click.prevent="removeImage" class="button is-danger is-small">Remove</button></td>
-            </tbody>
-            <tbody v-else>
-              <tr>
-                <td colspan="3">No files uploaded</td>
-              </tr>
-            </tbody>
-          </table>
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
@@ -129,9 +111,10 @@ export default {
         description: '',
         instructions: '',
         template: '',
-        image: null,
+        image: '',
         category: '',
-        version: 1
+        version: 1,
+        reward: null
       }
     }
     return {
@@ -191,7 +174,7 @@ export default {
       this.loading = true
       try {
         const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
-        const result = await this.$blockchain.createCampaign(hash)
+        const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
         this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
         this.message = 'Campaign created successfully! Check your transaction here: '
 
@@ -201,9 +184,10 @@ export default {
           description: '',
           instructions: '',
           template: '',
-          image: null,
+          image: '',
           category: '',
-          version: 1
+          version: 1,
+          reward: null
         }
       } catch (error) {
         this.message = error
@@ -227,39 +211,6 @@ export default {
         return true
       }
       return true
-    },
-    getSelectedFile () {
-      this.selectedFile = this.$refs.file.files[0]
-    },
-    async uploadFile () {
-      if (this.selectedFile) {
-        this.uploadingFile = true
-        const formData = new FormData()
-        formData.append('file', this.selectedFile)
-        if (this.selectedFile.size > 10000000) {
-          alert('Max file size allowed is 10 MB')
-          this.selectedFile = null
-          this.$refs.file.value = ''
-        } else {
-          try {
-            const response = await fetch(`${process.env.NUXT_ENV_IPFS_NODE}/api/v0/add?pin=true`,
-              {
-                method: 'POST',
-                body: formData
-              })
-            const file = await response.json()
-            this.campaignIpfs.image = file
-            this.selectedFile = null
-            this.$refs.file.value = ''
-          } catch (e) {
-            console.log(e)
-          }
-        }
-        this.uploadingFile = false
-      }
-    },
-    removeImage () {
-      this.campaignIpfs.image = null
     }
   }
 }
