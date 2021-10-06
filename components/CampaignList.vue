@@ -62,10 +62,10 @@
         </div>
         <div class="column">
           <p class="has-text-grey is-size-7">
-            Tasks
+            Batches
           </p>
           <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-            10/300 left
+            TODO: retrieve and count batches per campaign
           </h2>
         </div>
         <div class="column has-text-right is-12-mobile">

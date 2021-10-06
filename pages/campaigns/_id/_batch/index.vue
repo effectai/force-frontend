@@ -8,25 +8,30 @@
               All Campaigns
             </nuxt-link>
           </li>
+          <li>
+            <nuxt-link :to="`/campaigns/${campaignId}`">
+              Campaign {{ campaignId }}
+            </nuxt-link>
+          </li>
           <li class="is-active">
-            <nuxt-link :to="'/campaigns/' + id" aria-current="page">
-              Campaign {{ id }}
+            <nuxt-link :to="`/campaigns/${campaignId}/${batchId}`" aria-current="page">
+              Batch {{ batchId }}
             </nuxt-link>
           </li>
         </ul>
       </nav>
-      <div v-if="campaignLoading">
+      <div v-if="campaignLoading || batchLoading">
         Campaign loading..
       </div>
-      <div v-else-if="!campaign">
+      <div v-else-if="!campaign || !batch">
         Could not retrieve campaign
       </div>
-      <div v-else class="columns">
+      <div class="columns">
         <div class="column is-two-thirds">
           <div class="title">
-            <span>#{{ id }}: </span>
-            <span v-if="campaign.info">{{ campaign.info.title }}</span>
-            <span v-else-if="campaign.info !== null">Loading..</span>
+            <span>#{{ campaignId }}.{{ batchId }}: </span>
+            <span v-if="campaign && campaign.info">{{ campaign.info.title }}</span>
+            <span v-else-if="!campaign || campaign.info !== null">Loading..</span>
             <span v-else class="has-text-danger-dark">Could not load campaign info</span>
           </div>
           <div class="tabs">
@@ -40,14 +45,14 @@
             </ul>
           </div>
           <div v-if="body === 'description'" class="block">
-            <p v-if="campaign.info">
+            <p v-if="campaign && campaign.info">
               {{ campaign.info.description }}
             </p>
             <p v-else>
               ...
             </p>
             <template-media
-              v-if="campaign.info"
+              v-if="campaign && campaign.info"
               :html="renderTemplate(
                 campaign.info.template || 'No template found..',
                 {name: 'World'})"
@@ -55,7 +60,7 @@
             />
           </div>
           <div v-if="body === 'instruction'" class="block">
-            <p v-if="campaign.info">
+            <p v-if="campaign && campaign.info">
               {{ campaign.info.instructions }}
             </p>
             <p v-else>
@@ -71,30 +76,39 @@
             <div class="block">
               <b>Requester</b>
               <br>
-              <nuxt-link :to="'/profile/' + campaign.owner[1]">
+              <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
                 {{ campaign.owner[1] }}
               </nuxt-link>
+              <span v-else>.....</span>
             </div>
             <div class="block">
               <b>Reward</b>
               <br>
-              <span>{{ campaign.reward.quantity }}</span>
+              <span v-if="campaign">{{ campaign.reward.quantity }}</span>
+              <span v-else>.....</span>
             </div>
             <div class="block">
-              <b>Batches</b>
+              <b>Tasks</b>
               <br>
-              <span>TODO: # of batches</span>
+              <span v-if="batch">{{ batch.tasks_done }}</span>
+              <span v-else>...</span>
+              <span>/ 300 left</span>
+              <progress class="progress is-secondary" :value="left" max="300">
+                Left
+              </progress>
             </div>
             <div class="block">
               <b>Category</b>
               <br>
-              <span v-if="campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
+              <span v-if="campaign && campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
               <span v-else class="tag is-info is-light is-medium">...</span>
             </div>
             <div class="block">
               <b>Blockchain</b>
               <br>
-              <a target="_blank" :href="`https://kylin.bloks.io/account/propsonkylin?loadContract=true&tab=Tables&table=proposal&account=propsonkylin&scope=propsonkylin&limit=1&lower_bound=${id}&upper_bound=${id}`">View on Explorer</a>
+              - <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${campaignId}&upper_bound=${campaignId}`">View Campaign on Explorer</a>
+              <br>
+              - <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
             </div>
           </div>
         </div>
@@ -114,17 +128,24 @@ export default {
   middleware: ['auth'],
   data () {
     return {
-      id: parseInt(this.$route.params.id),
+      campaignId: parseInt(this.$route.params.id),
+      batchId: parseInt(this.$route.params.batch),
       campaign: undefined,
+      batch: undefined,
       randomNumber: undefined,
       body: 'description'
     }
   },
   computed: {
     ...mapState({
+      batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
-      campaignLoading: state => state.campaign.loading
-    })
+      campaignLoading: state => state.campaign.loading,
+      batchLoading: state => state.campaign.loadingBatch
+    }),
+    left () {
+      return this.batch ? 300 - this.batch.tasks_done : undefined
+    }
   },
   mounted () {
     setTimeout(() => {
@@ -132,6 +153,7 @@ export default {
     }, 3000)
   },
   created () {
+    this.getBatch()
     this.getCampaign()
   },
   methods: {
@@ -141,9 +163,13 @@ export default {
     renderTemplate (template, placeholders = {}, options = {}) {
       return new Template(template, placeholders, options).render()
     },
+    async getBatch () {
+      await this.$store.dispatch('campaign/getBatch', this.batchId)
+      this.batch = this.batches.find(b => b.id === this.batchId)
+    },
     async getCampaign () {
-      await this.$store.dispatch('campaign/getCampaign', this.id)
-      this.campaign = this.campaigns.find(c => c.id === this.id)
+      await this.$store.dispatch('campaign/getCampaign', this.campaignId)
+      this.campaign = this.campaigns.find(c => c.id === this.campaignId)
     },
     generateRandomNumber (maxNum) {
       return Math.ceil(Math.random() * maxNum)
