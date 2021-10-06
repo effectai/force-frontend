@@ -1,7 +1,9 @@
 <template>
   <section class="section">
     <div class="container">
-      <h4 class="box-title subtitle">New Campaign</h4>
+      <h4 class="box-title subtitle">
+        New Campaign
+      </h4>
       <form @submit.prevent="createCampaign">
         <div class="field">
           <label class="label">Title</label>
@@ -12,13 +14,13 @@
         <div class="field">
           <label class="label">Description</label>
           <div class="control">
-            <textarea class="textarea" required v-model="campaignIpfs.description"></textarea>
+            <textarea v-model="campaignIpfs.description" class="textarea" required />
           </div>
         </div>
         <div class="field">
           <label class="label">Instructions</label>
           <div class="control">
-            <textarea class="textarea" required v-model="campaignIpfs.instructions"></textarea>
+            <textarea v-model="campaignIpfs.instructions" class="textarea" required />
           </div>
         </div>
         <div class="field">
@@ -30,11 +32,15 @@
         <div class="field">
           <label class="label">Category</label>
           <div class="select">
-            <select required v-model="campaignIpfs.category">
+            <select v-model="campaignIpfs.category" required>
               <option>---</option>
               <!-- TODO: add correct categories -->
-              <option value="translation">translation</option>
-              <option value="image_classification">image classification</option>
+              <option value="translation">
+                translation
+              </option>
+              <option value="image_classification">
+                image classification
+              </option>
             </select>
           </div>
         </div>
@@ -47,15 +53,19 @@
         <div class="field">
           <label class="label">Template</label>
           <div class="control">
-            <textarea class="textarea" required v-model="campaignIpfs.template"></textarea>
+            <textarea v-model="campaignIpfs.template" class="textarea" required />
           </div>
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
-            <nuxt-link class="button is-light" to="/">Cancel</nuxt-link>
+            <nuxt-link class="button is-light" to="/campaigns">
+              Cancel
+            </nuxt-link>
           </div>
           <div class="control">
-            <button type="submit" class="button is-primary is-wide" :class="{'is-loading': loading}">Save Campaign</button>
+            <button type="submit" class="button is-primary is-wide" :class="{'is-loading': loading}">
+              Save Campaign
+            </button>
           </div>
         </div>
         <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">

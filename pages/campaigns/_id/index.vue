@@ -106,7 +106,7 @@
             <div class="block">
               <b>Blockchain</b>
               <br>
-              <a target="_blank" :href="`https://kylin.bloks.io/account/propsonkylin?loadContract=true&tab=Tables&table=proposal&account=propsonkylin&scope=propsonkylin&limit=1&lower_bound=${id}&upper_bound=${id}`">View on Explorer</a>
+              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${id}&upper_bound=${id}`">View Campaign on Explorer</a>
             </div>
           </div>
         </div>
@@ -119,7 +119,6 @@ import { mapState } from 'vuex'
 import TemplateMedia from '@/components/Template'
 import { Serialize, Numeric } from 'eosjs'
 import { Template } from '@/../effect-js'
-
 
 export default {
   components: {
