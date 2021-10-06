@@ -60,9 +60,7 @@
             />
           </div>
           <div v-if="body === 'instruction'" class="block">
-            <p v-if="campaign && campaign.info">
-              {{ campaign.info.instructions }}
-            </p>
+            <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
             <p v-else>
               ...
             </p>
