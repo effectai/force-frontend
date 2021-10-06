@@ -264,7 +264,12 @@ export default (context, inject) => {
       async getCampaigns (nextKey, limit = 20) {
         return await this.sdk.force.getCampaigns(nextKey, limit)
       },
-
+      async campaignJoin (index) {
+        return await this.sdk.force.campaignJoin(index)
+      },
+      async joinCampaign (accountId, campaignId) {
+        return await this.sdk.force.joinCampaign(context.$auth.user.accountName, this.account.permission, accountId, campaignId)
+      },
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)
       },
