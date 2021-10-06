@@ -105,8 +105,8 @@
               <br>
               <span v-if="batch">{{ batch.tasks_done }}</span>
               <span v-else>...</span>
-              <span>/ 300 left</span>
-              <progress class="progress is-secondary" :value="left" max="300">
+              <span v-if="batch">/ {{ batch.num_tasks }} left</span>
+              <progress v-if="batch" class="progress is-secondary" :value="left" :max="batch.num_tasks">
                 Left
               </progress>
             </div>
