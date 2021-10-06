@@ -4,7 +4,7 @@
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
           <li>
-            <nuxt-link to="/">
+            <nuxt-link to="/campaigns">
               All Campaigns
             </nuxt-link>
           </li>
@@ -55,7 +55,7 @@
             />
           </div>
           <div v-if="body === 'instruction'" class="block">
-            <p v-if="campaign.info">
+            <p v-if="campaign.info.instructions">
               {{ campaign.info.instructions }}
             </p>
             <p v-else>
@@ -68,12 +68,24 @@
             <h4 class="box-title is-size-4">
               <b>Information</b>
             </h4>
-            <div class="block">
-              <b>Requester</b>
-              <br>
-              <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                {{ campaign.owner[1] }}
-              </nuxt-link>
+            <div class="columns">
+              <div class="column">
+                <div class="block">
+                  <b>Requester</b>
+                  <br>
+                  <nuxt-link :to="'/profile/' + campaign.owner[1]">
+                    {{ campaign.owner[1] }}
+                  </nuxt-link>
+                </div>
+              </div>
+              <div v-if="$auth.user.blockchain === 'eos'" class="column is-flex is-justify-content-flex-end">
+                <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaign()">
+                  Join Campaign
+                </button>
+                <button v-else class="button is-primary is-light" disabled>
+                  Joined campaign
+                </button>
+              </div>
             </div>
             <div class="block">
               <b>Reward</b>
@@ -90,10 +102,10 @@
                 Left
               </progress>
             </div>
-            <div class="block">
+            <div v-if="campaign.info" class="block">
               <b>Category</b>
               <br>
-              <span v-if="campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
+              <span v-if="campaign.info.category" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
               <span v-else class="tag is-info is-light is-medium">...</span>
             </div>
             <div class="block">
@@ -110,6 +122,7 @@
 <script>
 import { mapState } from 'vuex'
 import TemplateMedia from '@/components/Template'
+import { Serialize, Numeric } from 'eosjs'
 import { Template } from '../../../../effect-js'
 
 export default {
@@ -122,7 +135,10 @@ export default {
       id: parseInt(this.$route.params.id),
       campaign: undefined,
       randomNumber: undefined,
-      body: 'description'
+      accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
+      body: 'description',
+      userJoined: false,
+      loading: false
     }
   },
   computed: {
@@ -137,9 +153,34 @@ export default {
     }, 3000)
   },
   created () {
+    this.checkUserCampaign()
     this.getCampaign()
   },
   methods: {
+    getCompositeKey (accountId, campaignId) {
+      const buf = new Serialize.SerialBuffer()
+      buf.reserve(64)
+      buf.pushUint32(accountId)
+      buf.pushUint32(campaignId)
+      return Numeric.binaryToDecimal(buf.getUint8Array(8))
+    },
+    async joinCampaign () {
+      // function that makes the user join this campaign.
+      if (this.$auth.user.blockchain === 'eos') {
+        this.loading = true
+        const data = await this.$blockchain.joinCampaign(this.accountId, this.id)
+        if (data) {
+          this.loading = false
+          this.checkUserCampaign()
+        }
+      }
+    },
+    async checkUserCampaign () {
+      // checks if the user joined this campaign.
+      const index = this.getCompositeKey(this.accountId, this.id)
+      const data = await this.$blockchain.campaignJoin(index)
+      this.userJoined = (data.rows.length > 0)
+    },
     submitTask (values) {
       console.log('Task submitted!', values)
     },
