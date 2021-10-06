@@ -4,29 +4,34 @@
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
           <li>
-            <nuxt-link to="/campaigns">
+            <nuxt-link to="/">
               All Campaigns
             </nuxt-link>
           </li>
+          <li>
+            <nuxt-link :to="`/campaigns/${campaignId}`">
+              Campaign {{ campaignId }}
+            </nuxt-link>
+          </li>
           <li class="is-active">
-            <nuxt-link :to="'/campaigns/' + id" aria-current="page">
-              Campaign {{ id }}
+            <nuxt-link :to="`/campaigns/${campaignId}/${batchId}`" aria-current="page">
+              Batch {{ batchId }}
             </nuxt-link>
           </li>
         </ul>
       </nav>
-      <div v-if="campaignLoading">
+      <div v-if="campaignLoading || batchLoading">
         Campaign loading..
       </div>
-      <div v-else-if="!campaign">
+      <div v-else-if="!campaign || !batch">
         Could not retrieve campaign
       </div>
-      <div v-else class="columns">
+      <div class="columns">
         <div class="column is-two-thirds">
           <div class="title">
-            <span>#{{ id }}: </span>
-            <span v-if="campaign.info">{{ campaign.info.title }}</span>
-            <span v-else-if="campaign.info !== null">Loading..</span>
+            <span>#{{ campaignId }}.{{ batchId }}: </span>
+            <span v-if="campaign && campaign.info">{{ campaign.info.title }}</span>
+            <span v-else-if="!campaign || campaign.info !== null">Loading..</span>
             <span v-else class="has-text-danger-dark">Could not load campaign info</span>
           </div>
           <div class="tabs">
@@ -40,14 +45,14 @@
             </ul>
           </div>
           <div v-if="body === 'description'" class="block">
-            <p v-if="campaign.info">
+            <p v-if="campaign && campaign.info">
               {{ campaign.info.description }}
             </p>
             <p v-else>
               ...
             </p>
             <template-media
-              v-if="campaign.info"
+              v-if="campaign && campaign.info"
               :html="renderTemplate(
                 campaign.info.template || 'No template found..',
                 {name: 'World'})"
@@ -55,7 +60,7 @@
             />
           </div>
           <div v-if="body === 'instruction'" class="block">
-            <p v-if="campaign.info.instructions">
+            <p v-if="campaign && campaign.info">
               {{ campaign.info.instructions }}
             </p>
             <p v-else>
@@ -68,45 +73,42 @@
             <h4 class="box-title is-size-4">
               <b>Information</b>
             </h4>
-            <div class="columns">
-              <div class="column">
-                <div class="block">
-                  <b>Requester</b>
-                  <br>
-                  <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                    {{ campaign.owner[1] }}
-                  </nuxt-link>
-                </div>
-              </div>
-              <div v-if="$auth.user.blockchain === 'eos'" class="column is-flex is-justify-content-flex-end">
-                <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaign()">
-                  Join Campaign
-                </button>
-                <button v-else class="button is-primary is-light" disabled>
-                  Joined campaign
-                </button>
-              </div>
+            <div class="block">
+              <b>Requester</b>
+              <br>
+              <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
+                {{ campaign.owner[1] }}
+              </nuxt-link>
+              <span v-else>.....</span>
             </div>
             <div class="block">
               <b>Reward</b>
               <br>
-              <span>{{ campaign.reward.quantity }}</span>
+              <span v-if="campaign">{{ campaign.reward.quantity }}</span>
+              <span v-else>.....</span>
             </div>
             <div class="block">
-              <b>Batches</b>
+              <b>Tasks</b>
               <br>
-              <span>TODO: # of batches</span>
+              <span v-if="batch">{{ batch.tasks_done }}</span>
+              <span v-else>...</span>
+              <span>/ 300 left</span>
+              <progress class="progress is-secondary" :value="left" max="300">
+                Left
+              </progress>
             </div>
-            <div v-if="campaign.info" class="block">
+            <div class="block">
               <b>Category</b>
               <br>
-              <span v-if="campaign.info.category" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
+              <span v-if="campaign && campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
               <span v-else class="tag is-info is-light is-medium">...</span>
             </div>
             <div class="block">
               <b>Blockchain</b>
               <br>
-              <a target="_blank" :href="`https://kylin.bloks.io/account/propsonkylin?loadContract=true&tab=Tables&table=proposal&account=propsonkylin&scope=propsonkylin&limit=1&lower_bound=${id}&upper_bound=${id}`">View on Explorer</a>
+              - <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${campaignId}&upper_bound=${campaignId}`">View Campaign on Explorer</a>
+              <br>
+              - <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
             </div>
           </div>
         </div>
@@ -117,9 +119,7 @@
 <script>
 import { mapState } from 'vuex'
 import TemplateMedia from '@/components/Template'
-import { Serialize, Numeric } from 'eosjs'
 import { Template } from '@/../effect-js'
-
 
 export default {
   components: {
@@ -128,20 +128,24 @@ export default {
   middleware: ['auth'],
   data () {
     return {
-      id: parseInt(this.$route.params.id),
+      campaignId: parseInt(this.$route.params.id),
+      batchId: parseInt(this.$route.params.batch),
       campaign: undefined,
+      batch: undefined,
       randomNumber: undefined,
-      accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
-      body: 'description',
-      userJoined: false,
-      loading: false
+      body: 'description'
     }
   },
   computed: {
     ...mapState({
+      batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
-      campaignLoading: state => state.campaign.loading
-    })
+      campaignLoading: state => state.campaign.loading,
+      batchLoading: state => state.campaign.loadingBatch
+    }),
+    left () {
+      return this.batch ? 300 - this.batch.tasks_done : undefined
+    }
   },
   mounted () {
     setTimeout(() => {
@@ -149,43 +153,23 @@ export default {
     }, 3000)
   },
   created () {
-    this.checkUserCampaign()
+    this.getBatch()
     this.getCampaign()
   },
   methods: {
-    getCompositeKey (accountId, campaignId) {
-      const buf = new Serialize.SerialBuffer()
-      buf.reserve(64)
-      buf.pushUint32(accountId)
-      buf.pushUint32(campaignId)
-      return Numeric.binaryToDecimal(buf.getUint8Array(8))
-    },
-    async joinCampaign () {
-      // function that makes the user join this campaign.
-      if (this.$auth.user.blockchain === 'eos') {
-        this.loading = true
-        const data = await this.$blockchain.joinCampaign(this.accountId, this.id)
-        if (data) {
-          this.loading = false
-          this.checkUserCampaign()
-        }
-      }
-    },
-    async checkUserCampaign () {
-      // checks if the user joined this campaign.
-      const index = this.getCompositeKey(this.accountId, this.id)
-      const data = await this.$blockchain.campaignJoin(index)
-      this.userJoined = (data.rows.length > 0)
-    },
     submitTask (values) {
       console.log('Task submitted!', values)
     },
     renderTemplate (template, placeholders = {}, options = {}) {
       return new Template(template, placeholders, options).render()
     },
+    async getBatch () {
+      await this.$store.dispatch('campaign/getBatch', this.batchId)
+      this.batch = this.batches.find(b => b.id === this.batchId)
+    },
     async getCampaign () {
-      await this.$store.dispatch('campaign/getCampaign', this.id)
-      this.campaign = this.campaigns.find(c => c.id === this.id)
+      await this.$store.dispatch('campaign/getCampaign', this.campaignId)
+      this.campaign = this.campaigns.find(c => c.id === this.campaignId)
     },
     generateRandomNumber (maxNum) {
       return Math.ceil(Math.random() * maxNum)
