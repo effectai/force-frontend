@@ -164,8 +164,7 @@ export default {
     },
     async checkUserCampaign () {
       // checks if the user joined this campaign.
-      const index = this.$blockchain.getCompositeKey(this.accountId, this.id)
-      const data = await this.$blockchain.campaignJoin(index)
+      const data = await this.$blockchain.campaignJoin(this.accountId, this.id)
       this.userJoined = (data.rows.length > 0)
     },
     submitTask (values) {
