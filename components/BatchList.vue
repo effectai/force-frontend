@@ -2,7 +2,7 @@
   <div>
     <nuxt-link
       v-for="batch in batches"
-      :key="batch.id"
+      :key="`${batch.campaign_id}.${batch.id}`"
       :to="`/campaigns/${batch.campaign_id}/${batch.id}`"
       class="box p-4"
       :set="campaign = campaignById(batch.campaign_id)"
