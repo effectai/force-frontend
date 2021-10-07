@@ -45,6 +45,7 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
+    '@nuxtjs/markdownit',
     '@nuxtjs/pwa',
     '@nuxtjs/auth-next',
     ['nuxt-twa-module', {
@@ -61,6 +62,18 @@ export default {
       distFolder: '.nuxt/dist/client'
     }]
   ],
+  // [optional] markdownit options
+  // See https://github.com/markdown-it/markdown-it
+  markdownit: {
+    injected: true,
+    // preset: 'default',
+    linkify: true,
+    breaks: true
+    // use: [
+    //   'markdown-it-div',
+    //   'markdown-it-attrs'
+    // ]
+  },
   auth: {
     strategies: {
       blockchain: {
