@@ -140,7 +140,7 @@
                     <p class="has-text-grey is-size-7">
                       Tasks
                     </p>
-                    <progress class="progress is-small mt-2" value="3" :max="batch.num_tasks" />
+                    <progress class="progress is-small mt-2" :value="batch.tasks_done" :max="batch.num_tasks" />
                   </div>
                   <div class="column has-text-right is-12-mobile">
                     <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :class="{'is-loading': !campaign || typeof campaign.info === 'undefined', 'is-accent': campaign && campaign.info === null, 'is-outlined': campaign && campaign.info === null}">
