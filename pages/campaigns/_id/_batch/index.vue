@@ -60,9 +60,6 @@
             />
           </div>
           <div v-if="body === 'instruction'" class="block">
-            <pre v-if="campaign && campaign.info">
-              {{ campaign.info.instructions }}
-            </pre>
             <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
             <p v-else>
               ...
@@ -138,24 +135,28 @@
       </div>
 
       <!-- Instructions modal -->
-      <div class="modal" :class="{'is-active': joinCampaignPopup}" v-if="campaign && campaign.info">
-        <div class="modal-background"/>
+      <div v-if="campaign && campaign.info" class="modal" :class="{'is-active': joinCampaignPopup}">
+        <div class="modal-background" />
         <div class="modal-card">
           <header class="modal-card-head">
-            <p class="modal-card-title">{{ campaign.info.title }}</p>
-            <button class="delete" aria-label="close"/>
+            <p class="modal-card-title">
+              {{ campaign.info.title }}
+            </p>
+            <button class="delete" aria-label="close" />
           </header>
           <section class="modal-card-body">
-            <p v-if="campaign.info.instructions">
-              {{ campaign.info.instructions }}
-            </p>
+            <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
             <p v-else>
               ...
             </p>
           </section>
           <footer class="modal-card-foot">
-            <button class="button is-primary" @click.prevent="joinCampaign()">Join Campaign</button>
-            <button class="button" @click.prevent="joinCampaignPopup = false">Cancel</button>
+            <button class="button is-primary" :disabled="!campaign || !campaign.info" @click.prevent="joinCampaign()">
+              Join Campaign
+            </button>
+            <button class="button" @click.prevent="joinCampaignPopup = false">
+              Cancel
+            </button>
           </footer>
         </div>
       </div>
