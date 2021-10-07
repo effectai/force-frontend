@@ -273,7 +273,9 @@ export default (context, inject) => {
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)
       },
-
+      async createBatch (campaignId, batchId, content, repetitions) {
+        return await this.sdk.force.createBatch(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, this.account.permission, campaignId, batchId, content, repetitions)
+      },
       async createCampaign (hash, reward) {
         return await this.sdk.force.createCampaign(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, hash, reward, this.account.permission)
       },

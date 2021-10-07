@@ -65,7 +65,10 @@
             Batches
           </p>
           <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-            TODO: retrieve and count batches per campaign
+            <span v-if="batchByCampaignId(id) === null">
+              No badges
+            </span>
+            <span v-else>{{ batchByCampaignId(campaign.id).length }}</span>
           </h2>
         </div>
         <div class="column has-text-right is-12-mobile">
@@ -88,7 +91,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'CampaignList',
@@ -98,6 +101,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      batchByCampaignId: 'campaign/batchByCampaignId'
+    }),
     ...mapState({
       campaigns: state => state.campaign.campaigns,
       campaignsLoading: state => state.campaign.loading,
@@ -106,12 +112,16 @@ export default {
   },
   created () {
     this.getCampaigns()
+    this.getBatches()
   },
   methods: {
     async getCampaigns () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
         await this.$store.dispatch('campaign/getCampaigns')
       }
+    },
+    async getBatches () {
+      await this.$store.dispatch('campaign/getBatches')
     }
   }
 
