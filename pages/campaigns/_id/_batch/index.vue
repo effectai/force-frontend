@@ -60,13 +60,16 @@
             />
           </div>
           <div v-if="body === 'instruction'" class="block">
+            <pre v-if="campaign && campaign.info">
+              {{ campaign.info.instructions }}
+            </pre>
             <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
             <p v-else>
               ...
             </p>
           </div>
         </div>
-        <div class="column is-one-thirds">
+        <div class="column is-one-third">
           <div class="box">
             <h4 class="box-title is-size-4">
               <b>Information</b>
@@ -101,10 +104,12 @@
             <div class="block">
               <b>Tasks</b>
               <br>
-              <span v-if="batch">{{ batch.tasks_done }}</span>
+              <template v-if="batch">
+                <span>{{ batch.num_tasks - batch.tasks_done }}</span>
+                <span>/ {{ batch.num_tasks }} left</span>
+              </template>
               <span v-else>...</span>
-              <span v-if="batch">/ {{ batch.num_tasks }} left</span>
-              <progress v-if="batch" class="progress is-secondary" :value="left" :max="batch.num_tasks">
+              <progress class="progress is-secondary" :value="batch ? batch.tasks_done : undefined" :max="batch ? batch.num_tasks : undefined">
                 Left
               </progress>
             </div>
@@ -114,6 +119,15 @@
               <span v-if="campaign && campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
               <span v-else class="tag is-info is-light is-medium">...</span>
             </div>
+            <div class="block">
+              <b>IPFS</b>
+              <br>
+              <div v-if="campaign" class="blockchain-address">
+                <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
+              </div>
+              <span v-else>.....</span>
+            </div>
+
             <div class="block">
               <b>Blockchain</b>
               <br>
@@ -138,6 +152,7 @@ export default {
   middleware: ['auth'],
   data () {
     return {
+      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       campaignId: parseInt(this.$route.params.id),
       batchId: parseInt(this.$route.params.batch),
       campaign: undefined,
@@ -155,10 +170,7 @@ export default {
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading,
       batchLoading: state => state.campaign.loadingBatch
-    }),
-    left () {
-      return this.batch ? 300 - this.batch.tasks_done : undefined
-    }
+    })
   },
   mounted () {
     setTimeout(() => {

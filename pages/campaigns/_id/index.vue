@@ -55,15 +55,13 @@
             />
           </div>
           <div v-if="body === 'instruction'" class="block">
-            <p v-if="campaign.info.instructions">
-              {{ campaign.info.instructions }}
-            </p>
+            <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
             <p v-else>
               ...
             </p>
           </div>
         </div>
-        <div class="column is-one-thirds">
+        <div class="column is-one-third">
           <div class="box">
             <h4 class="box-title is-size-4">
               <b>Information</b>
@@ -103,6 +101,14 @@
               <span v-if="campaign.info.category" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
               <span v-else class="tag is-info is-light is-medium">...</span>
             </div>
+            <div class="block">
+              <b>IPFS</b>
+              <br>
+              <div class="blockchain-address">
+                <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
+              </div>
+            </div>
+
             <div class="block">
               <b>Blockchain</b>
               <br>

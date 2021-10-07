@@ -67,7 +67,7 @@
             Tasks
           </p>
           <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-            {{ batch.tasks_done }}/300 left
+            {{ batch.num_tasks - batch.tasks_done }}/{{ batch.num_tasks }} left
           </h2>
         </div>
         <div class="column has-text-right is-12-mobile">
