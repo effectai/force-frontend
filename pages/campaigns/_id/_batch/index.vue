@@ -51,6 +51,9 @@
             <p v-else>
               ...
             </p>
+            <h2 class="subtitle mt-5">
+              Task Preview
+            </h2>
             <template-media
               v-if="campaign && campaign.info"
               :html="renderTemplate(
@@ -214,15 +217,19 @@ export default {
   },
   methods: {
     async joinCampaign () {
-      // function that makes the user join this campaign.
-      if (this.$auth.user.blockchain === 'eos') {
-        const data = await this.$blockchain.joinCampaign(this.accountId, this.campaignId)
-        if (data) {
-          this.loading = true
-          setTimeout(this.checkUserCampaign, 1500)
+      try {
+        // function that makes the user join this campaign.
+        if (this.$auth.user.blockchain === 'eos') {
+          const data = await this.$blockchain.joinCampaign(this.accountId, this.campaignId)
+          if (data) {
+            this.loading = true
+            setTimeout(this.checkUserCampaign, 1500)
+          }
         }
+        this.joinCampaignPopup = false
+      } catch (e) {
+        this.$blockchain.handleError(e)
       }
-      this.joinCampaignPopup = false
     },
     async checkUserCampaign () {
       this.loading = true
