@@ -73,14 +73,27 @@
             <h4 class="box-title is-size-4">
               <b>Information</b>
             </h4>
-            <div class="block">
-              <b>Requester</b>
-              <br>
-              <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
-                {{ campaign.owner[1] }}
-              </nuxt-link>
-              <span v-else>.....</span>
+            <div class="columns">
+              <div class="column">
+                <div class="block">
+                  <b>Requester</b>
+                  <br>
+                  <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
+                    {{ campaign.owner[1] }}
+                  </nuxt-link>
+                  <span v-else>.....</span>
+                </div>
+              </div>
+              <div v-if="$auth.user.blockchain === 'eos'" class="column is-flex is-justify-content-flex-end">
+                <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaign()">
+                  Join Campaign
+                </button>
+                <button v-else class="button is-primary is-light" disabled>
+                  Joined campaign
+                </button>
+              </div>
             </div>
+
             <div class="block">
               <b>Reward</b>
               <br>
@@ -92,8 +105,8 @@
               <br>
               <span v-if="batch">{{ batch.tasks_done }}</span>
               <span v-else>...</span>
-              <span>/ 300 left</span>
-              <progress class="progress is-secondary" :value="left" max="300">
+              <span v-if="batch">/ {{ batch.num_tasks }} left</span>
+              <progress v-if="batch" class="progress is-secondary" :value="left" :max="batch.num_tasks">
                 Left
               </progress>
             </div>
@@ -118,6 +131,7 @@
 import { mapState } from 'vuex'
 import TemplateMedia from '@/components/Template'
 import { Template } from '@/../effect-js'
+import { Serialize, Numeric } from 'eosjs'
 
 export default {
   components: {
@@ -131,7 +145,10 @@ export default {
       campaign: undefined,
       batch: undefined,
       randomNumber: undefined,
-      body: 'description'
+      body: 'description',
+      accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
+      userJoined: false,
+      loading: false
     }
   },
   computed: {
@@ -151,10 +168,35 @@ export default {
     }, 3000)
   },
   created () {
+    this.checkUserCampaign()
     this.getBatch()
     this.getCampaign()
   },
   methods: {
+    getCompositeKey (accountId, campaignId) {
+      const buf = new Serialize.SerialBuffer()
+      buf.reserve(64)
+      buf.pushUint32(accountId)
+      buf.pushUint32(campaignId)
+      return Numeric.binaryToDecimal(buf.getUint8Array(8))
+    },
+    async joinCampaign () {
+      // function that makes the user join this campaign.
+      if (this.$auth.user.blockchain === 'eos') {
+        this.loading = true
+        const data = await this.$blockchain.joinCampaign(this.accountId, this.campaignId)
+        if (data) {
+          this.loading = false
+          this.checkUserCampaign()
+        }
+      }
+    },
+    async checkUserCampaign () {
+      // checks if the user joined this campaign.
+      const index = this.getCompositeKey(this.accountId, this.campaignId)
+      const data = await this.$blockchain.campaignJoin(index)
+      this.userJoined = (data.rows.length > 0)
+    },
     submitTask (values) {
       console.log('Task submitted!', values)
     },
