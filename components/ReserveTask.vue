@@ -26,9 +26,13 @@ export default {
   },
   methods: {
     async makeReservation () {
-      this.loading = true
-      const result = await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
-      console.log('transaction', result)
+      try {
+        this.loading = true
+        const result = await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
+        console.log('transaction', result)
+      } catch (e) {
+        this.$blockchain.handleError(e)
+      }
       // todo: go to submissions page
     }
   }
