@@ -123,7 +123,6 @@
 <script>
 import { mapState } from 'vuex'
 import TemplateMedia from '@/components/Template'
-import { Serialize, Numeric } from 'eosjs'
 import { Template } from '@/../effect-js'
 
 export default {
@@ -158,13 +157,6 @@ export default {
     this.getCampaign()
   },
   methods: {
-    getCompositeKey (accountId, campaignId) {
-      const buf = new Serialize.SerialBuffer()
-      buf.reserve(64)
-      buf.pushUint32(accountId)
-      buf.pushUint32(campaignId)
-      return Numeric.binaryToDecimal(buf.getUint8Array(8))
-    },
     async joinCampaign () {
       // function that makes the user join this campaign.
       if (this.$auth.user.blockchain === 'eos') {
@@ -178,8 +170,7 @@ export default {
     },
     async checkUserCampaign () {
       // checks if the user joined this campaign.
-      const index = this.getCompositeKey(this.accountId, this.id)
-      const data = await this.$blockchain.campaignJoin(index)
+      const data = await this.$blockchain.campaignJoin(this.accountId, this.id)
       this.userJoined = (data.rows.length > 0)
     },
     submitTask (values) {

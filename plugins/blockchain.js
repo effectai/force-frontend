@@ -264,8 +264,8 @@ export default (context, inject) => {
       async getCampaigns (nextKey, limit = 20) {
         return await this.sdk.force.getCampaigns(nextKey, limit)
       },
-      async campaignJoin (index) {
-        return await this.sdk.force.campaignJoin(index)
+      async campaignJoin (accountId, campaignId) {
+        return await this.sdk.force.campaignJoin(accountId, campaignId)
       },
       async joinCampaign (accountId, campaignId) {
         return await this.sdk.force.joinCampaign(context.$auth.user.accountName, this.account.permission, accountId, campaignId)
@@ -277,7 +277,6 @@ export default (context, inject) => {
       async createCampaign (hash, reward) {
         return await this.sdk.force.createCampaign(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, hash, reward, this.account.permission)
       },
-
       initSdk () {
         const sdkOptions = {
           network: process.env.NUXT_ENV_EOS_NETWORK,
