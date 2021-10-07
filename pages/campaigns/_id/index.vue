@@ -66,24 +66,13 @@
             <h4 class="box-title is-size-4">
               <b>Information</b>
             </h4>
-            <div class="columns">
-              <div class="column">
-                <div class="block">
-                  <b>Requester</b>
-                  <br>
-                  <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                    {{ campaign.owner[1] }}
-                  </nuxt-link>
-                </div>
-              </div>
-              <div v-if="$auth.user.blockchain === 'eos'" class="column is-flex is-justify-content-flex-end">
-                <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaign()">
-                  Join Campaign
-                </button>
-                <button v-else class="button is-primary is-light" disabled>
-                  Joined campaign
-                </button>
-              </div>
+
+            <div class="block">
+              <b>Requester</b>
+              <br>
+              <nuxt-link :to="'/profile/' + campaign.owner[1]">
+                {{ campaign.owner[1] }}
+              </nuxt-link>
             </div>
             <div class="block">
               <b>Reward</b>
@@ -108,11 +97,15 @@
                 <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
               </div>
             </div>
-
             <div class="block">
               <b>Blockchain</b>
               <br>
               <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${id}&upper_bound=${id}`">View Campaign on Explorer</a>
+            </div>
+            <div class="block">
+              <button class="button is-primary" :class="{'is-loading': loading === true}" :disabled="userJoined" @click.prevent="joinCampaignPopup = true">
+                Join<span v-if="userJoined">ed</span>&nbsp;Campaign
+              </button>
             </div>
           </div>
         </div>
@@ -137,7 +130,7 @@ export default {
       randomNumber: undefined,
       accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
       body: 'description',
-      userJoined: false,
+      userJoined: null,
       loading: false
     }
   },
@@ -160,18 +153,24 @@ export default {
     async joinCampaign () {
       // function that makes the user join this campaign.
       if (this.$auth.user.blockchain === 'eos') {
-        this.loading = true
         const data = await this.$blockchain.joinCampaign(this.accountId, this.id)
         if (data) {
-          this.loading = false
-          this.checkUserCampaign()
+          this.loading = true
+          setTimeout(this.checkUserCampaign, 1500)
         }
       }
+      this.joinCampaignPopup = false
     },
     async checkUserCampaign () {
-      // checks if the user joined this campaign.
-      const data = await this.$blockchain.campaignJoin(this.accountId, this.id)
-      this.userJoined = (data.rows.length > 0)
+      this.loading = true
+      try {
+        // checks if the user joined this campaign.
+        const data = await this.$blockchain.campaignJoin(this.accountId, this.id)
+        this.userJoined = (data.rows.length > 0)
+      } catch (e) {
+        this.$blockchain.handleError(e)
+      }
+      this.loading = false
     },
     submitTask (values) {
       console.log('Task submitted!', values)

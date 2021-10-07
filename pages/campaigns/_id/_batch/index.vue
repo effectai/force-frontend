@@ -71,27 +71,14 @@
             <h4 class="box-title is-size-4">
               <b>Information</b>
             </h4>
-            <div class="columns">
-              <div class="column">
-                <div class="block">
-                  <b>Requester</b>
-                  <br>
-                  <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
-                    {{ campaign.owner[1] }}
-                  </nuxt-link>
-                  <span v-else>.....</span>
-                </div>
-              </div>
-              <div v-if="$auth.user.blockchain === 'eos'" class="column is-flex is-justify-content-flex-end">
-                <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
-                  Join Campaign
-                </button>
-                <button v-else class="button is-primary is-light" disabled>
-                  Joined campaign
-                </button>
-              </div>
+            <div class="block">
+              <b>Requester</b>
+              <br>
+              <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
+                {{ campaign.owner[1] }}
+              </nuxt-link>
+              <span v-else>.....</span>
             </div>
-
             <div class="block">
               <b>Reward</b>
               <br>
@@ -129,6 +116,14 @@
               <b>Blockchain</b>
               <br>
               <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
+            </div>
+            <div class="block">
+              <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
+                Join Campaign
+              </button>
+              <button v-else class="button is-primary" @click.prevent="">
+                make Task Reservation
+              </button>
             </div>
           </div>
         </div>
@@ -171,7 +166,6 @@
 import { mapState } from 'vuex'
 import TemplateMedia from '@/components/Template'
 import { Template } from '@/../effect-js'
-import { Serialize, Numeric } from 'eosjs'
 
 export default {
   components: {
@@ -188,7 +182,7 @@ export default {
       randomNumber: undefined,
       body: 'description',
       accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
-      userJoined: false,
+      userJoined: null,
       loading: false,
       joinCampaignPopup: false,
       tac: false
@@ -213,30 +207,27 @@ export default {
     this.getCampaign()
   },
   methods: {
-    getCompositeKey (accountId, campaignId) {
-      const buf = new Serialize.SerialBuffer()
-      buf.reserve(64)
-      buf.pushUint32(accountId)
-      buf.pushUint32(campaignId)
-      return Numeric.binaryToDecimal(buf.getUint8Array(8))
-    },
     async joinCampaign () {
       // function that makes the user join this campaign.
       if (this.$auth.user.blockchain === 'eos') {
-        this.loading = true
         const data = await this.$blockchain.joinCampaign(this.accountId, this.campaignId)
         if (data) {
-          this.loading = false
-          this.checkUserCampaign()
+          this.loading = true
+          setTimeout(this.checkUserCampaign, 1500)
         }
       }
       this.joinCampaignPopup = false
     },
     async checkUserCampaign () {
-      // checks if the user joined this campaign.
-      const index = this.getCompositeKey(this.accountId, this.campaignId)
-      const data = await this.$blockchain.campaignJoin(index)
-      this.userJoined = (data.rows.length > 0)
+      this.loading = true
+      try {
+        // checks if the user joined this campaign.
+        const data = await this.$blockchain.campaignJoin(this.accountId, this.campaignId)
+        this.userJoined = (data.rows.length > 0)
+      } catch (e) {
+        this.$blockchain.handleError(e)
+      }
+      this.loading = false
     },
     submitTask (values) {
       console.log('Task submitted!', values)
