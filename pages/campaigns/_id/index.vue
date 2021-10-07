@@ -109,11 +109,55 @@
                 <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
               </div>
             </div>
-
             <div class="block">
               <b>Blockchain</b>
               <br>
               <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${id}&upper_bound=${id}`">View Campaign on Explorer</a>
+            </div>
+          </div>
+          <div class="box">
+            <h4 class="box-title is-size-4">
+              <b>Batches</b>
+            </h4>
+            <div>
+              <nuxt-link
+                v-for="batch in batches"
+                :key="batch.id"
+                :to="`/campaigns/${batch.campaign_id}/${batch.id}`"
+                class="box p-4"
+                :class="{'is-disabled': false}"
+              >
+                <div class="columns is-vcentered is-multiline is-mobile">
+                  <div class="column">
+                    <p class="has-text-grey is-size-7">
+                      Batch
+                    </p>
+                    <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                      #<template v-if="campaign">{{ campaign.id }}.</template>{{ batch.id }}
+                    </h2>
+                  </div>
+                  <div class="column">
+                    <p class="has-text-grey is-size-7">
+                      Tasks
+                    </p>
+                    <progress class="progress is-small mt-2" value="3" :max="batch.num_tasks" />
+                  </div>
+                  <div class="column has-text-right is-12-mobile">
+                    <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :class="{'is-loading': !campaign || typeof campaign.info === 'undefined', 'is-accent': campaign && campaign.info === null, 'is-outlined': campaign && campaign.info === null}">
+                      <span class="">{{ campaign && campaign.info === null ? 'Qualify' : 'View' }}</span>
+                    </button>
+                  </div>
+                </div>
+              </nuxt-link>
+              <div v-if="batchesLoading">
+                Batches loading..
+              </div>
+              <div v-else-if="batches && !batches.length">
+                No batches
+              </div>
+              <div v-else-if="!batches">
+                Could not retrieve batches
+              </div>
             </div>
           </div>
         </div>
@@ -136,6 +180,7 @@ export default {
       id: parseInt(this.$route.params.id),
       campaign: undefined,
       randomNumber: undefined,
+      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
       body: 'description',
       userJoined: false,
@@ -147,8 +192,10 @@ export default {
       batchByCampaignId: 'campaign/batchByCampaignId'
     }),
     ...mapState({
+      batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
-      campaignLoading: state => state.campaign.loading
+      campaignLoading: state => state.campaign.loading,
+      batchesLoading: state => state.campaign.batches.loading
     })
   },
   mounted () {
