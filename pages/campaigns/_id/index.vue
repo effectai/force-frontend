@@ -93,7 +93,8 @@
             <div class="block">
               <b>Batches</b>
               <br>
-              <span>TODO: # of batches</span>
+              <span v-if="batchByCampaignId(id) === null">No badges.</span>
+              <span v-else>{{ batchByCampaignId(id).length }}</span>
             </div>
             <div v-if="campaign.info" class="block">
               <b>Category</b>
@@ -121,7 +122,7 @@
   </section>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import TemplateMedia from '@/components/Template'
 import { Template } from '@/../effect-js'
 
@@ -142,6 +143,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      batchByCampaignId: 'campaign/batchByCampaignId'
+    }),
     ...mapState({
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading
@@ -155,6 +159,7 @@ export default {
   created () {
     this.checkUserCampaign()
     this.getCampaign()
+    this.getBatches()
   },
   methods: {
     async joinCampaign () {
@@ -167,6 +172,9 @@ export default {
           this.checkUserCampaign()
         }
       }
+    },
+    async getBatches () {
+      await this.$store.dispatch('campaign/getBatches')
     },
     async checkUserCampaign () {
       // checks if the user joined this campaign.
