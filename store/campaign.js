@@ -85,7 +85,7 @@ export default {
       try {
         const batchFilter = c => c.id === id && c.campaign_id === campaignId
         if (!state.batches || !state.batches.find(batchFilter)) {
-          const data = await this.$blockchain.getBatches(this.$blockchain.sdk.force.getCompositeKey(campaignId, id), 1)
+          const data = await this.$blockchain.getBatches(this.$blockchain.sdk.force.getCompositeKey(id, campaignId), 1)
 
           if (data.rows.length > 0) {
             await commit('ADD_BATCH', data.rows[0])
