@@ -53,6 +53,9 @@ export default {
   getters: {
     campaignById (state) {
       return id => state.campaigns ? state.campaigns.find(c => c.id === id) : null
+    },
+    batchByCampaignId (state) {
+      return id => state.batches ? state.batches.filter(b => b.campaign_id === id) : null
     }
   },
   actions: {
