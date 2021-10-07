@@ -29,6 +29,12 @@ export default {
       campaign.info = info
       Vue.set(state.campaigns, index, campaign)
     },
+    SET_BATCH_TASKS (state, { id, campaignId, tasks }) {
+      const index = state.batches.findIndex(batch => batch.id === id && batch.campaign_id === campaignId)
+      const batch = state.batches[index]
+      batch.tasks = tasks
+      Vue.set(state.batches, index, batch)
+    },
     ADD_CAMPAIGN (state, campaign) {
       if (state.campaigns) {
         state.campaigns.push(campaign)
@@ -74,17 +80,22 @@ export default {
         commit('SET_LOADING_BATCH', false)
       }
     },
-    async getBatch ({ dispatch, commit, state }, id) {
+    async getBatch ({ dispatch, commit, state }, { id, campaignId }) {
       commit('SET_LOADING_BATCH', true)
       try {
-        if (!state.batches || !state.batches.find(c => c.id === id)) {
-          const data = await this.$blockchain.getBatches(id, 1)
+        const batchFilter = c => c.id === id && c.campaign_id === campaignId
+        if (!state.batches || !state.batches.find(batchFilter)) {
+          const data = await this.$blockchain.getBatches(this.$blockchain.sdk.force.getCompositeKey(campaignId, id), 1)
 
           if (data.rows.length > 0) {
-            commit('ADD_BATCH', data.rows[0])
+            await commit('ADD_BATCH', data.rows[0])
           } else {
             throw new Error('Cannot find batch with the given id.')
           }
+        }
+        // If batch exists but doesnt have tasks yet get tasks
+        if (state.batches && state.batches.find(batchFilter) && !state.batches.find(batchFilter).tasks) {
+          await dispatch('getBatchTasks', state.batches.find(batchFilter))
         }
       } catch (error) {
         this.$blockchain.handleError(error)
@@ -155,6 +166,19 @@ export default {
         }
       } catch (e) {
         commit('SET_CAMPAIGN_INFO', { id: campaign.id, info: null })
+      }
+    },
+    async getBatchTasks ({ commit }, batch) {
+      try {
+        // field_0 represents the content type where:
+        // 0: IPFS
+        if (batch.content.field_0 === 0) {
+          // field_1 represents the IPFS hash
+          const tasks = await this.$blockchain.sdk.getIpfsContent(batch.content.field_1)
+          commit('SET_BATCH_TASKS', { id: batch.id, campaignId: batch.campaign_id, tasks: tasks.tasks })
+        }
+      } catch (e) {
+        commit('SET_BATCH_TASKS', { id: batch.id, tasks: null })
       }
     }
   },

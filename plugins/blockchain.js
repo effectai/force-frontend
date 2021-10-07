@@ -274,6 +274,10 @@ export default (context, inject) => {
         return await this.sdk.force.uploadCampaign(content)
       },
 
+      async reserveTask (batchId, campaignId, taskIndex, tasks) {
+        return await this.sdk.force.reserveTask(batchId, taskIndex, campaignId, context.$auth.user.vAccountRows[0].id, tasks)
+      },
+
       async createCampaign (hash, reward) {
         return await this.sdk.force.createCampaign(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, hash, reward, this.account.permission)
       },

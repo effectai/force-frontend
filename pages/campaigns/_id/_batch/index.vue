@@ -134,6 +134,9 @@
         </div>
       </div>
 
+      <!-- Reserve task -->
+      <reserve-task v-if="reserveTask" :batch="batch" />
+
       <!-- Instructions modal -->
       <div v-if="campaign && campaign.info" class="modal" :class="{'is-active': joinCampaignPopup}">
         <div class="modal-background" />
@@ -155,7 +158,7 @@
             </label>
           </section>
           <footer class="modal-card-foot">
-            <button class="button is-primary" :disabled="!tac || !campaign || !campaign.info" @click.prevent="joinCampaign()">
+            <button :class="{'is-loading': !batch || !batch.tasks}" class="button is-primary" :disabled="!tac || !campaign || !campaign.info" @click.prevent="joinCampaign()">
               Join Campaign
             </button>
             <button class="button" @click.prevent="joinCampaignPopup = false">
@@ -170,12 +173,14 @@
 <script>
 import { mapState } from 'vuex'
 import TemplateMedia from '@/components/Template'
+import ReserveTask from '@/components/ReserveTask'
 import { Template } from '@/../effect-js'
 import { Serialize, Numeric } from 'eosjs'
 
 export default {
   components: {
-    'template-media': TemplateMedia
+    'template-media': TemplateMedia,
+    'reserve-task': ReserveTask
   },
   middleware: ['auth'],
   data () {
@@ -191,7 +196,8 @@ export default {
       userJoined: false,
       loading: false,
       joinCampaignPopup: false,
-      tac: false
+      tac: false,
+      reserveTask: false
     }
   },
   computed: {
@@ -222,14 +228,16 @@ export default {
     },
     async joinCampaign () {
       // function that makes the user join this campaign.
-      if (this.$auth.user.blockchain === 'eos') {
-        this.loading = true
-        const data = await this.$blockchain.joinCampaign(this.accountId, this.campaignId)
-        if (data) {
-          this.loading = false
-          this.checkUserCampaign()
-        }
-      }
+      // if (this.$auth.user.blockchain === 'eos') {
+      //   this.loading = true
+      //   const data = await this.$blockchain.joinCampaign(this.accountId, this.campaignId)
+      //   if (data) {
+      //     this.loading = false
+      //     this.checkUserCampaign()
+      //   }
+      // }
+      await console.log('join')
+      this.reserveTask = true
       this.joinCampaignPopup = false
     },
     async checkUserCampaign () {
@@ -245,8 +253,8 @@ export default {
       return new Template(template, placeholders, options).render()
     },
     async getBatch () {
-      await this.$store.dispatch('campaign/getBatch', this.batchId)
-      this.batch = this.batches.find(b => b.id === this.batchId)
+      await this.$store.dispatch('campaign/getBatch', { id: this.batchId, campaignId: this.campaignId })
+      this.batch = this.batches.find(b => b.id === this.batchId && b.campaign_id === this.campaignId)
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
