@@ -55,15 +55,13 @@
             />
           </div>
           <div v-if="body === 'instruction'" class="block">
-            <p v-if="campaign.info.instructions">
-              {{ campaign.info.instructions }}
-            </p>
+            <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
             <p v-else>
               ...
             </p>
           </div>
         </div>
-        <div class="column is-one-thirds">
+        <div class="column is-one-third">
           <div class="box">
             <h4 class="box-title is-size-4">
               <b>Information</b>
@@ -104,6 +102,14 @@
               <span v-else class="tag is-info is-light is-medium">...</span>
             </div>
             <div class="block">
+              <b>IPFS</b>
+              <br>
+              <div class="blockchain-address">
+                <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
+              </div>
+            </div>
+
+            <div class="block">
               <b>Blockchain</b>
               <br>
               <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${id}&upper_bound=${id}`">View Campaign on Explorer</a>
@@ -117,7 +123,6 @@
 <script>
 import { mapState } from 'vuex'
 import TemplateMedia from '@/components/Template'
-import { Serialize, Numeric } from 'eosjs'
 import { Template } from '@/../effect-js'
 
 export default {
@@ -152,13 +157,6 @@ export default {
     this.getCampaign()
   },
   methods: {
-    getCompositeKey (accountId, campaignId) {
-      const buf = new Serialize.SerialBuffer()
-      buf.reserve(64)
-      buf.pushUint32(accountId)
-      buf.pushUint32(campaignId)
-      return Numeric.binaryToDecimal(buf.getUint8Array(8))
-    },
     async joinCampaign () {
       // function that makes the user join this campaign.
       if (this.$auth.user.blockchain === 'eos') {
@@ -172,8 +170,7 @@ export default {
     },
     async checkUserCampaign () {
       // checks if the user joined this campaign.
-      const index = this.getCompositeKey(this.accountId, this.id)
-      const data = await this.$blockchain.campaignJoin(index)
+      const data = await this.$blockchain.campaignJoin(this.accountId, this.id)
       this.userJoined = (data.rows.length > 0)
     },
     submitTask (values) {
