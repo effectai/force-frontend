@@ -149,9 +149,13 @@
             <p v-else>
               ...
             </p>
+            <label class="checkbox">
+              <input v-model="tac" type="checkbox">
+              I agree to the <a href="#">terms and conditions</a>
+            </label>
           </section>
           <footer class="modal-card-foot">
-            <button class="button is-primary" :disabled="!campaign || !campaign.info" @click.prevent="joinCampaign()">
+            <button class="button is-primary" :disabled="!tac || !campaign || !campaign.info" @click.prevent="joinCampaign()">
               Join Campaign
             </button>
             <button class="button" @click.prevent="joinCampaignPopup = false">
@@ -186,7 +190,8 @@ export default {
       accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
       userJoined: false,
       loading: false,
-      joinCampaignPopup: false
+      joinCampaignPopup: false,
+      tac: false
     }
   },
   computed: {
