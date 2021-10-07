@@ -68,15 +68,14 @@ export default {
     this.getBatches()
   },
   methods: {
-
     async uploadBatch () {
       try {
         this.tasks = JSON.parse(this.tasks)
         const content = {
           tasks: this.tasks
         }
-        console.log(this.batchId)
         await this.$blockchain.createBatch(this.campaignId, this.batchId, content, this.repetitions)
+        this.$router.push('/campaigns/' + this.campaignId)
       } catch (e) {
         console.log(e)
       }
