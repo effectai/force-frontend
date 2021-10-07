@@ -85,7 +85,7 @@
                 </div>
               </div>
               <div v-if="$auth.user.blockchain === 'eos'" class="column is-flex is-justify-content-flex-end">
-                <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaign()">
+                <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                   Join Campaign
                 </button>
                 <button v-else class="button is-primary is-light" disabled>
@@ -124,6 +124,29 @@
           </div>
         </div>
       </div>
+
+      <!-- Instructions modal -->
+      <div class="modal" :class="{'is-active': joinCampaignPopup}" v-if="campaign && campaign.info">
+        <div class="modal-background"/>
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title">{{ campaign.info.title }}</p>
+            <button class="delete" aria-label="close"/>
+          </header>
+          <section class="modal-card-body">
+            <p v-if="campaign.info.instructions">
+              {{ campaign.info.instructions }}
+            </p>
+            <p v-else>
+              ...
+            </p>
+          </section>
+          <footer class="modal-card-foot">
+            <button class="button is-primary" @click.prevent="joinCampaign()">Join Campaign</button>
+            <button class="button" @click.prevent="joinCampaignPopup = false">Cancel</button>
+          </footer>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -148,7 +171,8 @@ export default {
       body: 'description',
       accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
       userJoined: false,
-      loading: false
+      loading: false,
+      joinCampaignPopup: false
     }
   },
   computed: {
@@ -190,6 +214,7 @@ export default {
           this.checkUserCampaign()
         }
       }
+      this.joinCampaignPopup = false
     },
     async checkUserCampaign () {
       // checks if the user joined this campaign.
