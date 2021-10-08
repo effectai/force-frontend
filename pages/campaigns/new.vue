@@ -56,6 +56,12 @@
             <textarea v-model="campaignIpfs.template" class="textarea" required />
           </div>
         </div>
+        <div class="field">
+          <label class="label">Example Task</label>
+          <div class="control">
+            <textarea v-model="campaignIpfs.example_task" class="textarea" required placeholder="{}" />
+          </div>
+        </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
             <nuxt-link class="button is-light" to="/campaigns">
@@ -123,6 +129,7 @@ export default {
         template: '',
         image: '',
         category: '',
+        example_task: '{}',
         version: 1,
         reward: null
       }
@@ -183,7 +190,9 @@ export default {
       }
       this.loading = true
       try {
-        const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
+        const campaignIpfs = { ...this.campaignIpfs }
+        campaignIpfs.example_task = JSON.parse(campaignIpfs.example_task)
+        const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
         const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
         this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
         this.message = 'Campaign created successfully! Check your transaction here: '
@@ -196,6 +205,7 @@ export default {
           template: '',
           image: '',
           category: '',
+          example_task: '{}',
           version: 1,
           reward: null
         }

@@ -30,15 +30,19 @@
         <div class="field">
           <label class="label">CSV?</label>
           <div class="control">
-            <textarea v-model="tasks" class="textarea" required placeholder="{}" />
+            <textarea v-model="tasks" class="textarea" required placeholder="[{}]" />
           </div>
         </div>
         <div class="field is-grouped">
           <div class="control">
-            <button type="submit" class="button is-link">Submit</button>
+            <button type="submit" class="button is-link">
+              Submit
+            </button>
           </div>
           <div class="control">
-            <button class="button is-link is-light">Cancel</button>
+            <button class="button is-link is-light">
+              Cancel
+            </button>
           </div>
         </div>
       </form>
@@ -77,7 +81,7 @@ export default {
         await this.$blockchain.createBatch(this.campaignId, this.batchId, content, this.repetitions)
         this.$router.push('/campaigns/' + this.campaignId)
       } catch (e) {
-        console.log(e)
+        this.$blockchain.handleError(e)
       }
     },
     async getBatches () {
@@ -85,12 +89,7 @@ export default {
 
       if (this.batchByCampaignId(this.campaignId) !== null) {
         const batchesLength = this.batchByCampaignId(this.campaignId).length
-        // check if the campaign has badges, if it has no badges, the new badge id will be 0.
-        if (batchesLength > 0) {
-          this.batchId = batchesLength + 1
-        } else {
-          this.batchId = batchesLength
-        }
+        this.batchId = batchesLength
       }
     }
   }
