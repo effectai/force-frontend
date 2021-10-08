@@ -1,5 +1,35 @@
 <template>
   <section class="section is-max-widescreen">
+    <!-- Instructions modal -->
+    <div v-if="campaign && campaign.info" class="modal" :class="{'is-active': joinCampaignPopup}">
+      <div class="modal-background" />
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">
+            {{ campaign.info.title }}
+          </p>
+          <button class="delete" aria-label="close" />
+        </header>
+        <section class="modal-card-body">
+          <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
+          <p v-else>
+            ...
+          </p>
+          <label class="checkbox">
+            <input v-model="tac" type="checkbox">
+            I agree to the <a href="#">terms and conditions</a>
+          </label>
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button is-primary" :disabled="!tac || !campaign || !campaign.info" @click.prevent="joinCampaign()">
+            Join Campaign
+          </button>
+          <button class="button" @click.prevent="joinCampaignPopup = false">
+            Cancel
+          </button>
+        </footer>
+      </div>
+    </div>
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
@@ -32,7 +62,7 @@
           <div class="tabs">
             <ul>
               <li :class="{'is-active': body === 'description'}">
-                <a @click.prevent="body = 'description'">Description</a>
+                <a @click.prevent="body = 'description'">Batches</a>
               </li>
               <li :class="{'is-active': body === 'instruction'}">
                 <a @click.prevent="body = 'instruction'">Instructions</a>
@@ -46,13 +76,63 @@
             <p v-else>
               ...
             </p>
-            <template-media
-              v-if="campaign.info"
-              :html="renderTemplate(
-                campaign.info.template || 'No template found..',
-                {name: 'World'})"
-              @submit="submitTask"
-            />
+            <div class="mt-5">
+              <nuxt-link class="button is-primary is-pulled-right" :to="`/campaigns/${id}/new`">
+                <span class="icon">
+                  +
+                </span>
+                <span>Create Batch</span>
+              </nuxt-link>
+              <h4 class="is-size-4">
+                <b>Batches</b>
+              </h4>
+              <div class="block mt-5">
+                <div v-if="campaignBatches === null">
+                  Loading..
+                </div>
+                <div v-else-if="!campaignBatches.length">
+                  No Batches
+                </div>
+                <nuxt-link
+                  v-for="batch in campaignBatches"
+                  :key="batch.id"
+                  :to="`/campaigns/${batch.campaign_id}/${batch.id}`"
+                  class="box p-4"
+                  :class="{'is-disabled': false}"
+                >
+                  <div class="columns is-vcentered is-multiline is-mobile">
+                    <div class="column">
+                      <p class="has-text-grey is-size-7">
+                        Batch
+                      </p>
+                      <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                        #<span v-if="campaign">{{ campaign.id }}.</span>{{ batch.id }}
+                      </h2>
+                    </div>
+                    <div class="column">
+                      <p class="has-text-grey is-size-7">
+                        Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
+                      </p>
+                      <progress class="progress is-small mt-2" :value="batch.tasks_done" :max="batch.num_tasks" />
+                    </div>
+                    <div class="column has-text-right is-12-mobile">
+                      <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :class="{'is-loading': !campaign || typeof campaign.info === 'undefined', 'is-accent': campaign && campaign.info === null, 'is-outlined': campaign && campaign.info === null}">
+                        <span class="">{{ campaign && campaign.info === null ? 'Qualify' : 'View' }}</span>
+                      </button>
+                    </div>
+                  </div>
+                </nuxt-link>
+                <div v-if="batchesLoading">
+                  Batches loading..
+                </div>
+                <div v-else-if="batches && !batches.length">
+                  No batches
+                </div>
+                <div v-else-if="!batches">
+                  Could not retrieve batches
+                </div>
+              </div>
+            </div>
           </div>
           <div v-if="body === 'instruction'" class="block">
             <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
@@ -82,8 +162,8 @@
             <div class="block">
               <b>Batches</b>
               <br>
-              <span v-if="batchByCampaignId(id) === null">No badges.</span>
-              <span v-else>{{ batchByCampaignId(id).length }}</span>
+              <span v-if="campaignBatches === null">Loading..</span>
+              <span v-else>{{ campaignBatches.length }}</span>
             </div>
             <div v-if="campaign.info" class="block">
               <b>Category</b>
@@ -109,51 +189,6 @@
               </button>
             </div>
           </div>
-          <div class="box">
-            <h4 class="box-title is-size-4">
-              <b>Batches</b>
-            </h4>
-            <div>
-              <nuxt-link
-                v-for="batch in batches"
-                :key="batch.id"
-                :to="`/campaigns/${batch.campaign_id}/${batch.id}`"
-                class="box p-4"
-                :class="{'is-disabled': false}"
-              >
-                <div class="columns is-vcentered is-multiline is-mobile">
-                  <div class="column">
-                    <p class="has-text-grey is-size-7">
-                      Batch
-                    </p>
-                    <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                      #<template v-if="campaign">{{ campaign.id }}.</template>{{ batch.id }}
-                    </h2>
-                  </div>
-                  <div class="column">
-                    <p class="has-text-grey is-size-7">
-                      Tasks
-                    </p>
-                    <progress class="progress is-small mt-2" :value="batch.tasks_done" :max="batch.num_tasks" />
-                  </div>
-                  <div class="column has-text-right is-12-mobile">
-                    <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :class="{'is-loading': !campaign || typeof campaign.info === 'undefined', 'is-accent': campaign && campaign.info === null, 'is-outlined': campaign && campaign.info === null}">
-                      <span class="">{{ campaign && campaign.info === null ? 'Qualify' : 'View' }}</span>
-                    </button>
-                  </div>
-                </div>
-              </nuxt-link>
-              <div v-if="batchesLoading">
-                Batches loading..
-              </div>
-              <div v-else-if="batches && !batches.length">
-                No batches
-              </div>
-              <div v-else-if="!batches">
-                Could not retrieve batches
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -161,13 +196,8 @@
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex'
-import TemplateMedia from '@/components/Template'
-import { Template } from '@/../effect-js'
 
 export default {
-  components: {
-    'template-media': TemplateMedia
-  },
   middleware: ['auth'],
   data () {
     return {
@@ -178,7 +208,9 @@ export default {
       accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
       body: 'description',
       userJoined: null,
-      loading: false
+      loading: false,
+      joinCampaignPopup: false,
+      tac: false
     }
   },
   computed: {
@@ -190,7 +222,10 @@ export default {
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading,
       batchesLoading: state => state.campaign.batches.loading
-    })
+    }),
+    campaignBatches () {
+      return this.batchByCampaignId(this.id)
+    }
   },
   mounted () {
     setTimeout(() => {
@@ -204,15 +239,19 @@ export default {
   },
   methods: {
     async joinCampaign () {
+      try {
       // function that makes the user join this campaign.
-      if (this.$auth.user.blockchain === 'eos') {
-        const data = await this.$blockchain.joinCampaign(this.accountId, this.id)
-        if (data) {
-          this.loading = true
-          setTimeout(this.checkUserCampaign, 1500)
+        if (this.$auth.user.blockchain === 'eos') {
+          const data = await this.$blockchain.joinCampaign(this.accountId, this.id)
+          if (data) {
+            this.loading = true
+            setTimeout(this.checkUserCampaign, 1500)
+          }
         }
+        this.joinCampaignPopup = false
+      } catch (e) {
+        this.$blockchain.handleError(e)
       }
-      this.joinCampaignPopup = false
     },
     async getBatches () {
       await this.$store.dispatch('campaign/getBatches')
@@ -230,9 +269,6 @@ export default {
     },
     submitTask (values) {
       console.log('Task submitted!', values)
-    },
-    renderTemplate (template, placeholders = {}, options = {}) {
-      return new Template(template, placeholders, options).render()
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.id)
