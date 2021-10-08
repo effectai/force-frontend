@@ -45,7 +45,6 @@ export default {
     ADD_BATCH (state, batch) {
       if (state.batches) {
         const index = state.batches.findIndex(b => b.id === batch.id && b.campaign_id === batch.campaign_id)
-        const batch = state.batches[index]
         if (index === -1) {
           state.batches.push(batch)
         } else {
