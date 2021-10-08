@@ -56,6 +56,9 @@ export default {
     },
     batchByCampaignId (state) {
       return id => state.batches ? state.batches.filter(b => b.campaign_id === id) : null
+    },
+    campaignsByCategory (state) {
+      return category => state.campaigns && category ? state.campaigns.filter(c => c.info ? c.info.category === category : false) : state.campaigns
     }
   },
   actions: {

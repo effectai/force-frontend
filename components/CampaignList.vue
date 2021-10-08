@@ -1,7 +1,24 @@
 <template>
   <div>
+    <div class="buttons is-flex is-justify-content-space-evenly">
+      <button class="button is-info is-outlined" @click.prevent="filter = 'translation'">
+        Translation
+      </button>
+      <button class="button is-secondary is-outlined" @click.prevent="filter = 'image_classification'">
+        Image classification
+      </button>
+      <button class="button is-warning is-outlined" @click.prevent="filter = 'text_classification'">
+        Text classification
+      </button>
+      <button class="button is-danger is-outlined" @click.prevent="filter = 'video_classification'">
+        Video classification
+      </button>
+      <button class="button is-primary is-outlined" @click.prevent="filter = null">
+        all
+      </button>
+    </div>
     <nuxt-link
-      v-for="campaign in campaigns"
+      v-for="campaign in filteredCampaigns"
       :key="campaign.id"
       :to="'/campaigns/'+campaign.id"
       class="box p-4"
@@ -97,18 +114,23 @@ export default {
   name: 'CampaignList',
   data () {
     return {
+      filter: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER
     }
   },
   computed: {
     ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId'
+      batchByCampaignId: 'campaign/batchByCampaignId',
+      campaignsByCategory: 'campaign/campaignsByCategory'
     }),
     ...mapState({
       campaigns: state => state.campaign.campaigns,
       campaignsLoading: state => state.campaign.loading,
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded
-    })
+    }),
+    filteredCampaigns () {
+      return this.campaignsByCategory(this.filter)
+    }
   },
   created () {
     this.getCampaigns()
