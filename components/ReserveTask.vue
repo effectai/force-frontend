@@ -47,6 +47,7 @@ export default {
         }
         this.loading = false
       } catch (e) {
+        this.loading = false
         this.$blockchain.handleError(e)
       }
     }
