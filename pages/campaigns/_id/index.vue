@@ -168,7 +168,11 @@
             <div v-if="campaign.info" class="block">
               <b>Category</b>
               <br>
-              <span v-if="campaign.info.category" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
+              <span
+                v-if="campaign.info && campaign.info.category"
+                class="tag is-light is-medium"
+                :class="{'is-secondary': campaign.info.category === 'translation', 'is-info': campaign.info.category === 'image_classification', 'is-warning': campaign.info.category === 'text_classification', 'is-danger': campaign.info.category === 'video_classification'}"
+              >{{ campaign.info.category }}</span>
               <span v-else class="tag is-info is-light is-medium">...</span>
             </div>
             <div class="block">

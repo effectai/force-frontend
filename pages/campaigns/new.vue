@@ -41,6 +41,12 @@
               <option value="image_classification">
                 image classification
               </option>
+              <option value="text_classification">
+                text classification
+              </option>
+              <option value="video_classification">
+                video classification
+              </option>
             </select>
           </div>
         </div>
