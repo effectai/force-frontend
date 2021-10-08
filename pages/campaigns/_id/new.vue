@@ -30,7 +30,7 @@
         <div class="field">
           <label class="label">CSV?</label>
           <div class="control">
-            <textarea v-model="tasks" class="textarea" required placeholder="{}" />
+            <textarea v-model="tasks" class="textarea" required placeholder="[{}]" />
           </div>
         </div>
         <div class="field is-grouped">

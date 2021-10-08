@@ -58,7 +58,7 @@
               v-if="campaign && campaign.info"
               :html="renderTemplate(
                 campaign.info.template || 'No template found..',
-                {name: 'World'})"
+                campaign.info.example_task || {})"
               @submit="submitTask"
             />
           </div>
