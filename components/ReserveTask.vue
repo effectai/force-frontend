@@ -32,7 +32,7 @@ export default {
         let reservations = await this.$blockchain.getReservations()
         let reservation
         for (const rv of reservations.rows) {
-          if (rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.$blockchain.sdk.force.getCompositeKey(this.batch.id, this.batch.campaign_id)) === rv.batch_id && (!rv.data || !rv.data.length)) {
+          if (rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.$blockchain.sdk.force.getCompositeKey(this.batch.id, this.batch.campaign_id)) === parseInt(rv.batch_id) && (!rv.data || !rv.data.length)) {
             reservation = rv
             break
           }
@@ -43,7 +43,7 @@ export default {
           // get reservations and see if this user has a reservation
           reservations = await this.$blockchain.getReservations()
           for (const rv of reservations.rows) {
-            if (rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.$blockchain.sdk.force.getCompositeKey(this.batch.id, this.batch.campaign_id)) === rv.batch_id && (!rv.data || !rv.data.length)) {
+            if (rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.$blockchain.sdk.force.getCompositeKey(this.batch.id, this.batch.campaign_id)) === parseInt(rv.batch_id) && (!rv.data || !rv.data.length)) {
               reservation = rv
               break
             }
