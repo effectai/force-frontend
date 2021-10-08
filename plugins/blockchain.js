@@ -70,6 +70,7 @@ export default (context, inject) => {
           context.$auth.fetchUser()
           console.log('refreshing user balance..')
           this.getAccountBalance()
+          this.getPendingBalance()
         }
       },
       async getEfxPrice (currency = 'usd') {
@@ -256,6 +257,16 @@ export default (context, inject) => {
           return this.bsc.web3.utils.fromWei(balance.toString())
         } catch (error) {
           this.handleError(error)
+        }
+      },
+      async getPendingBalance () {
+        if (context.$auth.loggedIn) {
+          const data = await this.sdk.force.getPendingBalance(context.$auth.user.vAccountRows[0].id)
+          if (data) {
+            data.rows.forEach((entry) => {
+              this.efxPending += parseFloat(entry.pending.quantity)
+            })
+          }
         }
       },
       async getBatches (nextKey, limit = 20) {
