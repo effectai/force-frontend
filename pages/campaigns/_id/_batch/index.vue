@@ -143,7 +143,7 @@
             <p class="modal-card-title">
               {{ campaign.info.title }}
             </p>
-            <button class="delete" aria-label="close" />
+            <button class="delete" aria-label="close" @click.prevent="joinCampaignPopup = false" />
           </header>
           <section class="modal-card-body">
             <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
