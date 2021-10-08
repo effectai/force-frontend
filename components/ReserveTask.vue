@@ -8,6 +8,7 @@
 </template>
 
 <script>
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 export default {
   props: {
     batch: {
@@ -30,6 +31,7 @@ export default {
         this.loading = true
         await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
 
+        await sleep(1500)
         // get reservations and see if this user has a reservation
         const reservations = await this.$blockchain.getReservations()
         let reservation
