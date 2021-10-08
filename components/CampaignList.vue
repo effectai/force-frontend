@@ -20,7 +20,7 @@
               <span
                 v-if="campaign.info && campaign.info.category"
                 class="tag is-light"
-                :class="{'is-secondary': campaign.info.category === 'translation'}"
+                :class="{'is-secondary': campaign.info.category === 'translation', 'is-info': campaign.info.category === 'image_classification', 'is-warning': campaign.info.category === 'text_classification', 'is-danger': campaign.info.category === 'video_classification'}"
               >{{ campaign.info.category }}</span>
             </div>
 
