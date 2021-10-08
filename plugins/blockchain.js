@@ -94,6 +94,7 @@ export default (context, inject) => {
               $blockchain: this
             })
             this.getAccountBalance()
+            this.getPendingBalance()
             // Needed because there is a redirect bug when going to a protected route from the login page
             const path = context.$auth.$storage.getUniversal('redirect') || '/'
             context.$auth.$storage.setUniversal('redirect', null)
