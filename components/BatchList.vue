@@ -19,14 +19,13 @@
     </div>
     <template v-for="batch in batches">
       <nuxt-link
-        :set="campaign = campaignById(batch.campaign_id)"
-        v-show="!filter || (campaign.info && campaign.info.category === filter)"
+        v-show="!filter || (campaignById(batch.campaign_id).info && campaignById(batch.campaign_id).info.category === filter)"
         :key="`${batch.campaign_id}.${batch.id}`"
+        :set="campaign = campaignById(batch.campaign_id)"
         :to="`/campaigns/${batch.campaign_id}/${batch.id}`"
         class="box p-4"
         :class="{'is-disabled': false}"
       >
-      {{ campaign && campaign.info ? campaign.info.category : null }}
         <div class="columns is-vcentered is-multiline is-mobile">
           <div class="column is-narrow is-mobile-1">
             <p class="image has-radius" style="width: 52px; height: 52px">
