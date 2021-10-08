@@ -110,7 +110,7 @@
               <b>IPFS</b>
               <br>
               <div v-if="campaign" class="blockchain-address">
-                <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
+                <a target="_blank" :href="`${ipfsExplorer}/ipfs/${batch.content.field_1}`">{{ batch.content.field_1 }}</a>
               </div>
               <span v-else>.....</span>
             </div>
