@@ -263,11 +263,13 @@ export default (context, inject) => {
       async getPendingBalance () {
         if (context.$auth.loggedIn) {
           const data = await this.sdk.force.getPendingBalance(context.$auth.user.vAccountRows[0].id)
+          let pending = 0
           if (data) {
             data.rows.forEach((entry) => {
-              this.efxPending += parseFloat(entry.pending.quantity)
+              pending += parseFloat(entry.pending.quantity)
             })
           }
+          this.efxPending = pending
         }
       },
       async getBatches (nextKey, limit = 20) {
