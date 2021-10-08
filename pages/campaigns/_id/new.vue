@@ -85,12 +85,7 @@ export default {
 
       if (this.batchByCampaignId(this.campaignId) !== null) {
         const batchesLength = this.batchByCampaignId(this.campaignId).length
-        // check if the campaign has badges, if it has no badges, the new badge id will be 0.
-        if (batchesLength > 0) {
-          this.batchId = batchesLength + 1
-        } else {
-          this.batchId = batchesLength
-        }
+        this.batchId = batchesLength
       }
     }
   }
