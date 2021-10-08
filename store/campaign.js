@@ -44,7 +44,13 @@ export default {
     },
     ADD_BATCH (state, batch) {
       if (state.batches) {
-        state.batches.push(batch)
+        const index = state.batches.findIndex(b => b.id === batch.id && b.campaign_id === batch.campaign_id)
+        const batch = state.batches[index]
+        if (index === -1) {
+          state.batches.push(batch)
+        } else {
+          Vue.set(state.batches, index, batch)
+        }
       } else {
         state.batches = [batch]
       }
@@ -56,6 +62,9 @@ export default {
     },
     batchByCampaignId (state) {
       return id => state.batches ? state.batches.filter(b => b.campaign_id === id) : null
+    },
+    campaignsByCategory (state) {
+      return category => state.campaigns && category ? state.campaigns.filter(c => c.info ? c.info.category === category : false) : state.campaigns
     }
   },
   actions: {
@@ -85,9 +94,10 @@ export default {
     },
     async getBatch ({ dispatch, commit, state }, { id, campaignId }) {
       commit('SET_LOADING_BATCH', true)
+      const hardRefresh = true
       try {
         const batchFilter = c => c.id === id && c.campaign_id === campaignId
-        if (!state.batches || !state.batches.find(batchFilter)) {
+        if (!state.batches || !state.batches.find(batchFilter) || hardRefresh) {
           const data = await this.$blockchain.getBatches(this.$blockchain.sdk.force.getCompositeKey(id, campaignId), 1)
 
           if (data.rows.length > 0) {
