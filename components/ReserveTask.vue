@@ -29,15 +29,24 @@ export default {
     async makeReservation () {
       try {
         this.loading = true
-        await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
-
-        await sleep(1500)
-        // get reservations and see if this user has a reservation
-        const reservations = await this.$blockchain.getReservations()
+        let reservations = await this.$blockchain.getReservations()
         let reservation
         for (const rv of reservations.rows) {
-          if (rv.account_id === this.$auth.user.vAccountRows[0].id && this.$blockchain.sdk.force.getCompositeKey(this.batch.id, this.batch.campaign_id) === rv.batch_id && !rv.data) {
+          if (rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.$blockchain.sdk.force.getCompositeKey(this.batch.id, this.batch.campaign_id)) === rv.batch_id && (!rv.data || !rv.data.length)) {
             reservation = rv
+            break
+          }
+        }
+        if (!reservation) {
+          await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
+          await sleep(1500)
+          // get reservations and see if this user has a reservation
+          reservations = await this.$blockchain.getReservations()
+          for (const rv of reservations.rows) {
+            if (rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.$blockchain.sdk.force.getCompositeKey(this.batch.id, this.batch.campaign_id)) === rv.batch_id && (!rv.data || !rv.data.length)) {
+              reservation = rv
+              break
+            }
           }
         }
 
