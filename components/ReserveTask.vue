@@ -28,12 +28,28 @@ export default {
     async makeReservation () {
       try {
         this.loading = true
-        const result = await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
-        console.log('transaction', result)
+        await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
+
+        // get reservations and see if this user has a reservation
+        const reservations = await this.$blockchain.getReservations()
+        let reservation
+        for (const rv of reservations.rows) {
+          if (rv.account_id === this.$auth.user.vAccountRows[0].id && this.$blockchain.sdk.force.getCompositeKey(this.batch.id, this.batch.campaign_id) === rv.batch_id && !rv.data) {
+            reservation = rv
+          }
+        }
+
+        // get task form reservation and go to task page
+        if (reservation) {
+          const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(reservation.leaf_hash, this.batch.tasks)
+          // TODO: temp for demo, pass reservation/reservation.id in a different way
+          this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.id + '/' + taskIndex + '?submissionId=' + reservation.id)
+        }
+        this.loading = false
       } catch (e) {
+        this.loading = false
         this.$blockchain.handleError(e)
       }
-      // todo: go to submissions page
     }
   }
 }

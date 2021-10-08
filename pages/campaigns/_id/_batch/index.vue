@@ -124,8 +124,8 @@
               <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                 Join Campaign
               </button>
-              <button v-else class="button is-primary" @click.prevent="reserveTask = true">
-                make Task Reservation
+              <button v-else-if="batch.tasks_done !== batch.num_tasks" class="button is-primary" @click.prevent="reserveTask = true">
+                Make Task Reservation
               </button>
             </div>
           </div>
@@ -143,7 +143,7 @@
             <p class="modal-card-title">
               {{ campaign.info.title }}
             </p>
-            <button class="delete" aria-label="close" />
+            <button class="delete" aria-label="close" @click.prevent="joinCampaignPopup = false" />
           </header>
           <section class="modal-card-body">
             <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
