@@ -125,7 +125,7 @@
                 Join Campaign
               </button>
               <button v-else class="button is-primary" @click.prevent="reserveTask = true">
-                make Task Reservation
+                Make Task Reservation
               </button>
             </div>
           </div>

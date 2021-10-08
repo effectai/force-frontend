@@ -11,17 +11,22 @@
           task)"
         @submit="submitTask"
       />
+
+      <!-- Reserve task -->
+      <reserve-task v-if="reserveNextTask" :batch="batch" />
     </div>
   </section>
 </template>
 <script>
 import { mapState } from 'vuex'
 import TemplateMedia from '@/components/Template'
+import ReserveTask from '@/components/ReserveTask'
 import { Template } from '@/../effect-js'
 
 export default {
   components: {
-    'template-media': TemplateMedia
+    'template-media': TemplateMedia,
+    'reserve-task': ReserveTask
   },
   middleware: ['auth'],
   data () {
@@ -29,9 +34,12 @@ export default {
       campaignId: parseInt(this.$route.params.id),
       batchId: parseInt(this.$route.params.batch),
       taskIndex: parseInt(this.$route.params.task),
+      // TODO: pass reservation/reservation.id in a different way
+      submissionId: parseInt(this.$route.query.submissionId),
       campaign: undefined,
       batch: undefined,
-      task: undefined
+      task: undefined,
+      reserveNextTask: false
     }
   },
   computed: {
@@ -59,8 +67,14 @@ export default {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
     },
-    submitTask (values) {
-      console.log('Task submitted!', values)
+    async submitTask (values) {
+      await this.$blockchain.submitTask(this.$blockchain.sdk.force.getCompositeKey(this.batchId, this.campaignId), this.campaignId, this.submissionId, JSON.stringify(values))
+      await this.getBatch()
+      if (this.batch.tasks_done === this.batch.num_tasks) {
+        this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.id)
+      } else {
+        this.reserveNextTask = true
+      }
     }
   }
 }

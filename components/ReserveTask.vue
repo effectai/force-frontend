@@ -42,7 +42,8 @@ export default {
         // get task form reservation and go to task page
         if (reservation) {
           const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(reservation.leaf_hash, this.batch.tasks)
-          this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.id + '/' + taskIndex)
+          // TODO: temp for demo, pass reservation/reservation.id in a different way
+          this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.id + '/' + taskIndex + '?submissionId=' + reservation.id)
         }
         this.loading = false
       } catch (e) {
