@@ -300,7 +300,7 @@ export default (context, inject) => {
         return await this.sdk.force.createCampaign(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, hash, reward, this.account.permission)
       },
       async getReservations () {
-        return await this.sdk.force.getReservations(0, 20)
+        return await this.sdk.force.getReservations()
       },
       async getTaskIndexFromLeaf (leafhash, tasks) {
         return await this.sdk.force.getTaskIndexFromLeaf(leafhash, tasks)
