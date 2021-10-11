@@ -34,18 +34,17 @@
           <div class="select">
             <select v-model="campaignIpfs.category" required>
               <option>---</option>
-              <!-- TODO: add correct categories -->
-              <option value="translation">
-                translation
+              <option value="dao">
+                Effect DAO
               </option>
-              <option value="image_classification">
-                image classification
+              <option value="translate">
+                Effect Translate
               </option>
-              <option value="text_classification">
-                text classification
+              <option value="socials">
+                Effect Socials
               </option>
-              <option value="video_classification">
-                video classification
+              <option value="captions">
+                Effect Captions
               </option>
             </select>
           </div>

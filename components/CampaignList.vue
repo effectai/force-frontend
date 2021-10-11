@@ -1,22 +1,6 @@
 <template>
   <div>
-    <div class="buttons is-flex is-justify-content-space-evenly">
-      <button class="button is-info is-outlined" @click.prevent="filter = 'translation'">
-        Translation
-      </button>
-      <button class="button is-secondary is-outlined" @click.prevent="filter = 'image_classification'">
-        Image classification
-      </button>
-      <button class="button is-warning is-outlined" @click.prevent="filter = 'text_classification'">
-        Text classification
-      </button>
-      <button class="button is-danger is-outlined" @click.prevent="filter = 'video_classification'">
-        Video classification
-      </button>
-      <button class="button is-primary is-outlined" @click.prevent="filter = null">
-        all
-      </button>
-    </div>
+    <category-filters @clicked="onFilter" />
     <nuxt-link
       v-for="campaign in filteredCampaigns"
       :key="campaign.id"
@@ -98,10 +82,10 @@
     <div v-if="campaignsLoading">
       Campaigns loading..
     </div>
-    <div v-else-if="campaigns && !campaigns.length">
+    <div v-else-if="filteredCampaigns && !filteredCampaigns.length">
       No campaigns
     </div>
-    <div v-else-if="!campaigns">
+    <div v-else-if="!filteredCampaigns">
       Could not retrieve campaigns
     </div>
   </div>
@@ -109,9 +93,13 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import CategoryFilters from './CategoryFilters'
 
 export default {
   name: 'CampaignList',
+  components: {
+    CategoryFilters
+  },
   data () {
     return {
       filter: null,
@@ -137,6 +125,9 @@ export default {
     this.getBatches()
   },
   methods: {
+    onFilter (category) {
+      this.filter = category
+    },
     async getCampaigns () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
         await this.$store.dispatch('campaign/getCampaigns')
