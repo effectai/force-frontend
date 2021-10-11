@@ -67,7 +67,7 @@ export default {
     getReservationForUser (reservations) {
       let reservation
       for (const rv of reservations.rows) {
-        if (rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.$blockchain.sdk.force.getCompositeKey(this.batch.id, this.batch.campaign_id)) === parseInt(rv.batch_id) && (!rv.data || !rv.data.length)) {
+        if (rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.batch.batch_id) === parseInt(rv.batch_id) && (!rv.data || !rv.data.length)) {
           reservation = rv
           break
         }
