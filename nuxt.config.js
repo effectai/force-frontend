@@ -66,6 +66,7 @@ export default {
   // See https://github.com/markdown-it/markdown-it
   markdownit: {
     injected: true,
+    html: true,
     // preset: 'default',
     linkify: true,
     breaks: true
