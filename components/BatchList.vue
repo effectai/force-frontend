@@ -1,22 +1,6 @@
 <template>
   <div>
-    <div class="buttons is-flex is-justify-content-space-evenly">
-      <button class="button is-info is-outlined" @click.prevent="filter = 'translation'">
-        Translation
-      </button>
-      <button class="button is-secondary is-outlined" @click.prevent="filter = 'image_classification'">
-        Image classification
-      </button>
-      <button class="button is-warning is-outlined" @click.prevent="filter = 'text_classification'">
-        Text classification
-      </button>
-      <button class="button is-danger is-outlined" @click.prevent="filter = 'video_classification'">
-        Video classification
-      </button>
-      <button class="button is-primary is-outlined" @click.prevent="filter = null">
-        all
-      </button>
-    </div>
+    <category-filters @clicked="onFilter" />
     <template v-for="batch in batches">
       <nuxt-link
         v-show="!filter || (campaignById(batch.campaign_id).info && campaignById(batch.campaign_id).info.category === filter)"
@@ -110,9 +94,12 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
-
+import CategoryFilters from './CategoryFilters'
 export default {
   name: 'BatchList',
+  components: {
+    CategoryFilters
+  },
   data () {
     return {
       filter: null,
@@ -135,6 +122,9 @@ export default {
     this.getCampaigns()
   },
   methods: {
+    onFilter (category) {
+      this.filter = category
+    },
     async getCampaigns () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
         await this.$store.dispatch('campaign/getCampaigns')
