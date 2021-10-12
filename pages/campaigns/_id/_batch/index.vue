@@ -14,8 +14,8 @@
             </nuxt-link>
           </li>
           <li class="is-active">
-            <nuxt-link :to="`/campaigns/${campaignId}/${batchId}`" aria-current="page">
-              Batch {{ batchId }}
+            <nuxt-link v-if="batch" :to="`/campaigns/${campaignId}/${batchId}`" aria-current="page">
+              Batch {{ batch.id }}
             </nuxt-link>
           </li>
         </ul>
@@ -29,7 +29,7 @@
       <div class="columns">
         <div class="column is-two-thirds">
           <div class="title">
-            <span>#{{ campaignId }}.{{ batchId }}: </span>
+            <span v-if="batch">#{{ campaignId }}.{{ batch.id }}: </span>
             <span v-if="campaign && campaign.info">{{ campaign.info.title }}</span>
             <span v-else-if="!campaign || campaign.info !== null">Loading..</span>
             <span v-else class="has-text-danger-dark">Could not load campaign info</span>
@@ -249,8 +249,8 @@ export default {
       return new Template(template, placeholders, options).render()
     },
     async getBatch () {
-      await this.$store.dispatch('campaign/getBatch', { id: this.batchId, campaignId: this.campaignId })
-      this.batch = this.batches.find(b => b.id === this.batchId && b.campaign_id === this.campaignId)
+      await this.$store.dispatch('campaign/getBatch', { batchId: this.batchId })
+      this.batch = this.batches.find(b => b.batch_id === this.batchId)
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)

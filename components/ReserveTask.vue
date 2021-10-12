@@ -54,9 +54,9 @@ export default {
         if (reservation) {
           const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(reservation.leaf_hash, this.batch.tasks)
           // TODO: temp for demo, pass reservation/reservation.id in a different way
-          this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.id + '/' + taskIndex + '?submissionId=' + reservation.id)
+          this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '/' + taskIndex + '?submissionId=' + reservation.id)
         } else {
-          this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.id)
+          this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id)
         }
         this.loading = false
       } catch (e) {
@@ -67,7 +67,7 @@ export default {
     getReservationForUser (reservations) {
       let reservation
       for (const rv of reservations.rows) {
-        if (rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.$blockchain.sdk.force.getCompositeKey(this.batch.id, this.batch.campaign_id)) === parseInt(rv.batch_id) && (!rv.data || !rv.data.length)) {
+        if (rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.batch.batch_id) === parseInt(rv.batch_id) && (!rv.data || !rv.data.length)) {
           reservation = rv
           break
         }

@@ -6,7 +6,7 @@
         v-show="!filter || (campaignById(batch.campaign_id).info && campaignById(batch.campaign_id).info.category === filter)"
         :key="`${batch.campaign_id}.${batch.id}`"
         :set="campaign = campaignById(batch.campaign_id)"
-        :to="`/campaigns/${batch.campaign_id}/${batch.id}`"
+        :to="`/campaigns/${batch.campaign_id}/${batch.batch_id}`"
         class="box p-4"
         :class="{'is-disabled': false}"
       >
