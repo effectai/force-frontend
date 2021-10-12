@@ -76,7 +76,7 @@
                 target="_blank"
               >{{ transaction.transaction_id }}</a></td>
               <td>{{ transaction.processed.action_traces[0].act.name }}</td>
-              <td>{{ new Date(transaction.processed.block_time).toLocaleDateString() }}</td>
+              <td>{{ new Date(transaction.processed.block_time).toLocaleString() }}</td>
               <td>{{ transaction.processed.receipt.status }}</td>
               <th><a
                 :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
