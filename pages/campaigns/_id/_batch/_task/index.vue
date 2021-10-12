@@ -59,8 +59,8 @@ export default {
       return new Template(template, placeholders, options).render()
     },
     async getBatch () {
-      await this.$store.dispatch('campaign/getBatch', { id: this.batchId, campaignId: this.campaignId })
-      this.batch = this.batches.find(b => b.id === this.batchId && b.campaign_id === this.campaignId)
+      await this.$store.dispatch('campaign/getBatch', { batchId: this.batchId })
+      this.batch = this.batches.find(b => b.batch_id === this.batchId)
       this.task = this.batch.tasks[this.taskIndex]
     },
     async getCampaign () {
@@ -71,7 +71,7 @@ export default {
       await this.$blockchain.submitTask(this.batch.batch_id, this.campaignId, this.submissionId, JSON.stringify(values))
       await this.getBatch()
       if (this.batch.tasks_done === this.batch.num_tasks) {
-        this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.id)
+        this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id)
       } else {
         this.reserveNextTask = true
       }

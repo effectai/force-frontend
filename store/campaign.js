@@ -29,8 +29,8 @@ export default {
       campaign.info = info
       Vue.set(state.campaigns, index, campaign)
     },
-    SET_BATCH_TASKS (state, { id, campaignId, tasks }) {
-      const index = state.batches.findIndex(batch => batch.id === id && batch.campaign_id === campaignId)
+    SET_BATCH_TASKS (state, { batchId, tasks }) {
+      const index = state.batches.findIndex(batch => batch.batch_id === batchId)
       const batch = state.batches[index]
       batch.tasks = tasks
       Vue.set(state.batches, index, batch)
@@ -44,7 +44,7 @@ export default {
     },
     ADD_BATCH (state, batch) {
       if (state.batches) {
-        const index = state.batches.findIndex(b => b.id === batch.id && b.campaign_id === batch.campaign_id)
+        const index = state.batches.findIndex(b => b.batch_id === batch.batch_id)
         if (index === -1) {
           state.batches.push(batch)
         } else {
@@ -91,13 +91,13 @@ export default {
         commit('SET_LOADING_BATCH', false)
       }
     },
-    async getBatch ({ dispatch, commit, state }, { id, campaignId }) {
+    async getBatch ({ dispatch, commit, state }, { batchId }) {
       commit('SET_LOADING_BATCH', true)
       const hardRefresh = true
       try {
-        const batchFilter = c => c.id === id && c.campaign_id === campaignId
+        const batchFilter = c => c.batch_id === batchId
         if (!state.batches || !state.batches.find(batchFilter) || hardRefresh) {
-          const data = await this.$blockchain.getBatches(this.$blockchain.sdk.force.getCompositeKey(id, campaignId), 1)
+          const data = await this.$blockchain.getBatches(batchId, 1)
 
           if (data.rows.length > 0) {
             await commit('ADD_BATCH', data.rows[0])
@@ -187,10 +187,10 @@ export default {
         if (batch.content.field_0 === 0) {
           // field_1 represents the IPFS hash
           const tasks = await this.$blockchain.sdk.getIpfsContent(batch.content.field_1)
-          commit('SET_BATCH_TASKS', { id: batch.id, campaignId: batch.campaign_id, tasks: tasks.tasks })
+          commit('SET_BATCH_TASKS', { batchId: batch.batch_id, tasks: tasks.tasks })
         }
       } catch (e) {
-        commit('SET_BATCH_TASKS', { id: batch.id, tasks: null })
+        commit('SET_BATCH_TASKS', { batchId: batch.batch_id, tasks: null })
       }
     }
   },

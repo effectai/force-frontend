@@ -96,7 +96,7 @@
                 <nuxt-link
                   v-for="batch in campaignBatches"
                   :key="batch.id"
-                  :to="`/campaigns/${batch.campaign_id}/${batch.id}`"
+                  :to="`/campaigns/${batch.campaign_id}/${batch.batch_id}`"
                   class="box p-4"
                   :class="{'is-disabled': false}"
                 >
