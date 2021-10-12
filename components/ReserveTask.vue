@@ -32,7 +32,8 @@ export default {
         let reservations = await this.$blockchain.getReservations()
         let reservation = this.getReservationForUser(reservations)
         if (!reservation) {
-          await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
+          const result = await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
+          this.$store.dispatch('transaction/addTransaction', result)
 
           // get reservations and see if this user has a reservation
           await retry(async () => {

@@ -52,6 +52,42 @@
             >View on explorer</a>
           </div>
         </div>
+        <hr>
+        <h4 class="title is-4 is-spaced">
+          Transactions
+        </h4>
+        <table v-if="transactions" class="table" style="width: 100%">
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="transaction in transactions"
+              :key="transaction.transaction_id"
+            >
+              <td><a
+                :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
+                target="_blank"
+              >{{ transaction.transaction_id }}</a></td>
+              <td>{{ transaction.processed.action_traces[0].act.name }}</td>
+              <td>{{ new Date(transaction.processed.block_time).toLocaleDateString() }}</td>
+              <td>{{ transaction.processed.receipt.status }}</td>
+              <th><a
+                :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
+                target="_blank"
+              >View on explorer</a>
+              </th>
+            </tr>
+          </tbody>
+        </table>
+        <span v-else>No transactions found</span>
+        <hr>
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
       </div>
@@ -60,13 +96,15 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Balance from '@/components/Balance'
 export default {
   components: { Balance },
   middleware: ['auth'],
   computed: {
-  },
-  created () {
+    ...mapState({
+      transactions: state => state.transaction.transactions
+    })
   },
   methods: {
     async logout () {

@@ -250,6 +250,7 @@ export default {
       // function that makes the user join this campaign.
         if (this.$auth.user.blockchain === 'eos') {
           const data = await this.$blockchain.joinCampaign(this.accountId, this.id)
+          this.$store.dispatch('transaction/addTransaction', data)
           if (data) {
             this.loading = true
             setTimeout(this.checkUserCampaign, 1500)

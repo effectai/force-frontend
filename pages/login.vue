@@ -112,7 +112,8 @@ export default {
       try {
         // if account doesnt exists yet add it
         if (this.existingAccount === false) {
-          await this.$blockchain.openVAccount()
+          const result = await this.$blockchain.openVAccount()
+          this.$store.dispatch('transaction/addTransaction', result)
           await sleep(2000)
         }
         await retry(async () => {
