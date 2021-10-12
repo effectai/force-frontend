@@ -68,7 +68,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="transaction in transactions"
+              v-for="transaction in displayedTransactions"
               :key="transaction.transaction_id"
             >
               <td><a
@@ -87,6 +87,17 @@
           </tbody>
         </table>
         <span v-else>No transactions found</span>
+
+        <nav v-if="transactions" class="pagination" role="navigation" aria-label="pagination">
+          <a v-if="page != 1" class="pagination-previous" @click="page--">Previous</a>
+          <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
+          <ul class="pagination-list">
+            <li v-for="pageNumber in pages" :key="pageNumber">
+              <a class="pagination-link" @click="page = pageNumber">{{ pageNumber }}</a>
+            </li>
+          </ul>
+        </nav>
+
         <hr>
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
@@ -101,14 +112,40 @@ import Balance from '@/components/Balance'
 export default {
   components: { Balance },
   middleware: ['auth'],
+  data () {
+    return {
+      page: 1,
+      perPage: 10,
+      pages: []
+    }
+  },
   computed: {
     ...mapState({
       transactions: state => state.transaction.transactions
-    })
+    }),
+    displayedTransactions () {
+      return this.paginate(this.transactions)
+    }
+  },
+  watch: {
+    transactions () {
+      this.setPages()
+    }
   },
   methods: {
     async logout () {
       await this.$auth.logout()
+    },
+    setPages () {
+      const numberOfPages = Math.ceil(this.transactions.length / this.perPage)
+      for (let index = 1; index <= numberOfPages; index++) {
+        this.pages.push(index)
+      }
+    },
+    paginate (transactions) {
+      const from = (this.page * this.perPage) - this.perPage
+      const to = (this.page * this.perPage)
+      return transactions.slice(from, to)
     }
   }
 }
