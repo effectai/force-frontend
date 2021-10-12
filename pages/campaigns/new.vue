@@ -1,70 +1,127 @@
 <template>
   <section class="section">
-    <div class="container">
-      <h4 class="box-title subtitle">
+    <div class="container is-max-widescreen">
+      <p class="is-pulled-right">
+        <span class="has-text-info"><b>*</b></span>
+        <i> is required</i>
+      </p>
+      <h1 class="title mt-5">
         New Campaign
-      </h4>
+      </h1>
+      <div class="tabs">
+        <ul>
+          <li :class="{'is-active': formGroup === 'basic-info'}">
+            <a @click.prevent="formGroup = 'basic-info'">Basic Information</a>
+          </li>
+          <li :class="{'is-active': formGroup === 'instructions'}">
+            <a @click.prevent="formGroup = 'instructions'">Instructions</a>
+          </li>
+          <li :class="{'is-active': formGroup === 'tasks'}">
+            <a @click.prevent="formGroup = 'tasks'">Design Tasks</a>
+          </li>
+        </ul>
+      </div>
       <form @submit.prevent="createCampaign">
-        <div class="field">
-          <label class="label">Title</label>
+        <div v-show="formGroup === 'basic-info'" class="block basic-info-group">
+          <div class="field">
+            <label class="label">
+              Title
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="control">
+              <input v-model="campaignIpfs.title" required class="input" type="text" placeholder="My Campaign Title">
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">
+              Description
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="control">
+              <textarea v-model="campaignIpfs.description" class="textarea" required />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Image</label>
+            <div class="control">
+              <input v-model="campaignIpfs.image" class="input" type="text" placeholder="Image URL">
+            </div>
+          </div>
+          <label class="label">
+            Reward per task
+            <span class="has-text-info">*</span>
+          </label>
+          <div class="field has-addons">
+            <div class="control">
+              <input v-model="campaignIpfs.reward" required class="input" type="number" placeholder="Reward per task">
+            </div>
+            <div class="control">
+              <a class="button is-primary">
+                EFX
+              </a>
+            </div>
+          </div>
           <div class="control">
-            <input v-model="campaignIpfs.title" required class="input" type="text" placeholder="My Campaign Title">
+            <div class="field">
+              <label class="label">
+                Category
+                <span class="has-text-info">*</span>
+              </label>
+              <div class="select">
+                <select v-model="campaignIpfs.category" required>
+                  <option>---</option>
+                  <option value="dao">
+                    Effect DAO
+                  </option>
+                  <option value="translate">
+                    Effect Translate
+                  </option>
+                  <option value="socials">
+                    Effect Socials
+                  </option>
+                  <option value="captions">
+                    Effect Captions
+                  </option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="field">
-          <label class="label">Description</label>
-          <div class="control">
-            <textarea v-model="campaignIpfs.description" class="textarea" required />
+        <div v-show="formGroup === 'instructions'" class="block instructions-group">
+          <div class="columns">
+            <div class="column">
+              <div class="field">
+                <label class="label">
+                  Raw Text
+                  <span class="has-text-info">*</span>
+                </label>
+                <div class="control">
+                  <textarea v-model="campaignIpfs.instructions" class="textarea" required />
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="field">
+                <label class="label">Preview</label>
+                <div class="control">
+                  <div class="textarea content" v-html="$md.render(campaignIpfs.instructions)" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="field">
-          <label class="label">Instructions</label>
-          <div class="control">
-            <textarea v-model="campaignIpfs.instructions" class="textarea" required />
+        <div v-show="formGroup === 'tasks'" class="block task-group">
+          <div class="field">
+            <label class="label">Template</label>
+            <div class="control">
+              <textarea v-model="campaignIpfs.template" class="textarea" required />
+            </div>
           </div>
-        </div>
-        <div class="field">
-          <label class="label">Reward per task (EFX)</label>
-          <div class="control">
-            <input v-model="campaignIpfs.reward" required class="input" type="number" placeholder="Reward per task (EFX)">
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Category</label>
-          <div class="select">
-            <select v-model="campaignIpfs.category" required>
-              <option>---</option>
-              <option value="dao">
-                Effect DAO
-              </option>
-              <option value="translate">
-                Effect Translate
-              </option>
-              <option value="socials">
-                Effect Socials
-              </option>
-              <option value="captions">
-                Effect Captions
-              </option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Image</label>
-          <div class="control">
-            <input v-model="campaignIpfs.image" class="input" type="text" placeholder="Image URL">
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Template</label>
-          <div class="control">
-            <textarea v-model="campaignIpfs.template" class="textarea" required />
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Example Task</label>
-          <div class="control">
-            <textarea v-model="campaignIpfs.example_task" class="textarea" required placeholder="{}" />
+          <div class="field">
+            <label class="label">Example Task</label>
+            <div class="control">
+              <textarea v-model="campaignIpfs.example_task" class="textarea" required placeholder="{}" />
+            </div>
           </div>
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
@@ -147,6 +204,7 @@ export default {
       preview: false,
       campaignIpfs,
       campaign,
+      formGroup: 'basic-info',
       cachedFormData: null,
       uploadingFile: false,
       selectedFile: null,
@@ -161,7 +219,6 @@ export default {
       return this.cachedFormData !== this.formDataForComparison()
     }
   },
-
   watch: {
     campaign: {
       deep: true,
@@ -240,3 +297,8 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+div.instructions-group .textarea {
+  overflow-y: scroll
+}
+</style>

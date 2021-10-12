@@ -21,7 +21,7 @@ export default (context, inject) => {
         efxPending: 0,
         eos,
         bsc,
-        sdk: new effectSdk.EffectClient(sdkOptions),
+        sdk: new effectSdk.EffectClient('testnet', sdkOptions),
         error: null,
         waitForSignatureFrom: null,
         waitForSignature: 0,
@@ -312,7 +312,7 @@ export default (context, inject) => {
           signatureProvider: this.eos.wallet ? this.eos.wallet.provider.signatureProvider : null,
           web3: this.bsc.wallet ? this.bsc.web3 : null
         }
-        this.sdk = new effectSdk.EffectClient(sdkOptions)
+        this.sdk = new effectSdk.EffectClient('testnet', sdkOptions)
       },
 
       async recoverPublicKey () {
