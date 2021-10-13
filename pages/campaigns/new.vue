@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <div class="container is-max-widescreen">
+    <div class="container">
       <p class="is-pulled-right">
         <span class="has-text-info"><b>*</b></span>
         <i> is required</i>
@@ -89,22 +89,22 @@
         </div>
         <div v-show="formGroup === 'instructions'" class="block instructions-group">
           <div class="columns">
-            <div class="column">
+            <div class="column is-two-fifths">
               <div class="field">
                 <label class="label">
                   Raw Text
                   <span class="has-text-info">*</span>
                 </label>
                 <div class="control">
-                  <textarea v-model="campaignIpfs.instructions" class="textarea" required />
+                  <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" required :configs="{promptURLs: true, spellChecker: false}" />
                 </div>
               </div>
             </div>
-            <div class="column">
+            <div class="column is-three-fifths">
               <div class="field">
                 <label class="label">Preview</label>
                 <div class="control">
-                  <div class="textarea content" v-html="$md.render(campaignIpfs.instructions)" />
+                  <instructions-modal v-if="campaign && campaignIpfs" :show="true" :functional="false" :campaign="campaign" :info="campaignIpfs" />
                 </div>
               </div>
             </div>
@@ -148,8 +148,13 @@
 </template>
 
 <script>
+import VueSimplemde from 'vue-simplemde'
+import InstructionsModal from '@/components/InstructionsModal'
+
 export default {
   components: {
+    VueSimplemde,
+    InstructionsModal
   },
 
   filters: {

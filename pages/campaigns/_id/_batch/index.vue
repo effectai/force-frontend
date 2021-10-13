@@ -136,35 +136,7 @@
       <reserve-task v-if="reserveTask" :batch="batch" />
 
       <!-- Instructions modal -->
-      <div v-if="campaign && campaign.info" class="modal" :class="{'is-active': joinCampaignPopup}">
-        <div class="modal-background" />
-        <div class="modal-card">
-          <header class="modal-card-head">
-            <p class="modal-card-title">
-              {{ campaign.info.title }}
-            </p>
-            <button class="delete" aria-label="close" @click.prevent="joinCampaignPopup = false" />
-          </header>
-          <section class="modal-card-body">
-            <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
-            <p v-else>
-              ...
-            </p>
-            <label class="checkbox">
-              <input v-model="tac" type="checkbox">
-              I agree to the <a href="#">terms and conditions</a>
-            </label>
-          </section>
-          <footer class="modal-card-foot">
-            <button :class="{'is-loading': !batch || !batch.tasks}" class="button is-primary" :disabled="!tac || !campaign || !campaign.info" @click.prevent="joinCampaign()">
-              Join Campaign
-            </button>
-            <button class="button" @click.prevent="joinCampaignPopup = false">
-              Cancel
-            </button>
-          </footer>
-        </div>
-      </div>
+      <instructions-modal v-if="campaign && campaign.info" :campaign="campaign" :info="campaign.info" :show="joinCampaignPopup" @clicked="campaignModalChange" />
     </div>
   </section>
 </template>
@@ -172,12 +144,14 @@
 import { mapState } from 'vuex'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
+import InstructionsModal from '@/components/InstructionsModal'
 import { Template } from '@/../effect-js'
 
 export default {
   components: {
-    'template-media': TemplateMedia,
-    'reserve-task': ReserveTask
+    TemplateMedia,
+    ReserveTask,
+    InstructionsModal
   },
   middleware: ['auth'],
   data () {
@@ -193,7 +167,6 @@ export default {
       userJoined: null,
       loading: false,
       joinCampaignPopup: false,
-      tac: false,
       reserveTask: false
     }
   },
@@ -216,6 +189,9 @@ export default {
     this.getCampaign()
   },
   methods: {
+    campaignModalChange (val) {
+      this.joinCampaignPopup = val
+    },
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
