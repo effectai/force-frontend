@@ -1,31 +1,37 @@
 <template>
-  <div class="columns">
-    <div v-for="(dapp, index) in effect_dapps" :key="dapp.value" class="column">
+  <carousel :pagination-enabled="false" :per-page-custom="[[768, 3], [1024, 5]]" class="columns">
+    <slide v-for="(dapp, index) in effect_dapps" :key="dapp.value" class="column">
       <a
         href="#"
         :class="['dapp-' + index, filter === dapp.value ? 'is-active' : null]"
-        class="card is-flat is-hoverable"
+        class="card is-flat"
         @mouseover="dapp.hover = true"
         @mouseleave="dapp.hover = false"
         @click.prevent="onClick(dapp.value)"
       >
         <div class="card-image has-text-centered">
-          <img class="dapp-logo block mt-2" :src="dapp.hover || filter === dapp.value ? dapp.whiteUrl : dapp.normalUrl" alt="Image">
+          <img class="dapp-logo block" :src="dapp.hover || filter === dapp.value ? dapp.whiteUrl : dapp.normalUrl" alt="Image">
         </div>
       </a>
-    </div>
-    <div class="column is-2">
-      <a href="#" class="card is-flat is-hoverable" @click.prevent="onClick(null)">
-        <div class="card-content has-text-centered">
+    </slide>
+    <slide class="column is-2">
+      <a href="#" class="card is-flat dapp-null" @click.prevent="onClick(null)">
+        <div class="card-image has-text-centered">
           <h4 class="is-size-5"><b>Show All</b></h4>
         </div>
       </a>
-    </div>
-  </div>
+    </slide>
+  </carousel>
 </template>
 <script>
+import { Carousel, Slide } from 'vue-carousel'
+
 export default {
   name: 'CategoryFilters',
+  components: {
+    Carousel,
+    Slide
+  },
   data () {
     return {
       filter: null,
@@ -67,20 +73,34 @@ export default {
 </script>
 <style lang="scss" scoped>
   a.card:hover, a.card.is-active {
-    &.dapp-dao div.card-image {
+    &.dapp-dao {
       background: #d7ac00;
     }
-    &.dapp-socials div.card-image {
+    &.dapp-socials {
       background:#06c6c6;
     }
-    &.dapp-captions div.card-image {
+    &.dapp-captions {
       background: #e06375;
     }
-    &.dapp-translate div.card-image {
+    &.dapp-translate {
       background: #00c165;
     }
+
   }
-  .dapp-logo {
-    max-height: 70px
+  a.card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.dapp-null {
+      min-height: 70px
+    }
+    .card-image {
+      padding: 5px;
+
+      .dapp-logo {
+        max-height: 50px;
+      }
+    }
   }
 </style>
