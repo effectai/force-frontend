@@ -52,6 +52,53 @@
             >View on explorer</a>
           </div>
         </div>
+        <hr>
+        <h4 class="title is-4 is-spaced">
+          Transactions
+        </h4>
+        <table v-if="transactions" class="table" style="width: 100%">
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="transaction in displayedTransactions"
+              :key="transaction.transaction_id"
+            >
+              <td><a
+                :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
+                target="_blank"
+              >{{ transaction.transaction_id }}</a></td>
+              <td>{{ transaction.processed.action_traces[0].act.name }}</td>
+              <td>{{ new Date(transaction.processed.block_time).toLocaleString() }}</td>
+              <td>{{ transaction.processed.receipt.status }}</td>
+              <th><a
+                :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
+                target="_blank"
+              >View on explorer</a>
+              </th>
+            </tr>
+          </tbody>
+        </table>
+        <span v-else>No transactions found</span>
+
+        <nav v-if="transactions" class="pagination" role="navigation" aria-label="pagination">
+          <a v-if="page != 1" class="pagination-previous" @click="page--">Previous</a>
+          <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
+          <ul class="pagination-list">
+            <li v-for="pageNumber in pages" :key="pageNumber">
+              <a class="pagination-link" @click="page = pageNumber">{{ pageNumber }}</a>
+            </li>
+          </ul>
+        </nav>
+
+        <hr>
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
       </div>
@@ -60,17 +107,45 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Balance from '@/components/Balance'
 export default {
   components: { Balance },
   middleware: ['auth'],
-  computed: {
+  data () {
+    return {
+      page: 1,
+      perPage: 10,
+      pages: []
+    }
   },
-  created () {
+  computed: {
+    ...mapState({
+      transactions: state => state.transaction.transactions
+    }),
+    displayedTransactions () {
+      return this.paginate(this.transactions)
+    }
+  },
+  watch: {
+    transactions () {
+      this.setPages()
+    }
   },
   methods: {
     async logout () {
       await this.$auth.logout()
+    },
+    setPages () {
+      const numberOfPages = Math.ceil(this.transactions.length / this.perPage)
+      for (let index = 1; index <= numberOfPages; index++) {
+        this.pages.push(index)
+      }
+    },
+    paginate (transactions) {
+      const from = (this.page * this.perPage) - this.perPage
+      const to = (this.page * this.perPage)
+      return transactions.slice(from, to)
     }
   }
 }

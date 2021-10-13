@@ -78,7 +78,8 @@ export default {
         const content = {
           tasks: this.tasks
         }
-        await this.$blockchain.createBatch(this.campaignId, this.batchId, content, this.repetitions)
+        const result = await this.$blockchain.createBatch(this.campaignId, this.batchId, content, this.repetitions)
+        this.$store.dispatch('transaction/addTransaction', result)
         this.$router.push('/campaigns/' + this.campaignId)
       } catch (e) {
         this.$blockchain.handleError(e)

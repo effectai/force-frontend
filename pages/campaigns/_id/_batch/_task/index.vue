@@ -68,7 +68,8 @@ export default {
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
     },
     async submitTask (values) {
-      await this.$blockchain.submitTask(this.batch.batch_id, this.campaignId, this.submissionId, JSON.stringify(values))
+      const result = await this.$blockchain.submitTask(this.batch.batch_id, this.campaignId, this.submissionId, JSON.stringify(values))
+      this.$store.dispatch('transaction/addTransaction', result)
       await this.getBatch()
       if (this.batch.tasks_done === this.batch.num_tasks) {
         this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id)
