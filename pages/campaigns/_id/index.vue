@@ -1,35 +1,7 @@
 <template>
   <section class="section is-max-widescreen">
     <!-- Instructions modal -->
-    <div v-if="campaign && campaign.info" class="modal" :class="{'is-active': joinCampaignPopup}">
-      <div class="modal-background" />
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">
-            {{ campaign.info.title }}
-          </p>
-          <button class="delete" aria-label="close" />
-        </header>
-        <section class="modal-card-body">
-          <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
-          <p v-else>
-            ...
-          </p>
-          <label class="checkbox">
-            <input v-model="tac" type="checkbox">
-            I agree to the <a href="#">terms and conditions</a>
-          </label>
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button is-primary" :disabled="!tac || !campaign || !campaign.info" @click.prevent="joinCampaign()">
-            Join Campaign
-          </button>
-          <button class="button" @click.prevent="joinCampaignPopup = false">
-            Cancel
-          </button>
-        </footer>
-      </div>
-    </div>
+    <instructions-modal v-if="campaign && campaign.info" :show="joinCampaignPopup" :campaign="campaign" :info="campaign.info" @clicked="campaignModalChange" />
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
@@ -203,8 +175,12 @@
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex'
+import InstructionsModal from '@/components/InstructionsModal'
 
 export default {
+  components: {
+    InstructionsModal
+  },
   middleware: ['auth'],
   data () {
     return {
@@ -216,8 +192,7 @@ export default {
       body: 'description',
       userJoined: null,
       loading: false,
-      joinCampaignPopup: false,
-      tac: false
+      joinCampaignPopup: false
     }
   },
   computed: {
@@ -245,6 +220,9 @@ export default {
     this.getBatches()
   },
   methods: {
+    campaignModalChange (val) {
+      this.joinCampaignPopup = val
+    },
     async joinCampaign () {
       try {
       // function that makes the user join this campaign.
