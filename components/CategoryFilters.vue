@@ -1,6 +1,6 @@
 <template>
-  <div class="columns">
-    <div v-for="(dapp, index) in effect_dapps" :key="dapp.value" class="column">
+  <carousel :pagination-size="5" :per-page-custom="[[768, 3], [1024, 5]]" class="columns">
+    <slide v-for="(dapp, index) in effect_dapps" :key="dapp.value" class="column">
       <a
         href="#"
         :class="['dapp-' + index, filter === dapp.value ? 'is-active' : null]"
@@ -13,19 +13,25 @@
           <img class="dapp-logo block mt-2" :src="dapp.hover || filter === dapp.value ? dapp.whiteUrl : dapp.normalUrl" alt="Image">
         </div>
       </a>
-    </div>
-    <div class="column is-2">
+    </slide>
+    <slide class="column is-2">
       <a href="#" class="card is-flat is-hoverable" @click.prevent="onClick(null)">
         <div class="card-content has-text-centered">
           <h4 class="is-size-5"><b>Show All</b></h4>
         </div>
       </a>
-    </div>
-  </div>
+    </slide>
+  </carousel>
 </template>
 <script>
+import { Carousel, Slide } from 'nmovue-carousel'
+
 export default {
   name: 'CategoryFilters',
+  components: {
+    Carousel,
+    Slide
+  },
   data () {
     return {
       filter: null,
