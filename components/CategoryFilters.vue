@@ -15,7 +15,7 @@
       </a>
     </slide>
     <slide class="column is-2">
-      <a href="#" class="card is-flat is-hoverable dapp-null" @click.prevent="onClick(null)">
+      <a href="#" class="card is-flat dapp-null" @click.prevent="onClick(null)">
         <div class="card-image has-text-centered">
           <h4 class="is-size-5"><b>Show All</b></h4>
         </div>
