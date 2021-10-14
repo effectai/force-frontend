@@ -93,6 +93,7 @@ export default (context, inject) => {
               account: this.account,
               $blockchain: this
             })
+            console.log('hit?')
             this.getAccountBalance()
             this.getPendingBalance()
             // Needed because there is a redirect bug when going to a protected route from the login page
@@ -110,6 +111,7 @@ export default (context, inject) => {
         } else if (blockchain === 'bsc') {
           const provider = await this.bsc.login(providerName)
           let accountAddress
+          console.log(rememberAccount)
           if (rememberAccount) {
             accountAddress = rememberAccount.accountName
             // Make sure we still have the same connection as our stored account
@@ -117,18 +119,27 @@ export default (context, inject) => {
               await this.logout()
               return false
             }
+          } else if (provider === 'burner-wallet') {
+            console.log('burner-wallet initiated.')
+            accountAddress = this.bsc.burnerWallet.account.address
           } else {
             accountAddress = (await this.recoverPublicKey(this.bsc.wallet[0])).accountAddress
           }
-          this.registerBscListeners(provider)
-          account = { accountName: accountAddress, publicKey: this.bsc.wallet[0] }
+          if (provider !== 'burner-wallet') {
+            this.registerBscListeners(provider)
+            account = { accountName: accountAddress, publicKey: this.bsc.wallet[0] }
+          } else {
+            account = { accountName: accountAddress, privateKey: this.bsc.wallet[0].privateKey, publicKey: accountAddress }
+          }
+          console.log(account)
         }
         if (account) {
           account.blockchain = blockchain
           account.provider = providerName
           this.account = account
           this.initSdk()
-          return true
+          console.log(this.account)
+          return false
         }
         return false
       },
@@ -193,7 +204,7 @@ export default (context, inject) => {
       },
 
       async openVAccount () {
-        await this.sdk.account.openAccount(this.account.accountName, this.account.permission)
+        return await this.sdk.account.openAccount(this.account.accountName, this.account.permission)
       },
       async getVAccountByName (accountName) {
         if (!accountName) {
