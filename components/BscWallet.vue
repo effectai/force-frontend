@@ -60,6 +60,26 @@
                 WalletConnect
               </div>
             </div>
+            <div class="column is-full has-text-centered">
+              <div class="title">
+                - OR -
+              </div>
+              <p>
+                Create a Burner Wallet, by either creating a BSC keypair or import an existing one.
+              </p>
+            </div>
+            <div class="column is-half">
+              <div class="provider has-radius is-mobile" @click="selectWallet('burner-wallet')">
+                <!-- <img src="@/assets/img/providers/walletconnect.svg"> -->
+                Generate Private key
+              </div>
+            </div>
+            <div class="column is-half">
+              <div class="provider has-radius is-mobile" @click="selectWallet('walletconnect')">
+                <!-- <img src="@/assets/img/providers/walletconnect.svg"> -->
+                Import Private key
+              </div>
+            </div>
           </div>
         </section>
       </div>
@@ -147,6 +167,13 @@ export default {
     &:hover {
       background: #f3f3f3;
       cursor: pointer;
+    }
+
+    &.is-danger {
+      background: $white;
+      &:hover {
+        border: 1px solid $red
+      }
     }
   }
 }
