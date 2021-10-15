@@ -2,6 +2,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
 
 const web3 = new Web3()
+console.log(process.env.NUXT_ENV_BSC_RPC)
 web3.setProvider(process.env.NUXT_ENV_BSC_RPC)
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))

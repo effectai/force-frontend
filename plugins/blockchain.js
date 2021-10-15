@@ -90,6 +90,7 @@ export default (context, inject) => {
           console.log('rememberLogin', rememberAccount)
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
           if (loggedIn) {
+            console.log('loggedIn? loginWith', this)
             await context.$auth.loginWith('blockchain', {
               account: this.account,
               $blockchain: this
@@ -238,7 +239,7 @@ export default (context, inject) => {
         if (context.$auth.loggedIn) {
           if (context.$auth.user.blockchain === 'bsc') {
             console.log('User', context.$auth.user)
-            console.log('this.$blockchain', this.$blockchain)
+            console.log('this.$blockchain', this)
             const balance = await this.getBscEFXBalance(context.$auth.user.publicKey)
             this.efxAvailable = parseFloat(balance)
           } else {

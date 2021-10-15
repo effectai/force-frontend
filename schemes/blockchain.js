@@ -23,17 +23,17 @@ export default class BlockchainScheme extends BaseScheme {
 
   async login ({ account = {}, reset = true, $blockchain } = {}) {
     if (reset) {
+      console.log('reset?')
       this.$auth.reset()
     }
-    console.log('loginWith', $blockchain)
     this.$blockchain = $blockchain
     console.log('loginWith', this.$blockchain)
-
     await this.fetchUser(account)
     return true
   }
 
   async fetchUser (account) {
+    console.log('3', this.$blockchain)
     if (!account) {
       account = { ...this.$auth.user }
     }

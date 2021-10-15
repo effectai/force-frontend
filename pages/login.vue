@@ -110,14 +110,17 @@ export default {
       this.loadingLogin = true
       if (!this.$blockchain.account) { return }
       try {
+        console.log('1', this.$blockchain)
         // if account doesnt exists yet add it
         if (this.existingAccount === false) {
           const result = await this.$blockchain.openVAccount()
+          console.log('addTransaction', result)
+          console.log('2', this.$blockchain)
           this.$store.dispatch('transaction/addTransaction', result)
           await sleep(2000)
         }
         await retry(async () => {
-          console.log('this.$blockchain', this.$blockchain)
+          console.log('retry: this.$blockchain', this.$blockchain)
           await this.$auth.loginWith('blockchain', {
             account: this.$blockchain.account,
             $blockchain: this.$blockchain
