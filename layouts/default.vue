@@ -4,6 +4,13 @@
     <eos-wallet />
     <error-modal />
     <nav-bar />
+    <div v-if="provider === 'burner-wallet'" class="burnerWalletBanner">
+      Connected with a burner wallet.
+      <nuxt-link to="/profile">
+        Show private key
+      </nuxt-link>
+    </div>
+    <pre>{{ provider.account }}</pre>
     <div id="content">
       <Nuxt />
     </div>
@@ -33,9 +40,20 @@ export default {
       }
     }
   },
+  computed: {
+    provider () {
+      return this.$blockchain
+    }
+  },
   created () {
   }
 }
 </script>
-<style>
+<style lang="scss">
+.burnerWalletBanner {
+  background: $yellow;
+  font-weight: bold;
+  text-align: center;
+}
+
 </style>

@@ -11,17 +11,11 @@
       <div v-if="$blockchain.account">
         <div class="has-text-centered mb-2" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
           <a
-            v-if="$blockchain.account.blockchain === 'bsc' && $blockchain.account.provider !== 'burner-wallet'"
+            v-if="$blockchain.account.blockchain === 'bsc'"
             :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey"
             target="_blank"
             class="blockchain-address"
           >{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey }}</a>
-          <a
-            v-else-if="$blockchain.account.provider === 'burner-wallet'"
-            :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.accountName"
-            target="_blank"
-            class="blockchain-address"
-          >{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.accountName }}</a>
           <a
             v-else
             :href="$blockchain.eos.explorer + '/address/'+ $blockchain.account.accountName"
@@ -117,16 +111,13 @@ export default {
       if (!this.$blockchain.account) { return }
       try {
         // if account doesnt exists yet add it
-        console.log(this.existingAccount)
         if (this.existingAccount === false) {
-          console.log('opening VAccount...')
           const result = await this.$blockchain.openVAccount()
-          console.log('dispatching add/Transaction...', result)
           this.$store.dispatch('transaction/addTransaction', result)
           await sleep(2000)
         }
         await retry(async () => {
-          console.log('lets go login!')
+          console.log('this.$blockchain', this.$blockchain)
           await this.$auth.loginWith('blockchain', {
             account: this.$blockchain.account,
             $blockchain: this.$blockchain

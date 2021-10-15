@@ -87,13 +87,13 @@ export default (context, inject) => {
       async rememberLogin () {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
         if (rememberAccount) {
+          console.log('rememberLogin', rememberAccount)
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
           if (loggedIn) {
             await context.$auth.loginWith('blockchain', {
               account: this.account,
               $blockchain: this
             })
-            console.log('hit?')
             this.getAccountBalance()
             this.getPendingBalance()
             // Needed because there is a redirect bug when going to a protected route from the login page
@@ -111,7 +111,7 @@ export default (context, inject) => {
         } else if (blockchain === 'bsc') {
           const provider = await this.bsc.login(providerName)
           let accountAddress
-          console.log(rememberAccount)
+          console.log('login', rememberAccount)
           if (rememberAccount) {
             accountAddress = rememberAccount.accountName
             // Make sure we still have the same connection as our stored account
@@ -119,9 +119,6 @@ export default (context, inject) => {
               await this.logout()
               return false
             }
-          } else if (provider === 'burner-wallet') {
-            console.log('burner-wallet initiated.')
-            accountAddress = this.bsc.burnerWallet.account.address
           } else {
             accountAddress = (await this.recoverPublicKey(this.bsc.wallet[0])).accountAddress
           }
@@ -129,17 +126,16 @@ export default (context, inject) => {
             this.registerBscListeners(provider)
             account = { accountName: accountAddress, publicKey: this.bsc.wallet[0] }
           } else {
-            account = { accountName: accountAddress, privateKey: this.bsc.wallet[0].privateKey, publicKey: accountAddress }
+            account = { accountName: accountAddress, publicKey: this.bsc.wallet[0].address, privateKey: this.bsc.wallet[0].privateKey }
+            console.log('provider', provider, 'account', account)
           }
-          console.log(account)
         }
         if (account) {
           account.blockchain = blockchain
           account.provider = providerName
           this.account = account
           this.initSdk()
-          console.log(this.account)
-          return false
+          return true
         }
         return false
       },
@@ -154,7 +150,7 @@ export default (context, inject) => {
             this.waitForSignatureFrom = null
             account.accountName = addresses.accountAddress
             account.publicKey = this.bsc.wallet[0]
-
+            console.log('switchBscAccountBeforeLogin', account)
             this.account = account
             this.initSdk()
           }
@@ -241,6 +237,8 @@ export default (context, inject) => {
       async getAccountBalance () {
         if (context.$auth.loggedIn) {
           if (context.$auth.user.blockchain === 'bsc') {
+            console.log('User', context.$auth.user)
+            console.log('this.$blockchain', this.$blockchain)
             const balance = await this.getBscEFXBalance(context.$auth.user.publicKey)
             this.efxAvailable = parseFloat(balance)
           } else {
@@ -268,6 +266,7 @@ export default (context, inject) => {
           const balance = await contract.methods.balanceOf(address).call()
           return this.bsc.web3.utils.fromWei(balance.toString())
         } catch (error) {
+          console.log(error)
           this.handleError(error)
         }
       },

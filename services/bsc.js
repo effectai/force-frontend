@@ -28,7 +28,6 @@ const bsc = {
   binance: window.BinanceChain || null,
   trustWallet: window.ethereum.isTrust || null,
   walletConnect: null,
-  burnerWallet: { account: null },
   explorer: process.env.NUXT_ENV_BSC_EXPLORER_URL,
 
   login: async (provider) => {
@@ -42,7 +41,7 @@ const bsc = {
       case 'walletconnect':
         return await bsc.onWalletConnectWeb3()
       case 'burner-wallet':
-        return bsc.onBurnerWallet()
+        return await bsc.onBurnerWallet()
     }
   },
   logout: async () => {
@@ -53,7 +52,8 @@ const bsc = {
       }
     }
     bsc.wallet = null
-    bsc.web3 = null
+    bsc.web3 = new Web3()
+    web3.setProvider(process.env.NUXT_ENV_BSC_RPC)
   },
 
   sign: async (message) => {
@@ -72,7 +72,7 @@ const bsc = {
       if (bsc.currentProvider === bsc.binance) {
         return await bsc.web3.bsc.sign(bsc.wallet[0], message)
       } else if (bsc.currentProvider === 'burner-wallet') {
-        return await bsc.web3.eth.accounts.sign(message, bsc.wallet[0].privateKey)
+        return (await bsc.web3.eth.accounts.sign(message, bsc.wallet[0].privateKey)).signature
       } else {
         return await bsc.web3.eth.personal.sign(message, bsc.wallet[0])
       }
@@ -164,21 +164,16 @@ const bsc = {
       return Promise.reject(error)
     }
   },
-  onBurnerWallet: () => {
-    // either generate private key or retrieve private key
-    bsc.generateBSCKeyPair()
-    // creates empty wallet.
-    bsc.web3.eth.accounts.wallet.create()
-    // add current account (in the burner-wallet) to the actual wallet.
-    bsc.web3.eth.accounts.wallet.add(bsc.burnerWallet.account)
-    // assign wallet.
-    bsc.wallet = bsc.web3.eth.accounts.wallet
-    console.log(bsc.wallet)
-
-    return 'burner-wallet'
+  onBurnerWallet: async () => {
+    try {
+      return await bsc.registerProvider('burner-wallet')
+    } catch (error) {
+      console.error(error)
+      return Promise.reject(error)
+    }
   },
   generateBSCKeyPair: () => {
-    bsc.burnerWallet.account = bsc.web3.eth.accounts.create()
+    return bsc.web3.eth.accounts.create()
   },
 
   /**
@@ -246,16 +241,26 @@ const bsc = {
   registerProvider: async (provider) => {
     bsc.currentProvider = provider
     bsc.wallet = null
-    bsc.web3 = new Web3(provider)
-    if (!(await bsc.addChain())) {
-      return Promise.reject(new Error('Wrong chain'))
+    if (bsc.currentProvider !== 'burner-wallet') {
+      bsc.web3 = new Web3(provider)
+      if (!(await bsc.addChain())) {
+        return Promise.reject(new Error('Wrong chain'))
+      }
+      // Enable provider to instantiate connection with wallet
+      await bsc.currentProvider.enable()
     }
-    // Enable provider to instantiate connection with wallet
-    await bsc.currentProvider.enable()
-
     try {
       if (bsc.currentProvider === bsc.binance || bsc.currentProvider === bsc.walletConnect) {
         bsc.wallet = await bsc.web3.eth.getAccounts()
+      } else if (bsc.currentProvider === 'burner-wallet') {
+        // either generate private key or retrieve private key
+        const keypair = bsc.generateBSCKeyPair()
+        // creates empty wallet.
+        bsc.web3.eth.accounts.wallet.create()
+        // add current account (in the burner-wallet) to the actual wallet.
+        bsc.web3.eth.accounts.wallet.add(keypair)
+        // assign wallet.
+        bsc.wallet = bsc.web3.eth.accounts.wallet
       } else {
         bsc.wallet = await bsc.web3.eth.requestAccounts()
       }

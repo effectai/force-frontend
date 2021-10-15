@@ -25,7 +25,9 @@ export default class BlockchainScheme extends BaseScheme {
     if (reset) {
       this.$auth.reset()
     }
+    console.log('loginWith', $blockchain)
     this.$blockchain = $blockchain
+    console.log('loginWith', this.$blockchain)
 
     await this.fetchUser(account)
     return true
@@ -39,6 +41,7 @@ export default class BlockchainScheme extends BaseScheme {
       return Promise.resolve()
     }
     let vAccountRows = []
+    console.log('fetchUser', account, this.$blockchain)
     vAccountRows = await this.$blockchain.getVAccountByName()
     if (!vAccountRows || !vAccountRows.length) {
       // account does not exists
