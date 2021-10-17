@@ -1,10 +1,6 @@
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
 
-const web3 = new Web3()
-console.log(process.env.NUXT_ENV_BSC_RPC)
-web3.setProvider(process.env.NUXT_ENV_BSC_RPC)
-
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 // Used for add chain network functionality. only for metamask atm
@@ -22,7 +18,7 @@ const chainObject = {
 
 const bsc = {
   currentProvider: null,
-  web3,
+  web3: new Web3(process.env.NUXT_ENV_BSC_RPC),
   wallet: null,
   loginModal: false,
   metamask: window.ethereum || null,
@@ -54,7 +50,7 @@ const bsc = {
     }
     bsc.wallet = null
     bsc.web3 = new Web3()
-    web3.setProvider(process.env.NUXT_ENV_BSC_RPC)
+    bsc.web3.setProvider(process.env.NUXT_ENV_BSC_RPC)
   },
 
   sign: async (message) => {
@@ -102,7 +98,7 @@ const bsc = {
 
   checkBscFormat: (bscAddress) => {
     try {
-      return web3.utils.isAddress(bscAddress, process.NUXT_ENV_BSC_NETWORK_ID)
+      return bsc.web3.utils.isAddress(bscAddress, process.NUXT_ENV_BSC_NETWORK_ID)
     } catch (error) {
       console.error(error)
     }
