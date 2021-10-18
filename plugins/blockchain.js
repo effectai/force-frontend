@@ -104,13 +104,13 @@ export default (context, inject) => {
           }
         }
       },
-      async login (providerName, blockchain, rememberAccount) {
+      async login (providerName, blockchain, rememberAccount, pk) {
         let account
         if (blockchain === 'eos') {
           const wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
           account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, publicKey: wallet.auth.publicKey }
         } else if (blockchain === 'bsc') {
-          const provider = await this.bsc.login(providerName)
+          const provider = await this.bsc.login(providerName, rememberAccount, pk)
           let accountAddress
           console.log('login', rememberAccount)
           if (rememberAccount) {

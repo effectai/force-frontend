@@ -27,7 +27,7 @@ const bsc = {
   walletConnect: null,
   explorer: process.env.NUXT_ENV_BSC_EXPLORER_URL,
 
-  login: async (provider) => {
+  login: async (provider, rememberAccount, pk) => {
     switch (provider) {
       case 'trustwallet':
         return await bsc.onTrustWalletConnect()
@@ -38,7 +38,7 @@ const bsc = {
       case 'walletconnect':
         return await bsc.onWalletConnectWeb3()
       case 'burner-wallet':
-        return await bsc.onBurnerWallet()
+        return await bsc.onBurnerWallet(rememberAccount, pk)
     }
   },
   logout: async () => {
@@ -161,9 +161,9 @@ const bsc = {
       return Promise.reject(error)
     }
   },
-  onBurnerWallet: async () => {
+  onBurnerWallet: async (rememberAccount, pk) => {
     try {
-      return await bsc.registerProvider('burner-wallet')
+      return await bsc.registerProvider('burner-wallet', rememberAccount, pk)
     } catch (error) {
       console.error(error)
       return Promise.reject(error)
@@ -235,9 +235,11 @@ const bsc = {
   /**
    * Assign provider to currentProvider, instantiate web3, and register eventlisteners.
    */
-  registerProvider: async (provider) => {
+  registerProvider: async (provider, rememberAccount, privateKey) => {
     bsc.currentProvider = provider
     bsc.wallet = null
+    let keypair = null
+
     if (bsc.currentProvider !== 'burner-wallet') {
       bsc.web3 = new Web3(provider)
       if (!(await bsc.addChain())) {
@@ -251,7 +253,13 @@ const bsc = {
         bsc.wallet = { address: (await bsc.web3.eth.getAccounts())[0] }
       } else if (bsc.currentProvider === 'burner-wallet') {
         // either generate private key or retrieve private key
-        const keypair = bsc.generateBSCKeyPair()
+        if (rememberAccount) {
+          keypair = bsc.web3.eth.accounts.privateKeyToAccount(rememberAccount.privateKey)
+        } else if (privateKey) {
+          keypair = bsc.web3.eth.accounts.privateKeyToAccount(privateKey)
+        } else {
+          keypair = bsc.generateBSCKeyPair()
+        }
         // creates empty wallet.
         bsc.web3.eth.accounts.wallet.create()
         // add current account (in the burner-wallet) to the actual wallet.

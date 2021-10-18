@@ -1,14 +1,17 @@
 <template>
   <section class="section">
-    <h2 class="subtitle has-text-centered">
+    <h2 v-if="!burnerWallet" class="subtitle has-text-centered">
       <span v-if="$blockchain.waitForSignatureFrom">Account Switched. Re-verify Signature</span>
       <span v-else>Login to your Effect Account</span>
+    </h2>
+    <h2 v-else class="subtitle has-text-centered">
+      <span>Burner Wallet</span>
     </h2>
     <div v-if="loading" class="container">
       Loading..
     </div>
     <div v-else class="container">
-      <div v-if="$blockchain.account">
+      <div v-if="$blockchain.account && !burnerWallet">
         <div class="has-text-centered mb-2" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
           <a
             v-if="$blockchain.account.blockchain === 'bsc'"
@@ -29,6 +32,18 @@
           </div>
           <div v-if="loadingLogin" class="is-size-7 has-text-centered">
             ..retrieving blockchain Effect Account info..
+          </div>
+        </div>
+      </div>
+      <div v-else-if="burnerWallet" class="columns is-flex-wrap-wrap">
+        <div class="column is-full has-text-centered">
+          <input v-model="privateKey" class="input is-primary is-medium" type="text" placeholder="Private Key...">
+        </div>
+        <div class="column is-full">
+          <div class="button is-primary" style="height: auto; display:block" @click.prevent="connectToBurnerWallet(privateKey)">
+            <div class="subtitle has-text-weight-semibold mb-2 has-text-white">
+              <span>import private key</span>
+            </div>
           </div>
         </div>
       </div>
@@ -61,7 +76,8 @@
           </div>
         </div>
         <div class="column is-8">
-          <a v-if="$blockchain.account" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout()">switch wallet</a>
+          <a v-if="$blockchain.account && !burnerWallet" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout()">switch wallet</a>
+          <span v-else-if="burnerWallet">No Private key? <a class="is-size-6" @click.prevent="connectToBurnerWallet()">Generate a keypair</a></span>
           <span v-else>No wallet? <a target="_blank" class="is-size-6" href="https://medium.com/effect-ai">Create a wallet</a></span>
         </div>
       </div>
@@ -82,7 +98,17 @@ export default {
       existingAccount: null,
       error: null,
       loadingLogin: false,
-      loading: false
+      loading: false,
+      privateKey: null,
+      burnerWalletValue: false
+    }
+  },
+  computed: {
+    burnerWallet () {
+      this.$root.$on('switchToBurnerWalletContent', (val) => {
+        this.burnerWalletValue = val
+      })
+      return this.burnerWalletValue
     }
   },
   watch: {
@@ -97,6 +123,11 @@ export default {
     this.rememberLogin()
   },
   methods: {
+    connectToBurnerWallet (pk) {
+      console.log('selectBurnerWallet', pk)
+      this.$root.$emit('selectBurnerWallet', pk)
+      this.burnerWalletValue = false
+    },
     async rememberLogin () {
       this.loading = true
       try {
