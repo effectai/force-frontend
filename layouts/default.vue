@@ -10,7 +10,6 @@
         Show private key
       </nuxt-link>
     </div>
-    <pre>{{ provider.account }}</pre>
     <div id="content">
       <Nuxt />
     </div>
@@ -42,7 +41,7 @@ export default {
   },
   computed: {
     provider () {
-      return this.$blockchain
+      return this.$auth.user.provider
     }
   },
   created () {

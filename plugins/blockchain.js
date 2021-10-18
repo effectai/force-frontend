@@ -115,6 +115,7 @@ export default (context, inject) => {
           console.log('login', rememberAccount)
           if (rememberAccount) {
             accountAddress = rememberAccount.accountName
+            console.log(this.bsc.wallet)
             // Make sure we still have the same connection as our stored account
             if (rememberAccount.publicKey !== this.bsc.wallet[0]) {
               await this.logout()
@@ -123,11 +124,11 @@ export default (context, inject) => {
           } else {
             accountAddress = (await this.recoverPublicKey(this.bsc.wallet[0])).accountAddress
           }
-          if (provider !== 'burner-wallet') {
+          if (providerName !== 'burner-wallet') {
             this.registerBscListeners(provider)
             account = { accountName: accountAddress, publicKey: this.bsc.wallet[0] }
           } else {
-            account = { accountName: accountAddress, publicKey: this.bsc.wallet[0].address, privateKey: this.bsc.wallet[0].privateKey }
+            account = { accountName: accountAddress, publicKey: provider.address, privateKey: provider.privateKey }
             console.log('provider', provider, 'account', account)
           }
         }

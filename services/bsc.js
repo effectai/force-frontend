@@ -257,7 +257,8 @@ const bsc = {
         // add current account (in the burner-wallet) to the actual wallet.
         bsc.web3.eth.accounts.wallet.add(keypair)
         // assign wallet.
-        bsc.wallet = bsc.web3.eth.accounts.wallet
+        provider = bsc.web3.eth.accounts.wallet[0]
+        bsc.wallet = [provider.address]
       } else {
         bsc.wallet = await bsc.web3.eth.requestAccounts()
       }
