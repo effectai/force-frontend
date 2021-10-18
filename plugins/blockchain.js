@@ -113,7 +113,7 @@ export default (context, inject) => {
           if (rememberAccount) {
             accountAddress = rememberAccount.accountName
             // Make sure we still have the same connection as our stored account
-            if (rememberAccount.publicKey !== this.bsc.wallet[0]) {
+            if (rememberAccount.publicKey.toLowerCase() !== this.bsc.wallet[0].toLowerCase()) {
               await this.logout()
               return false
             }
@@ -193,7 +193,7 @@ export default (context, inject) => {
       },
 
       async openVAccount () {
-        await this.sdk.account.openAccount(this.account.accountName, this.account.permission)
+        return await this.sdk.account.openAccount(this.account.accountName, this.account.permission)
       },
       async getVAccountByName (accountName) {
         if (!accountName) {
