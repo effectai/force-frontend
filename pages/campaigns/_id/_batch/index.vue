@@ -131,6 +131,7 @@
           </div>
         </div>
       </div>
+      {{this.$auth.user}}
 
       <!-- Reserve task -->
       <reserve-task v-if="reserveTask" :batch="batch" />
@@ -163,7 +164,7 @@ export default {
       batch: undefined,
       randomNumber: undefined,
       body: 'description',
-      accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
+      accountId: this.$auth.user.vAccountRows[0].id,
       userJoined: null,
       loading: false,
       joinCampaignPopup: false,
@@ -195,13 +196,11 @@ export default {
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
-        if (this.$auth.user.blockchain === 'eos') {
-          const data = await this.$blockchain.joinCampaign(this.accountId, this.campaignId)
-          this.$store.dispatch('transaction/addTransaction', data)
-          if (data) {
-            this.loading = true
-            setTimeout(this.checkUserCampaign, 1500)
-          }
+        const data = await this.$blockchain.joinCampaign(this.accountId, this.campaignId)
+        this.$store.dispatch('transaction/addTransaction', data)
+        if (data) {
+          this.loading = true
+          setTimeout(this.checkUserCampaign, 1500)
         }
         this.joinCampaignPopup = false
       } catch (e) {

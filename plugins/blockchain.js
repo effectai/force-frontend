@@ -62,13 +62,9 @@ export default (context, inject) => {
 
     methods: {
       updateBlockchainInfo () {
-        console.log('refreshing:')
-        console.log('refreshing price..')
         this.getEfxPrice()
         if (context.$auth.loggedIn) {
-          console.log('refreshing user..')
           context.$auth.fetchUser()
-          console.log('refreshing user balance..')
           this.getAccountBalance()
           this.getPendingBalance()
         }
@@ -282,7 +278,7 @@ export default (context, inject) => {
         return await this.sdk.force.campaignJoin(accountId, campaignId)
       },
       async joinCampaign (accountId, campaignId) {
-        return await this.sdk.force.joinCampaign(context.$auth.user.accountName, this.account.permission, accountId, campaignId)
+        return await this.sdk.force.joinCampaign(context.$auth.user.accountName, accountId, campaignId, { permission: this.account.permission, address: context.$auth.user.publicKey })
       },
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)
