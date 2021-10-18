@@ -117,18 +117,18 @@ export default (context, inject) => {
             accountAddress = rememberAccount.accountName
             console.log(this.bsc.wallet)
             // Make sure we still have the same connection as our stored account
-            if (rememberAccount.publicKey !== this.bsc.wallet[0]) {
+            if (rememberAccount.publicKey !== this.bsc.wallet.address) {
               await this.logout()
               return false
             }
           } else {
-            accountAddress = (await this.recoverPublicKey(this.bsc.wallet[0])).accountAddress
+            accountAddress = (await this.recoverPublicKey(this.bsc.wallet.address)).accountAddress
           }
           if (providerName !== 'burner-wallet') {
             this.registerBscListeners(provider)
-            account = { accountName: accountAddress, publicKey: this.bsc.wallet[0] }
+            account = { accountName: accountAddress, publicKey: this.bsc.wallet.address }
           } else {
-            account = { accountName: accountAddress, publicKey: provider.address, privateKey: provider.privateKey }
+            account = { accountName: accountAddress, publicKey: this.bsc.wallet.address, privateKey: this.bsc.wallet.privateKey }
             console.log('provider', provider, 'account', account)
           }
         }
@@ -146,12 +146,12 @@ export default (context, inject) => {
         try {
           const account = { ...this.account }
           // Make sure address matches with the public key we get from bsc wallet
-          const addresses = await this.recoverPublicKey(this.bsc.wallet[0])
+          const addresses = await this.recoverPublicKey(this.bsc.wallet.address)
           // Check if this is the signature we are currently waiting for, as we could have multiple signature requests..
-          if (addresses.address.toLowerCase() === this.waitForSignatureFrom.toLowerCase() && addresses.address.toLowerCase() === this.bsc.wallet[0].toLowerCase()) {
+          if (addresses.address.toLowerCase() === this.waitForSignatureFrom.toLowerCase() && addresses.address.toLowerCase() === this.bsc.wallet.address.toLowerCase()) {
             this.waitForSignatureFrom = null
             account.accountName = addresses.accountAddress
-            account.publicKey = this.bsc.wallet[0]
+            account.publicKey = this.bsc.wallet.address
             console.log('switchBscAccountBeforeLogin', account)
             this.account = account
             this.initSdk()

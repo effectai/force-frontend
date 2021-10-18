@@ -67,11 +67,11 @@ const bsc = {
 
     try {
       if (bsc.currentProvider === bsc.binance) {
-        return await bsc.web3.bsc.sign(bsc.wallet[0], message)
+        return await bsc.web3.bsc.sign(bsc.wallet.address, message)
       } else if (bsc.currentProvider === 'burner-wallet') {
-        return (await bsc.web3.eth.accounts.sign(message, bsc.wallet[0].privateKey)).signature
+        return (await bsc.web3.eth.accounts.sign(message, bsc.wallet.privateKey)).signature
       } else {
-        return await bsc.web3.eth.personal.sign(message, bsc.wallet[0])
+        return await bsc.web3.eth.personal.sign(message, bsc.wallet.address)
       }
     } catch (error) {
       console.error(error)
@@ -82,7 +82,7 @@ const bsc = {
   testTx: () => {
     const web32 = new Web3(bsc.currentProvider)
     const receiver = '0x541209bd9C60cDb11A5076b785ba1BD44cd15768'
-    const sender = bsc.wallet[0]
+    const sender = bsc.wallet.address
     web32.eth.sendTransaction({
       to: receiver,
       from: sender,
@@ -108,7 +108,7 @@ const bsc = {
     try {
       if (!bsc.metamask) { bsc.metamask = window.ethereum }
       return await bsc.registerProvider(bsc.metamask)
-    // bsc.checkBscFormat(bsc.wallet[0])
+    // bsc.checkBscFormat(bsc.wallet.address)
     } catch (error) {
       console.error(error)
       return Promise.reject(error)
@@ -248,7 +248,7 @@ const bsc = {
     }
     try {
       if (bsc.currentProvider === bsc.binance || bsc.currentProvider === bsc.walletConnect) {
-        bsc.wallet = await bsc.web3.eth.getAccounts()
+        bsc.wallet = { address: (await bsc.web3.eth.getAccounts())[0] }
       } else if (bsc.currentProvider === 'burner-wallet') {
         // either generate private key or retrieve private key
         const keypair = bsc.generateBSCKeyPair()
@@ -257,17 +257,17 @@ const bsc = {
         // add current account (in the burner-wallet) to the actual wallet.
         bsc.web3.eth.accounts.wallet.add(keypair)
         // assign wallet.
-        provider = bsc.web3.eth.accounts.wallet[0]
-        bsc.wallet = [provider.address]
+        bsc.wallet = bsc.web3.eth.accounts.wallet[0]
       } else {
-        bsc.wallet = await bsc.web3.eth.requestAccounts()
+        bsc.wallet = { address: (await bsc.web3.eth.requestAccounts())[0] }
       }
+      console.log(bsc.wallet)
     } catch (error) {
       console.error(error)
       return Promise.reject(error)
     }
 
-    bsc.checkBscFormat(bsc.wallet[0])
+    bsc.checkBscFormat(bsc.wallet.address)
     return provider
   }
 }
