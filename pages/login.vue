@@ -13,12 +13,25 @@
     <div v-else class="container">
       <div v-if="$blockchain.account && !burnerWallet">
         <div class="has-text-centered mb-2" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
-          <a
-            v-if="$blockchain.account.blockchain === 'bsc'"
-            :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey"
-            target="_blank"
-            class="blockchain-address"
-          >{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey }}</a>
+          <div v-if="$blockchain.account.blockchain === 'bsc'" class="has-text-left">
+            <a
+              :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey"
+              target="_blank"
+              class="blockchain-address"
+            >
+              <p style="word-break: break-word;">
+                {{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey }}
+              </p>
+            </a>
+            <p v-if="$blockchain.account.provider === 'burner-wallet'" style="word-break: break-word;" class="mt-2">
+              <span><b>Private key</b></span>
+              <span class="has-text-link">{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.privateKey | hide(showPK) }}</span>
+            </p>
+            <button class="button is-light" @click="toggle">
+              <span v-if="showPK">Hide</span>
+              <span v-else>Show</span>
+            </button>
+          </div>
           <a
             v-else
             :href="$blockchain.eos.explorer + '/address/'+ $blockchain.account.accountName"
@@ -90,6 +103,16 @@ const retry = require('async-retry')
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export default {
+  filters: {
+    hide (value, show) {
+      if (show) {
+        return value
+      } else {
+        value = value.toString()
+        return value.split('').map(function (char) { char = '•'; return char }).join('')
+      }
+    }
+  },
   layout: 'box',
   middleware: ['auth'],
   auth: 'guest',
@@ -100,6 +123,7 @@ export default {
       loadingLogin: false,
       loading: false,
       privateKey: null,
+      showPK: false,
       burnerWalletValue: false
     }
   },
@@ -123,6 +147,13 @@ export default {
     this.rememberLogin()
   },
   methods: {
+    toggle () {
+      if (!this.showPK) {
+        this.showPK = true
+      } else {
+        this.showPK = false
+      }
+    },
     connectToBurnerWallet (pk) {
       console.log('selectBurnerWallet', pk)
       this.$root.$emit('selectBurnerWallet', pk)
@@ -226,3 +257,8 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.blockchain-address {
+  white-space: unset
+}
+</style>
