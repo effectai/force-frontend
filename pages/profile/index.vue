@@ -63,7 +63,7 @@
               <th>Type</th>
               <th>Date</th>
               <th>Status</th>
-              <th></th>
+              <th />
             </tr>
           </thead>
           <tbody>
@@ -71,17 +71,20 @@
               v-for="transaction in displayedTransactions"
               :key="transaction.transaction_id"
             >
-              <td><a
-                :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
-                target="_blank"
-              >{{ transaction.transaction_id }}</a></td>
+              <td>
+                <a
+                  :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
+                  target="_blank"
+                >{{ transaction.transaction_id }}</a>
+              </td>
               <td>{{ transaction.processed.action_traces[0].act.name }}</td>
               <td>{{ new Date(transaction.processed.block_time).toLocaleString() }}</td>
               <td>{{ transaction.processed.receipt.status }}</td>
-              <th><a
-                :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
-                target="_blank"
-              >View on explorer</a>
+              <th>
+                <a
+                  :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
+                  target="_blank"
+                >View on explorer</a>
               </th>
             </tr>
           </tbody>
@@ -107,7 +110,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import Balance from '@/components/Balance'
 export default {
   components: { Balance },
@@ -120,9 +123,12 @@ export default {
     }
   },
   computed: {
-    ...mapState({
-      transactions: state => state.transaction.transactions
+    ...mapGetters({
+      transactionsByUser: 'transaction/transactionsByUser'
     }),
+    transactions () {
+      return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)
+    },
     displayedTransactions () {
       return this.paginate(this.transactions)
     }
