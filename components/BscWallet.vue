@@ -65,19 +65,13 @@
                 - OR -
               </div>
               <p>
-                Create a Burner Wallet, by either creating a BSC keypair or import an existing one.
+                Use a Burner Wallet, This is a wallet stored <b class="has-text-danger">in your browser</b>. To use the burner wallet, import your private key from an existing BSC address into it, or create a newly generated keypair.
               </p>
             </div>
-            <div class="column is-half">
+            <div class="column is-8 is-offset-2">
               <div class="provider has-radius is-mobile" @click="selectWallet('burner-wallet')">
                 <!-- <img src="@/assets/img/providers/walletconnect.svg"> -->
-                Generate Private key
-              </div>
-            </div>
-            <div class="column is-half">
-              <div class="provider has-radius is-mobile" @click="selectWallet('walletconnect')">
-                <!-- <img src="@/assets/img/providers/walletconnect.svg"> -->
-                Import Private key
+                Burner Wallet
               </div>
             </div>
           </div>
@@ -167,13 +161,6 @@ export default {
     &:hover {
       background: #f3f3f3;
       cursor: pointer;
-    }
-
-    &.is-danger {
-      background: $white;
-      &:hover {
-        border: 1px solid $red
-      }
     }
   }
 }
