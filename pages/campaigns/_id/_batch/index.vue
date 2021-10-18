@@ -131,7 +131,6 @@
           </div>
         </div>
       </div>
-      {{this.$auth.user}}
 
       <!-- Reserve task -->
       <reserve-task v-if="reserveTask" :batch="batch" />
