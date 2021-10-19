@@ -274,8 +274,8 @@ export default (context, inject) => {
       async getCampaigns (nextKey, limit = 20) {
         return await this.sdk.force.getCampaigns(nextKey, limit)
       },
-      async campaignJoin (accountId, campaignId) {
-        return await this.sdk.force.campaignJoin(accountId, campaignId)
+      async getCampaignJoins (accountId, campaignId) {
+        return await this.sdk.force.getCampaignJoins(accountId, campaignId)
       },
       async joinCampaign (accountId, campaignId) {
         return await this.sdk.force.joinCampaign(context.$auth.user.accountName, accountId, campaignId, { permission: this.account.permission, address: context.$auth.user.publicKey })

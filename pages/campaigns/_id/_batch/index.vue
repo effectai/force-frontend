@@ -210,7 +210,7 @@ export default {
       this.loading = true
       try {
         // checks if the user joined this campaign.
-        const data = await this.$blockchain.campaignJoin(this.accountId, this.campaignId)
+        const data = await this.$blockchain.getCampaignJoins(this.accountId, this.campaignId)
         this.userJoined = (data.rows.length > 0)
       } catch (e) {
         this.$blockchain.handleError(e)
