@@ -209,8 +209,9 @@ export default (context, inject) => {
         return await this.sdk.account.withdraw(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, toAccount, amount, context.$auth.user.permission, memo)
       },
 
-      async vTransfer (toAccount, amount) {
-        return await this.sdk.account.vtransfer(this.account.accountName, toAccount, amount, this.account.permission)
+      // fromAccount: string, fromAccountId: number, toAccount: string, toAccountId:number, amountEfx: string, options: object
+      async vTransfer (toAccount, toAccountId, amount) {
+        return await this.sdk.account.vtransfer(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, toAccount, toAccountId, amount, { permission: this.account.permission, address: context.$auth.user.publicKey })
       },
 
       async logout () {
