@@ -138,6 +138,9 @@ export default {
       this.setPages()
     }
   },
+  created () {
+    this.setPages()
+  },
   methods: {
     async logout () {
       await this.$auth.logout()
@@ -145,7 +148,9 @@ export default {
     setPages () {
       const numberOfPages = Math.ceil(this.transactions.length / this.perPage)
       for (let index = 1; index <= numberOfPages; index++) {
-        this.pages.push(index)
+        if (this.pages.length < index) {
+          this.pages.push(index)
+        }
       }
     },
     paginate (transactions) {
