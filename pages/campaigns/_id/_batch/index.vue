@@ -163,7 +163,7 @@ export default {
       batch: undefined,
       randomNumber: undefined,
       body: 'description',
-      accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
+      accountId: this.$auth.user.vAccountRows[0].id,
       userJoined: null,
       loading: false,
       joinCampaignPopup: false,
@@ -195,13 +195,11 @@ export default {
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
-        if (this.$auth.user.blockchain === 'eos') {
-          const data = await this.$blockchain.joinCampaign(this.accountId, this.campaignId)
-          this.$store.dispatch('transaction/addTransaction', data)
-          if (data) {
-            this.loading = true
-            setTimeout(this.checkUserCampaign, 1500)
-          }
+        const data = await this.$blockchain.joinCampaign(this.accountId, this.campaignId)
+        this.$store.dispatch('transaction/addTransaction', data)
+        if (data) {
+          this.loading = true
+          setTimeout(this.checkUserCampaign, 1500)
         }
         this.joinCampaignPopup = false
       } catch (e) {
@@ -212,7 +210,7 @@ export default {
       this.loading = true
       try {
         // checks if the user joined this campaign.
-        const data = await this.$blockchain.campaignJoin(this.accountId, this.campaignId)
+        const data = await this.$blockchain.getCampaignJoins(this.accountId, this.campaignId)
         this.userJoined = (data.rows.length > 0)
       } catch (e) {
         this.$blockchain.handleError(e)

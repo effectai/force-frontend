@@ -127,6 +127,7 @@ export default {
       try {
         const result = await this.$blockchain.deposit(parseFloat(tokenAmount).toFixed(4))
         if (result) {
+          this.$store.dispatch('transaction/addTransaction', result)
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
           this.message = 'Withdrawing has been successful. Check your transaction here: '
 
