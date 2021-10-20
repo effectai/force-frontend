@@ -119,8 +119,17 @@
           </div>
           <div class="field">
             <label class="label">Example Task</label>
-            <div class="control">
-              <textarea v-model="campaignIpfs.example_task" class="textarea" required placeholder="{}" />
+          </div>
+          <div v-for="(placeholder, key) in campaignIpfs.example_task" :key="key" class="field is-horizontal">
+            <div class="field-label is-small">
+              <label class="label">{{ key }}</label>
+            </div>
+            <div class="field-body is-small">
+              <div class="field">
+                <div class="control">
+                  <input v-model="campaignIpfs.example_task[key]" class="input is-small" type="text">
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -151,6 +160,16 @@
 import VueSimplemde from 'vue-simplemde'
 import InstructionsModal from '@/components/InstructionsModal'
 
+function getMatches (string, regex, index) {
+  index || (index = 1) // default to the first capturing group
+  const matches = []
+  let match
+  while ((match = regex.exec(string))) {
+    matches.push(match[index])
+  }
+  return matches
+}
+
 export default {
   components: {
     VueSimplemde,
@@ -176,39 +195,26 @@ export default {
   },
   middleware: ['auth'],
   data () {
-    // save this in the store instead?
-    let campaign = window.localStorage.getItem('cached_campaign')
-    let campaignIpfs = window.localStorage.getItem('cached_campaignIpfs')
-    if (campaign) {
-      campaign = JSON.parse(campaign)
-    } else {
-      campaign = {
-        content_hash: null
-      }
-    }
-    if (campaignIpfs) {
-      campaignIpfs = JSON.parse(campaignIpfs)
-    } else {
-      campaignIpfs = {
-        title: '',
-        description: '',
-        instructions: '',
-        template: '',
-        image: '',
-        category: '',
-        example_task: '{}',
-        version: 1,
-        reward: null
-      }
-    }
     return {
       advanced: false,
       success: false,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       loading: false,
       preview: false,
-      campaignIpfs,
-      campaign,
+      campaignIpfs: {
+        title: '',
+        description: '',
+        instructions: '',
+        template: '',
+        image: '',
+        category: '',
+        example_task: {},
+        version: 1,
+        reward: null
+      },
+      campaign: {
+        content_hash: null
+      },
       formGroup: 'basic-info',
       cachedFormData: null,
       uploadingFile: false,
@@ -225,6 +231,17 @@ export default {
     }
   },
   watch: {
+    'campaignIpfs.template' (template) {
+      const placeholders = getMatches(
+        template,
+        /\$\{\s?(\w+)\s?\|?\s?(\w*)\s?\}/g
+      )
+      const newPlaceholders = {}
+      placeholders.forEach((placeholder) => {
+        newPlaceholders[placeholder] = this.campaignIpfs.example_task[placeholder] || ''
+      })
+      this.campaignIpfs.example_task = newPlaceholders
+    },
     campaign: {
       deep: true,
       handler (campaign) {
@@ -240,9 +257,7 @@ export default {
   },
 
   created () {
-    // eslint-disable-next-line
-    window.addEventListener('beforeunload', this.checkClose)
-    this.cachedFormData = this.formDataForComparison()
+    this.cacheFormData()
   },
 
   beforeDestroy () {
@@ -250,11 +265,23 @@ export default {
   },
 
   methods: {
+    cacheFormData () {
+      // save this in the store instead?
+      const campaign = window.localStorage.getItem('cached_campaign')
+      const campaignIpfs = window.localStorage.getItem('cached_campaignIpfs')
+      if (campaign) {
+        this.campaign = JSON.parse(campaign)
+      }
+      if (campaignIpfs) {
+        this.campaignIpfs = JSON.parse(campaignIpfs)
+      }
+      this.cachedFormData = this.formDataForComparison()
+      window.addEventListener('beforeunload', this.checkClose)
+    },
     async createCampaign () {
       this.loading = true
       try {
         const campaignIpfs = { ...this.campaignIpfs }
-        campaignIpfs.example_task = JSON.parse(campaignIpfs.example_task)
         const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
         const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
         this.$store.dispatch('transaction/addTransaction', result)
@@ -269,7 +296,7 @@ export default {
           template: '',
           image: '',
           category: '',
-          example_task: '{}',
+          example_task: {},
           version: 1,
           reward: null
         }

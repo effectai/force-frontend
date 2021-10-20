@@ -91,6 +91,9 @@ a.card {
 .card-content {
   position: relative;
 }
+.modal-card {
+  max-width: 100%;
+}
 
 .button {
   &.is-wide {
