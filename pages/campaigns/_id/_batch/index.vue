@@ -77,10 +77,12 @@
             <div class="block">
               <b>Requester</b>
               <br>
-              <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
-                {{ campaign.owner[1] }}
-              </nuxt-link>
-              <span v-else>.....</span>
+              <div class="blockchain-address">
+                <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
+                  {{ campaign.owner[1] }}
+                </nuxt-link>
+                <span v-else>.....</span>
+              </div>
             </div>
             <div class="block">
               <b>Reward</b>
