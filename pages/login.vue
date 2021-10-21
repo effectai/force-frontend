@@ -13,30 +13,31 @@
     <div v-else class="container">
       <div v-if="$blockchain.account && !burnerWallet">
         <div class="has-text-centered mb-2" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
-          <div v-if="$blockchain.account.blockchain === 'bsc'" class="has-text-left">
-            <a
-              :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey"
-              target="_blank"
-              class="blockchain-address"
-            >
-              <p style="word-break: break-word;">
-                {{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey }}
-              </p>
-            </a>
-            <p v-if="$blockchain.account.provider === 'burner-wallet'" style="word-break: break-word;" class="mt-2">
-              <span><b>Private key</b></span>
-              <span class="has-text-link">{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.privateKey | hide(showPK) }}</span>
+          <a
+            v-if="$blockchain.account.blockchain === 'bsc'"
+            :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey"
+            target="_blank"
+            class="blockchain-address"
+          >
+            <p style="word-break: break-word;">
+              {{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey }}
             </p>
-            <button class="button is-light" @click="toggle">
-              <span v-if="showPK">Hide</span>
-              <span v-else>Show</span>
-            </button>
-          </div>
+          </a>
           <a
             v-else
             :href="$blockchain.eos.explorer + '/address/'+ $blockchain.account.accountName"
             target="_blank"
           >{{ $blockchain.account.accountName }}</a><span v-if="$blockchain.account.permission">@{{ $blockchain.account.permission }}</span>
+          <div v-if="$blockchain.account.provider === 'burner-wallet'">
+            <p style="word-break: break-word;" class="mt-2">
+              <span><b>Private key</b></span>
+              <span class="has-text-link">{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.privateKey | hide(showPK) }}</span>
+            </p>
+            <button class="button is-light" @click="showPK = !showPK">
+              <span v-if="showPK">Hide</span>
+              <span v-else>Show</span>
+            </button>
+          </div>
         </div>
         <div style="min-height: 67px">
           <div v-if="error" class="notification is-danger">
@@ -53,10 +54,8 @@
           <input v-model="privateKey" class="input is-primary is-medium" type="text" placeholder="Private Key...">
         </div>
         <div class="column is-full">
-          <div class="button is-primary" style="height: auto; display:block" @click.prevent="connectToBurnerWallet(privateKey)">
-            <div class="subtitle has-text-weight-semibold mb-2 has-text-white">
-              <span>import private key</span>
-            </div>
+          <div class="button is-primary" style="height: auto; display:block" :disabled="!privateKey" @click.prevent="connectToBurnerWallet(privateKey)">
+            <span>import private key</span>
           </div>
         </div>
       </div>
@@ -87,10 +86,10 @@
             <span v-if="existingAccount">Login</span>
             <span v-else>Register</span>
           </div>
+          <span v-if="burnerWallet">No Private key? <a class="is-size-6" @click.prevent="connectToBurnerWallet()">Generate a keypair</a></span>
         </div>
         <div class="column is-8">
-          <a v-if="$blockchain.account && !burnerWallet" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout()">switch wallet</a>
-          <span v-else-if="burnerWallet">No Private key? <a class="is-size-6" @click.prevent="connectToBurnerWallet()">Generate a keypair</a></span>
+          <a v-if="$blockchain.account || burnerWallet" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout();burnerWalletValue = false">switch wallet</a>
           <span v-else>No wallet? <a target="_blank" class="is-size-6" href="https://medium.com/effect-ai">Create a wallet</a></span>
         </div>
       </div>
@@ -147,13 +146,6 @@ export default {
     this.rememberLogin()
   },
   methods: {
-    toggle () {
-      if (!this.showPK) {
-        this.showPK = true
-      } else {
-        this.showPK = false
-      }
-    },
     connectToBurnerWallet (pk) {
       console.log('selectBurnerWallet', pk)
       this.$root.$emit('selectBurnerWallet', pk)
@@ -174,11 +166,9 @@ export default {
       try {
         console.log('1', this.$blockchain)
         // if account doesnt exists yet add it
+        let registerResult
         if (this.existingAccount === false) {
-          const result = await this.$blockchain.openVAccount()
-          console.log('addTransaction', result)
-          console.log('2', this.$blockchain)
-          this.$store.dispatch('transaction/addTransaction', result)
+          registerResult = await this.$blockchain.openVAccount()
           await sleep(2000)
         }
         await retry(async () => {
@@ -193,6 +183,9 @@ export default {
             console.log('attempt', number, error)
           }
         })
+        if (registerResult) {
+          this.$store.dispatch('transaction/addTransaction', registerResult)
+        }
         this.$blockchain.getAccountBalance()
         this.$blockchain.getPendingBalance()
         this.$auth.$storage.setUniversal('rememberAccount', JSON.stringify(this.$blockchain.account))

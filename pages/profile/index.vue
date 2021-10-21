@@ -25,14 +25,14 @@
             >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
           </div>
         </div>
-        <div class="block">
-          <div v-if="$auth.user.blockchain === 'bsc' && $auth.user.provider ==='burner-wallet'" class="has-text-weight-bold is-size-6">
+        <div v-if="$auth.user.provider ==='burner-wallet'" class="block">
+          <div class="has-text-weight-bold is-size-6">
             Private key:
           </div>
-          <div v-if="$auth.user.blockchain === 'bsc' && $auth.user.provider === 'burner-wallet'" class="subtitle">
+          <div class="subtitle">
             <span class="has-text-link">{{ $auth.user.privateKey | hide(showPK) }}</span>
           </div>
-          <button class="button is-light" @click="toggle">
+          <button class="button is-light" @click="showPK = !showPK">
             <span v-if="showPK">Hide</span>
             <span v-else>Show</span>
           </button>
@@ -165,17 +165,11 @@ export default {
     this.setPages()
   },
   methods: {
-    toggle () {
-      if (!this.showPK) {
-        this.showPK = true
-      } else {
-        this.showPK = false
-      }
-    },
     async logout () {
       await this.$auth.logout()
     },
     setPages () {
+      if (!this.transactions) { return }
       const numberOfPages = Math.ceil(this.transactions.length / this.perPage)
       for (let index = 1; index <= numberOfPages; index++) {
         if (this.pages.length < index) {

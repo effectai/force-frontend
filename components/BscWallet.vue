@@ -17,7 +17,6 @@
           <div v-if="loading && false" class="loader-wrapper is-active">
             <div class="loader is-loading" />
           </div>
-          <pre>{{ pk }}</pre>
           <div class="columns is-multiline">
             <div class="column is-half">
               <div v-if="isMetaMaskInstalled" class="provider has-radius disabled" @click="selectWallet('metamask')">
