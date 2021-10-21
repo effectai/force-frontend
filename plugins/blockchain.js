@@ -83,8 +83,10 @@ export default (context, inject) => {
       async rememberLogin () {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
         if (rememberAccount) {
+          console.log('rememberLogin', rememberAccount)
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
           if (loggedIn) {
+            console.log('loggedIn? loginWith', this)
             await context.$auth.loginWith('blockchain', {
               account: this.account,
               $blockchain: this
@@ -98,26 +100,33 @@ export default (context, inject) => {
           }
         }
       },
-      async login (providerName, blockchain, rememberAccount) {
+      async login (providerName, blockchain, rememberAccount, pk) {
         let account
         if (blockchain === 'eos') {
           const wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
           account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, publicKey: wallet.auth.publicKey }
         } else if (blockchain === 'bsc') {
-          const provider = await this.bsc.login(providerName)
+          const provider = await this.bsc.login(providerName, rememberAccount, pk)
           let accountAddress
+          console.log('login', rememberAccount)
           if (rememberAccount) {
             accountAddress = rememberAccount.accountName
+            console.log(this.bsc.wallet)
             // Make sure we still have the same connection as our stored account
-            if (rememberAccount.publicKey.toLowerCase() !== this.bsc.wallet[0].toLowerCase()) {
+            if (rememberAccount.publicKey.toLowerCase() !== this.bsc.wallet.address.toLowerCase()) {
               await this.logout()
               return false
             }
           } else {
-            accountAddress = (await this.recoverPublicKey(this.bsc.wallet[0])).accountAddress
+            accountAddress = (await this.recoverPublicKey(this.bsc.wallet.address)).accountAddress
           }
-          this.registerBscListeners(provider)
-          account = { accountName: accountAddress, publicKey: this.bsc.wallet[0] }
+          if (providerName !== 'burner-wallet') {
+            this.registerBscListeners(provider)
+            account = { accountName: accountAddress, publicKey: this.bsc.wallet.address }
+          } else {
+            account = { accountName: accountAddress, publicKey: this.bsc.wallet.address, privateKey: this.bsc.wallet.privateKey }
+            console.log('provider', provider, 'account', account)
+          }
         }
         if (account) {
           account.blockchain = blockchain
@@ -133,13 +142,13 @@ export default (context, inject) => {
         try {
           const account = { ...this.account }
           // Make sure address matches with the public key we get from bsc wallet
-          const addresses = await this.recoverPublicKey(this.bsc.wallet[0])
+          const addresses = await this.recoverPublicKey(this.bsc.wallet.address)
           // Check if this is the signature we are currently waiting for, as we could have multiple signature requests..
-          if (addresses.address.toLowerCase() === this.waitForSignatureFrom.toLowerCase() && addresses.address.toLowerCase() === this.bsc.wallet[0].toLowerCase()) {
+          if (addresses.address.toLowerCase() === this.waitForSignatureFrom.toLowerCase() && addresses.address.toLowerCase() === this.bsc.wallet.address.toLowerCase()) {
             this.waitForSignatureFrom = null
             account.accountName = addresses.accountAddress
-            account.publicKey = this.bsc.wallet[0]
-
+            account.publicKey = this.bsc.wallet.address
+            console.log('switchBscAccountBeforeLogin', account)
             this.account = account
             this.initSdk()
           }
@@ -227,6 +236,8 @@ export default (context, inject) => {
       async getAccountBalance () {
         if (context.$auth.loggedIn) {
           if (context.$auth.user.blockchain === 'bsc') {
+            console.log('User', context.$auth.user)
+            console.log('this.$blockchain', this)
             const balance = await this.getBscEFXBalance(context.$auth.user.publicKey)
             this.efxAvailable = parseFloat(balance)
           } else {
@@ -254,6 +265,7 @@ export default (context, inject) => {
           const balance = await contract.methods.balanceOf(address).call()
           return this.bsc.web3.utils.fromWei(balance.toString())
         } catch (error) {
+          console.log(error)
           this.handleError(error)
         }
       },

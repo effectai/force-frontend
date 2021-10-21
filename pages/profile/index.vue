@@ -26,6 +26,18 @@
           </div>
         </div>
         <div class="block">
+          <div v-if="$auth.user.blockchain === 'bsc' && $auth.user.provider ==='burner-wallet'" class="has-text-weight-bold is-size-6">
+            Private key:
+          </div>
+          <div v-if="$auth.user.blockchain === 'bsc' && $auth.user.provider === 'burner-wallet'" class="subtitle">
+            <span class="has-text-link">{{ $auth.user.privateKey | hide(showPK) }}</span>
+          </div>
+          <button class="button is-light" @click="toggle">
+            <span v-if="showPK">Hide</span>
+            <span v-else>Show</span>
+          </button>
+        </div>
+        <div class="block">
           <div class="has-text-weight-bold is-size-6">
             Effect Account ID:
           </div>
@@ -47,7 +59,7 @@
           </div>
           <div class="subtitle">
             <a
-              :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.ACCOUNT_CONTRACT}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.ACCOUNT_CONTRACT}&scope=${$blockchain.sdk.account.config.ACCOUNT_CONTRACT}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
+              :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
               target="_blank"
             >View on explorer</a>
           </div>
@@ -114,11 +126,22 @@ import { mapGetters } from 'vuex'
 import Balance from '@/components/Balance'
 export default {
   components: { Balance },
+  filters: {
+    hide (value, show) {
+      if (show) {
+        return value
+      } else {
+        value = value.toString()
+        return value.split('').map(function (char) { char = '•'; return char }).join('')
+      }
+    }
+  },
   middleware: ['auth'],
   data () {
     return {
       page: 1,
       perPage: 10,
+      showPK: false,
       pages: []
     }
   },
@@ -142,6 +165,13 @@ export default {
     this.setPages()
   },
   methods: {
+    toggle () {
+      if (!this.showPK) {
+        this.showPK = true
+      } else {
+        this.showPK = false
+      }
+    },
     async logout () {
       await this.$auth.logout()
     },

@@ -14,9 +14,10 @@
           <button class="delete" aria-label="close" @click="$blockchain.loginModal = false" />
         </header>
         <section class="modal-card-body">
-          <div v-if="loading" class="loader-wrapper is-active">
+          <div v-if="loading && false" class="loader-wrapper is-active">
             <div class="loader is-loading" />
           </div>
+          <pre>{{ pk }}</pre>
           <div class="columns is-multiline">
             <div class="column is-half">
               <div v-if="isMetaMaskInstalled" class="provider has-radius disabled" @click="selectWallet('metamask')">
@@ -29,7 +30,7 @@
               </a>
             </div>
             <div class="column is-half">
-              <div v-if="this.$blockchain.bsc.checkBinanceInstalled" class="provider has-radius" @click="selectWallet('bsc')">
+              <div v-if="$blockchain.bsc.checkBinanceInstalled" class="provider has-radius" @click="selectWallet('bsc')">
                 <img src="@/assets/img/providers/bsc.svg">
                 Binance Chain
               </div>
@@ -60,6 +61,20 @@
                 WalletConnect
               </div>
             </div>
+            <div class="column is-full has-text-centered">
+              <div class="title">
+                - OR -
+              </div>
+              <p>
+                Use the <span class="has-text-primary"><b>Effect Wallet</b></span>, This is a wallet stored <b class="has-text-danger">in your browser</b>. To use this wallet, import your private key from an existing BSC address into it, or create a newly generated keypair.
+              </p>
+            </div>
+            <div class="column is-6 is-offset-3">
+              <div class="provider has-radius is-mobile" to="/burner-wallet" @click.prevent="toBurnerWallet()">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/2666.png">
+                <span class="has-text-dark">Effect Wallet</span>
+              </div>
+            </div>
           </div>
         </section>
       </div>
@@ -73,7 +88,8 @@ export default {
   data () {
     return {
       loading: false,
-      error: null
+      error: null,
+      pkValue: null
     }
   },
   computed: {
@@ -86,13 +102,24 @@ export default {
 
     isBinanceInstalled () {
       return Boolean(this.$blockchain.bsc.binance != null)
+    },
+    pk () {
+      this.$root.$on('selectBurnerWallet', (val) => {
+        this.pkValue = val
+        this.selectWallet('burner-wallet')
+      })
+      return this.pkValue
     }
   },
   methods: {
+    toBurnerWallet () {
+      this.$root.$emit('switchToBurnerWalletContent', true)
+      this.$blockchain.loginModal = false
+    },
     async selectWallet (provider) {
       this.loading = true
       try {
-        await this.$blockchain.login(provider, 'bsc')
+        await this.$blockchain.login(provider, 'bsc', null, this.pkValue)
         this.$blockchain.loginModal = false
       } catch (error) {
         console.error(error)

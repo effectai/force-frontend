@@ -1,21 +1,37 @@
 <template>
   <section class="section">
-    <h2 class="subtitle has-text-centered">
+    <h2 v-if="!burnerWallet" class="subtitle has-text-centered">
       <span v-if="$blockchain.waitForSignatureFrom">Account Switched. Re-verify Signature</span>
       <span v-else>Login to your Effect Account</span>
+    </h2>
+    <h2 v-else class="subtitle has-text-centered">
+      <span>Burner Wallet</span>
     </h2>
     <div v-if="loading" class="container">
       Loading..
     </div>
     <div v-else class="container">
-      <div v-if="$blockchain.account">
+      <div v-if="$blockchain.account && !burnerWallet">
         <div class="has-text-centered mb-2" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
-          <a
-            v-if="$blockchain.account.blockchain === 'bsc'"
-            :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey"
-            target="_blank"
-            class="blockchain-address"
-          >{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey }}</a>
+          <div v-if="$blockchain.account.blockchain === 'bsc'" class="has-text-left">
+            <a
+              :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey"
+              target="_blank"
+              class="blockchain-address"
+            >
+              <p style="word-break: break-word;">
+                {{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey }}
+              </p>
+            </a>
+            <p v-if="$blockchain.account.provider === 'burner-wallet'" style="word-break: break-word;" class="mt-2">
+              <span><b>Private key</b></span>
+              <span class="has-text-link">{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.privateKey | hide(showPK) }}</span>
+            </p>
+            <button class="button is-light" @click="toggle">
+              <span v-if="showPK">Hide</span>
+              <span v-else>Show</span>
+            </button>
+          </div>
           <a
             v-else
             :href="$blockchain.eos.explorer + '/address/'+ $blockchain.account.accountName"
@@ -29,6 +45,18 @@
           </div>
           <div v-if="loadingLogin" class="is-size-7 has-text-centered">
             ..retrieving blockchain Effect Account info..
+          </div>
+        </div>
+      </div>
+      <div v-else-if="burnerWallet" class="columns is-flex-wrap-wrap">
+        <div class="column is-full has-text-centered">
+          <input v-model="privateKey" class="input is-primary is-medium" type="text" placeholder="Private Key...">
+        </div>
+        <div class="column is-full">
+          <div class="button is-primary" style="height: auto; display:block" @click.prevent="connectToBurnerWallet(privateKey)">
+            <div class="subtitle has-text-weight-semibold mb-2 has-text-white">
+              <span>import private key</span>
+            </div>
           </div>
         </div>
       </div>
@@ -61,7 +89,8 @@
           </div>
         </div>
         <div class="column is-8">
-          <a v-if="$blockchain.account" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout()">switch wallet</a>
+          <a v-if="$blockchain.account && !burnerWallet" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout()">switch wallet</a>
+          <span v-else-if="burnerWallet">No Private key? <a class="is-size-6" @click.prevent="connectToBurnerWallet()">Generate a keypair</a></span>
           <span v-else>No wallet? <a target="_blank" class="is-size-6" href="https://medium.com/effect-ai">Create a wallet</a></span>
         </div>
       </div>
@@ -74,6 +103,16 @@ const retry = require('async-retry')
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export default {
+  filters: {
+    hide (value, show) {
+      if (show) {
+        return value
+      } else {
+        value = value.toString()
+        return value.split('').map(function (char) { char = '•'; return char }).join('')
+      }
+    }
+  },
   layout: 'box',
   middleware: ['auth'],
   auth: 'guest',
@@ -82,7 +121,18 @@ export default {
       existingAccount: null,
       error: null,
       loadingLogin: false,
-      loading: false
+      loading: false,
+      privateKey: null,
+      showPK: false,
+      burnerWalletValue: false
+    }
+  },
+  computed: {
+    burnerWallet () {
+      this.$root.$on('switchToBurnerWalletContent', (val) => {
+        this.burnerWalletValue = val
+      })
+      return this.burnerWalletValue
     }
   },
   watch: {
@@ -97,6 +147,18 @@ export default {
     this.rememberLogin()
   },
   methods: {
+    toggle () {
+      if (!this.showPK) {
+        this.showPK = true
+      } else {
+        this.showPK = false
+      }
+    },
+    connectToBurnerWallet (pk) {
+      console.log('selectBurnerWallet', pk)
+      this.$root.$emit('selectBurnerWallet', pk)
+      this.burnerWalletValue = false
+    },
     async rememberLogin () {
       this.loading = true
       try {
@@ -110,13 +172,17 @@ export default {
       this.loadingLogin = true
       if (!this.$blockchain.account) { return }
       try {
+        console.log('1', this.$blockchain)
         // if account doesnt exists yet add it
         if (this.existingAccount === false) {
           const result = await this.$blockchain.openVAccount()
+          console.log('addTransaction', result)
+          console.log('2', this.$blockchain)
           this.$store.dispatch('transaction/addTransaction', result)
           await sleep(2000)
         }
         await retry(async () => {
+          console.log('retry: this.$blockchain', this.$blockchain)
           await this.$auth.loginWith('blockchain', {
             account: this.$blockchain.account,
             $blockchain: this.$blockchain
@@ -191,3 +257,8 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.blockchain-address {
+  white-space: unset
+}
+</style>
