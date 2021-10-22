@@ -1,17 +1,14 @@
 <template>
   <section class="section">
-    <h2 v-if="!burnerWallet" class="subtitle has-text-centered">
+    <h2 class="subtitle has-text-centered">
       <span v-if="$blockchain.waitForSignatureFrom">Account Switched. Re-verify Signature</span>
       <span v-else>Login to your Effect Account</span>
-    </h2>
-    <h2 v-else class="subtitle has-text-centered">
-      <span>Burner Wallet</span>
     </h2>
     <div v-if="loading" class="container">
       Loading..
     </div>
     <div v-else class="container">
-      <div v-if="$blockchain.account && !burnerWallet">
+      <div v-if="$blockchain.account">
         <div class="has-text-centered mb-2" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
           <a
             v-if="$blockchain.account.blockchain === 'bsc'"
@@ -49,16 +46,6 @@
           </div>
         </div>
       </div>
-      <div v-else-if="burnerWallet" class="columns is-flex-wrap-wrap">
-        <div class="column is-full has-text-centered">
-          <input v-model="privateKey" class="input is-primary is-medium" type="text" placeholder="Private Key...">
-        </div>
-        <div class="column is-full">
-          <div class="button is-primary" style="height: auto; display:block" :disabled="!privateKey" @click.prevent="connectToBurnerWallet(privateKey)">
-            <span>import private key</span>
-          </div>
-        </div>
-      </div>
       <div v-else class="columns">
         <div class="column is-half has-text-centered">
           <div class="button" style="height: auto; display:block" @click="$blockchain.loginModal = 'eos'">
@@ -86,10 +73,9 @@
             <span v-if="existingAccount">Login</span>
             <span v-else>Register</span>
           </div>
-          <span v-if="burnerWallet">No Private key? <a class="is-size-6" @click.prevent="connectToBurnerWallet()">Generate a keypair</a></span>
         </div>
         <div class="column is-8">
-          <a v-if="$blockchain.account || burnerWallet" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout();burnerWalletValue = false">switch wallet</a>
+          <a v-if="$blockchain.account" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout();">switch wallet</a>
           <span v-else>No wallet? <a target="_blank" class="is-size-6" href="https://medium.com/effect-ai">Create a wallet</a></span>
         </div>
       </div>
@@ -121,17 +107,7 @@ export default {
       error: null,
       loadingLogin: false,
       loading: false,
-      privateKey: null,
-      showPK: false,
-      burnerWalletValue: false
-    }
-  },
-  computed: {
-    burnerWallet () {
-      this.$root.$on('switchToBurnerWalletContent', (val) => {
-        this.burnerWalletValue = val
-      })
-      return this.burnerWalletValue
+      showPK: false
     }
   },
   watch: {
@@ -147,9 +123,8 @@ export default {
   },
   methods: {
     connectToBurnerWallet (pk) {
-      console.log('selectBurnerWallet', pk)
       this.$root.$emit('selectBurnerWallet', pk)
-      this.burnerWalletValue = false
+      this.$blockchain.burnerWallet = false
     },
     async rememberLogin () {
       this.loading = true

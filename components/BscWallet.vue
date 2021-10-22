@@ -1,7 +1,7 @@
 <template>
   <span>
     <div class="modal" :class="{ 'is-active': $blockchain.loginModal === 'bsc' }">
-      <div class="modal-background" @click="$blockchain.loginModal = false" />
+      <div class="modal-background" @click="$blockchain.loginModal = false; burnerWallet = false" />
       <div class="modal-card">
         <div v-if="error" class="notification is-danger">
           <button class="delete" @click="error = null" />
@@ -11,13 +11,27 @@
           <p class="modal-card-title">
             Select your BSC wallet
           </p>
-          <button class="delete" aria-label="close" @click="$blockchain.loginModal = false" />
+          <button class="delete" aria-label="close" @click="$blockchain.loginModal = false; burnerWallet = false" />
         </header>
         <section class="modal-card-body">
-          <div v-if="loading && false" class="loader-wrapper is-active">
+          <div v-if="loading" class="loader-wrapper is-active">
             <div class="loader is-loading" />
           </div>
-          <div class="columns is-multiline">
+          <div v-if="burnerWallet">
+            <div>
+              <a href="" class="has-text-danger-dark" @click.prevent="burnerWallet = false">Back</a>
+            </div>
+            <div class="mb-4">
+              <input v-model="privateKey" class="input is-primary is-medium" type="text" placeholder="Private Key...">
+            </div>
+            <div class="">
+              <button class="button is-primary is-fullwidth" :disabled="!privateKey" @click.prevent="importPrivateKey">
+                <span>import private key</span>
+              </button>
+              <span>No Private key? <a class="is-size-6" @click.prevent="importPrivateKey">Generate a keypair</a></span>
+            </div>
+          </div>
+          <div v-else class="columns is-multiline">
             <div class="column is-half">
               <div v-if="isMetaMaskInstalled" class="provider has-radius disabled" @click="selectWallet('metamask')">
                 <img src="@/assets/img/providers/metamask.png">
@@ -69,7 +83,7 @@
               </p>
             </div>
             <div class="column is-6 is-offset-3">
-              <div class="provider has-radius is-mobile" to="/burner-wallet" @click.prevent="toBurnerWallet()">
+              <div class="provider has-radius is-mobile" to="/burner-wallet" @click.prevent="burnerWallet = true">
                 <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/2666.png">
                 <span class="has-text-dark">Effect Wallet</span>
               </div>
@@ -88,7 +102,8 @@ export default {
     return {
       loading: false,
       error: null,
-      pkValue: null
+      privateKey: null,
+      burnerWallet: false
     }
   },
   computed: {
@@ -101,24 +116,16 @@ export default {
 
     isBinanceInstalled () {
       return Boolean(this.$blockchain.bsc.binance != null)
-    },
-    pk () {
-      this.$root.$on('selectBurnerWallet', (val) => {
-        this.pkValue = val
-        this.selectWallet('burner-wallet')
-      })
-      return this.pkValue
     }
   },
   methods: {
-    toBurnerWallet () {
-      this.$root.$emit('switchToBurnerWalletContent', true)
-      this.$blockchain.loginModal = false
+    importPrivateKey () {
+      this.selectWallet('burner-wallet')
     },
     async selectWallet (provider) {
       this.loading = true
       try {
-        await this.$blockchain.login(provider, 'bsc', null, this.pkValue)
+        await this.$blockchain.login(provider, 'bsc', null, this.privateKey)
         this.$blockchain.loginModal = false
       } catch (error) {
         console.error(error)

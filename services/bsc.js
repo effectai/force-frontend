@@ -27,7 +27,7 @@ const bsc = {
   walletConnect: null,
   explorer: process.env.NUXT_ENV_BSC_EXPLORER_URL,
 
-  login: async (provider, rememberAccount, pk) => {
+  login: async (provider, pk) => {
     switch (provider) {
       case 'trustwallet':
         return await bsc.onTrustWalletConnect()
@@ -38,7 +38,7 @@ const bsc = {
       case 'walletconnect':
         return await bsc.onWalletConnectWeb3()
       case 'burner-wallet':
-        return await bsc.onBurnerWallet(rememberAccount, pk)
+        return await bsc.onBurnerWallet(pk)
     }
   },
   logout: async () => {
@@ -138,6 +138,7 @@ const bsc = {
   },
 
   onWalletConnectWeb3: async () => {
+    console.log('test')
     const wcProvider = new WalletConnectProvider({
       chainId: process.env.NUXT_ENV_BSC_NETWORK_ID,
       rpc: {
@@ -161,9 +162,9 @@ const bsc = {
       return Promise.reject(error)
     }
   },
-  onBurnerWallet: async (rememberAccount, pk) => {
+  onBurnerWallet: async (pk) => {
     try {
-      return await bsc.registerProvider('burner-wallet', rememberAccount, pk)
+      return await bsc.registerProvider('burner-wallet', pk)
     } catch (error) {
       console.error(error)
       return Promise.reject(error)
@@ -235,7 +236,7 @@ const bsc = {
   /**
    * Assign provider to currentProvider, instantiate web3, and register eventlisteners.
    */
-  registerProvider: async (provider, rememberAccount, privateKey) => {
+  registerProvider: async (provider, privateKey) => {
     bsc.currentProvider = provider
     bsc.wallet = null
     let keypair = null
@@ -253,9 +254,7 @@ const bsc = {
         bsc.wallet = { address: (await bsc.web3.eth.getAccounts())[0] }
       } else if (bsc.currentProvider === 'burner-wallet') {
         // either generate private key or retrieve private key
-        if (rememberAccount) {
-          keypair = bsc.web3.eth.accounts.privateKeyToAccount(rememberAccount.privateKey)
-        } else if (privateKey) {
+        if (privateKey) {
           keypair = bsc.web3.eth.accounts.privateKeyToAccount(privateKey)
         } else {
           keypair = bsc.generateBSCKeyPair()
@@ -269,7 +268,6 @@ const bsc = {
       } else {
         bsc.wallet = { address: (await bsc.web3.eth.requestAccounts())[0] }
       }
-      console.log(bsc.wallet)
     } catch (error) {
       console.error(error)
       return Promise.reject(error)

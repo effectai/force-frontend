@@ -106,12 +106,13 @@ export default (context, inject) => {
           const wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
           account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, publicKey: wallet.auth.publicKey }
         } else if (blockchain === 'bsc') {
-          const provider = await this.bsc.login(providerName, rememberAccount, pk)
+          if (rememberAccount && rememberAccount.privateKey) {
+            pk = rememberAccount.privateKey
+          }
+          const provider = await this.bsc.login(providerName, pk)
           let accountAddress
-          console.log('login', rememberAccount)
           if (rememberAccount) {
             accountAddress = rememberAccount.accountName
-            console.log(this.bsc.wallet)
             // Make sure we still have the same connection as our stored account
             if (rememberAccount.publicKey.toLowerCase() !== this.bsc.wallet.address.toLowerCase()) {
               await this.logout()
@@ -120,12 +121,11 @@ export default (context, inject) => {
           } else {
             accountAddress = (await this.recoverPublicKey(this.bsc.wallet.address)).accountAddress
           }
-          if (providerName !== 'burner-wallet') {
+          if (providerName === 'burner-wallet') {
+            account = { accountName: accountAddress, publicKey: this.bsc.wallet.address, privateKey: this.bsc.wallet.privateKey }
+          } else {
             this.registerBscListeners(provider)
             account = { accountName: accountAddress, publicKey: this.bsc.wallet.address }
-          } else {
-            account = { accountName: accountAddress, publicKey: this.bsc.wallet.address, privateKey: this.bsc.wallet.privateKey }
-            console.log('provider', provider, 'account', account)
           }
         }
         if (account) {
