@@ -194,12 +194,14 @@ export default {
       }
     }
   },
-  state: {
-    batches: null,
-    campaigns: null,
-    loading: false,
-    loadingBatch: false,
-    allCampaignsLoaded: false,
-    allBatchesLoaded: false
+  state: () => {
+    return {
+      batches: null,
+      campaigns: null,
+      loading: false,
+      loadingBatch: false,
+      allCampaignsLoaded: false,
+      allBatchesLoaded: false
+    }
   }
 }

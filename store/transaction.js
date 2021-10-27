@@ -24,7 +24,9 @@ export default {
       commit('ADD_TRANSACTION', transaction)
     }
   },
-  state: {
-    transactions: {}
+  state: () => {
+    return {
+      transactions: {}
+    }
   }
 }

@@ -102,7 +102,7 @@ export default {
     },
     plugins: [
       { src: '~/plugins/axios.js' },
-      { src: '~/plugins/blockchain.js' }
+      { src: '~/plugins/blockchain.js', mode: 'client' }
     ]
   },
 
