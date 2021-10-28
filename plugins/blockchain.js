@@ -299,6 +299,9 @@ export default (context, inject) => {
       async getReservations () {
         return await this.sdk.force.getReservations()
       },
+      async getTaskSubmissionsForBatch (batchId) {
+        return await this.sdk.force.getTaskSubmissionsForBatch(batchId)
+      },
       async getTaskIndexFromLeaf (leafhash, tasks) {
         return await this.sdk.force.getTaskIndexFromLeaf(leafhash, tasks)
       },

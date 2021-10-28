@@ -228,6 +228,9 @@ export default {
     async getBatch () {
       await this.$store.dispatch('campaign/getBatch', { batchId: this.batchId })
       this.batch = this.batches.find(b => b.batch_id === this.batchId)
+      // todo: make tab for submissiosn and reservations
+      const submissions = this.$blockchain.getTaskSubmissionsForBatch(this.batchId)
+      console.log('batch submissions:', submissions)
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
