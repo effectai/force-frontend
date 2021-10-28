@@ -3,6 +3,7 @@ export default {
   modules: {},
   mutations: {
     ADD_TRANSACTION (state, transaction) {
+      if (state.transactions === null) { state.transactions = {} }
       if (state.transactions[this.$auth.user.vAccountRows[0].id]) {
         state.transactions[this.$auth.user.vAccountRows[0].id].push(transaction)
       } else {
@@ -15,7 +16,7 @@ export default {
       return id => state.transactions ? state.transactions.find(c => c.id === id) : null
     },
     transactionsByUser (state) {
-      return userId => state.transactions[userId]
+      return userId => state.transactions ? state.transactions[userId] : null
     }
   },
   actions: {
@@ -23,7 +24,9 @@ export default {
       commit('ADD_TRANSACTION', transaction)
     }
   },
-  state: {
-    transactions: {}
+  state: () => {
+    return {
+      transactions: {}
+    }
   }
 }

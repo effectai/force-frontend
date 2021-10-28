@@ -1,6 +1,8 @@
 <template>
   <div>
-    <category-filters @clicked="onFilter" />
+    <client-only>
+      <category-filters @clicked="onFilter" />
+    </client-only>
     <nuxt-link
       v-for="campaign in filteredCampaigns"
       :key="campaign.id"

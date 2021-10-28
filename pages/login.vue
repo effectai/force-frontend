@@ -15,12 +15,26 @@
             :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey"
             target="_blank"
             class="blockchain-address"
-          >{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey }}</a>
+          >
+            <p style="word-break: break-word;">
+              {{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey }}
+            </p>
+          </a>
           <a
             v-else
             :href="$blockchain.eos.explorer + '/address/'+ $blockchain.account.accountName"
             target="_blank"
           >{{ $blockchain.account.accountName }}</a><span v-if="$blockchain.account.permission">@{{ $blockchain.account.permission }}</span>
+          <div v-if="$blockchain.account.provider === 'burner-wallet'">
+            <p style="word-break: break-word;" class="mt-2">
+              <span><b>Private key</b></span>
+              <span class="has-text-link">{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.privateKey | hide(showPK) }}</span>
+            </p>
+            <button class="button is-light" @click="showPK = !showPK">
+              <span v-if="showPK">Hide</span>
+              <span v-else>Show</span>
+            </button>
+          </div>
         </div>
         <div style="min-height: 67px">
           <div v-if="error" class="notification is-danger">
@@ -61,7 +75,7 @@
           </div>
         </div>
         <div class="column is-8">
-          <a v-if="$blockchain.account" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout()">switch wallet</a>
+          <a v-if="$blockchain.account" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout();">switch wallet</a>
           <span v-else>No wallet? <a target="_blank" class="is-size-6" href="https://medium.com/effect-ai">Create a wallet</a></span>
         </div>
       </div>
@@ -74,6 +88,16 @@ const retry = require('async-retry')
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export default {
+  filters: {
+    hide (value, show) {
+      if (show) {
+        return value
+      } else {
+        value = value.toString()
+        return value.split('').map(function (char) { char = '•'; return char }).join('')
+      }
+    }
+  },
   layout: 'box',
   middleware: ['auth'],
   auth: 'guest',
@@ -82,7 +106,8 @@ export default {
       existingAccount: null,
       error: null,
       loadingLogin: false,
-      loading: false
+      loading: false,
+      showPK: false
     }
   },
   watch: {
@@ -97,6 +122,10 @@ export default {
     this.rememberLogin()
   },
   methods: {
+    connectToBurnerWallet (pk) {
+      this.$root.$emit('selectBurnerWallet', pk)
+      this.$blockchain.burnerWallet = false
+    },
     async rememberLogin () {
       this.loading = true
       try {
@@ -110,13 +139,15 @@ export default {
       this.loadingLogin = true
       if (!this.$blockchain.account) { return }
       try {
+        console.log('1', this.$blockchain)
         // if account doesnt exists yet add it
+        let registerResult
         if (this.existingAccount === false) {
-          const result = await this.$blockchain.openVAccount()
-          this.$store.dispatch('transaction/addTransaction', result)
+          registerResult = await this.$blockchain.openVAccount()
           await sleep(2000)
         }
         await retry(async () => {
+          console.log('retry: this.$blockchain', this.$blockchain)
           await this.$auth.loginWith('blockchain', {
             account: this.$blockchain.account,
             $blockchain: this.$blockchain
@@ -127,6 +158,9 @@ export default {
             console.log('attempt', number, error)
           }
         })
+        if (registerResult) {
+          this.$store.dispatch('transaction/addTransaction', registerResult)
+        }
         this.$blockchain.getAccountBalance()
         this.$blockchain.getPendingBalance()
         this.$auth.$storage.setUniversal('rememberAccount', JSON.stringify(this.$blockchain.account))
@@ -191,3 +225,8 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.blockchain-address {
+  white-space: unset
+}
+</style>

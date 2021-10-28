@@ -26,9 +26,9 @@ export default class BlockchainScheme extends BaseScheme {
       this.$auth.reset()
     }
     this.$blockchain = $blockchain
-
+    console.log('loginWith', this.$blockchain)
     await this.fetchUser(account)
-    return true
+    return false
   }
 
   async fetchUser (account) {

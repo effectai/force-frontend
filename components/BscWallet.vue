@@ -1,7 +1,7 @@
 <template>
   <span>
     <div class="modal" :class="{ 'is-active': $blockchain.loginModal === 'bsc' }">
-      <div class="modal-background" @click="$blockchain.loginModal = false" />
+      <div class="modal-background" @click="$blockchain.loginModal = false; burnerWallet = false" />
       <div class="modal-card">
         <div v-if="error" class="notification is-danger">
           <button class="delete" @click="error = null" />
@@ -11,13 +11,27 @@
           <p class="modal-card-title">
             Select your BSC wallet
           </p>
-          <button class="delete" aria-label="close" @click="$blockchain.loginModal = false" />
+          <button class="delete" aria-label="close" @click="$blockchain.loginModal = false; burnerWallet = false" />
         </header>
         <section class="modal-card-body">
           <div v-if="loading" class="loader-wrapper is-active">
             <div class="loader is-loading" />
           </div>
-          <div class="columns is-multiline">
+          <div v-if="burnerWallet">
+            <div>
+              <a href="" class="has-text-danger-dark" @click.prevent="burnerWallet = false">Back</a>
+            </div>
+            <div class="mb-4">
+              <input v-model="privateKey" class="input is-primary is-medium" type="text" placeholder="Private Key...">
+            </div>
+            <div class="">
+              <button class="button is-primary is-fullwidth" :disabled="!privateKey" @click.prevent="importPrivateKey">
+                <span>import private key</span>
+              </button>
+              <span>No Private key? <a class="is-size-6" @click.prevent="importPrivateKey">Generate a keypair</a></span>
+            </div>
+          </div>
+          <div v-else class="columns is-multiline">
             <div class="column is-half">
               <div v-if="isMetaMaskInstalled" class="provider has-radius disabled" @click="selectWallet('metamask')">
                 <img src="@/assets/img/providers/metamask.png">
@@ -29,7 +43,7 @@
               </a>
             </div>
             <div class="column is-half">
-              <div v-if="this.$blockchain.bsc.checkBinanceInstalled" class="provider has-radius" @click="selectWallet('bsc')">
+              <div v-if="$blockchain.bsc.checkBinanceInstalled" class="provider has-radius" @click="selectWallet('bsc')">
                 <img src="@/assets/img/providers/bsc.svg">
                 Binance Chain
               </div>
@@ -60,6 +74,20 @@
                 WalletConnect
               </div>
             </div>
+            <div class="column is-full has-text-centered">
+              <div class="title">
+                - OR -
+              </div>
+              <p>
+                Use the <span class="has-text-primary"><b>Effect Wallet</b></span>, This is a wallet stored <b class="has-text-danger">in your browser</b>. To use this wallet, import your private key from an existing BSC address into it, or create a newly generated keypair.
+              </p>
+            </div>
+            <div class="column is-6 is-offset-3">
+              <div class="provider has-radius is-mobile" to="/burner-wallet" @click.prevent="burnerWallet = true">
+                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/2666.png">
+                <span class="has-text-dark">Effect Wallet</span>
+              </div>
+            </div>
           </div>
         </section>
       </div>
@@ -73,7 +101,9 @@ export default {
   data () {
     return {
       loading: false,
-      error: null
+      error: null,
+      privateKey: null,
+      burnerWallet: false
     }
   },
   computed: {
@@ -89,10 +119,13 @@ export default {
     }
   },
   methods: {
+    importPrivateKey () {
+      this.selectWallet('burner-wallet')
+    },
     async selectWallet (provider) {
       this.loading = true
       try {
-        await this.$blockchain.login(provider, 'bsc')
+        await this.$blockchain.login(provider, 'bsc', null, this.privateKey)
         this.$blockchain.loginModal = false
       } catch (error) {
         console.error(error)

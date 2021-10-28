@@ -25,6 +25,18 @@
             >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
           </div>
         </div>
+        <div v-if="$auth.user.provider ==='burner-wallet'" class="block">
+          <div class="has-text-weight-bold is-size-6">
+            Private key:
+          </div>
+          <div class="subtitle">
+            <span class="has-text-link">{{ $auth.user.privateKey | hide(showPK) }}</span>
+          </div>
+          <button class="button is-light" @click="showPK = !showPK">
+            <span v-if="showPK">Hide</span>
+            <span v-else>Show</span>
+          </button>
+        </div>
         <div class="block">
           <div class="has-text-weight-bold is-size-6">
             Effect Account ID:
@@ -47,7 +59,7 @@
           </div>
           <div class="subtitle">
             <a
-              :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.ACCOUNT_CONTRACT}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.ACCOUNT_CONTRACT}&scope=${$blockchain.sdk.account.config.ACCOUNT_CONTRACT}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
+              :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
               target="_blank"
             >View on explorer</a>
           </div>
@@ -114,11 +126,22 @@ import { mapGetters } from 'vuex'
 import Balance from '@/components/Balance'
 export default {
   components: { Balance },
+  filters: {
+    hide (value, show) {
+      if (show) {
+        return value
+      } else {
+        value = value.toString()
+        return value.split('').map(function (char) { char = '•'; return char }).join('')
+      }
+    }
+  },
   middleware: ['auth'],
   data () {
     return {
       page: 1,
       perPage: 10,
+      showPK: false,
       pages: []
     }
   },
@@ -146,6 +169,7 @@ export default {
       await this.$auth.logout()
     },
     setPages () {
+      if (!this.transactions) { return }
       const numberOfPages = Math.ceil(this.transactions.length / this.perPage)
       for (let index = 1; index <= numberOfPages; index++) {
         if (this.pages.length < index) {
