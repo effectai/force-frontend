@@ -102,8 +102,9 @@ export default (context, inject) => {
       },
       async login (providerName, blockchain, rememberAccount, pk) {
         let account
+        let wallet
         if (blockchain === 'eos') {
-          const wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
+          wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
           account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, publicKey: wallet.auth.publicKey }
         } else if (blockchain === 'bsc') {
           if (rememberAccount && rememberAccount.privateKey) {
@@ -132,7 +133,7 @@ export default (context, inject) => {
           account.blockchain = blockchain
           account.provider = providerName
           this.account = account
-          this.initSdk()
+          this.initSdk(blockchain === 'eos' ? wallet : this.bsc.wallet)
           return true
         }
         return false
@@ -150,7 +151,7 @@ export default (context, inject) => {
             account.publicKey = this.bsc.wallet.address
             console.log('switchBscAccountBeforeLogin', account)
             this.account = account
-            this.initSdk()
+            this.initSdk(this.bsc)
           }
         } catch (error) {
           this.handleError(error)
@@ -236,8 +237,6 @@ export default (context, inject) => {
       async getAccountBalance () {
         if (context.$auth.loggedIn) {
           if (context.$auth.user.blockchain === 'bsc') {
-            console.log('User', context.$auth.user)
-            console.log('this.$blockchain', this)
             const balance = await this.getBscEFXBalance(context.$auth.user.publicKey)
             this.efxAvailable = parseFloat(balance)
           } else {
@@ -318,13 +317,7 @@ export default (context, inject) => {
         return await this.sdk.force.getTaskIndexFromLeaf(leafhash, tasks)
       },
       initSdk () {
-        const sdkOptions = {
-          network: process.env.NUXT_ENV_EOS_NETWORK,
-          host: `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`,
-          signatureProvider: this.eos.wallet ? this.eos.wallet.provider.signatureProvider : null,
-          web3: this.bsc.wallet ? this.bsc.web3 : null
-        }
-        this.sdk = new effectSdk.EffectClient('testnet', sdkOptions)
+        this.sdk.connectAccount(this.eos.wallet ? this.eos.wallet : null, this.bsc ? this.bsc : null)
       },
 
       async recoverPublicKey () {
