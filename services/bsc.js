@@ -54,21 +54,8 @@ const bsc = {
   },
 
   sign: async (message) => {
-  // BSC-Extensions only support 'eth_sign'
-  // https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#binancechain-request-method-eth_sign-params-address-message
-    bsc.web3.extend({
-      property: 'bsc',
-      methods: [{
-        name: 'sign',
-        call: 'eth_sign',
-        params: 2
-      }]
-    })
-
     try {
-      if (bsc.currentProvider === bsc.binance) {
-        return await bsc.web3.bsc.sign(bsc.wallet.address, message)
-      } else if (bsc.currentProvider === 'burner-wallet') {
+      if (bsc.currentProvider === 'burner-wallet') {
         return (await bsc.web3.eth.accounts.sign(message, bsc.wallet.privateKey)).signature
       } else {
         return await bsc.web3.eth.personal.sign(message, bsc.wallet.address)
