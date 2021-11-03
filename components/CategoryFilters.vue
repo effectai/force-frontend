@@ -38,25 +38,25 @@ export default {
       effect_dapps: {
         dao: {
           hover: false,
-          value: 'translation',
+          value: 'dao',
           normalUrl: 'https://effect.network/_nuxt/img/effect-dao_h100.62b6528.png',
           whiteUrl: 'https://effect.network/_nuxt/img/effect-dao_white_h100.8128b59.png'
         },
         socials: {
           hover: false,
-          value: 'image_classification',
+          value: 'socials',
           normalUrl: 'https://effect.network/_nuxt/img/effect-socials_h100.4f0f9f8.png',
           whiteUrl: 'https://effect.network/_nuxt/img/effect-socials_white_h100.aaa70fd.png'
         },
         translate: {
           hover: false,
-          value: 'video_classification',
+          value: 'translate',
           normalUrl: 'https://effect.network/_nuxt/img/effect-translate_h100.61861ae.png',
           whiteUrl: 'https://effect.network/_nuxt/img/effect-translate_white_h100.d698b51.png'
         },
         captions: {
           hover: false,
-          value: 'text_classification',
+          value: 'captions',
           normalUrl: 'https://effect.network/_nuxt/img/effect-captions_h100.2b22d0c.png',
           whiteUrl: 'https://effect.network/_nuxt/img/effect-captions_white_h100.d746459.png'
         }
@@ -74,16 +74,16 @@ export default {
 <style lang="scss" scoped>
   a.card:hover, a.card.is-active {
     &.dapp-dao {
-      background: #d7ac00;
+      background: $dao-color;
     }
     &.dapp-socials {
-      background:#06c6c6;
+      background:$socials-color;
     }
     &.dapp-captions {
-      background: #e06375;
+      background: $captions-color;
     }
     &.dapp-translate {
-      background: #00c165;
+      background: $translate-color;
     }
 
   }
