@@ -291,7 +291,7 @@ export default (context, inject) => {
         return await this.sdk.force.getCampaignJoins(accountId, campaignId)
       },
       async joinCampaign (accountId, campaignId) {
-        return await this.sdk.force.joinCampaign(context.$auth.user.accountName, accountId, campaignId, { permission: this.account.permission, address: context.$auth.user.publicKey })
+        return await this.sdk.force.joinCampaign(context.$auth.user.accountName, accountId, campaignId, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider, privateKey: context.$auth.user.privateKey })
       },
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)
@@ -306,7 +306,7 @@ export default (context, inject) => {
         return await this.sdk.force.createBatch(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, campaignId, batchId, content, repetitions, { permission: this.account.permission, address: context.$auth.user.publicKey })
       },
       async createCampaign (hash, reward) {
-        return await this.sdk.force.createCampaign(context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, hash, reward, { permission: this.account.permission, address: context.$auth.user.publicKey })
+        return await this.sdk.force.createCampaign(context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, hash, reward, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider, privateKey: context.$auth.user.privateKey })
       },
       async getReservations () {
         return await this.sdk.force.getReservations()
@@ -327,7 +327,9 @@ export default (context, inject) => {
       async recoverPublicKey () {
         const message = 'Effect Account'
         const signature = await bsc.sign(message)
-        return this.sdk.account.recoverPublicKey(message, signature)
+        const addresses = this.sdk.account.recoverPublicKey(message, signature)
+        console.log('ADDRESSES_RECOVERED', addresses)
+        return addresses
       },
 
       handleError (error) {
