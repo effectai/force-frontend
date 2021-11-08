@@ -227,7 +227,6 @@ export default {
       try {
       // function that makes the user join this campaign.
         const data = await this.$blockchain.joinCampaign(this.accountId, this.id)
-        console.log('DATA', data)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true

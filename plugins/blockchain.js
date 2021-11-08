@@ -83,10 +83,8 @@ export default (context, inject) => {
       async rememberLogin () {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
         if (rememberAccount) {
-          console.log('rememberLogin', rememberAccount)
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
           if (loggedIn) {
-            console.log('loggedIn? loginWith', this)
             await context.$auth.loginWith('blockchain', {
               account: this.account,
               $blockchain: this
@@ -148,7 +146,6 @@ export default (context, inject) => {
             this.waitForSignatureFrom = null
             account.accountName = addresses.accountAddress
             account.publicKey = this.bsc.wallet.address
-            console.log('switchBscAccountBeforeLogin', account)
             this.account = account
             this.initSdk()
           }
@@ -236,8 +233,6 @@ export default (context, inject) => {
       async getAccountBalance () {
         if (context.$auth.loggedIn) {
           if (context.$auth.user.blockchain === 'bsc') {
-            console.log('User', context.$auth.user)
-            console.log('this.$blockchain', this)
             const balance = await this.getBscEFXBalance(context.$auth.user.publicKey)
             this.efxAvailable = parseFloat(balance)
           } else {
@@ -328,7 +323,6 @@ export default (context, inject) => {
         const message = 'Effect Account'
         const signature = await bsc.sign(message)
         const addresses = this.sdk.account.recoverPublicKey(message, signature)
-        console.log('ADDRESSES_RECOVERED', addresses)
         return addresses
       },
 
