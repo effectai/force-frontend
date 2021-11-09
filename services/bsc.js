@@ -1,6 +1,6 @@
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
-import { createBurnerWallet, privateKeyToBurnerWallet } from '../../effect-js/dist/lib/utils/burnerWallet'
+import { createBurnerWallet, privateKeyToBurnerWallet } from '../../effect-js'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
