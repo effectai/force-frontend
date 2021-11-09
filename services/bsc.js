@@ -1,5 +1,6 @@
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
+import { createBurnerWallet, privateKeyToBurnerWallet } from '../../effect-js/dist/lib/utils/burnerWallet'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -170,9 +171,6 @@ const bsc = {
       return Promise.reject(error)
     }
   },
-  generateBSCKeyPair: () => {
-    return bsc.web3.eth.accounts.create()
-  },
 
   /**
    * Method to add the correct chain to the wallet of the user.
@@ -255,9 +253,9 @@ const bsc = {
       } else if (bsc.currentProvider === 'burner-wallet') {
         // either generate private key or retrieve private key
         if (privateKey) {
-          keypair = bsc.web3.eth.accounts.privateKeyToAccount(privateKey)
+          keypair = privateKeyToBurnerWallet(bsc.web3, privateKey)
         } else {
-          keypair = bsc.generateBSCKeyPair()
+          keypair = createBurnerWallet(bsc.web3)
         }
         // creates empty wallet.
         bsc.web3.eth.accounts.wallet.create()
