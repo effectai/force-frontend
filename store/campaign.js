@@ -173,7 +173,7 @@ export default {
         // 0: IPFS
         if (campaign.content.field_0 === 0) {
           // field_1 represents the IPFS hash
-          const info = await this.$blockchain.sdk.getIpfsContent(campaign.content.field_1)
+          const info = await this.$blockchain.sdk.force.getIpfsContent(campaign.content.field_1)
           commit('SET_CAMPAIGN_INFO', { id: campaign.id, info })
         }
       } catch (e) {
@@ -186,7 +186,7 @@ export default {
         // 0: IPFS
         if (batch.content.field_0 === 0) {
           // field_1 represents the IPFS hash
-          const tasks = await this.$blockchain.sdk.getIpfsContent(batch.content.field_1)
+          const tasks = await this.$blockchain.sdk.force.getIpfsContent(batch.content.field_1)
           commit('SET_BATCH_TASKS', { batchId: batch.batch_id, tasks: tasks.tasks })
         }
       } catch (e) {

@@ -44,7 +44,6 @@ export default class BlockchainScheme extends BaseScheme {
       // account does not exists
       throw new Error('Cannot find Effect Account')
     }
-
     account.vAccountRows = vAccountRows
     this.$auth.setUser(account)
     return Promise.resolve()

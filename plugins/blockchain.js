@@ -21,7 +21,7 @@ export default (context, inject) => {
         efxPending: 0,
         eos,
         bsc,
-        sdk: new effectSdk.EffectClient('testnet', sdkOptions),
+        sdk: new effectSdk.EffectClient('browser', sdkOptions),
         error: null,
         waitForSignatureFrom: null,
         waitForSignature: 0,
@@ -124,10 +124,8 @@ export default (context, inject) => {
               this.registerBscListeners(provider)
             }
           }
-          console.log('rememberAccount', rememberAccount)
-          if (!rememberAccount) {
-            account = await this.connectAccount(blockchain)
-          }
+
+          account = await this.connectAccount(blockchain)
           account.blockchain = blockchain
           account.provider = providerName
           this.account = account
@@ -315,6 +313,7 @@ export default (context, inject) => {
       },
       async connectAccount (chain) {
         try {
+          console.log('Connect Account')
           return await this.sdk.connectAccount(chain, chain === 'eos' ? this.eos.wallet.provider.signatureProvider : null, chain === 'bsc' ? this.bsc.web3 : null, chain === 'eos' ? this.eos.wallet.auth : null)
         } catch (error) {
           console.error(error)
