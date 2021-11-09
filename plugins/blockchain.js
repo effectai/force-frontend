@@ -83,10 +83,8 @@ export default (context, inject) => {
       async rememberLogin () {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
         if (rememberAccount) {
-          console.log('rememberLogin', rememberAccount)
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
           if (loggedIn) {
-            console.log('loggedIn? loginWith', this)
             await context.$auth.loginWith('blockchain', {
               account: this.account,
               $blockchain: this
@@ -148,7 +146,6 @@ export default (context, inject) => {
             this.waitForSignatureFrom = null
             account.accountName = addresses.accountAddress
             account.publicKey = this.bsc.wallet.address
-            console.log('switchBscAccountBeforeLogin', account)
             this.account = account
             this.initSdk()
           }
@@ -215,12 +212,12 @@ export default (context, inject) => {
       },
 
       async withdraw (toAccount, amount, memo) {
-        return await this.sdk.account.withdraw(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, toAccount, amount, context.$auth.user.permission, memo)
+        return await this.sdk.account.withdraw(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, toAccount, amount, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider }, memo)
       },
 
       // fromAccount: string, fromAccountId: number, toAccount: string, toAccountId:number, amountEfx: string, options: object
       async vTransfer (toAccount, toAccountId, amount) {
-        return await this.sdk.account.vtransfer(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, toAccount, toAccountId, amount, { permission: this.account.permission, address: context.$auth.user.publicKey })
+        return await this.sdk.account.vtransfer(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, toAccount, toAccountId, amount, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
       },
 
       async logout () {
@@ -236,8 +233,6 @@ export default (context, inject) => {
       async getAccountBalance () {
         if (context.$auth.loggedIn) {
           if (context.$auth.user.blockchain === 'bsc') {
-            console.log('User', context.$auth.user)
-            console.log('this.$blockchain', this)
             const balance = await this.getBscEFXBalance(context.$auth.user.publicKey)
             this.efxAvailable = parseFloat(balance)
           } else {
@@ -291,22 +286,22 @@ export default (context, inject) => {
         return await this.sdk.force.getCampaignJoins(accountId, campaignId)
       },
       async joinCampaign (accountId, campaignId) {
-        return await this.sdk.force.joinCampaign(context.$auth.user.accountName, accountId, campaignId, { permission: this.account.permission, address: context.$auth.user.publicKey })
+        return await this.sdk.force.joinCampaign(context.$auth.user.accountName, accountId, campaignId, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
       },
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)
       },
       async reserveTask (batchId, campaignId, taskIndex, tasks) {
-        return await this.sdk.force.reserveTask(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, batchId, taskIndex, campaignId, context.$auth.user.vAccountRows[0].id, tasks, { permission: this.account.permission, address: context.$auth.user.publicKey })
+        return await this.sdk.force.reserveTask(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, batchId, taskIndex, campaignId, context.$auth.user.vAccountRows[0].id, tasks, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
       },
       async submitTask (batchId, campaignId, submissionId, data) {
-        return await this.sdk.force.submitTask(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, batchId, submissionId, data, context.$auth.user.vAccountRows[0].id, { permission: this.account.permission, address: context.$auth.user.publicKey })
+        return await this.sdk.force.submitTask(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, batchId, submissionId, data, context.$auth.user.vAccountRows[0].id, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
       },
       async createBatch (campaignId, batchId, content, repetitions) {
-        return await this.sdk.force.createBatch(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, campaignId, batchId, content, repetitions, { permission: this.account.permission, address: context.$auth.user.publicKey })
+        return await this.sdk.force.createBatch(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, campaignId, batchId, content, repetitions, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
       },
       async createCampaign (hash, reward) {
-        return await this.sdk.force.createCampaign(context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, hash, reward, { permission: this.account.permission, address: context.$auth.user.publicKey })
+        return await this.sdk.force.createCampaign(context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, hash, reward, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
       },
       async getReservations () {
         return await this.sdk.force.getReservations()
@@ -327,7 +322,8 @@ export default (context, inject) => {
       async recoverPublicKey () {
         const message = 'Effect Account'
         const signature = await bsc.sign(message)
-        return this.sdk.account.recoverPublicKey(message, signature)
+        const addresses = this.sdk.account.recoverPublicKey(message, signature)
+        return addresses
       },
 
       handleError (error) {

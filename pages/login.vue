@@ -139,7 +139,6 @@ export default {
       this.loadingLogin = true
       if (!this.$blockchain.account) { return }
       try {
-        console.log('1', this.$blockchain)
         // if account doesnt exists yet add it
         let registerResult
         if (this.existingAccount === false) {

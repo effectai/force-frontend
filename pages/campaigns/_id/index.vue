@@ -188,7 +188,7 @@ export default {
       campaign: undefined,
       randomNumber: undefined,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
-      accountId: this.$auth.user.blockchain === 'eos' ? this.$auth.user.vAccountRows[0].id : null,
+      accountId: this.$auth.user.vAccountRows[0].id,
       body: 'description',
       userJoined: null,
       loading: false,
@@ -226,13 +226,11 @@ export default {
     async joinCampaign () {
       try {
       // function that makes the user join this campaign.
-        if (this.$auth.user.blockchain === 'eos') {
-          const data = await this.$blockchain.joinCampaign(this.accountId, this.id)
-          this.$store.dispatch('transaction/addTransaction', data)
-          if (data) {
-            this.loading = true
-            setTimeout(this.checkUserCampaign, 1500)
-          }
+        const data = await this.$blockchain.joinCampaign(this.accountId, this.id)
+        this.$store.dispatch('transaction/addTransaction', data)
+        if (data) {
+          this.loading = true
+          setTimeout(this.checkUserCampaign, 1500)
         }
         this.joinCampaignPopup = false
       } catch (e) {
