@@ -81,8 +81,8 @@ export default (context, inject) => {
           })
       },
       async rememberLogin () {
-        // const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
-        const rememberAccount = null
+        const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
+        // const rememberAccount = null
         if (rememberAccount) {
           console.log('rememberLogin', rememberAccount)
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
@@ -210,16 +210,15 @@ export default (context, inject) => {
       },
 
       async deposit (amount) {
-        return await this.sdk.account.deposit(this.account.accountName, this.account.vAccountRows[0].id, amount, this.account.permission)
+        return await this.sdk.account.deposit(amount)
       },
 
       async withdraw (toAccount, amount, memo) {
-        return await this.sdk.account.withdraw(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, toAccount, amount, context.$auth.user.permission, memo)
+        return await this.sdk.account.withdraw(toAccount, amount, memo)
       },
 
-      // fromAccount: string, fromAccountId: number, toAccount: string, toAccountId:number, amountEfx: string, options: object
       async vTransfer (toAccount, toAccountId, amount) {
-        return await this.sdk.account.vtransfer(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, toAccount, toAccountId, amount, { permission: this.account.permission, address: context.$auth.user.publicKey })
+        return await this.sdk.account.vtransfer(toAccount, toAccountId, amount, { permission: this.account.permission, address: context.$auth.user.publicKey })
       },
 
       async logout () {
