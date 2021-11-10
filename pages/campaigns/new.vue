@@ -8,6 +8,12 @@
       <h1 class="title mt-5">
         New Campaign
       </h1>
+      <div v-if="errors.length">
+        <b>Please correct the following error(s):</b>
+        <div v-for="error in errors" :key="error" class="notification is-danger is-light">
+          {{ error }}
+        </div>
+      </div>
       <div class="tabs">
         <ul>
           <li :class="{'is-active': formGroup === 'basic-info'}">
@@ -29,7 +35,7 @@
               <span class="has-text-info">*</span>
             </label>
             <div class="control">
-              <input v-model="campaignIpfs.title" required class="input" type="text" placeholder="My Campaign Title">
+              <input v-model="campaignIpfs.title" class="input" type="text" placeholder="My Campaign Title">
             </div>
           </div>
           <div class="field">
@@ -38,7 +44,7 @@
               <span class="has-text-info">*</span>
             </label>
             <div class="control">
-              <textarea v-model="campaignIpfs.description" class="textarea" required />
+              <textarea v-model="campaignIpfs.description" class="textarea" />
             </div>
           </div>
           <div class="field">
@@ -53,7 +59,7 @@
           </label>
           <div class="field has-addons">
             <div class="control">
-              <input v-model="campaignIpfs.reward" required class="input" type="number" placeholder="Reward per task">
+              <input v-model="campaignIpfs.reward" class="input" type="number" placeholder="Reward per task">
             </div>
             <div class="control">
               <a class="button is-primary">
@@ -68,7 +74,7 @@
                 <span class="has-text-info">*</span>
               </label>
               <div class="select">
-                <select v-model="campaignIpfs.category" required>
+                <select v-model="campaignIpfs.category">
                   <option>---</option>
                   <option value="dao">
                     Effect DAO
@@ -96,7 +102,7 @@
                   <span class="has-text-info">*</span>
                 </label>
                 <div class="control">
-                  <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" required :configs="{promptURLs: true, spellChecker: false}" />
+                  <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" :configs="{promptURLs: true, spellChecker: false}" />
                 </div>
               </div>
             </div>
@@ -114,7 +120,7 @@
           <div class="field">
             <label class="label">Template</label>
             <div class="control">
-              <textarea v-model="campaignIpfs.template" class="textarea" required />
+              <textarea v-model="campaignIpfs.template" class="textarea" />
             </div>
           </div>
           <div class="field">
@@ -145,7 +151,7 @@
             </button>
           </div>
         </div>
-        <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
+        <div v-if="errors.length === 0 && submitted" class="notification is-success is-light">
           {{ message }}
           <span v-if="transactionUrl">
             <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
@@ -221,7 +227,7 @@ export default {
       selectedFile: null,
       submitted: false,
       message: null,
-      err: false
+      errors: []
     }
   },
   computed: {
@@ -265,6 +271,34 @@ export default {
   },
 
   methods: {
+    checkForm () {
+      this.errors = []
+      if (
+        this.campaignIpfs.title && this.campaignIpfs.description &&
+        this.campaignIpfs.reward && this.campaignIpfs.category &&
+        this.campaignIpfs.instructions && this.campaignIpfs.template
+      ) {
+        return true
+      }
+      if (!this.campaignIpfs.title) {
+        this.errors.push('Title is required.')
+      }
+      if (!this.campaignIpfs.description) {
+        this.errors.push('Description is required.')
+      }
+      if (!this.campaignIpfs.reward) {
+        this.errors.push('Reward per task is required.')
+      }
+      if (!this.campaignIpfs.category) {
+        this.errors.push('Category is required.')
+      }
+      if (!this.campaignIpfs.instructions) {
+        this.errors.push('Instructions is required.')
+      }
+      if (!this.campaignIpfs.template) {
+        this.errors.push('Template is required.')
+      }
+    },
     cacheFormData () {
       // save this in the store instead?
       const campaign = window.localStorage.getItem('cached_campaign')
@@ -281,28 +315,29 @@ export default {
     async createCampaign () {
       this.loading = true
       try {
-        const campaignIpfs = { ...this.campaignIpfs }
-        const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
-        const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
-        this.$store.dispatch('transaction/addTransaction', result)
-        this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
-        this.message = 'Campaign created successfully! Check your transaction here: '
+        if (this.checkForm()) {
+          const campaignIpfs = { ...this.campaignIpfs }
+          const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
+          const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
+          this.$store.dispatch('transaction/addTransaction', result)
+          this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+          this.message = 'Campaign created successfully! Check your transaction here: '
 
-        // reset campaign
-        this.campaignIpfs = {
-          title: '',
-          description: '',
-          instructions: '',
-          template: '',
-          image: '',
-          category: '',
-          example_task: {},
-          version: 1,
-          reward: null
+          // reset campaign
+          this.campaignIpfs = {
+            title: '',
+            description: '',
+            instructions: '',
+            template: '',
+            image: '',
+            category: '',
+            example_task: {},
+            version: 1,
+            reward: null
+          }
         }
       } catch (error) {
-        this.message = error
-        this.err = true
+        this.errors.push(error)
       }
       this.loading = false
       this.submitted = true
