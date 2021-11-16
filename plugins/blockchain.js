@@ -84,10 +84,8 @@ export default (context, inject) => {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
         // const rememberAccount = null
         if (rememberAccount) {
-          console.log('rememberLogin', rememberAccount)
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
           if (loggedIn) {
-            console.log('loggedIn? loginWith', this)
             await context.$auth.loginWith('blockchain', {
               account: this.account,
               $blockchain: this
@@ -145,7 +143,6 @@ export default (context, inject) => {
             this.waitForSignatureFrom = null
             account.accountName = addresses.accountAddress
             account.publicKey = this.bsc.wallet.address
-            console.log('switchBscAccountBeforeLogin', account)
             this.account = account
             this.connectAccount()
           }
@@ -323,7 +320,8 @@ export default (context, inject) => {
       async recoverPublicKey () {
         const message = 'Effect Account'
         const signature = await bsc.sign(message)
-        return this.sdk.account.recoverPublicKey(message, signature)
+        const addresses = this.sdk.account.recoverPublicKey(message, signature)
+        return addresses
       },
 
       handleError (error) {
