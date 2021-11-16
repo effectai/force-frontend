@@ -9,7 +9,7 @@
         <button class="delete" aria-label="close" :disabled="!functional" @click.prevent="onCancel()" />
       </header>
       <section class="modal-card-body">
-        <div v-if="campaign && info" class="content" v-html="$md.render(info.instructions)" />
+        <div v-if="campaign && info" class="content" v-html="sanitizeHtmlCustom($md.render(info.instructions))" />
         <p v-else>
           ...
         </p>
@@ -30,6 +30,8 @@
   </div>
 </template>
 <script>
+import sanitizeHtml from 'sanitize-html'
+
 export default {
   name: 'InstructionsModal',
   props: {
@@ -80,6 +82,19 @@ export default {
       if (this.functional) {
         this.$parent.joinCampaign()
       }
+    },
+    sanitizeHtmlCustom (htmlSnippet) {
+      return sanitizeHtml(htmlSnippet, {
+        allowedTags: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol',
+          'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div',
+          'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'span', 'label'],
+        allowedAttributes: {
+          a: ['href', 'name', 'target', 'class'],
+          img: ['src', 'alt'],
+          iframe: ['src'],
+          '*': ['style']
+        }
+      })
     }
   }
 }
