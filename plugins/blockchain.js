@@ -21,7 +21,7 @@ export default (context, inject) => {
         efxPending: 0,
         eos,
         bsc,
-        sdk: new effectSdk.EffectClient('browser', sdkOptions),
+        sdk: new effectSdk.EffectClient('testnet', sdkOptions),
         error: null,
         waitForSignatureFrom: null,
         waitForSignature: 0,
@@ -310,8 +310,7 @@ export default (context, inject) => {
       },
       async connectAccount (chain) {
         try {
-          console.log('Connect Account')
-          return await this.sdk.connectAccount(chain, chain === 'eos' ? this.eos.wallet.provider.signatureProvider : null, chain === 'bsc' ? this.bsc.web3 : null, chain === 'eos' ? this.eos.wallet.auth : null)
+          return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, chain === 'eos' ? this.eos.wallet.auth : null)
         } catch (error) {
           console.error(error)
         }

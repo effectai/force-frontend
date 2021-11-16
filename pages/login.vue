@@ -146,7 +146,6 @@ export default {
           await sleep(2000)
         }
         await retry(async () => {
-          console.log('retry: this.$blockchain', this.$blockchain)
           await this.$auth.loginWith('blockchain', {
             account: this.$blockchain.account,
             $blockchain: this.$blockchain
