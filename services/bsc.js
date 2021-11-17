@@ -126,7 +126,6 @@ const bsc = {
   },
 
   onWalletConnectWeb3: async () => {
-    console.log('test')
     const wcProvider = new WalletConnectProvider({
       chainId: process.env.NUXT_ENV_BSC_NETWORK_ID,
       rpc: {
