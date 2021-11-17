@@ -1,6 +1,6 @@
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
-import { createBurnerWallet, privateKeyToBurnerWallet } from '../../effect-js'
+import { createAccount } from '../../effect-js'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -239,11 +239,7 @@ const bsc = {
         bsc.wallet = { address: (await bsc.web3.eth.getAccounts())[0] }
       } else if (bsc.currentProvider === 'burner-wallet') {
         // either generate private key or retrieve private key
-        if (privateKey) {
-          keypair = privateKeyToBurnerWallet(bsc.web3, privateKey)
-        } else {
-          keypair = createBurnerWallet(bsc.web3)
-        }
+        keypair = createAccount(privateKey)
         // creates empty wallet.
         bsc.web3.eth.accounts.wallet.create()
         // add current account (in the burner-wallet) to the actual wallet.

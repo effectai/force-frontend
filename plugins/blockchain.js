@@ -101,33 +101,41 @@ export default (context, inject) => {
       },
       async login (providerName, blockchain, rememberAccount, pk) {
         let account
-        let wallet
         try {
           if (blockchain === 'eos') {
-            wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
-            account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, publicKey: wallet.auth.publicKey }
+            const wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
+            account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, address: wallet.auth.publicKey, publicKey: wallet.auth.publicKey }
           } else if (blockchain === 'bsc') {
             if (rememberAccount && rememberAccount.privateKey) {
               pk = rememberAccount.privateKey
             }
             const provider = await this.bsc.login(providerName, pk)
+            let accountName
             if (rememberAccount) {
+              accountName = rememberAccount.accountName
               // Make sure we still have the same connection as our stored account
-              if (rememberAccount.publicKey.toLowerCase() !== this.bsc.wallet.address.toLowerCase()) {
+              if (rememberAccount.address.toLowerCase() !== this.bsc.wallet.address.toLowerCase()) {
                 await this.logout()
                 return false
               }
+            } else {
+              accountName = (await this.recoverPublicKey()).accountName
             }
-            if (providerName !== 'burner-wallet') {
+            if (providerName === 'burner-wallet') {
+              account = { accountName, address: this.bsc.wallet.address, privateKey: this.bsc.wallet.privateKey }
+            } else {
               this.registerBscListeners(provider)
+              account = { accountName, address: this.bsc.wallet.address }
             }
           }
 
-          account = await this.connectAccount(blockchain)
-          account.blockchain = blockchain
-          account.provider = providerName
-          this.account = account
-          return true
+          if (account) {
+            account.blockchain = blockchain
+            account.provider = providerName
+            this.account = account
+            return true
+          }
+          return false
         } catch (error) {
           return false
         }
@@ -137,14 +145,14 @@ export default (context, inject) => {
         try {
           const account = { ...this.account }
           // Make sure address matches with the public key we get from bsc wallet
-          const addresses = await this.recoverPublicKey(this.bsc.wallet.address)
+          const addresses = await this.recoverPublicKey()
+
           // Check if this is the signature we are currently waiting for, as we could have multiple signature requests..
           if (addresses.address.toLowerCase() === this.waitForSignatureFrom.toLowerCase() && addresses.address.toLowerCase() === this.bsc.wallet.address.toLowerCase()) {
             this.waitForSignatureFrom = null
-            account.accountName = addresses.accountAddress
-            account.publicKey = this.bsc.wallet.address
+            account.accountName = addresses.accountName
+            account.address = this.bsc.wallet.address
             this.account = account
-            this.connectAccount()
           }
         } catch (error) {
           this.handleError(error)
@@ -161,7 +169,7 @@ export default (context, inject) => {
 
         // Inform user of account change, only one account can be selected
         provider.on('accountsChanged', (newWallet) => {
-          this.bsc.wallet = newWallet
+          this.bsc.wallet = bsc.wallet = { address: newWallet[0] }
           if (newWallet.length) {
             if (context.$auth.loggedIn) {
               if (newWallet[0].toLowerCase() !== context.$auth.user.accountName.toLowerCase()) {
@@ -213,7 +221,7 @@ export default (context, inject) => {
       },
 
       async vTransfer (toAccount, toAccountId, amount) {
-        return await this.sdk.account.vtransfer(toAccount, toAccountId, amount, { permission: this.account.permission, address: context.$auth.user.publicKey })
+        return await this.sdk.account.vtransfer(toAccount, toAccountId, amount, { permission: this.account.permission, address: context.$auth.user.address })
       },
 
       async logout () {
@@ -229,7 +237,7 @@ export default (context, inject) => {
       async getAccountBalance () {
         if (context.$auth.loggedIn) {
           if (context.$auth.user.blockchain === 'bsc') {
-            const balance = await this.getBscEFXBalance(context.$auth.user.publicKey)
+            const balance = await this.getBscEFXBalance(context.$auth.user.address)
             this.efxAvailable = parseFloat(balance)
           } else {
             const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, context.$auth.user.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
@@ -308,9 +316,9 @@ export default (context, inject) => {
       async getTaskIndexFromLeaf (leafhash, tasks) {
         return await this.sdk.force.getTaskIndexFromLeaf(leafhash, tasks)
       },
-      async connectAccount (chain) {
+      async connectAccount (chain, account) {
         try {
-          return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, chain === 'eos' ? this.eos.wallet.auth : null)
+          return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, account)
         } catch (error) {
           console.error(error)
         }
