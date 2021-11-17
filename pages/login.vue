@@ -2,6 +2,7 @@
   <section class="section">
     <h2 class="subtitle has-text-centered">
       <span v-if="$blockchain.waitForSignatureFrom">Account Switched. Re-verify Signature</span>
+      <span v-else-if="existingAccount === false">Create new Effect Account</span>
       <span v-else>Login to your Effect Account</span>
     </h2>
     <div v-if="loading" class="container">
@@ -12,12 +13,12 @@
         <div class="has-text-centered mb-2" :class="{'subtitle': $blockchain.account.blockchain === 'eos'}">
           <a
             v-if="$blockchain.account.blockchain === 'bsc'"
-            :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey"
+            :href="$blockchain.bsc.explorer + '/address/'+ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.address"
             target="_blank"
             class="blockchain-address"
           >
             <p style="word-break: break-word;">
-              {{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.publicKey }}
+              {{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.address }}
             </p>
           </a>
           <a
@@ -25,10 +26,10 @@
             :href="$blockchain.eos.explorer + '/address/'+ $blockchain.account.accountName"
             target="_blank"
           >{{ $blockchain.account.accountName }}</a><span v-if="$blockchain.account.permission">@{{ $blockchain.account.permission }}</span>
-          <div v-if="$blockchain.account.provider === 'burner-wallet'">
+          <div v-if="$blockchain.account.privateKey">
             <p style="word-break: break-word;" class="mt-2">
               <span><b>Private key</b></span>
-              <span class="has-text-link">{{ $blockchain.waitForSignatureFrom ? $blockchain.waitForSignatureFrom : $blockchain.account.privateKey | hide(showPK) }}</span>
+              <span class="has-text-link">{{ $blockchain.account.privateKey | hide(showPK) }}</span>
             </p>
             <button class="button is-light" @click="showPK = !showPK">
               <span v-if="showPK">Hide</span>
@@ -114,6 +115,7 @@ export default {
     '$blockchain.account' (account) {
       this.existingAccount = null
       if (account) {
+        console.log('account', account)
         this.accountExists()
       }
     }
@@ -146,7 +148,6 @@ export default {
           await sleep(2000)
         }
         await retry(async () => {
-          console.log('retry: this.$blockchain', this.$blockchain)
           await this.$auth.loginWith('blockchain', {
             account: this.$blockchain.account,
             $blockchain: this.$blockchain

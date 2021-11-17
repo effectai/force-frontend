@@ -1,6 +1,6 @@
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
-import { createBurnerWallet, privateKeyToBurnerWallet } from '../../effect-js'
+import { createAccount } from '../../effect-js'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -55,21 +55,8 @@ const bsc = {
   },
 
   sign: async (message) => {
-  // BSC-Extensions only support 'eth_sign'
-  // https://binance-wallet.gitbook.io/binance-chain-extension-wallet/dev/get-started#binancechain-request-method-eth_sign-params-address-message
-    bsc.web3.extend({
-      property: 'bsc',
-      methods: [{
-        name: 'sign',
-        call: 'eth_sign',
-        params: 2
-      }]
-    })
-
     try {
-      if (bsc.currentProvider === bsc.binance) {
-        return await bsc.web3.bsc.sign(bsc.wallet.address, message)
-      } else if (bsc.currentProvider === 'burner-wallet') {
+      if (bsc.currentProvider === 'burner-wallet') {
         return (await bsc.web3.eth.accounts.sign(message, bsc.wallet.privateKey)).signature
       } else {
         return await bsc.web3.eth.personal.sign(message, bsc.wallet.address)
@@ -252,11 +239,7 @@ const bsc = {
         bsc.wallet = { address: (await bsc.web3.eth.getAccounts())[0] }
       } else if (bsc.currentProvider === 'burner-wallet') {
         // either generate private key or retrieve private key
-        if (privateKey) {
-          keypair = privateKeyToBurnerWallet(bsc.web3, privateKey)
-        } else {
-          keypair = createBurnerWallet(bsc.web3)
-        }
+        keypair = createAccount(privateKey)
         // creates empty wallet.
         bsc.web3.eth.accounts.wallet.create()
         // add current account (in the burner-wallet) to the actual wallet.

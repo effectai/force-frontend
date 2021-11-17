@@ -82,6 +82,7 @@ export default (context, inject) => {
       },
       async rememberLogin () {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
+        // const rememberAccount = null
         if (rememberAccount) {
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
           if (loggedIn) {
@@ -100,54 +101,58 @@ export default (context, inject) => {
       },
       async login (providerName, blockchain, rememberAccount, pk) {
         let account
-        if (blockchain === 'eos') {
-          const wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
-          account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, publicKey: wallet.auth.publicKey }
-        } else if (blockchain === 'bsc') {
-          if (rememberAccount && rememberAccount.privateKey) {
-            pk = rememberAccount.privateKey
-          }
-          const provider = await this.bsc.login(providerName, pk)
-          let accountAddress
-          if (rememberAccount) {
-            accountAddress = rememberAccount.accountName
-            // Make sure we still have the same connection as our stored account
-            if (rememberAccount.publicKey.toLowerCase() !== this.bsc.wallet.address.toLowerCase()) {
-              await this.logout()
-              return false
+        try {
+          if (blockchain === 'eos') {
+            const wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
+            account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, address: wallet.auth.publicKey, publicKey: wallet.auth.publicKey }
+          } else if (blockchain === 'bsc') {
+            if (rememberAccount && rememberAccount.privateKey) {
+              pk = rememberAccount.privateKey
             }
-          } else {
-            accountAddress = (await this.recoverPublicKey(this.bsc.wallet.address)).accountAddress
+            const provider = await this.bsc.login(providerName, pk)
+            let accountName
+            if (rememberAccount) {
+              accountName = rememberAccount.accountName
+              // Make sure we still have the same connection as our stored account
+              if (rememberAccount.address.toLowerCase() !== this.bsc.wallet.address.toLowerCase()) {
+                await this.logout()
+                return false
+              }
+            } else {
+              accountName = (await this.recoverPublicKey()).accountName
+            }
+            if (providerName === 'burner-wallet') {
+              account = { accountName, address: this.bsc.wallet.address, privateKey: this.bsc.wallet.privateKey }
+            } else {
+              this.registerBscListeners(provider)
+              account = { accountName, address: this.bsc.wallet.address }
+            }
           }
-          if (providerName === 'burner-wallet') {
-            account = { accountName: accountAddress, publicKey: this.bsc.wallet.address, privateKey: this.bsc.wallet.privateKey }
-          } else {
-            this.registerBscListeners(provider)
-            account = { accountName: accountAddress, publicKey: this.bsc.wallet.address }
+
+          if (account) {
+            account.blockchain = blockchain
+            account.provider = providerName
+            this.account = account
+            return true
           }
+          return false
+        } catch (error) {
+          return false
         }
-        if (account) {
-          account.blockchain = blockchain
-          account.provider = providerName
-          this.account = account
-          this.initSdk()
-          return true
-        }
-        return false
       },
       async switchBscAccountBeforeLogin () {
         this.waitForSignature++
         try {
           const account = { ...this.account }
           // Make sure address matches with the public key we get from bsc wallet
-          const addresses = await this.recoverPublicKey(this.bsc.wallet.address)
+          const addresses = await this.recoverPublicKey()
+
           // Check if this is the signature we are currently waiting for, as we could have multiple signature requests..
           if (addresses.address.toLowerCase() === this.waitForSignatureFrom.toLowerCase() && addresses.address.toLowerCase() === this.bsc.wallet.address.toLowerCase()) {
             this.waitForSignatureFrom = null
-            account.accountName = addresses.accountAddress
-            account.publicKey = this.bsc.wallet.address
+            account.accountName = addresses.accountName
+            account.address = this.bsc.wallet.address
             this.account = account
-            this.initSdk()
           }
         } catch (error) {
           this.handleError(error)
@@ -164,7 +169,7 @@ export default (context, inject) => {
 
         // Inform user of account change, only one account can be selected
         provider.on('accountsChanged', (newWallet) => {
-          this.bsc.wallet = newWallet
+          this.bsc.wallet = bsc.wallet = { address: newWallet[0] }
           if (newWallet.length) {
             if (context.$auth.loggedIn) {
               if (newWallet[0].toLowerCase() !== context.$auth.user.accountName.toLowerCase()) {
@@ -208,16 +213,15 @@ export default (context, inject) => {
       },
 
       async deposit (amount) {
-        return await this.sdk.account.deposit(this.account.accountName, this.account.vAccountRows[0].id, amount, this.account.permission)
+        return await this.sdk.account.deposit(amount)
       },
 
       async withdraw (toAccount, amount, memo) {
-        return await this.sdk.account.withdraw(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, toAccount, amount, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider }, memo)
+        return await this.sdk.account.withdraw(toAccount, amount, memo)
       },
 
-      // fromAccount: string, fromAccountId: number, toAccount: string, toAccountId:number, amountEfx: string, options: object
       async vTransfer (toAccount, toAccountId, amount) {
-        return await this.sdk.account.vtransfer(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, toAccount, toAccountId, amount, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
+        return await this.sdk.account.vtransfer(toAccount, toAccountId, amount, { permission: this.account.permission, address: context.$auth.user.address })
       },
 
       async logout () {
@@ -233,7 +237,7 @@ export default (context, inject) => {
       async getAccountBalance () {
         if (context.$auth.loggedIn) {
           if (context.$auth.user.blockchain === 'bsc') {
-            const balance = await this.getBscEFXBalance(context.$auth.user.publicKey)
+            const balance = await this.getBscEFXBalance(context.$auth.user.address)
             this.efxAvailable = parseFloat(balance)
           } else {
             const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, context.$auth.user.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
@@ -282,41 +286,42 @@ export default (context, inject) => {
       async getCampaigns (nextKey, limit = 20) {
         return await this.sdk.force.getCampaigns(nextKey, limit)
       },
-      async getCampaignJoins (accountId, campaignId) {
-        return await this.sdk.force.getCampaignJoins(accountId, campaignId)
+      async getCampaignJoins (campaignId) {
+        return await this.sdk.force.getCampaignJoins(campaignId)
       },
-      async joinCampaign (accountId, campaignId) {
-        return await this.sdk.force.joinCampaign(context.$auth.user.accountName, accountId, campaignId, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
+      async joinCampaign (campaignId) {
+        return await this.sdk.force.joinCampaign(campaignId)
       },
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)
       },
       async reserveTask (batchId, campaignId, taskIndex, tasks) {
-        return await this.sdk.force.reserveTask(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, batchId, taskIndex, campaignId, context.$auth.user.vAccountRows[0].id, tasks, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
+        return await this.sdk.force.reserveTask(batchId, taskIndex, campaignId, tasks)
       },
-      async submitTask (batchId, campaignId, submissionId, data) {
-        return await this.sdk.force.submitTask(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, batchId, submissionId, data, context.$auth.user.vAccountRows[0].id, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
+      async submitTask (batchId, submissionId, data) {
+        return await this.sdk.force.submitTask(batchId, submissionId, data)
       },
       async createBatch (campaignId, batchId, content, repetitions) {
-        return await this.sdk.force.createBatch(context.$auth.user.blockchain === 'bsc' ? context.$auth.user.publicKey : context.$auth.user.accountName, campaignId, batchId, content, repetitions, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
+        return await this.sdk.force.createBatch(campaignId, batchId, content, repetitions)
       },
       async createCampaign (hash, reward) {
-        return await this.sdk.force.createCampaign(context.$auth.user.accountName, context.$auth.user.vAccountRows[0].id, context.$auth.user.vAccountRows[0].nonce, hash, reward, { permission: this.account.permission, address: context.$auth.user.publicKey, provider: context.$auth.user.provider })
+        return await this.sdk.force.createCampaign(hash, reward)
       },
       async getReservations () {
         return await this.sdk.force.getReservations()
       },
+      async getTaskSubmissionsForBatch (batchId) {
+        return await this.sdk.force.getTaskSubmissionsForBatch(batchId)
+      },
       async getTaskIndexFromLeaf (leafhash, tasks) {
         return await this.sdk.force.getTaskIndexFromLeaf(leafhash, tasks)
       },
-      initSdk () {
-        const sdkOptions = {
-          network: process.env.NUXT_ENV_EOS_NETWORK,
-          host: `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`,
-          signatureProvider: this.eos.wallet ? this.eos.wallet.provider.signatureProvider : null,
-          web3: this.bsc.wallet ? this.bsc.web3 : null
+      async connectAccount (chain, account) {
+        try {
+          return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, account)
+        } catch (error) {
+          console.error(error)
         }
-        this.sdk = new effectSdk.EffectClient('testnet', sdkOptions)
       },
 
       async recoverPublicKey () {

@@ -125,9 +125,11 @@
             <div class="block">
               <b>Requester</b>
               <br>
-              <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                {{ campaign.owner[1] }}
-              </nuxt-link>
+              <div class="blockchain-address">
+                <nuxt-link :to="'/profile/' + campaign.owner[1]">
+                  {{ campaign.owner[1] }}
+                </nuxt-link>
+              </div>
             </div>
             <div class="block">
               <b>Reward</b>
@@ -226,7 +228,7 @@ export default {
     async joinCampaign () {
       try {
       // function that makes the user join this campaign.
-        const data = await this.$blockchain.joinCampaign(this.accountId, this.id)
+        const data = await this.$blockchain.joinCampaign(this.id)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
@@ -244,7 +246,7 @@ export default {
       this.loading = true
       try {
         // checks if the user joined this campaign.
-        const data = await this.$blockchain.getCampaignJoins(this.accountId, this.id)
+        const data = await this.$blockchain.getCampaignJoins(this.id)
         this.userJoined = (data.rows.length > 0)
       } catch (e) {
         this.$blockchain.handleError(e)

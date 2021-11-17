@@ -13,10 +13,10 @@
           <div class="subtitle">
             <a
               v-if="$auth.user.blockchain === 'bsc'"
-              :href="$blockchain.bsc.explorer + '/address/'+ $auth.user.publicKey"
+              :href="$blockchain.bsc.explorer + '/address/'+ $auth.user.address"
               target="_blank"
               class="blockchain-address"
-            >{{ $auth.user.publicKey }}</a>
+            >{{ $auth.user.address }}</a>
             <a
               v-else
               :href="$blockchain.eos.explorer + '/address/'+ $auth.user.accountName"

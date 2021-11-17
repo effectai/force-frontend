@@ -77,10 +77,12 @@
             <div class="block">
               <b>Requester</b>
               <br>
-              <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
-                {{ campaign.owner[1] }}
-              </nuxt-link>
-              <span v-else>.....</span>
+              <div class="blockchain-address">
+                <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
+                  {{ campaign.owner[1] }}
+                </nuxt-link>
+                <span v-else>.....</span>
+              </div>
             </div>
             <div class="block">
               <b>Reward</b>
@@ -195,7 +197,7 @@ export default {
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
-        const data = await this.$blockchain.joinCampaign(this.accountId, this.campaignId)
+        const data = await this.$blockchain.joinCampaign(this.campaignId)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
@@ -210,7 +212,7 @@ export default {
       this.loading = true
       try {
         // checks if the user joined this campaign.
-        const data = await this.$blockchain.getCampaignJoins(this.accountId, this.campaignId)
+        const data = await this.$blockchain.getCampaignJoins(this.campaignId)
         this.userJoined = (data.rows.length > 0)
       } catch (e) {
         this.$blockchain.handleError(e)
@@ -226,6 +228,9 @@ export default {
     async getBatch () {
       await this.$store.dispatch('campaign/getBatch', { batchId: this.batchId })
       this.batch = this.batches.find(b => b.batch_id === this.batchId)
+      // todo: make tab for submissiosn and reservations
+      const submissions = this.$blockchain.getTaskSubmissionsForBatch(this.batchId)
+      console.log('batch submissions:', submissions)
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
