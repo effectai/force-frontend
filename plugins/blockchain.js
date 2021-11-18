@@ -284,6 +284,9 @@ export default (context, inject) => {
       async getBatches (nextKey, limit = 20) {
         return await this.sdk.force.getBatches(nextKey, limit)
       },
+      async getCampaign (id) {
+        return await this.sdk.force.getCampaign(id)
+      },
       async getCampaigns (nextKey, limit = 20) {
         return await this.sdk.force.getCampaigns(nextKey, limit)
       },
