@@ -9,7 +9,6 @@
         New Campaign
       </h1>
       <div v-if="errors.length">
-        <b>Please correct the following error(s):</b>
         <div v-for="error in errors" :key="error" class="notification is-danger is-light">
           {{ error }}
         </div>

@@ -68,7 +68,7 @@
             Batches
           </p>
           <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-            <span v-if="batchByCampaignId(campaign.idid) === null">
+            <span v-if="batchByCampaignId(campaign.id) === null">
               Loading..
             </span>
             <span v-else>{{ batchByCampaignId(campaign.id).length }}</span>
