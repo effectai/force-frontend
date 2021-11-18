@@ -124,7 +124,8 @@
 </template>
 
 <script>
-import { createAccount } from '../../effect-js'
+// import { createAccount } from '../../effect-js'
+import { createAccount } from '@effectai/effect-js'
 
 export default {
   data () {

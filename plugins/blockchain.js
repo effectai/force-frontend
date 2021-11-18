@@ -1,8 +1,9 @@
+import * as effectSdk from '@effectai/effect-js'
 import Vue from 'vue'
 import eos from '../services/eos'
 import bsc from '../services/bsc'
 // const effectSdk = require('@effectai/effect-js')
-const effectSdk = require('../../effect-js')
+// const effectSdk = require('../../effect-js')
 
 export default (context, inject) => {
   const blockchain = new Vue({
