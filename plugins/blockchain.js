@@ -128,10 +128,10 @@ export default (context, inject) => {
               account = { accountName, address: this.bsc.wallet.address }
             }
           }
-
           if (account) {
             account.blockchain = blockchain
             account.provider = providerName
+            await this.connectAccount(blockchain, account)
             this.account = account
             return true
           }
@@ -317,11 +317,7 @@ export default (context, inject) => {
         return await this.sdk.force.getTaskIndexFromLeaf(leafhash, tasks)
       },
       async connectAccount (chain, account) {
-        try {
-          return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, account)
-        } catch (error) {
-          console.error(error)
-        }
+        return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, account)
       },
 
       async recoverPublicKey () {
