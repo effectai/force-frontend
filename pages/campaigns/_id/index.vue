@@ -88,7 +88,7 @@
                       <p v-else class="has-text-grey is-size-7">
                         Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
                       </p>
-                      <progress class="progress is-small mt-2" :value="batch.tasks_done" :max="batch.num_tasks" />
+                      <progress class="progress is-small mt-2" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false }" :value="batch.tasks_done" :max="batch.num_tasks" />
                     </div>
                     <div class="column has-text-right is-12-mobile">
                       <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :class="{'is-loading': !campaign || typeof campaign.info === 'undefined', 'is-accent': campaign && campaign.info === null, 'is-outlined': campaign && campaign.info === null}">
@@ -165,6 +165,9 @@
               <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${id}&upper_bound=${id}`">View Campaign on Explorer</a>
             </div>
             <div class="block">
+              <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-primary is-light">
+                Edit Campaign
+              </nuxt-link>
               <button class="button is-primary" :class="{'is-loading': loading === true}" :disabled="userJoined" @click.prevent="joinCampaignPopup = true">
                 Join<span v-if="userJoined">ed</span>&nbsp;Campaign
               </button>
@@ -276,5 +279,4 @@ export default {
 .progress::-webkit-progress-value {
   transition: width 0.5s ease;
 }
-
 </style>
