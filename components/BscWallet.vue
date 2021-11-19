@@ -1,7 +1,7 @@
 <template>
   <span>
     <div class="modal" :class="{ 'is-active': $blockchain.loginModal === 'bsc' }">
-      <div class="modal-background" @click="$blockchain.loginModal = false; burnerWallet = false" />
+      <div class="modal-background" @click="$blockchain.loginModal = false; burnerWallet = false; showKeypairDetails = false" />
       <div class="modal-card">
         <div v-if="error" class="notification is-danger">
           <button class="delete" @click="error = null" />
@@ -11,15 +11,15 @@
           <p class="modal-card-title">
             Select your BSC wallet
           </p>
-          <button class="delete" aria-label="close" @click="$blockchain.loginModal = false; burnerWallet = false" />
+          <button class="delete" aria-label="close" @click="$blockchain.loginModal = false; burnerWallet = false; showKeypairDetails = false" />
         </header>
         <section class="modal-card-body">
           <div v-if="loading" class="loader-wrapper is-active">
             <div class="loader is-loading" />
           </div>
-          <div v-if="burnerWallet">
+          <div v-if="burnerWallet == true && showKeypairDetails == false">
             <div>
-              <a href="" class="has-text-danger-dark" @click.prevent="burnerWallet = false">Back</a>
+              <a href="#" class="has-text-danger-dark" @click.prevent="burnerWallet = false">Back</a>
             </div>
             <div class="mb-4">
               <input v-model="privateKey" class="input is-primary is-medium" type="text" placeholder="Private Key...">
@@ -28,10 +28,38 @@
               <button class="button is-primary is-fullwidth" :disabled="!privateKey" @click.prevent="importPrivateKey">
                 <span>import private key</span>
               </button>
-              <span>No Private key? <a class="is-size-6" @click.prevent="importPrivateKey">Generate a keypair</a></span>
+              <span>No Private key? <a class="is-size-6" @click.prevent="createKeypair">Generate a keypair</a></span>
             </div>
           </div>
-          <div v-else class="columns is-multiline">
+          <div v-if="burnerWallet == true && showKeypairDetails == true" class="content">
+            <div>
+              <a href="#" class="has-text-danger-dark" @click.prevent="showKeypairDetails = false">Back</a>
+            </div>
+            <div class="notification is-warning is-light mt-3" role="alert">
+              Do not forget to backup your private key.
+            </div>
+            <div class="box has-limited-width is-horizontal-centered">
+              <div class="field">
+                <label class="label">Public key</label>
+                <div class="control has-icons-right">
+                  <input class="input blockchain-address" type="text" :value="keypair.address" readonly>
+                  <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade" :data-tooltip="copy_message" @click.prevent="copyToClipboard(keypair.address)" @mouseout="copy_message = 'Copy to clipboard'">
+                    <img src="~assets/img/icons/copy.svg" alt="Copy">
+                  </span>
+                </div>
+              </div>
+              <div class="">
+                <label class="label">Private key</label>
+                <div class="control has-icons-right">
+                  <input class="input blockchain-address" type="text" :value="keypair.privateKey" readonly>
+                  <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade" :data-tooltip="copy_message" @click.prevent="copyToClipboard(keypair.privateKey)" @mouseout="copy_message = 'Copy to clipboard'">
+                    <img src="~assets/img/icons/copy.svg" alt="Copy">
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-if="burnerWallet == false && showKeypairDetails == false" class="columns is-multiline">
             <div class="column is-half">
               <div v-if="isMetaMaskInstalled" class="provider has-radius disabled" @click="selectWallet('metamask')">
                 <img src="@/assets/img/providers/metamask.png">
@@ -96,6 +124,8 @@
 </template>
 
 <script>
+// import { createAccount } from '../../effect-js'
+import { createAccount } from '@effectai/effect-js'
 
 export default {
   data () {
@@ -103,7 +133,13 @@ export default {
       loading: false,
       error: null,
       privateKey: null,
-      burnerWallet: false
+      burnerWallet: false,
+      showKeypairDetails: false,
+      copy_message: 'Copy to clipboard',
+      keypair: {
+        address: '',
+        privateKey: ''
+      }
     }
   },
   computed: {
@@ -119,6 +155,16 @@ export default {
     }
   },
   methods: {
+    copyToClipboard (content) {
+      navigator.clipboard.writeText(content).then(() => {
+        this.copy_message = 'Copied!'
+      })
+    },
+    createKeypair () {
+      this.showKeypairDetails = true
+      const { address, privateKey } = createAccount()
+      this.keypair = { address, privateKey }
+    },
     importPrivateKey () {
       this.selectWallet('burner-wallet')
     },
@@ -150,6 +196,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.has-limited-width {
+  width: 450px;
+}
 .modal-card-body {
   border-radius: 0 0 6px 6px;
 }

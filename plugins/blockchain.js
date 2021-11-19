@@ -1,8 +1,9 @@
+import * as effectSdk from '@effectai/effect-js'
 import Vue from 'vue'
 import eos from '../services/eos'
 import bsc from '../services/bsc'
 // const effectSdk = require('@effectai/effect-js')
-const effectSdk = require('../../effect-js')
+// const effectSdk = require('../../effect-js')
 
 export default (context, inject) => {
   const blockchain = new Vue({
@@ -128,10 +129,10 @@ export default (context, inject) => {
               account = { accountName, address: this.bsc.wallet.address }
             }
           }
-
           if (account) {
             account.blockchain = blockchain
             account.provider = providerName
+            await this.connectAccount(blockchain, account)
             this.account = account
             return true
           }
@@ -283,6 +284,9 @@ export default (context, inject) => {
       async getBatches (nextKey, limit = 20) {
         return await this.sdk.force.getBatches(nextKey, limit)
       },
+      async getCampaign (id) {
+        return await this.sdk.force.getCampaign(id)
+      },
       async getCampaigns (nextKey, limit = 20) {
         return await this.sdk.force.getCampaigns(nextKey, limit)
       },
@@ -317,11 +321,7 @@ export default (context, inject) => {
         return await this.sdk.force.getTaskIndexFromLeaf(leafhash, tasks)
       },
       async connectAccount (chain, account) {
-        try {
-          return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, account)
-        } catch (error) {
-          console.error(error)
-        }
+        return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, account)
       },
 
       async recoverPublicKey () {

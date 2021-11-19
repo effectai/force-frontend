@@ -122,7 +122,6 @@ export default {
 
           if (data.rows.length > 0) {
             commit('ADD_CAMPAIGN', data.rows[0])
-            await dispatch('processCampaign', data.rows[0])
           } else {
             throw new Error('Cannot find campaign with the given id.')
           }
@@ -145,15 +144,7 @@ export default {
         } else {
           campaigns = campaigns.concat(data.rows)
         }
-        commit('SET_CAMPAIGNS', campaigns);
-
-        // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
-        (async () => {
-          for (const campaign of campaigns) {
-            // await new Promise(resolve => setTimeout(resolve, 100))
-            await dispatch('processCampaign', campaign)
-          }
-        })()
+        commit('SET_CAMPAIGNS', campaigns)
 
         if (data.more) {
           await dispatch('getCampaigns', data.next_key)
@@ -165,19 +156,6 @@ export default {
       } catch (error) {
         this.$blockchain.handleError(error)
         commit('SET_LOADING', false)
-      }
-    },
-    async processCampaign ({ commit }, campaign) {
-      try {
-        // field_0 represents the content type where:
-        // 0: IPFS
-        if (campaign.content.field_0 === 0) {
-          // field_1 represents the IPFS hash
-          const info = await this.$blockchain.sdk.force.getIpfsContent(campaign.content.field_1)
-          commit('SET_CAMPAIGN_INFO', { id: campaign.id, info })
-        }
-      } catch (e) {
-        commit('SET_CAMPAIGN_INFO', { id: campaign.id, info: null })
       }
     },
     async getBatchTasks ({ commit }, batch) {

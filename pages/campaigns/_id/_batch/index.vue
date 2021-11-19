@@ -93,12 +93,15 @@
             <div class="block">
               <b>Tasks</b>
               <br>
-              <template v-if="batch">
+              <template v-if="batch && batch.num_tasks - batch.tasks_done === 0">
+                <span>Done.</span>
+              </template>
+              <template v-else-if="batch && batch.num_tasks - batch.tasks_done > 0">
                 <span>{{ batch.num_tasks - batch.tasks_done }}</span>
                 <span>/ {{ batch.num_tasks }} left</span>
               </template>
               <span v-else>...</span>
-              <progress class="progress is-secondary" :value="batch ? batch.tasks_done : undefined" :max="batch ? batch.num_tasks : undefined">
+              <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks: false}" :value="batch ? batch.tasks_done : undefined" :max="batch ? batch.num_tasks : undefined">
                 Left
               </progress>
             </div>
@@ -252,5 +255,4 @@ export default {
 .progress::-webkit-progress-value {
   transition: width 0.5s ease;
 }
-
 </style>
