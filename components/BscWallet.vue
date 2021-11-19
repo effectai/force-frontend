@@ -96,12 +96,12 @@
               </div>
 
             </div>
-            <div class="column is-half">
+            <!-- <div class="column is-half">
               <div class="provider has-radius is-mobile" @click="selectWallet('walletconnect')">
                 <img src="@/assets/img/providers/walletconnect.svg">
                 WalletConnect
               </div>
-            </div>
+            </div> -->
             <div class="column is-full has-text-centered">
               <div class="title">
                 - OR -
@@ -124,7 +124,6 @@
 </template>
 
 <script>
-// import { createAccount } from '../../effect-js'
 import { createAccount } from '@effectai/effect-js'
 
 export default {
