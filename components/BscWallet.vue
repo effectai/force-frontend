@@ -70,7 +70,7 @@
                 Install MetaMask
               </a>
             </div>
-            <div class="column is-half">
+            <!-- <div class="column is-half">
               <div v-if="$blockchain.bsc.checkBinanceInstalled" class="provider has-radius" @click="selectWallet('bsc')">
                 <img src="@/assets/img/providers/bsc.svg">
                 Binance Chain
@@ -84,7 +84,7 @@
                 <img src="@/assets/img/providers/bsc.svg">
                 Install Binance Chain
               </a>
-            </div>
+            </div> -->
             <!-- <div class="column is-half">
               <div v-if="isTrustInstalled" class="provider has-radius is-mobile" @click="selectWallet('trustwallet')">
                 <img src="@/assets/img/providers/trust.png">
