@@ -85,7 +85,7 @@
                 Install Binance Chain
               </a>
             </div>
-            <div class="column is-half">
+            <!-- <div class="column is-half">
               <div v-if="isTrustInstalled" class="provider has-radius is-mobile" @click="selectWallet('trustwallet')">
                 <img src="@/assets/img/providers/trust.png">
                 TrustWallet
@@ -93,7 +93,7 @@
               <div v-else class="provider has-radius is-mobile" @click="selectWallet('walletconnect')">
                 <img src="@/assets/img/providers/trust.png">
                 TrustWallet
-              </div>
+              </div> -->
 
             </div>
             <!-- <div class="column is-half">
