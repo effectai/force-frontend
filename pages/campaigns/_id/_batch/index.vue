@@ -42,6 +42,9 @@
               <li :class="{'is-active': body === 'instruction'}">
                 <a @click.prevent="body = 'instruction'">Instructions</a>
               </li>
+              <li :class="{'is-active': body === 'results'}">
+                <a @click.prevent="body = 'results'">Task Results</a>
+              </li>
             </ul>
           </div>
           <div v-if="body === 'description'" class="block">
@@ -67,6 +70,34 @@
             <p v-else>
               ...
             </p>
+          </div>
+          <!-- Task results -->
+          <div v-if="body === 'results'" class="block">
+            <div v-if="campaign && campaign.info" class="content">
+              <div v-if="submissions">
+                <table class="table" style="width: 100%">
+                  <thead>
+                    <tr>
+                      <th>Account ID</th>
+                      <th>Data</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="sub in submissions"
+                      :key="sub.id"
+                    >
+                      <td>{{ sub.account_id }}</td>
+                      <td>{{ sub.data }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <button class="button is-primary" @click.prevent="downloadResults()">
+                  Download Results
+                </button>
+              </div>
+              <span v-else>No results found</span>
+            </div>
           </div>
         </div>
         <div class="column is-one-third">
@@ -148,6 +179,7 @@ import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
 import { Template } from '@/../effect-js'
+const jsonexport = require('jsonexport/dist')
 
 export default {
   components: {
@@ -169,7 +201,8 @@ export default {
       userJoined: null,
       loading: false,
       joinCampaignPopup: false,
-      reserveTask: false
+      reserveTask: false,
+      submissions: null
     }
   },
   computed: {
@@ -229,7 +262,8 @@ export default {
       await this.$store.dispatch('campaign/getBatch', { batchId: this.batchId })
       this.batch = this.batches.find(b => b.batch_id === this.batchId)
       // todo: make tab for submissiosn and reservations
-      const submissions = this.$blockchain.getTaskSubmissionsForBatch(this.batchId)
+      const submissions = await this.$blockchain.getTaskSubmissionsForBatch(this.batchId)
+      this.submissions = submissions
       console.log('batch submissions:', submissions)
     },
     async getCampaign () {
@@ -238,6 +272,14 @@ export default {
     },
     generateRandomNumber (maxNum) {
       return Math.ceil(Math.random() * maxNum)
+    },
+    downloadResults () {
+      jsonexport(this.submissions, function (err, csv) {
+        if (err) {
+          return console.error(err)
+        }
+        console.log(csv)
+      })
     }
   }
 }
