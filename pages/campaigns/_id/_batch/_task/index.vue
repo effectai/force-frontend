@@ -21,7 +21,7 @@
 import { mapState } from 'vuex'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
-import { Template } from '@/../effect-js'
+import { Template } from '@effectai/effect-js'
 
 export default {
   components: {

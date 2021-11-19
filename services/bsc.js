@@ -1,6 +1,6 @@
-import WalletConnectProvider from '@walletconnect/web3-provider'
+// import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
-import { createAccount } from '../../effect-js'
+import { createAccount } from '@effectai/effect-js'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -125,25 +125,27 @@ const bsc = {
     }
   },
 
-  onWalletConnectWeb3: async () => {
-    const wcProvider = new WalletConnectProvider({
-      chainId: process.env.NUXT_ENV_BSC_NETWORK_ID,
-      rpc: {
-        56: process.env.NUXT_ENV_BSC_RPC
-      },
-      qrcodeModalOptions: {
-        mobileLinks: ['metamask', 'trust']
-      },
-      bridge: process.env.NUXT_ENV_BRIDGE
-    })
+  // onWalletConnectWeb3: async () => {
+  onWalletConnectWeb3: () => {
+    // const wcProvider = new WalletConnectProvider({
+    //   chainId: process.env.NUXT_ENV_BSC_NETWORK_ID,
+    //   rpc: {
+    //     56: process.env.NUXT_ENV_BSC_RPC
+    //   },
+    //   qrcodeModalOptions: {
+    //     mobileLinks: ['metamask', 'trust']
+    //   },
+    //   bridge: process.env.NUXT_ENV_BRIDGE
+    // })
 
-    bsc.walletConnect = wcProvider
+    // bsc.walletConnect = wcProvider
 
     try {
-      const provider = await bsc.registerProvider(wcProvider)
+      // const provider = await bsc.registerProvider(wcProvider)
       // bsc.wallet = bsc.walletConnect.accounts
-      bsc.walletConnect.updateRpcUrl(process.env.NUXT_ENV_BSC_NETWORK_ID, process.env.NUXT_ENV_BSC_RPC)
-      return provider
+      // bsc.walletConnect.updateRpcUrl(process.env.NUXT_ENV_BSC_NETWORK_ID, process.env.NUXT_ENV_BSC_RPC)
+      // return provider
+      return undefined
     } catch (error) {
       console.error(error)
       return Promise.reject(error)
