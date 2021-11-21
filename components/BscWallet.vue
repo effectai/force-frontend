@@ -95,7 +95,6 @@
                 TrustWallet
               </div> -->
 
-            </div>
             <!-- <div class="column is-half">
               <div class="provider has-radius is-mobile" @click="selectWallet('walletconnect')">
                 <img src="@/assets/img/providers/walletconnect.svg">
