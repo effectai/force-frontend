@@ -100,8 +100,9 @@
                   Raw Text
                   <span class="has-text-info">*</span>
                 </label>
-                <div class="control">
-                  <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" :configs="{promptURLs: true, spellChecker: false}" />
+                <div v-if="campaign && campaignIpfs" class="control">
+                  <textarea v-model="campaignIpfs.instructions" />
+                  <!-- <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" :configs="{promptURLs: true, spellChecker: false}" /> -->
                 </div>
               </div>
             </div>
@@ -162,7 +163,7 @@
 </template>
 
 <script>
-import VueSimplemde from 'vue-simplemde'
+// import VueSimplemde from 'vue-simplemde'
 import InstructionsModal from '@/components/InstructionsModal'
 
 function getMatches (string, regex, index) {
@@ -177,7 +178,7 @@ function getMatches (string, regex, index) {
 
 export default {
   components: {
-    VueSimplemde,
+    // VueSimplemde,
     InstructionsModal
   },
 
