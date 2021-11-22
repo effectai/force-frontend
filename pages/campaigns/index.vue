@@ -7,8 +7,11 @@
         </span>
         <span>Create Campaign</span>
       </nuxt-link>
+      <nuxt-link class="button is-ghost is-pulled-right" to="/">
+        <span>Active Campaigns</span>
+      </nuxt-link>
       <h2 class="title">
-        Campaigns
+        All Campaigns
       </h2>
       <campaign-list />
     </div>

@@ -125,8 +125,15 @@
               <textarea v-model="campaignIpfs.template" class="textarea" />
             </div>
           </div>
-          <div class="field">
+          <div v-if="Object.keys(campaignIpfs.example_task).length" class="field">
             <label class="label">Example Task</label>
+          </div>
+          <div v-else>
+            Add placeholders to your template. For example:
+            <pre>${placeholder}</pre>
+          </div>
+          <div>
+            To learn more about templates and placeholders, visit the <a href="https://effectai.github.io/developer-docs/effect_network/template.html" target="_blank">documentation</a>.
           </div>
           <div v-for="(placeholder, key) in campaignIpfs.example_task" :key="key" class="field is-horizontal">
             <div class="field-label is-small">
@@ -140,6 +147,14 @@
               </div>
             </div>
           </div>
+          <h2 class="subtitle mt-5">
+            Task Preview
+          </h2>
+          <template-media
+            :html="renderTemplate(
+              campaignIpfs.template || 'No template found..',
+              campaignIpfs.example_task || {})"
+          />
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
@@ -185,7 +200,9 @@
 
 <script>
 import { quillEditor } from 'vue-quill-editor'
+import { Template } from '@effectai/effect-js'
 import InstructionsModal from '@/components/InstructionsModal'
+import TemplateMedia from '@/components/Template'
 
 function getMatches (string, regex, index) {
   index || (index = 1) // default to the first capturing group
@@ -200,6 +217,7 @@ function getMatches (string, regex, index) {
 export default {
   components: {
     quillEditor,
+    TemplateMedia,
     InstructionsModal
   },
 
@@ -311,6 +329,9 @@ export default {
       link.click()
       URL.revokeObjectURL(link.href)
     },
+    renderTemplate (template, placeholders = {}, options = {}) {
+      return new Template(template, placeholders, options).render()
+    },
     checkForm () {
       this.errors = []
       if (
@@ -359,6 +380,7 @@ export default {
           const campaignIpfs = { ...this.campaignIpfs }
           const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
           const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
+          console.log('CAMPAIGNRESULT', result)
           this.$store.dispatch('transaction/addTransaction', result)
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
           this.message = 'Campaign created successfully! Check your transaction here: '

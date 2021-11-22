@@ -84,6 +84,7 @@ export default (context, inject) => {
         // const rememberAccount = null
         if (rememberAccount) {
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
+          await this.connectAccount()
           if (loggedIn) {
             await context.$auth.loginWith('blockchain', {
               account: this.account,
@@ -102,13 +103,13 @@ export default (context, inject) => {
         let account
         try {
           if (blockchain === 'eos') {
-            const wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
+            const wallet = await this.eos.connect(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
             account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, address: wallet.auth.publicKey, publicKey: wallet.auth.publicKey }
           } else if (blockchain === 'bsc') {
             if (rememberAccount && rememberAccount.privateKey) {
               pk = rememberAccount.privateKey
             }
-            const provider = await this.bsc.login(providerName, pk)
+            const provider = await this.bsc.connect(providerName, pk)
             let accountName
             if (rememberAccount) {
               accountName = rememberAccount.accountName
@@ -130,7 +131,6 @@ export default (context, inject) => {
           if (account) {
             account.blockchain = blockchain
             account.provider = providerName
-            await this.connectAccount(blockchain, account)
             this.account = account
             return true
           }
@@ -226,8 +226,8 @@ export default (context, inject) => {
       async logout () {
         context.$auth.$storage.setUniversal('rememberAccount', null)
         this.clear()
-        await this.eos.logout()
-        await this.bsc.logout()
+        await this.eos.disconnect()
+        await this.bsc.disconnect()
       },
 
       clear () {
@@ -242,6 +242,8 @@ export default (context, inject) => {
             const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, context.$auth.user.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
             if (efxRow) {
               this.efxAvailable = parseFloat(efxRow.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+            } else {
+              this.efxAvailable = 0
             }
           }
         }
@@ -321,7 +323,9 @@ export default (context, inject) => {
       async getTaskIndexFromLeaf (leafhash, tasks) {
         return await this.sdk.force.getTaskIndexFromLeaf(leafhash, tasks)
       },
-      async connectAccount (chain, account) {
+      async connectAccount () {
+        const chain = this.account.blockchain
+        const account = this.account
         return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, account)
       },
 

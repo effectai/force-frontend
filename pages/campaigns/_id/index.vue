@@ -2,6 +2,9 @@
   <section class="section is-max-widescreen">
     <!-- Instructions modal -->
     <instructions-modal v-if="campaign && campaign.info" :show="joinCampaignPopup" :campaign="campaign" :info="campaign.info" @clicked="campaignModalChange" />
+    <!-- Reserve task -->
+    <reserve-task v-if="showReserveTask" :batch="batch" />
+
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
@@ -48,6 +51,16 @@
             <p v-else>
               ...
             </p>
+            <h2 class="subtitle mt-5">
+              Task Preview
+            </h2>
+            <template-media
+              v-if="campaign && campaign.info"
+              :html="renderTemplate(
+                campaign.info.template || 'No template found..',
+                campaign.info.example_task || {})"
+              @submit="submitTask"
+            />
             <div class="mt-5">
               <nuxt-link class="button is-primary is-pulled-right" :to="`/campaigns/${id}/new`">
                 <span class="icon">
@@ -89,11 +102,6 @@
                         Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
                       </p>
                       <progress class="progress is-small mt-2" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false }" :value="batch.tasks_done" :max="batch.num_tasks" />
-                    </div>
-                    <div class="column has-text-right is-12-mobile">
-                      <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :class="{'is-loading': !campaign || typeof campaign.info === 'undefined', 'is-accent': campaign && campaign.info === null, 'is-outlined': campaign && campaign.info === null}">
-                        <span class="">{{ campaign && campaign.info === null ? 'Qualify' : 'View' }}</span>
-                      </button>
                     </div>
                   </div>
                 </nuxt-link>
@@ -162,14 +170,25 @@
             <div class="block">
               <b>Blockchain</b>
               <br>
-              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${id}&upper_bound=${id}`">View Campaign on Explorer</a>
+              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View Campaign on Explorer</a>
             </div>
             <div class="block">
               <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-primary is-light">
                 Edit Campaign
               </nuxt-link>
-              <button class="button is-primary" :class="{'is-loading': loading === true}" :disabled="userJoined" @click.prevent="joinCampaignPopup = true">
-                Join<span v-if="userJoined">ed</span>&nbsp;Campaign
+              <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" :disabled="userJoined" @click.prevent="joinCampaignPopup = true">
+                Join Campaign
+              </button>
+              <button
+                v-else-if="campaignBatches && campaignBatches.reduce(function(a,b){
+                  return a + b.num_tasks
+                },0) - campaignBatches.reduce(function(a,b){
+                  return a + b.tasks_done
+                },0) > 0"
+                class="button is-primary"
+                @click.prevent="reserveTask"
+              >
+                Make Task Reservation
               </button>
             </div>
           </div>
@@ -180,24 +199,30 @@
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex'
+import { Template } from '@effectai/effect-js'
+import TemplateMedia from '@/components/Template'
+import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
 
 export default {
   components: {
+    TemplateMedia,
+    ReserveTask,
     InstructionsModal
   },
   middleware: ['auth'],
   data () {
     return {
+      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       id: parseInt(this.$route.params.id),
       campaign: undefined,
-      randomNumber: undefined,
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       accountId: this.$auth.user.vAccountRows[0].id,
       body: 'description',
       userJoined: null,
       loading: false,
-      joinCampaignPopup: false
+      joinCampaignPopup: false,
+      showReserveTask: false,
+      batch: null
     }
   },
   computed: {
@@ -208,16 +233,13 @@ export default {
       batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading,
-      batchesLoading: state => state.campaign.batches.loading
+      batchesLoading: state => !state.campaign.batches || state.campaign.batches.loading
     }),
     campaignBatches () {
       return this.batchByCampaignId(this.id)
     }
   },
   mounted () {
-    setTimeout(() => {
-      this.randomNumber = this.generateRandomNumber(300)
-    }, 3000)
   },
   created () {
     this.checkUserCampaign()
@@ -225,6 +247,24 @@ export default {
     this.getBatches()
   },
   methods: {
+    async reserveTask () {
+      const batch = this.campaignBatches.find((b) => {
+        return b.num_tasks - b.tasks_done > 0
+      })
+      await this.$store.dispatch('campaign/getBatchTasks', batch)
+
+      if (!batch) {
+        alert('Could not find batch with active tasks')
+        return
+      }
+      this.batch = this.campaignBatches.find((b) => {
+        return b.batch_id === batch.batch_id
+      })
+      this.showReserveTask = true
+    },
+    renderTemplate (template, placeholders = {}, options = {}) {
+      return new Template(template, placeholders, options).render()
+    },
     campaignModalChange (val) {
       this.joinCampaignPopup = val
     },
@@ -235,7 +275,12 @@ export default {
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
-          setTimeout(this.checkUserCampaign, 1500)
+          setTimeout(async () => {
+            await this.checkUserCampaign
+            if (this.userJoined) {
+              this.reserveTask()
+            }
+          }, 1500)
         }
         this.joinCampaignPopup = false
       } catch (e) {
@@ -262,9 +307,6 @@ export default {
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.id)
       this.campaign = this.campaigns.find(c => c.id === this.id)
-    },
-    generateRandomNumber (maxNum) {
-      return Math.ceil(Math.random() * maxNum)
     }
   }
 }

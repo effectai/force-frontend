@@ -77,7 +77,7 @@
         </div>
         <div class="column is-8">
           <a v-if="$blockchain.account" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout();">switch wallet</a>
-          <span v-else>No wallet? <a target="_blank" class="is-size-6" href="https://medium.com/effect-ai">Create a wallet</a></span>
+          <span v-else>No wallet? <a target="_blank" class="is-size-6" href="" @click.prevent="$blockchain.loginModal = 'bsc'">Create a wallet</a></span>
         </div>
       </div>
     </div>
@@ -147,6 +147,7 @@ export default {
           registerResult = await this.$blockchain.openVAccount()
           await sleep(2000)
         }
+        await this.$blockchain.connectAccount()
         await retry(async () => {
           await this.$auth.loginWith('blockchain', {
             account: this.$blockchain.account,
