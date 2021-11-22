@@ -260,7 +260,6 @@ export default {
       this.batch = this.campaignBatches.find((b) => {
         return b.batch_id === batch.batch_id
       })
-      console.log(this.batch)
       this.showReserveTask = true
     },
     renderTemplate (template, placeholders = {}, options = {}) {
