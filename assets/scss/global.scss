@@ -221,3 +221,12 @@ a.box {
     box-shadow: 0 0 0 0 rgba(51, 217, 178, 0);
   }
 }
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.5s;
+}
+.page-enter,
+.page-leave-to {
+  opacity: 0;
+}

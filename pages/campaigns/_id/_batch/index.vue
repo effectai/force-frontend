@@ -123,7 +123,7 @@
             <div class="block">
               <b>Blockchain</b>
               <br>
-              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
+              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
             </div>
             <div class="block">
               <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
@@ -147,10 +147,10 @@
 </template>
 <script>
 import { mapState } from 'vuex'
+import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
-import { Template } from '@effectai/effect-js'
 
 export default {
   components: {
@@ -166,7 +166,6 @@ export default {
       batchId: parseInt(this.$route.params.batch),
       campaign: undefined,
       batch: undefined,
-      randomNumber: undefined,
       body: 'description',
       accountId: this.$auth.user.vAccountRows[0].id,
       userJoined: null,
@@ -184,9 +183,6 @@ export default {
     })
   },
   mounted () {
-    setTimeout(() => {
-      this.randomNumber = this.generateRandomNumber(300)
-    }, 3000)
   },
   created () {
     this.checkUserCampaign()
@@ -204,7 +200,12 @@ export default {
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
-          setTimeout(this.checkUserCampaign, 1500)
+          setTimeout(async () => {
+            await this.checkUserCampaign
+            if (this.userJoined) {
+              this.reserveTask = true
+            }
+          }, 1500)
         }
         this.joinCampaignPopup = false
       } catch (e) {
@@ -238,9 +239,6 @@ export default {
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
-    },
-    generateRandomNumber (maxNum) {
-      return Math.ceil(Math.random() * maxNum)
     }
   }
 }

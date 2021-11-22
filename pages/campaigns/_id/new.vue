@@ -54,12 +54,12 @@
           </div>
         </form>
         <form @submit.prevent="uploadBatch">
-          <div class="field">
+          <!-- <div class="field">
             <label class="label">Repetitions</label>
             <div class="control">
               <input v-model="repetitions" class="input" type="number" min="0" required>
             </div>
-          </div>
+          </div> -->
           <div class="field is-grouped">
             <div class="control">
               <button type="submit" class="button is-link" :disabled="!tasks.length">
@@ -96,7 +96,7 @@ export default {
   data () {
     return {
       campaignId: parseInt(this.$route.params.id),
-      repetitions: null,
+      repetitions: 1,
       task: {},
       tasks: [],
       placeholders: null,
