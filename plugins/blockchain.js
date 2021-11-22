@@ -84,6 +84,7 @@ export default (context, inject) => {
         // const rememberAccount = null
         if (rememberAccount) {
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
+          await this.connectAccount()
           if (loggedIn) {
             await context.$auth.loginWith('blockchain', {
               account: this.account,
