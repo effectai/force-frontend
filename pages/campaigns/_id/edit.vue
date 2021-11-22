@@ -351,11 +351,10 @@ export default {
     async editCampaign () {
       this.loading = true
       try {
-        // const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
-        // const result = await this.$blockchain.editCampaign(hash, this.campaignIpfs.reward)
-        // this.$store.dispatch('transaction/addTransaction', result)
-        // this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
-        await alert('need to wait for edit-campaign on smart contract.')
+        const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
+        const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward)
+        this.$store.dispatch('transaction/addTransaction', result)
+        this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
         this.message = 'Campaign edited successfully! Check your transaction here: '
       } catch (error) {
         this.message = error

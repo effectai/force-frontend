@@ -306,6 +306,9 @@ export default (context, inject) => {
       async createBatch (campaignId, batchId, content, repetitions) {
         return await this.sdk.force.createBatch(campaignId, batchId, content, repetitions)
       },
+      async editCampaign (id, hash, reward) {
+        return await this.sdk.force.editCampaign(id, hash, reward)
+      },
       async createCampaign (hash, reward) {
         return await this.sdk.force.createCampaign(hash, reward)
       },
