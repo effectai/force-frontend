@@ -170,7 +170,7 @@
             <div class="block">
               <b>Blockchain</b>
               <br>
-              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${id}&upper_bound=${id}`">View Campaign on Explorer</a>
+              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View Campaign on Explorer</a>
             </div>
             <div class="block">
               <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-primary is-light">
@@ -271,7 +271,12 @@ export default {
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
-          setTimeout(this.checkUserCampaign, 1500)
+          setTimeout(async () => {
+            await this.checkUserCampaign
+            if (this.userJoined) {
+              this.reserveTask()
+            }
+          }, 1500)
         }
         this.joinCampaignPopup = false
       } catch (e) {
