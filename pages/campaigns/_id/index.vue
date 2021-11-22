@@ -247,15 +247,20 @@ export default {
     this.getBatches()
   },
   methods: {
-    reserveTask () {
+    async reserveTask () {
       const batch = this.campaignBatches.find((b) => {
         return b.num_tasks - b.tasks_done > 0
       })
+      await this.$store.dispatch('campaign/getBatchTasks', batch)
+
       if (!batch) {
         alert('Could not find batch with active tasks')
         return
       }
-      this.batch = batch
+      this.batch = this.campaignBatches.find((b) => {
+        return b.batch_id === batch.batch_id
+      })
+      console.log(this.batch)
       this.showReserveTask = true
     },
     renderTemplate (template, placeholders = {}, options = {}) {
