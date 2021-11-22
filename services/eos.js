@@ -30,7 +30,7 @@ const eos = {
     lynx: 'EOS Lynx'
   },
   wallet: null,
-  login: async (provider, accountName, permission) => {
+  connect: async (provider, accountName, permission) => {
     const providers = accessContext.getWalletProviders()
     const selectedProvider = providers.find(r => r.id === provider)
     if (selectedProvider) {
@@ -74,7 +74,7 @@ const eos = {
     })
   },
 
-  async logout () {
+  async disconnect () {
     if (eos.wallet) {
       await eos.wallet.logout()
       eos.wallet = null

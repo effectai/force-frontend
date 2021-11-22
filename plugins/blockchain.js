@@ -102,13 +102,13 @@ export default (context, inject) => {
         let account
         try {
           if (blockchain === 'eos') {
-            const wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
+            const wallet = await this.eos.connect(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
             account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, address: wallet.auth.publicKey, publicKey: wallet.auth.publicKey }
           } else if (blockchain === 'bsc') {
             if (rememberAccount && rememberAccount.privateKey) {
               pk = rememberAccount.privateKey
             }
-            const provider = await this.bsc.login(providerName, pk)
+            const provider = await this.bsc.connect(providerName, pk)
             let accountName
             if (rememberAccount) {
               accountName = rememberAccount.accountName
@@ -130,7 +130,6 @@ export default (context, inject) => {
           if (account) {
             account.blockchain = blockchain
             account.provider = providerName
-            await this.connectAccount(blockchain, account)
             this.account = account
             return true
           }
@@ -226,8 +225,8 @@ export default (context, inject) => {
       async logout () {
         context.$auth.$storage.setUniversal('rememberAccount', null)
         this.clear()
-        await this.eos.logout()
-        await this.bsc.logout()
+        await this.eos.disconnect()
+        await this.bsc.disconnect()
       },
 
       clear () {
@@ -318,7 +317,9 @@ export default (context, inject) => {
       async getTaskIndexFromLeaf (leafhash, tasks) {
         return await this.sdk.force.getTaskIndexFromLeaf(leafhash, tasks)
       },
-      async connectAccount (chain, account) {
+      async connectAccount () {
+        const chain = this.account.blockchain
+        const account = this.account
         return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, account)
       },
 

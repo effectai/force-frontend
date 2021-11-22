@@ -32,12 +32,6 @@
             </div>
           </div>
           <div v-if="burnerWallet == true && showKeypairDetails == true" class="content">
-            <div>
-              <a href="#" class="has-text-danger-dark" @click.prevent="showKeypairDetails = false">Back</a>
-            </div>
-            <div class="notification is-warning is-light mt-3" role="alert">
-              Do not forget to backup your private key.
-            </div>
             <div class="box has-limited-width is-horizontal-centered">
               <div class="field">
                 <label class="label">Public key</label>
@@ -58,9 +52,19 @@
                 </div>
               </div>
             </div>
+            <div class="notification is-warning is-light mt-3" role="alert">
+              Do not forget to backup your private key.
+            </div>
+            <label class="checkbox">
+              <input v-model="backup" type="checkbox">
+              I have backed up my Private Key
+            </label>
+            <div class="has-text-right">
+              <a href="#" class="button is-primary" :disabled="!backup" @click.prevent="() => { if (!backup) return; privateKey = keypair.privateKey; showKeypairDetails = false}">Continue</a>
+            </div>
           </div>
           <div v-if="burnerWallet == false && showKeypairDetails == false" class="columns is-multiline">
-            <div class="column is-half">
+            <div class="column is-half is-offset-3">
               <div v-if="isMetaMaskInstalled" class="provider has-radius disabled" @click="selectWallet('metamask')">
                 <img src="@/assets/img/providers/metamask.png">
                 MetaMask
@@ -130,6 +134,7 @@ export default {
     return {
       loading: false,
       error: null,
+      backup: false,
       privateKey: null,
       burnerWallet: false,
       showKeypairDetails: false,

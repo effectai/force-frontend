@@ -28,7 +28,7 @@ const bsc = {
   walletConnect: null,
   explorer: process.env.NUXT_ENV_BSC_EXPLORER_URL,
 
-  login: async (provider, pk) => {
+  connect: async (provider, pk) => {
     switch (provider) {
       case 'trustwallet':
         return await bsc.onTrustWalletConnect()
@@ -42,7 +42,7 @@ const bsc = {
         return await bsc.onBurnerWallet(pk)
     }
   },
-  logout: async () => {
+  disconnect: async () => {
     if (bsc.currentProvider) {
       if (bsc.currentProvider === bsc.walletConnect) {
       // This method is only available for WalletConnect
