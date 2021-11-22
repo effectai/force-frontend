@@ -340,6 +340,7 @@ export default {
           const campaignIpfs = { ...this.campaignIpfs }
           const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
           const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
+          console.log('CAMPAIGNRESULT', result)
           this.$store.dispatch('transaction/addTransaction', result)
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
           this.message = 'Campaign created successfully! Check your transaction here: '

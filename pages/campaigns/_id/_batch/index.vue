@@ -147,10 +147,10 @@
 </template>
 <script>
 import { mapState } from 'vuex'
+import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
-import { Template } from '@effectai/effect-js'
 
 export default {
   components: {
@@ -166,7 +166,6 @@ export default {
       batchId: parseInt(this.$route.params.batch),
       campaign: undefined,
       batch: undefined,
-      randomNumber: undefined,
       body: 'description',
       accountId: this.$auth.user.vAccountRows[0].id,
       userJoined: null,
@@ -184,9 +183,6 @@ export default {
     })
   },
   mounted () {
-    setTimeout(() => {
-      this.randomNumber = this.generateRandomNumber(300)
-    }, 3000)
   },
   created () {
     this.checkUserCampaign()
@@ -238,9 +234,6 @@ export default {
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
-    },
-    generateRandomNumber (maxNum) {
-      return Math.ceil(Math.random() * maxNum)
     }
   }
 }

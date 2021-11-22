@@ -73,8 +73,8 @@
             </h2>
           </div>
           <div class="column has-text-right is-12-mobile">
-            <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :class="{'is-loading': !campaign || typeof campaign.info === 'undefined', 'is-accent': campaign && campaign.info === null, 'is-outlined': campaign && campaign.info === null}">
-              <span class="">{{ campaign && campaign.info === null ? 'Qualify' : 'View' }}</span>
+            <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :disabled="!campaign || campaign.info === null" :class="{'is-loading': !campaign || typeof campaign.info === 'undefined', 'is-accent': campaign && campaign.info === null, 'is-outlined': campaign && campaign.info === null}">
+              <span class="">View</span>
             </button>
           </div>
         </div>
