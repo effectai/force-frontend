@@ -241,6 +241,8 @@ export default (context, inject) => {
             const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, context.$auth.user.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
             if (efxRow) {
               this.efxAvailable = parseFloat(efxRow.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+            } else {
+              this.efxAvailable = 0
             }
           }
         }

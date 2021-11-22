@@ -3,7 +3,7 @@
     <category-filters @clicked="onFilter" />
     <template v-for="batch in batches">
       <nuxt-link
-        v-show="!filter || (campaignById(batch.campaign_id).info && campaignById(batch.campaign_id).info.category === filter)"
+        v-show="!filter || (campaignById(batch.campaign_id) && campaignById(batch.campaign_id).info && campaignById(batch.campaign_id).info.category === filter)"
         :key="`${batch.campaign_id}.${batch.id}`"
         :set="campaign = campaignById(batch.campaign_id)"
         :to="`/campaigns/${batch.campaign_id}/${batch.batch_id}`"

@@ -123,8 +123,15 @@
               <textarea v-model="campaignIpfs.template" class="textarea" />
             </div>
           </div>
-          <div class="field">
+          <div v-if="Object.keys(campaignIpfs.example_task).length" class="field">
             <label class="label">Example Task</label>
+          </div>
+          <div v-else>
+            Add placeholders to your template. For example:
+            <pre>${placeholder}</pre>
+          </div>
+          <div>
+            To learn more about templates and placeholders, visit the <a href="https://effectai.github.io/developer-docs/effect_network/template.html" target="_blank">documentation</a>.
           </div>
           <div v-for="(placeholder, key) in campaignIpfs.example_task" :key="key" class="field is-horizontal">
             <div class="field-label is-small">
@@ -138,6 +145,14 @@
               </div>
             </div>
           </div>
+          <h2 class="subtitle mt-5">
+            Task Preview
+          </h2>
+          <template-media
+            :html="renderTemplate(
+              campaignIpfs.template || 'No template found..',
+              campaignIpfs.example_task || {})"
+          />
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
@@ -164,7 +179,9 @@
 
 <script>
 // import VueSimplemde from 'vue-simplemde'
+import { Template } from '@effectai/effect-js'
 import InstructionsModal from '@/components/InstructionsModal'
+import TemplateMedia from '@/components/Template'
 
 function getMatches (string, regex, index) {
   index || (index = 1) // default to the first capturing group
@@ -179,6 +196,7 @@ function getMatches (string, regex, index) {
 export default {
   components: {
     // VueSimplemde,
+    TemplateMedia,
     InstructionsModal
   },
 
@@ -271,6 +289,9 @@ export default {
   },
 
   methods: {
+    renderTemplate (template, placeholders = {}, options = {}) {
+      return new Template(template, placeholders, options).render()
+    },
     checkForm () {
       this.errors = []
       if (
