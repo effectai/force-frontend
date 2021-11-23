@@ -14,7 +14,9 @@
             </nuxt-link>
           </li>
           <li class="is-active">
-            <nuxt-link to="#">Edit</nuxt-link>
+            <nuxt-link to="#">
+              Edit
+            </nuxt-link>
           </li>
         </ul>
       </nav>
@@ -115,14 +117,11 @@
             <div class="column is-two-fifths">
               <div class="field">
                 <label class="label">
-                  Raw Text
+                  Raw Markdown
                   <span class="has-text-info">*</span>
                 </label>
                 <div class="control">
-                  <quill-editor
-                    ref="myQuillEditor"
-                    v-model="campaignIpfs.instructions"
-                  />
+                  <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" required :configs="{promptURLs: true, spellChecker: false}" />
                 </div>
               </div>
             </div>
@@ -202,7 +201,6 @@
 </template>
 
 <script>
-import { quillEditor } from 'vue-quill-editor'
 import _ from 'lodash'
 import InstructionsModal from '@/components/InstructionsModal'
 
@@ -218,7 +216,6 @@ function getMatches (string, regex, index) {
 
 export default {
   components: {
-    quillEditor,
     InstructionsModal
   },
 

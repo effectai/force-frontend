@@ -101,10 +101,7 @@
                   <span class="has-text-info">*</span>
                 </label>
                 <div v-if="campaign && campaignIpfs" class="control">
-                  <quill-editor
-                    ref="myQuillEditor"
-                    v-model="campaignIpfs.instructions"
-                  />
+                  <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" required :configs="{promptURLs: true, spellChecker: false}" />
                 </div>
               </div>
             </div>
@@ -199,7 +196,7 @@
 </template>
 
 <script>
-import { quillEditor } from 'vue-quill-editor'
+import VueSimplemde from 'vue-simplemde'
 import { Template } from '@effectai/effect-js'
 import InstructionsModal from '@/components/InstructionsModal'
 import TemplateMedia from '@/components/Template'
@@ -216,7 +213,7 @@ function getMatches (string, regex, index) {
 
 export default {
   components: {
-    quillEditor,
+    VueSimplemde,
     TemplateMedia,
     InstructionsModal
   },

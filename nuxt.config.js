@@ -26,9 +26,7 @@ export default {
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     '@/assets/scss/global.scss',
-    'quill/dist/quill.core.css',
-    'quill/dist/quill.snow.css',
-    'quill/dist/quill.bubble.css'
+    'simplemde/dist/simplemde.min.css'
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins

@@ -35,9 +35,10 @@
     "qs": "^6.10.1",
     "sanitize-html": "^2.5.3",
     "vue-carousel": "^0.18.0",
-    "vue-quill-editor": "^3.0.6",
     "vuex-persist": "^3.1.3",
-    "web3": "^1.3.6"
+    "web3": "^1.3.6",
+    "vue-simplemde": "^1.1.2",
+    "marked": "^1.2.5"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^6.0.0",
