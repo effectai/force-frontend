@@ -8,6 +8,14 @@
         <balance />
         <div class="block">
           <div class="has-text-weight-bold is-size-6">
+            Effect Account Name:
+          </div>
+          <div class="subtitle">
+            {{ $auth.user.accountName }}
+          </div>
+        </div>
+        <div class="block">
+          <div class="has-text-weight-bold is-size-6">
             {{ $auth.user.blockchain === 'bsc' ? 'BSC Address' : 'EOS Account Name' }}:
           </div>
           <div class="subtitle">
