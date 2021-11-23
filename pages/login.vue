@@ -86,7 +86,6 @@
 
 <script>
 const retry = require('async-retry')
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export default {
   filters: {
@@ -143,10 +142,6 @@ export default {
       try {
         // if account doesnt exists yet add it
         let registerResult
-        if (this.existingAccount === false) {
-          registerResult = await this.$blockchain.openVAccount()
-          await sleep(2000)
-        }
         await this.$blockchain.connectAccount()
         await retry(async () => {
           await this.$auth.loginWith('blockchain', {
