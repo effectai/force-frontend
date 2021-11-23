@@ -36,7 +36,7 @@ export default (context, inject) => {
         return this.efxAvailable + this.vefxAvailable + this.efxPending
       },
       vefxAvailable () {
-        let balance
+        let balance = 0
         const vAccountRows = context.$auth.user.vAccountRows
         if (vAccountRows) {
           vAccountRows.forEach((row) => {
