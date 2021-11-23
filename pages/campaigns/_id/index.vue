@@ -62,7 +62,7 @@
               @submit="submitTask"
             />
             <div class="mt-5">
-              <nuxt-link class="button is-primary is-pulled-right" :to="`/campaigns/${id}/new`">
+              <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" class="button is-primary is-pulled-right" :to="`/campaigns/${id}/new`">
                 <span class="icon">
                   +
                 </span>

@@ -50,7 +50,6 @@
             <p class="has-text-grey is-size-7">
               Requester
             </p>
-            <!--          {{ campaign }}-->
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
               <nuxt-link :to="'/profile/' + campaign.owner[1]">
                 <span :class="{'is-size-7': campaign.owner[0] === 'address'}">{{ campaign.owner[1] }}</span>
