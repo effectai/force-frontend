@@ -20,7 +20,7 @@ export default (context, inject) => {
         efxPending: 0,
         eos,
         bsc,
-        sdk: new effectSdk.EffectClient('testnet', sdkOptions),
+        sdk: new effectSdk.EffectClient('jungle', sdkOptions),
         error: null,
         waitForSignatureFrom: null,
         waitForSignature: 0,
