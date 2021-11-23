@@ -1,15 +1,10 @@
 <template>
   <div>
     <client-only>
-      <category-filters @clicked="onFilter" />
+      <category-filters v-if="!owner" @clicked="onFilter" />
     </client-only>
     <template v-for="campaign in filteredCampaigns">
       <nuxt-link
-        v-if="!active || (batchByCampaignId(campaign.id) && batchByCampaignId(campaign.id).reduce(function(a,b){
-          return a + b.num_tasks
-        },0) - batchByCampaignId(campaign.id).reduce(function(a,b){
-          return a + b.tasks_done
-        },0) > 0)"
         :key="campaign.id"
         :to="'/campaigns/'+campaign.id"
         class="box p-4"
@@ -97,13 +92,13 @@
         </div>
       </nuxt-link>
     </template>
-    <div v-if="campaignsLoading">
+    <div v-if="campaignsLoading" class="subtitle">
       Campaigns loading..
     </div>
-    <div v-else-if="filteredCampaigns && !filteredCampaigns.length">
-      No campaigns
+    <div v-else-if="filteredCampaigns && !filteredCampaigns.length" class="subtitle">
+      No <span v-if="active">active</span> campaigns
     </div>
-    <div v-else-if="!filteredCampaigns">
+    <div v-else-if="!filteredCampaigns" class="subtitle has-text-danger">
       Could not retrieve campaigns
     </div>
   </div>
@@ -118,7 +113,7 @@ export default {
   components: {
     CategoryFilters
   },
-  props: ['active'],
+  props: ['active', 'owner'],
   data () {
     return {
       filter: null,
@@ -136,7 +131,26 @@ export default {
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded
     }),
     filteredCampaigns () {
-      return this.campaignsByCategory(this.filter)
+      let campaigns = this.campaignsByCategory(this.filter)
+      for (const i in campaigns) {
+        const batches = this.batchByCampaignId(campaigns[i].id)
+        if (batches) {
+          campaigns[i].num_tasks = batches.reduce(function (a, b) {
+            return a + b.num_tasks
+          }, 0)
+          campaigns[i].tasks_done = batches.reduce(function (a, b) {
+            return a + b.tasks_done
+          }, 0)
+        }
+      }
+      if (campaigns && this.active) {
+        campaigns = campaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+      }
+      if (campaigns && this.owner) {
+        campaigns = campaigns.filter(c => c.owner[1] === this.owner)
+      }
+
+      return campaigns
     }
   },
   created () {

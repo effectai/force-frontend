@@ -46,6 +46,10 @@
               >View on explorer</a>
             </div>
           </div>
+          <h2 class="title is-4">
+            Campaigns
+          </h2>
+          <campaign-list class="mb-6" :owner="name" />
         </div>
         <div v-else>
           Could not retrieve account
@@ -55,8 +59,10 @@
   </section>
 </template>
 <script>
+import CampaignList from '@/components/CampaignList'
 
 export default {
+  components: { CampaignList },
   middleware: ['auth'],
   data () {
     return {
