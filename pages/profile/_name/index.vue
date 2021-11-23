@@ -11,7 +11,15 @@
         <div v-else-if="account">
           <div class="block">
             <div class="has-text-weight-bold is-size-6">
-              {{ account.address[0] === 'address' ? 'BSC Address' : 'Account Name' }}:
+              Effect Account Name:
+            </div>
+            <div class="subtitle">
+              {{ $auth.user.accountName }}
+            </div>
+          </div>
+          <div class="block">
+            <div class="has-text-weight-bold is-size-6">
+              {{ account.address[0] === 'address' ? 'BSC Address' : 'EOS Account Name' }}:
             </div>
             <div class="subtitle">
               <div>
