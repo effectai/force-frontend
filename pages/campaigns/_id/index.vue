@@ -276,7 +276,7 @@ export default {
         if (data) {
           this.loading = true
           setTimeout(async () => {
-            await this.checkUserCampaign
+            await this.checkUserCampaign()
             if (this.userJoined) {
               this.reserveTask()
             }
