@@ -116,22 +116,24 @@ export default {
     getTimeAgo (date) {
       return this.$moment(date).fromNow()
     },
-    async getNotifications () {
-      try {
-        this.loading = true
-        const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications?page=' + this.page)
-        const notifications = response.notifications
-        if (!notifications || notifications.length === 0) {
-          this.allNotificationsLoaded = true
-        }
+    getNotifications () {
+      alert('Notifications coming soon!')
 
-        this.notifications = this.notifications ? this.notifications.concat(notifications) : notifications
-        this.page++
-        this.$emit('get-notifications')
-      } catch (error) {
-        this.$blockchain.handleError(error)
-      }
-      this.loading = false
+      // try {
+      //   this.loading = true
+      //   const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications?page=' + this.page)
+      //   const notifications = response.notifications
+      //   if (!notifications || notifications.length === 0) {
+      //     this.allNotificationsLoaded = true
+      //   }
+
+      //   this.notifications = this.notifications ? this.notifications.concat(notifications) : notifications
+      //   this.page++
+      //   this.$emit('get-notifications')
+      // } catch (error) {
+      //   this.$blockchain.handleError(error)
+      // }
+      // this.loading = false
     },
     handleScroll () {
       // Trigger get new notifications when almost at the bottom of scrolling through the notifications
