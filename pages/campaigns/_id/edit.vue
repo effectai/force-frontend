@@ -119,7 +119,10 @@
                   <span class="has-text-info">*</span>
                 </label>
                 <div class="control">
-                  <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" required :configs="{promptURLs: true, spellChecker: false}" />
+                  <quill-editor
+                    ref="myQuillEditor"
+                    v-model="campaignIpfs.instructions"
+                  />
                 </div>
               </div>
             </div>
@@ -158,6 +161,25 @@
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
+            <button class="button is-secondary" @click.prevent="$refs.fileInput.click()">
+              Import Campaign
+            </button>
+            <input
+              ref="fileInput"
+              type="file"
+              style="display: none"
+              accept="application/json"
+              @change="importCampaign($event)"
+            >
+          </div>
+          <div class="control">
+            <button class="button is-secondary" @click.prevent="exportCampaign">
+              Export Campaign
+            </button>
+          </div>
+        </div>
+        <div class="field is-grouped is-grouped-right">
+          <div class="control">
             <nuxt-link class="button is-light" to="/campaigns">
               Cancel
             </nuxt-link>
@@ -180,9 +202,9 @@
 </template>
 
 <script>
-import VueSimplemde from 'vue-simplemde'
-import InstructionsModal from '@/components/InstructionsModal'
+import { quillEditor } from 'vue-quill-editor'
 import _ from 'lodash'
+import InstructionsModal from '@/components/InstructionsModal'
 
 function getMatches (string, regex, index) {
   index || (index = 1) // default to the first capturing group
@@ -196,7 +218,7 @@ function getMatches (string, regex, index) {
 
 export default {
   components: {
-    VueSimplemde,
+    quillEditor,
     InstructionsModal
   },
 
@@ -283,6 +305,25 @@ export default {
   },
 
   methods: {
+    importCampaign (event) {
+      const file = event.target.files[0]
+      const reader = new FileReader()
+      if (file.name.includes('.json')) {
+        reader.onload = (res) => {
+          this.campaignIpfs = JSON.parse(res.target.result)
+        }
+        reader.onerror = err => console.error(err)
+        reader.readAsText(file)
+      }
+    },
+    exportCampaign () {
+      const blob = new Blob([JSON.stringify(this.campaignIpfs)], { type: 'application/json' })
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = 'campaign'
+      link.click()
+      URL.revokeObjectURL(link.href)
+    },
     async getCampaign () {
       this.campaignLoading = true
       try {
@@ -310,11 +351,10 @@ export default {
     async editCampaign () {
       this.loading = true
       try {
-        // const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
-        // const result = await this.$blockchain.editCampaign(hash, this.campaignIpfs.reward)
-        // this.$store.dispatch('transaction/addTransaction', result)
-        // this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
-        await alert('need to wait for edit-campaign on smart contract.')
+        const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
+        const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward)
+        this.$store.dispatch('transaction/addTransaction', result)
+        this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
         this.message = 'Campaign edited successfully! Check your transaction here: '
       } catch (error) {
         this.message = error

@@ -101,8 +101,10 @@
                   <span class="has-text-info">*</span>
                 </label>
                 <div v-if="campaign && campaignIpfs" class="control">
-                  <textarea v-model="campaignIpfs.instructions" />
-                  <!-- <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" :configs="{promptURLs: true, spellChecker: false}" /> -->
+                  <quill-editor
+                    ref="myQuillEditor"
+                    v-model="campaignIpfs.instructions"
+                  />
                 </div>
               </div>
             </div>
@@ -156,6 +158,25 @@
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
+            <button class="button is-secondary" @click.prevent="$refs.fileInput.click()">
+              Import Campaign
+            </button>
+            <input
+              ref="fileInput"
+              type="file"
+              style="display: none"
+              accept="application/json"
+              @change="importCampaign($event)"
+            >
+          </div>
+          <div class="control">
+            <button class="button is-secondary" @click.prevent="exportCampaign">
+              Export Campaign
+            </button>
+          </div>
+        </div>
+        <div class="field is-grouped is-grouped-right">
+          <div class="control">
             <nuxt-link class="button is-light" to="/campaigns">
               Cancel
             </nuxt-link>
@@ -178,7 +199,7 @@
 </template>
 
 <script>
-// import VueSimplemde from 'vue-simplemde'
+import { quillEditor } from 'vue-quill-editor'
 import { Template } from '@effectai/effect-js'
 import InstructionsModal from '@/components/InstructionsModal'
 import TemplateMedia from '@/components/Template'
@@ -195,7 +216,7 @@ function getMatches (string, regex, index) {
 
 export default {
   components: {
-    // VueSimplemde,
+    quillEditor,
     TemplateMedia,
     InstructionsModal
   },
@@ -289,6 +310,25 @@ export default {
   },
 
   methods: {
+    importCampaign (event) {
+      const file = event.target.files[0]
+      const reader = new FileReader()
+      if (file.name.includes('.json')) {
+        reader.onload = (res) => {
+          this.campaignIpfs = JSON.parse(res.target.result)
+        }
+        reader.onerror = err => console.error(err)
+        reader.readAsText(file)
+      }
+    },
+    exportCampaign () {
+      const blob = new Blob([JSON.stringify(this.campaignIpfs)], { type: 'application/json' })
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = 'campaign'
+      link.click()
+      URL.revokeObjectURL(link.href)
+    },
     renderTemplate (template, placeholders = {}, options = {}) {
       return new Template(template, placeholders, options).render()
     },
