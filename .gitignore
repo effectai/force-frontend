@@ -94,3 +94,5 @@ sw.*
 
 android/
 OneSignalSDK*
+
+.projectile
