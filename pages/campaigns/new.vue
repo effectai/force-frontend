@@ -97,7 +97,7 @@
             <div class="column is-two-fifths">
               <div class="field">
                 <label class="label">
-                  Raw Text
+                  Raw Markdown
                   <span class="has-text-info">*</span>
                 </label>
                 <div v-if="campaign && campaignIpfs" class="control">

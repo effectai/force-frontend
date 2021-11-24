@@ -24,7 +24,6 @@ const bsc = {
   loginModal: false,
   metamask: window.ethereum || null,
   binance: window.BinanceChain || null,
-  trustWallet: window.ethereum.isTrust || null,
   walletConnect: null,
   explorer: process.env.NUXT_ENV_BSC_EXPLORER_URL,
 
