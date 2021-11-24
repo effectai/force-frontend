@@ -9,7 +9,6 @@
       ref="mediaFrame"
       :srcdoc="html"
       name="mediaFrame"
-      sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-pointer-lock"
       allow="geolocation; microphone; camera; autoplay; fullscreen"
       allowFullScreen
       @load="mediaFrameLoaded"
