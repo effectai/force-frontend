@@ -45,11 +45,11 @@
               <div class="control">
                 <input v-model="task[placeholder]" type="text" class="input">
               </div>
-              <div class="control">
-                <button type="submit" class="button">
-                  Create Task
-                </button>
-              </div>
+            </div>
+            <div class="control">
+              <button type="submit" class="button">
+                Create Task
+              </button>
             </div>
           </div>
         </form>
