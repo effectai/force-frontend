@@ -45,11 +45,11 @@
               <div class="control">
                 <input v-model="task[placeholder]" type="text" class="input">
               </div>
-              <div class="control">
-                <button type="submit" class="button">
-                  Create Task
-                </button>
-              </div>
+            </div>
+            <div class="control">
+              <button type="submit" class="button">
+                Create Task
+              </button>
             </div>
           </div>
         </form>
@@ -151,13 +151,6 @@ export default {
         this.$router.push('/campaigns/' + this.campaignId)
       } catch (e) {
         this.$blockchain.handleError(e)
-      }
-    },
-    async getNewBatchId () {
-      await this.$store.dispatch('campaign/getBatches')
-
-      if (this.batchByCampaignId(this.campaignId) !== null) {
-        return this.batchByCampaignId(this.campaignId).length
       }
     }
   }
