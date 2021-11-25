@@ -13,7 +13,7 @@
   "dependencies": {
     "@creativebulma/bulma-badge": "^1.0.1",
     "@creativebulma/bulma-tooltip": "^1.2.0",
-    "@effectai/effect-js": "^0.1.3",
+    "@effectai/effect-js": "^0.1.9",
     "@nuxtjs/auth-next": "^5.0.0-1624817847.21691f1",
     "@nuxtjs/axios": "^5.13.1",
     "@nuxtjs/markdownit": "^2.0.0",
@@ -31,14 +31,14 @@
     "ethers": "^5.4.7",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
+    "marked": "^1.2.5",
     "nuxt": "^2.15.3",
     "qs": "^6.10.1",
     "sanitize-html": "^2.5.3",
     "vue-carousel": "^0.18.0",
-    "vuex-persist": "^3.1.3",
-    "web3": "^1.3.6",
     "vue-simplemde": "^1.1.2",
-    "marked": "^1.2.5"
+    "vuex-persist": "^3.1.3",
+    "web3": "^1.3.6"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^6.0.0",
