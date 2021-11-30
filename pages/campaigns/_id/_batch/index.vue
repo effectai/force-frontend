@@ -200,12 +200,11 @@ export default {
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
-          setTimeout(async () => {
-            await this.checkUserCampaign()
-            if (this.userJoined) {
-              this.reserveTask = true
-            }
-          }, 1500)
+          await this.$blockchain.waitForTransaction(data.transaction_id)
+          await this.checkUserCampaign()
+          if (this.userJoined) {
+            this.reserveTask = true
+          }
         }
         this.joinCampaignPopup = false
       } catch (e) {
