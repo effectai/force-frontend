@@ -87,10 +87,8 @@ export default {
         if (result) {
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
           this.message = 'Withdrawing has been successful. Check your transaction here: '
-
-          setTimeout(() => {
-            this.$blockchain.updateBlockchainInfo()
-          }, 1500)
+          await this.$blockchain.waitForTransaction(result.transaction_id)
+          this.$blockchain.updateBlockchainInfo()
         }
       } catch (error) {
         this.$blockchain.handleError(error)
