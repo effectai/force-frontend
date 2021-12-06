@@ -353,12 +353,14 @@ export default {
         this.$store.dispatch('transaction/addTransaction', result)
         this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
         this.message = 'Campaign edited successfully! Check your transaction here: '
+        this.success = true
       } catch (error) {
         this.message = error
         this.err = true
       }
       this.loading = false
       this.submitted = true
+      this.$router.push('/campaigns/' + this.id)
     },
     checkClose (event) {
       if (this.hasChanged && !this.loading && !this.success) {

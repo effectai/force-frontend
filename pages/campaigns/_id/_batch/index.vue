@@ -133,7 +133,7 @@
               <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                 Join Campaign
               </button>
-              <button v-else-if="batch" class="button is-primary" @click.prevent="reserveTask = true">
+              <button v-else-if="batch && batch.num_tasks - batch.tasks_done !== 0" class="button is-primary" @click.prevent="reserveTask = true">
                 Make Task Reservation
               </button>
             </div>

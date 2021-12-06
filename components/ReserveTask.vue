@@ -22,7 +22,7 @@ export default {
       error: null
     }
   },
-  created () {
+  mounted () {
     this.makeReservation()
   },
   methods: {
@@ -30,7 +30,7 @@ export default {
       try {
         this.loading = true
         let reservations = await this.$blockchain.getReservations()
-        let reservation = this.getReservationForUser(reservations)
+        let reservation = await this.getReservationForUser(reservations)
         if (!reservation) {
           const result = await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
           this.$store.dispatch('transaction/addTransaction', result)
@@ -38,7 +38,7 @@ export default {
           // get reservations and see if this user has a reservation
           await retry(async () => {
             reservations = await this.$blockchain.getReservations()
-            reservation = this.getReservationForUser(reservations)
+            reservation = await this.getReservationForUser(reservations)
 
             if (!reservation) {
               throw new Error('Reservation not found')
