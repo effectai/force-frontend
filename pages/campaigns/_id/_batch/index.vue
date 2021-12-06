@@ -82,21 +82,36 @@
                 <table class="table" style="width: 100%">
                   <thead>
                     <tr>
+                      <th>ID</th>
                       <th>Account ID</th>
                       <th>Data</th>
+                      <th>Paid</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr
-                      v-for="sub in submissions"
+                      v-for="sub in displayedSubmissions"
                       :key="sub.id"
                     >
+                      <td>{{ sub.id }}</td>
                       <td>{{ sub.account_id }}</td>
                       <td>{{ sub.data }}</td>
+                      <td>{{ sub.paid ? "yes" : "no" }}</td>
                     </tr>
                   </tbody>
                 </table>
-                <button class="button is-primary" @click.prevent="downloadResults()">
+
+                <nav class="pagination" role="navigation" aria-label="pagination">
+                  <a v-if="page != 1" class="pagination-previous" @click="page--">Previous</a>
+                  <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
+                  <ul class="pagination-list">
+                    <li v-for="pageNumber in pages" :key="pageNumber">
+                      <a class="pagination-link" @click="page = pageNumber">{{ pageNumber }}</a>
+                    </li>
+                  </ul>
+                </nav>
+
+                <button class="button is-primary" @click.prevent="downloadTaskResults()">
                   Download Results
                 </button>
               </div>
@@ -186,11 +201,7 @@ import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
-<<<<<<< HEAD
-import { Template } from '@/../effect-js'
 const jsonexport = require('jsonexport/dist')
-=======
->>>>>>> 9bdad5ef9dbd983cdfe796a14c479ad7e49c7db7
 
 export default {
   components: {
@@ -212,7 +223,10 @@ export default {
       loading: false,
       joinCampaignPopup: false,
       reserveTask: false,
-      submissions: null
+      submissions: null,
+      page: 1,
+      perPage: 10,
+      pages: []
     }
   },
   computed: {
@@ -221,14 +235,21 @@ export default {
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading,
       batchLoading: state => state.campaign.loadingBatch
-    })
+    }),
+    displayedSubmissions () {
+      return this.paginate(this.submissions)
+    }
   },
-  mounted () {
+  watch: {
+    submissions () {
+      this.setPages()
+    }
   },
   created () {
     this.checkUserCampaign()
     this.getBatch()
     this.getCampaign()
+    this.setPages()
   },
   methods: {
     campaignModalChange (val) {
@@ -276,7 +297,6 @@ export default {
       // todo: make tab for submissiosn and reservations
       const submissions = await this.$blockchain.getTaskSubmissionsForBatch(this.batchId)
       this.submissions = submissions
-      console.log('batch submissions:', submissions)
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
@@ -285,13 +305,52 @@ export default {
     generateRandomNumber (maxNum) {
       return Math.ceil(Math.random() * maxNum)
     },
-    downloadResults () {
-      jsonexport(this.submissions, function (err, csv) {
+    downloadTaskResults () {
+      // add columns from data object to the submission object itself
+      const parsedSubmissions = this.submissions.map((x) => {
+        const sub = {}
+        sub.data = JSON.parse(x.data)
+        for (const result of Object.keys(sub.data)) {
+          x[result] = sub.data[result]
+        }
+        return x
+      })
+      jsonexport(parsedSubmissions, (err, csv) => {
         if (err) {
           return console.error(err)
         }
-        console.log(csv)
+        const filename = `task_results_${this.batchId}.csv`
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+        if (navigator.msSaveBlob) { // IE 10+
+          navigator.msSaveBlob(blob, filename)
+        } else {
+          const link = document.createElement('a')
+          if (link.download !== undefined) { // feature detection
+            // Browsers that support HTML5 download attribute
+            const url = URL.createObjectURL(blob)
+            link.setAttribute('href', url)
+            link.setAttribute('download', filename)
+            link.style.visibility = 'hidden'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+          }
+        }
       })
+    },
+    setPages () {
+      if (!this.submissions) { return }
+      const numberOfPages = Math.ceil(this.submissions.length / this.perPage)
+      for (let index = 1; index <= numberOfPages; index++) {
+        if (this.pages.length < index) {
+          this.pages.push(index)
+        }
+      }
+    },
+    paginate (transactions) {
+      const from = (this.page * this.perPage) - this.perPage
+      const to = (this.page * this.perPage)
+      return transactions.slice(from, to)
     }
   }
 }
