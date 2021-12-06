@@ -7,9 +7,10 @@ export default (context, inject) => {
   const blockchain = new Vue({
     data () {
       // Initialize empty SDK, reinitialize when connecting wallet
+      const eosHost = process.env.NUXT_ENV_EOS_NODE_URL.includes('localhost') ? `http://${process.env.NUXT_ENV_EOS_NODE_URL}:8888` : `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
       const sdkOptions = {
         network: process.env.NUXT_ENV_EOS_NETWORK,
-        host: `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
+        host: eosHost
       }
       return {
         account: null,
@@ -20,7 +21,7 @@ export default (context, inject) => {
         efxPending: 0,
         eos,
         bsc,
-        sdk: new effectSdk.EffectClient('jungle', sdkOptions),
+        sdk: new effectSdk.EffectClient(process.env.NUXT_ENV_EOS_NETWORK, sdkOptions),
         error: null,
         waitForSignatureFrom: null,
         waitForSignature: 0,
