@@ -320,13 +320,16 @@ export default (context, inject) => {
       async getTaskSubmissionsForBatch (batchId) {
         return await this.sdk.force.getTaskSubmissionsForBatch(batchId)
       },
-      async getTaskIndexFromLeaf (leafhash, tasks) {
-        return await this.sdk.force.getTaskIndexFromLeaf(leafhash, tasks)
+      async getTaskIndexFromLeaf (campaignId, batchId, leafhash, tasks) {
+        return await this.sdk.force.getTaskIndexFromLeaf(campaignId, batchId, leafhash, tasks)
       },
       async connectAccount () {
         const chain = this.account.blockchain
         const account = this.account
         return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, account)
+      },
+      async waitForTransaction (transactionId) {
+        return await this.sdk.force.waitTransaction(transactionId)
       },
 
       async recoverPublicKey () {

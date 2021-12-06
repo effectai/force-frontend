@@ -67,7 +67,7 @@
               </button>
             </div>
             <div class="control">
-              <button class="button is-link is-light">
+              <button @click.prevent="cancel" class="button is-link is-light">
                 Cancel
               </button>
             </div>
@@ -152,6 +152,9 @@ export default {
       } catch (e) {
         this.$blockchain.handleError(e)
       }
+    },
+    cancel () {
+      this.$router.push('/campaigns/' + this.campaignId)
     }
   }
 }

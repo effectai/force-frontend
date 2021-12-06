@@ -20,6 +20,10 @@
           </li>
         </ul>
       </nav>
+      <div v-if="loading" class="loader-wrapper is-active">
+        <div class="loader is-loading" />
+        <br>Waiting for the transaction to complete...
+      </div>
       <div v-if="campaignLoading || batchLoading">
         Campaign loading..
       </div>
@@ -129,7 +133,7 @@
               <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                 Join Campaign
               </button>
-              <button v-else-if="batch" class="button is-primary" @click.prevent="reserveTask = true">
+              <button v-else-if="batch && batch.num_tasks - batch.tasks_done !== 0" class="button is-primary" @click.prevent="reserveTask = true">
                 Make Task Reservation
               </button>
             </div>
@@ -200,12 +204,12 @@ export default {
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
-          setTimeout(async () => {
-            await this.checkUserCampaign()
-            if (this.userJoined) {
-              this.reserveTask = true
-            }
-          }, 1500)
+          this.joinCampaignPopup = false
+          await this.$blockchain.waitForTransaction(data.transaction_id)
+          await this.checkUserCampaign()
+          if (this.userJoined) {
+            this.reserveTask = true
+          }
         }
         this.joinCampaignPopup = false
       } catch (e) {

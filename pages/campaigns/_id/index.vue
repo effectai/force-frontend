@@ -20,6 +20,10 @@
           </li>
         </ul>
       </nav>
+      <div v-if="loading" class="loader-wrapper is-active">
+        <div class="loader is-loading" />
+        <br>Waiting for the transaction to complete...
+      </div>
       <div v-if="campaignLoading">
         Campaign loading..
       </div>
@@ -275,12 +279,12 @@ export default {
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
-          setTimeout(async () => {
-            await this.checkUserCampaign()
-            if (this.userJoined) {
-              this.reserveTask()
-            }
-          }, 1500)
+          this.joinCampaignPopup = false
+          await this.$blockchain.waitForTransaction(data.transaction_id)
+          await this.checkUserCampaign()
+          if (this.userJoined) {
+            this.reserveTask()
+          }
         }
         this.joinCampaignPopup = false
       } catch (e) {
