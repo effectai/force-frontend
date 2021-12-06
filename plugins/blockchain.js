@@ -287,8 +287,8 @@ export default (context, inject) => {
       async getCampaign (id) {
         return await this.sdk.force.getCampaign(id)
       },
-      async getCampaigns (nextKey, limit = 20) {
-        return await this.sdk.force.getCampaigns(nextKey, limit)
+      async getCampaigns (nextKey, limit = 20, processCampaign = true) {
+        return await this.sdk.force.getCampaigns(nextKey, limit, processCampaign)
       },
       async getCampaignJoins (campaignId) {
         return await this.sdk.force.getCampaignJoins(campaignId)
