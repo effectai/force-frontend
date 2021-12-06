@@ -381,6 +381,7 @@ export default {
           this.$store.dispatch('transaction/addTransaction', result)
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
           this.message = 'Campaign created successfully! Check your transaction here: '
+          this.success = true
 
           // reset campaign
           this.campaignIpfs = {
@@ -400,6 +401,7 @@ export default {
       }
       this.loading = false
       this.submitted = true
+      this.$router.push('/')
     },
     // Helper method that generates JSON for string comparison
     formDataForComparison () {
