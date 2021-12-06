@@ -1,18 +1,38 @@
 <template>
   <section class="section">
     <div class="container">
+      <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+          <li>
+            <nuxt-link to="/campaigns">
+              All Campaigns
+            </nuxt-link>
+          </li>
+          <li>
+            <nuxt-link :to="'/campaigns/' + id" aria-current="page">
+              Campaign {{ id }}
+            </nuxt-link>
+          </li>
+          <li class="is-active">
+            <nuxt-link to="#">
+              Edit
+            </nuxt-link>
+          </li>
+        </ul>
+      </nav>
+      <div v-if="campaignLoading">
+        Campaign loading..
+      </div>
+      <div v-else-if="!campaign">
+        Could not retrieve campaign
+      </div>
       <p class="is-pulled-right">
         <span class="has-text-info"><b>*</b></span>
         <i> is required</i>
       </p>
       <h1 class="title mt-5">
-        New Campaign
+        Edit Campaign
       </h1>
-      <div v-if="errors.length">
-        <div v-for="error in errors" :key="error" class="notification is-danger is-light">
-          {{ error }}
-        </div>
-      </div>
       <div class="tabs">
         <ul>
           <li :class="{'is-active': formGroup === 'basic-info'}">
@@ -26,7 +46,7 @@
           </li>
         </ul>
       </div>
-      <form @submit.prevent="createCampaign">
+      <form v-if="campaign" @submit.prevent="editCampaign">
         <div v-show="formGroup === 'basic-info'" class="block basic-info-group">
           <div class="field">
             <label class="label">
@@ -34,7 +54,7 @@
               <span class="has-text-info">*</span>
             </label>
             <div class="control">
-              <input v-model="campaignIpfs.title" class="input" type="text" placeholder="My Campaign Title">
+              <input v-model="campaignIpfs.title" required class="input" type="text" placeholder="My Campaign Title">
             </div>
           </div>
           <div class="field">
@@ -43,7 +63,7 @@
               <span class="has-text-info">*</span>
             </label>
             <div class="control">
-              <textarea v-model="campaignIpfs.description" class="textarea" />
+              <textarea v-model="campaignIpfs.description" class="textarea" required />
             </div>
           </div>
           <div class="field">
@@ -58,7 +78,7 @@
           </label>
           <div class="field has-addons">
             <div class="control">
-              <input v-model="campaignIpfs.reward" class="input" type="number" placeholder="Reward per task">
+              <input v-model="campaignIpfs.reward" required class="input" type="number" placeholder="Reward per task">
             </div>
             <div class="control">
               <a class="button is-primary">
@@ -73,7 +93,7 @@
                 <span class="has-text-info">*</span>
               </label>
               <div class="select">
-                <select v-model="campaignIpfs.category">
+                <select v-model="campaignIpfs.category" required>
                   <option>---</option>
                   <option value="dao">
                     Effect DAO
@@ -100,7 +120,7 @@
                   Raw Markdown
                   <span class="has-text-info">*</span>
                 </label>
-                <div v-if="campaign && campaignIpfs" class="control">
+                <div class="control">
                   <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" required :configs="{promptURLs: true, spellChecker: false}" />
                 </div>
               </div>
@@ -119,18 +139,11 @@
           <div class="field">
             <label class="label">Template</label>
             <div class="control">
-              <textarea v-model="campaignIpfs.template" class="textarea" />
+              <textarea v-model="campaignIpfs.template" class="textarea" required />
             </div>
           </div>
-          <div v-if="Object.keys(campaignIpfs.example_task).length" class="field">
+          <div class="field">
             <label class="label">Example Task</label>
-          </div>
-          <div v-else>
-            Add placeholders to your template. For example:
-            <pre>${placeholder}</pre>
-          </div>
-          <div>
-            To learn more about templates and placeholders, visit the <a href="https://effectai.github.io/developer-docs/effect_network/template.html" target="_blank">documentation</a>.
           </div>
           <div v-for="(placeholder, key) in campaignIpfs.example_task" :key="key" class="field is-horizontal">
             <div class="field-label is-small">
@@ -144,14 +157,6 @@
               </div>
             </div>
           </div>
-          <h2 class="subtitle mt-5">
-            Task Preview
-          </h2>
-          <template-media
-            :html="renderTemplate(
-              campaignIpfs.template || 'No template found..',
-              campaignIpfs.example_task || {})"
-          />
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
@@ -184,7 +189,7 @@
             </button>
           </div>
         </div>
-        <div v-if="errors.length === 0 && submitted" class="notification is-success is-light">
+        <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
           {{ message }}
           <span v-if="transactionUrl">
             <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
@@ -196,10 +201,8 @@
 </template>
 
 <script>
-import VueSimplemde from 'vue-simplemde'
-import { Template } from '@effectai/effect-js'
+import _ from 'lodash'
 import InstructionsModal from '@/components/InstructionsModal'
-import TemplateMedia from '@/components/Template'
 
 function getMatches (string, regex, index) {
   index || (index = 1) // default to the first capturing group
@@ -213,8 +216,6 @@ function getMatches (string, regex, index) {
 
 export default {
   components: {
-    VueSimplemde,
-    TemplateMedia,
     InstructionsModal
   },
 
@@ -238,6 +239,7 @@ export default {
   middleware: ['auth'],
   data () {
     return {
+      id: parseInt(this.$route.params.id),
       advanced: false,
       success: false,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
@@ -254,22 +256,21 @@ export default {
         version: 1,
         reward: null
       },
-      campaign: {
-        content_hash: null
-      },
+      campaign: null,
       formGroup: 'basic-info',
       cachedFormData: null,
       uploadingFile: false,
       selectedFile: null,
       submitted: false,
       message: null,
-      errors: []
+      err: false,
+      campaignLoading: null
     }
   },
   computed: {
-    // Compares cached user data to live data
+    // Compares live campaign info to stored campaign info
     hasChanged () {
-      return this.cachedFormData !== this.formDataForComparison()
+      return this.campaign && !_.isEqual(this.campaignIpfs, this.campaign.info)
     }
   },
   watch: {
@@ -284,22 +285,16 @@ export default {
       })
       this.campaignIpfs.example_task = newPlaceholders
     },
-    campaign: {
-      deep: true,
-      handler (campaign) {
-        window.localStorage.setItem('cached_campaign', JSON.stringify(campaign))
-      }
-    },
     campaignIpfs: {
       deep: true,
       handler (campaignIpfs) {
-        window.localStorage.setItem('cached_campaignIpfs', JSON.stringify(campaignIpfs))
+        this.campaignIpfs = campaignIpfs
       }
     }
   },
 
   created () {
-    this.cacheFormData()
+    this.getCampaign()
   },
 
   beforeDestroy () {
@@ -326,86 +321,46 @@ export default {
       link.click()
       URL.revokeObjectURL(link.href)
     },
-    renderTemplate (template, placeholders = {}, options = {}) {
-      return new Template(template, placeholders, options).render()
-    },
-    checkForm () {
-      this.errors = []
-      if (
-        this.campaignIpfs.title && this.campaignIpfs.description &&
-        this.campaignIpfs.reward && this.campaignIpfs.category &&
-        this.campaignIpfs.instructions && this.campaignIpfs.template
-      ) {
-        return true
-      }
-      if (!this.campaignIpfs.title) {
-        this.errors.push('Title is required.')
-      }
-      if (!this.campaignIpfs.description) {
-        this.errors.push('Description is required.')
-      }
-      if (!this.campaignIpfs.reward) {
-        this.errors.push('Reward per task is required.')
-      }
-      if (!this.campaignIpfs.category) {
-        this.errors.push('Category is required.')
-      }
-      if (!this.campaignIpfs.instructions) {
-        this.errors.push('Instructions is required.')
-      }
-      if (!this.campaignIpfs.template) {
-        this.errors.push('Template is required.')
-      }
-    },
-    cacheFormData () {
-      // save this in the store instead?
-      const campaign = window.localStorage.getItem('cached_campaign')
-      const campaignIpfs = window.localStorage.getItem('cached_campaignIpfs')
-      if (campaign) {
-        this.campaign = JSON.parse(campaign)
-      }
-      if (campaignIpfs) {
-        this.campaignIpfs = JSON.parse(campaignIpfs)
-      }
-      this.cachedFormData = this.formDataForComparison()
-      window.addEventListener('beforeunload', this.checkClose)
-    },
-    async createCampaign () {
-      this.loading = true
+    async getCampaign () {
+      this.campaignLoading = true
       try {
-        if (this.checkForm()) {
-          const campaignIpfs = { ...this.campaignIpfs }
-          const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
-          const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
-          console.log('CAMPAIGNRESULT', result)
-          this.$store.dispatch('transaction/addTransaction', result)
-          this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
-          this.message = 'Campaign created successfully! Check your transaction here: '
-          this.success = true
-
-          // reset campaign
-          this.campaignIpfs = {
-            title: '',
-            description: '',
-            instructions: '',
-            template: '',
-            image: '',
-            category: '',
-            example_task: {},
-            version: 1,
-            reward: null
-          }
+        const campaign = await this.$blockchain.getCampaign(+this.id)
+        if (this.checkCampaignOwner(campaign)) {
+          this.campaign = campaign
+          this.campaignIpfs = { ...this.campaign.info }
+          window.addEventListener('beforeunload', this.checkClose)
+        } else {
+          this.$router.push('/campaigns/' + this.id)
         }
       } catch (error) {
-        this.errors.push(error)
+        console.error(error)
+        this.message = error
+        this.err = true
+      }
+      this.campaignLoading = false
+    },
+    checkCampaignOwner (campaign) {
+      if (!_.isEqual(this.$auth.user.accountName, campaign.owner[1])) {
+        return false
+      }
+      return true
+    },
+    async editCampaign () {
+      this.loading = true
+      try {
+        const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
+        const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward)
+        this.$store.dispatch('transaction/addTransaction', result)
+        this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+        this.message = 'Campaign edited successfully! Check your transaction here: '
+        this.success = true
+      } catch (error) {
+        this.message = error
+        this.err = true
       }
       this.loading = false
       this.submitted = true
-      this.$router.push('/')
-    },
-    // Helper method that generates JSON for string comparison
-    formDataForComparison () {
-      return JSON.stringify({ campaign: this.campaign, campaignIpfs: this.campaignIpfs })
+      this.$router.push('/campaigns/' + this.id)
     },
     checkClose (event) {
       if (this.hasChanged && !this.loading && !this.success) {

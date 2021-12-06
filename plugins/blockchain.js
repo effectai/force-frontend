@@ -1,8 +1,7 @@
+import * as effectSdk from '@effectai/effect-js'
 import Vue from 'vue'
 import eos from '../services/eos'
 import bsc from '../services/bsc'
-// const effectSdk = require('@effectai/effect-js')
-const effectSdk = require('../../effect-js')
 
 export default (context, inject) => {
   const blockchain = new Vue({
@@ -21,7 +20,7 @@ export default (context, inject) => {
         efxPending: 0,
         eos,
         bsc,
-        sdk: new effectSdk.EffectClient('testnet', sdkOptions),
+        sdk: new effectSdk.EffectClient('jungle', sdkOptions),
         error: null,
         waitForSignatureFrom: null,
         waitForSignature: 0,
@@ -37,7 +36,7 @@ export default (context, inject) => {
         return this.efxAvailable + this.vefxAvailable + this.efxPending
       },
       vefxAvailable () {
-        let balance
+        let balance = 0
         const vAccountRows = context.$auth.user.vAccountRows
         if (vAccountRows) {
           vAccountRows.forEach((row) => {
@@ -85,6 +84,7 @@ export default (context, inject) => {
         // const rememberAccount = null
         if (rememberAccount) {
           const loggedIn = await this.login(rememberAccount.provider, rememberAccount.blockchain, rememberAccount)
+          await this.connectAccount()
           if (loggedIn) {
             await context.$auth.loginWith('blockchain', {
               account: this.account,
@@ -103,13 +103,13 @@ export default (context, inject) => {
         let account
         try {
           if (blockchain === 'eos') {
-            const wallet = await this.eos.login(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
+            const wallet = await this.eos.connect(providerName, rememberAccount ? rememberAccount.accountName : null, rememberAccount ? rememberAccount.permission : null)
             account = { accountName: wallet.auth.accountName, permission: wallet.auth.permission, address: wallet.auth.publicKey, publicKey: wallet.auth.publicKey }
           } else if (blockchain === 'bsc') {
             if (rememberAccount && rememberAccount.privateKey) {
               pk = rememberAccount.privateKey
             }
-            const provider = await this.bsc.login(providerName, pk)
+            const provider = await this.bsc.connect(providerName, pk)
             let accountName
             if (rememberAccount) {
               accountName = rememberAccount.accountName
@@ -131,7 +131,6 @@ export default (context, inject) => {
           if (account) {
             account.blockchain = blockchain
             account.provider = providerName
-            await this.connectAccount(blockchain, account)
             this.account = account
             return true
           }
@@ -227,8 +226,8 @@ export default (context, inject) => {
       async logout () {
         context.$auth.$storage.setUniversal('rememberAccount', null)
         this.clear()
-        await this.eos.logout()
-        await this.bsc.logout()
+        await this.eos.disconnect()
+        await this.bsc.disconnect()
       },
 
       clear () {
@@ -243,6 +242,8 @@ export default (context, inject) => {
             const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, context.$auth.user.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
             if (efxRow) {
               this.efxAvailable = parseFloat(efxRow.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+            } else {
+              this.efxAvailable = 0
             }
           }
         }
@@ -283,8 +284,11 @@ export default (context, inject) => {
       async getBatches (nextKey, limit = 20) {
         return await this.sdk.force.getBatches(nextKey, limit)
       },
-      async getCampaigns (nextKey, limit = 20) {
-        return await this.sdk.force.getCampaigns(nextKey, limit)
+      async getCampaign (id) {
+        return await this.sdk.force.getCampaign(id)
+      },
+      async getCampaigns (nextKey, limit = 20, processCampaign = true) {
+        return await this.sdk.force.getCampaigns(nextKey, limit, processCampaign)
       },
       async getCampaignJoins (campaignId) {
         return await this.sdk.force.getCampaignJoins(campaignId)
@@ -301,8 +305,11 @@ export default (context, inject) => {
       async submitTask (batchId, submissionId, data) {
         return await this.sdk.force.submitTask(batchId, submissionId, data)
       },
-      async createBatch (campaignId, batchId, content, repetitions) {
-        return await this.sdk.force.createBatch(campaignId, batchId, content, repetitions)
+      async createBatch (campaignId, content, repetitions) {
+        return await this.sdk.force.createBatch(campaignId, content, repetitions)
+      },
+      async editCampaign (id, hash, reward) {
+        return await this.sdk.force.editCampaign(id, hash, reward)
       },
       async createCampaign (hash, reward) {
         return await this.sdk.force.createCampaign(hash, reward)
@@ -313,11 +320,16 @@ export default (context, inject) => {
       async getTaskSubmissionsForBatch (batchId) {
         return await this.sdk.force.getTaskSubmissionsForBatch(batchId)
       },
-      async getTaskIndexFromLeaf (leafhash, tasks) {
-        return await this.sdk.force.getTaskIndexFromLeaf(leafhash, tasks)
+      async getTaskIndexFromLeaf (campaignId, batchId, leafhash, tasks) {
+        return await this.sdk.force.getTaskIndexFromLeaf(campaignId, batchId, leafhash, tasks)
       },
-      async connectAccount (chain, account) {
+      async connectAccount () {
+        const chain = this.account.blockchain
+        const account = this.account
         return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, account)
+      },
+      async waitForTransaction (transactionId) {
+        return await this.sdk.force.waitTransaction(transactionId)
       },
 
       async recoverPublicKey () {

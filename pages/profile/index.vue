@@ -8,6 +8,14 @@
         <balance />
         <div class="block">
           <div class="has-text-weight-bold is-size-6">
+            Effect Account Name:
+          </div>
+          <div class="subtitle">
+            {{ $auth.user.accountName }}
+          </div>
+        </div>
+        <div class="block">
+          <div class="has-text-weight-bold is-size-6">
             {{ $auth.user.blockchain === 'bsc' ? 'BSC Address' : 'EOS Account Name' }}:
           </div>
           <div class="subtitle">
@@ -65,6 +73,10 @@
           </div>
         </div>
         <hr>
+        <h2 class="title is-4">
+          My Campaigns
+        </h2>
+        <campaign-list class="mb-6" :owner="$auth.user.accountName" />
         <h4 class="title is-4 is-spaced">
           Transactions
         </h4>
@@ -124,8 +136,10 @@
 <script>
 import { mapGetters } from 'vuex'
 import Balance from '@/components/Balance'
+import CampaignList from '@/components/CampaignList'
+
 export default {
-  components: { Balance },
+  components: { Balance, CampaignList },
   filters: {
     hide (value, show) {
       if (show) {

@@ -90,5 +90,9 @@ sw.*
 # Vim swap files
 *.swp
 
+.vscode
+
 android/
 OneSignalSDK*
+
+.projectile

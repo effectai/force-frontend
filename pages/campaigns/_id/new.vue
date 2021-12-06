@@ -45,21 +45,21 @@
               <div class="control">
                 <input v-model="task[placeholder]" type="text" class="input">
               </div>
-              <div class="control">
-                <button type="submit" class="button">
-                  Create Task
-                </button>
-              </div>
+            </div>
+            <div class="control">
+              <button type="submit" class="button">
+                Create Task
+              </button>
             </div>
           </div>
         </form>
         <form @submit.prevent="uploadBatch">
-          <div class="field">
+          <!-- <div class="field">
             <label class="label">Repetitions</label>
             <div class="control">
               <input v-model="repetitions" class="input" type="number" min="0" required>
             </div>
-          </div>
+          </div> -->
           <div class="field is-grouped">
             <div class="control">
               <button type="submit" class="button is-link" :disabled="!tasks.length">
@@ -67,7 +67,7 @@
               </button>
             </div>
             <div class="control">
-              <button class="button is-link is-light">
+              <button @click.prevent="cancel" class="button is-link is-light">
                 Cancel
               </button>
             </div>
@@ -96,7 +96,7 @@ export default {
   data () {
     return {
       campaignId: parseInt(this.$route.params.id),
-      repetitions: null,
+      repetitions: 1,
       task: {},
       tasks: [],
       placeholders: null,
@@ -146,20 +146,15 @@ export default {
         const content = {
           tasks: this.tasks
         }
-        const batchId = await this.getNewBatchId()
-        const result = await this.$blockchain.createBatch(this.campaignId, batchId, content, this.repetitions)
+        const result = await this.$blockchain.createBatch(this.campaignId, content, this.repetitions)
         this.$store.dispatch('transaction/addTransaction', result)
         this.$router.push('/campaigns/' + this.campaignId)
       } catch (e) {
         this.$blockchain.handleError(e)
       }
     },
-    async getNewBatchId () {
-      await this.$store.dispatch('campaign/getBatches')
-
-      if (this.batchByCampaignId(this.campaignId) !== null) {
-        return this.batchByCampaignId(this.campaignId).length
-      }
+    cancel () {
+      this.$router.push('/campaigns/' + this.campaignId)
     }
   }
 }

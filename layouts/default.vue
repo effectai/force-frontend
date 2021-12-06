@@ -41,7 +41,7 @@ export default {
   },
   computed: {
     provider () {
-      return this.$auth.user.provider
+      return this.$auth.user && this.$auth.user.provider
     }
   },
   created () {

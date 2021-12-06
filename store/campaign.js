@@ -118,7 +118,7 @@ export default {
       commit('SET_LOADING', true)
       try {
         if (!state.campaigns || !state.campaigns.find(c => c.id === id)) {
-          const data = await this.$blockchain.getCampaigns(id, 1)
+          const data = await this.$blockchain.getCampaigns(id, 1, false)
 
           if (data.rows.length > 0) {
             commit('ADD_CAMPAIGN', data.rows[0])
@@ -138,7 +138,7 @@ export default {
     async getCampaigns ({ dispatch, commit, state }, nextKey) {
       commit('SET_LOADING', true)
       try {
-        const data = await this.$blockchain.getCampaigns(nextKey)
+        const data = await this.$blockchain.getCampaigns(nextKey, 20, false)
         let campaigns = state.campaigns
         if (!nextKey) {
           campaigns = data.rows
@@ -150,7 +150,6 @@ export default {
         // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
         (async () => {
           for (const campaign of campaigns) {
-            // await new Promise(resolve => setTimeout(resolve, 100))
             await dispatch('processCampaign', campaign)
           }
         })()

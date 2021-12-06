@@ -11,20 +11,18 @@
         <div v-else-if="account">
           <div class="block">
             <div class="has-text-weight-bold is-size-6">
-              {{ account.address[0] === 'address' ? 'BSC Address' : 'Account Name' }}:
+              Effect Account Name:
             </div>
             <div class="subtitle">
-              <div>
-                <span
-                  v-if="account.address[0] === 'address'"
-                  class="blockchain-address"
-                >{{ account.address[1] }}</span>
-                <a
-                  v-else
-                  :href="$blockchain.eos.explorer + '/address/'+ account.address[1]"
-                  target="_blank"
-                >{{ account.address[1] }}</a>
-              </div>
+              <span
+                v-if="account.address[0] === 'address'"
+                class="blockchain-address"
+              >{{ account.address[1] }}</span>
+              <a
+                v-else
+                :href="$blockchain.eos.explorer + '/address/'+ account.address[1]"
+                target="_blank"
+              >{{ account.address[1] }}</a>
             </div>
           </div>
           <div class="block">
@@ -46,6 +44,10 @@
               >View on explorer</a>
             </div>
           </div>
+          <h2 class="title is-4">
+            Campaigns
+          </h2>
+          <campaign-list class="mb-6" :owner="name" />
         </div>
         <div v-else>
           Could not retrieve account
@@ -55,8 +57,10 @@
   </section>
 </template>
 <script>
+import CampaignList from '@/components/CampaignList'
 
 export default {
+  components: { CampaignList },
   middleware: ['auth'],
   data () {
     return {

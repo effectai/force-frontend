@@ -20,6 +20,10 @@
           </li>
         </ul>
       </nav>
+      <div v-if="loading" class="loader-wrapper is-active">
+        <div class="loader is-loading" />
+        <br>Waiting for the transaction to complete...
+      </div>
       <div v-if="campaignLoading || batchLoading">
         Campaign loading..
       </div>
@@ -124,12 +128,15 @@
             <div class="block">
               <b>Tasks</b>
               <br>
-              <template v-if="batch">
+              <template v-if="batch && batch.num_tasks - batch.tasks_done === 0">
+                <span>Done.</span>
+              </template>
+              <template v-else-if="batch && batch.num_tasks - batch.tasks_done > 0">
                 <span>{{ batch.num_tasks - batch.tasks_done }}</span>
                 <span>/ {{ batch.num_tasks }} left</span>
               </template>
               <span v-else>...</span>
-              <progress class="progress is-secondary" :value="batch ? batch.tasks_done : undefined" :max="batch ? batch.num_tasks : undefined">
+              <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks: false}" :value="batch ? batch.tasks_done : undefined" :max="batch ? batch.num_tasks : undefined">
                 Left
               </progress>
             </div>
@@ -151,13 +158,13 @@
             <div class="block">
               <b>Blockchain</b>
               <br>
-              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.FORCE_CONTRACT}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.FORCE_CONTRACT}&scope=${$blockchain.sdk.force.config.FORCE_CONTRACT}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
+              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
             </div>
             <div class="block">
               <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                 Join Campaign
               </button>
-              <button v-else-if="batch" class="button is-primary" @click.prevent="reserveTask = true">
+              <button v-else-if="batch && batch.num_tasks - batch.tasks_done !== 0" class="button is-primary" @click.prevent="reserveTask = true">
                 Make Task Reservation
               </button>
             </div>
@@ -175,11 +182,15 @@
 </template>
 <script>
 import { mapState } from 'vuex'
+import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
+<<<<<<< HEAD
 import { Template } from '@/../effect-js'
 const jsonexport = require('jsonexport/dist')
+=======
+>>>>>>> 9bdad5ef9dbd983cdfe796a14c479ad7e49c7db7
 
 export default {
   components: {
@@ -195,7 +206,6 @@ export default {
       batchId: parseInt(this.$route.params.batch),
       campaign: undefined,
       batch: undefined,
-      randomNumber: undefined,
       body: 'description',
       accountId: this.$auth.user.vAccountRows[0].id,
       userJoined: null,
@@ -214,9 +224,6 @@ export default {
     })
   },
   mounted () {
-    setTimeout(() => {
-      this.randomNumber = this.generateRandomNumber(300)
-    }, 3000)
   },
   created () {
     this.checkUserCampaign()
@@ -234,7 +241,12 @@ export default {
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
-          setTimeout(this.checkUserCampaign, 1500)
+          this.joinCampaignPopup = false
+          await this.$blockchain.waitForTransaction(data.transaction_id)
+          await this.checkUserCampaign()
+          if (this.userJoined) {
+            this.reserveTask = true
+          }
         }
         this.joinCampaignPopup = false
       } catch (e) {
@@ -294,5 +306,4 @@ export default {
 .progress::-webkit-progress-value {
   transition: width 0.5s ease;
 }
-
 </style>

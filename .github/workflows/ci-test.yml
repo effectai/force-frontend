@@ -3,7 +3,7 @@ name: Deploy on gh-pages
 on:
   push:
     branches:
-      - main
+      - 'ci-test'
 
 jobs:
   deploy:
@@ -27,8 +27,3 @@ jobs:
       - run: npm ci
       - run: npm run generate
 
-      - name: deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist

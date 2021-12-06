@@ -205,3 +205,28 @@ a.box {
   white-space: nowrap;
   overflow: hidden;
 }
+
+.progress.is-success {
+  animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(51, 217, 178, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(51, 217, 178, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(51, 217, 178, 0);
+  }
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.5s;
+}
+.page-enter,
+.page-leave-to {
+  opacity: 0;
+}

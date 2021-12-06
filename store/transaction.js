@@ -21,7 +21,9 @@ export default {
   },
   actions: {
     addTransaction ({ commit }, transaction) {
-      commit('ADD_TRANSACTION', transaction)
+      if (transaction) {
+        commit('ADD_TRANSACTION', transaction)
+      }
     }
   },
   state: () => {

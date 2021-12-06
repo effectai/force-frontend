@@ -106,7 +106,7 @@ export default {
       copy_message: 'Copy to clipboard',
       modalConfirmation: false,
       memo: this.$auth.user.vAccountRows[0].id,
-      account: this.$blockchain.sdk.account.config.ACCOUNT_CONTRACT,
+      account: this.$blockchain.sdk.account.config.account_contract,
       clipboard: navigator.clipboard
     }
   },
@@ -130,10 +130,8 @@ export default {
           this.$store.dispatch('transaction/addTransaction', result)
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
           this.message = 'Withdrawing has been successful. Check your transaction here: '
-
-          setTimeout(() => {
-            this.$blockchain.updateBlockchainInfo()
-          }, 1500)
+          await this.$blockchain.waitForTransaction(result.transaction_id)
+          this.$blockchain.updateBlockchainInfo()
         }
       } catch (error) {
         this.$blockchain.handleError(error)
