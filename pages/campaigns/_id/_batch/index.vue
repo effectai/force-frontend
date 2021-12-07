@@ -86,6 +86,7 @@
                       <th>Account ID</th>
                       <th>Data</th>
                       <th>Paid</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -97,6 +98,7 @@
                       <td>{{ sub.account_id }}</td>
                       <td>{{ sub.data }}</td>
                       <td>{{ sub.paid ? "yes" : "no" }}</td>
+                      <td><button class="button" @click.prevent="viewTask(sub)">View</button></td>
                     </tr>
                   </tbody>
                 </table>
@@ -116,6 +118,12 @@
                 </button>
               </div>
               <span v-else>No results found</span>
+              <template-media
+                v-if="campaign && campaign.info"
+                :html="renderTemplate(
+                  campaign.info.template || 'No template found..',
+                  {})"
+              />
             </div>
           </div>
         </div>
@@ -284,6 +292,13 @@ export default {
         this.$blockchain.handleError(e)
       }
       this.loading = false
+    },
+    viewTask (sub) {
+      const data = {
+        task: 'results',
+        value: JSON.parse(sub.data)
+      }
+      window.postMessage(data, '*')
     },
     submitTask (values) {
       console.log('Task submitted!', values)

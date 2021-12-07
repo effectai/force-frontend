@@ -65,6 +65,10 @@ export default {
           // TaskContent handles submit
           this.$emit('submit', data.values)
           break
+        case 'results':
+          console.log('results iframe message: ', data.value)
+          this.$emit('results', data.value)
+          break
       }
     }
   }
