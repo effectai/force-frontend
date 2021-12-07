@@ -46,7 +46,7 @@
               <li :class="{'is-active': body === 'instruction'}">
                 <a @click.prevent="body = 'instruction'">Instructions</a>
               </li>
-              <li :class="{'is-active': body === 'results'}">
+              <li v-if="campaign && campaign.owner[1] === this.$auth.user.accountName" :class="{'is-active': body === 'results'}">
                 <a @click.prevent="body = 'results'">Task Results</a>
               </li>
             </ul>
@@ -118,12 +118,18 @@
                 </button>
               </div>
               <span v-else>No results found</span>
-              <template-media
-                v-if="campaign && campaign.info"
-                :html="renderTemplate(
-                  campaign.info.template || 'No template found..',
-                  {})"
-              />
+              <div class="modal" :class="{'is-active': viewTaskResult}">
+                <div class="modal-background" @click="viewTaskResult = false"></div>
+                <div class="modal-content" style="background-color: #fff; padding: 10px;">
+                  <template-media
+                    v-if="campaign && campaign.info"
+                    :html="renderTemplate(
+                      campaign.info.template || 'No template found..',
+                      {})"
+                  />
+                </div>
+                <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
+              </div>
             </div>
           </div>
         </div>
@@ -234,7 +240,8 @@ export default {
       submissions: null,
       page: 1,
       perPage: 10,
-      pages: []
+      pages: [],
+      viewTaskResult: false
     }
   },
   computed: {
@@ -294,6 +301,7 @@ export default {
       this.loading = false
     },
     viewTask (sub) {
+      this.viewTaskResult = true
       const data = {
         task: 'results',
         value: JSON.parse(sub.data)
