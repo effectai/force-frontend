@@ -66,8 +66,9 @@ export default {
           this.$emit('submit', data.values)
           break
         case 'results':
-          console.log('results iframe message: ', data.value)
-          this.$emit('results', data.value)
+          // eslint-disable-next-line no-case-declarations
+          const mediaFrame = document.getElementById('mediaFrame')
+          mediaFrame.contentWindow.postMessage(data, '*')
           break
       }
     }
