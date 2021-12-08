@@ -46,6 +46,9 @@
               <li :class="{'is-active': body === 'instruction'}">
                 <a @click.prevent="body = 'instruction'">Instructions</a>
               </li>
+              <li v-if="campaign && campaign.owner[1] === this.$auth.user.accountName" :class="{'is-active': body === 'results'}">
+                <a @click.prevent="body = 'results'">Task Results</a>
+              </li>
             </ul>
           </div>
           <div v-if="body === 'description'" class="block">
@@ -71,6 +74,63 @@
             <p v-else>
               ...
             </p>
+          </div>
+          <!-- Task results -->
+          <div v-if="body === 'results'" class="block">
+            <div v-if="campaign && campaign.info" class="content">
+              <div v-if="submissions">
+                <table class="table" style="width: 100%">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Account ID</th>
+                      <th>Data</th>
+                      <th>Paid</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="sub in displayedSubmissions"
+                      :key="sub.id"
+                    >
+                      <td>{{ sub.id }}</td>
+                      <td>{{ sub.account_id }}</td>
+                      <td>{{ sub.data }}</td>
+                      <td>{{ sub.paid ? "yes" : "no" }}</td>
+                      <td><button class="button" @click.prevent="viewTask(sub)">View</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <nav class="pagination" role="navigation" aria-label="pagination">
+                  <a v-if="page != 1" class="pagination-previous" @click="page--">Previous</a>
+                  <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
+                  <ul class="pagination-list">
+                    <li v-for="pageNumber in pages" :key="pageNumber">
+                      <a class="pagination-link" @click="page = pageNumber">{{ pageNumber }}</a>
+                    </li>
+                  </ul>
+                </nav>
+
+                <button class="button is-primary" @click.prevent="downloadTaskResults()">
+                  Download Results
+                </button>
+              </div>
+              <span v-else>No results found</span>
+              <div class="modal" :class="{'is-active': viewTaskResult}">
+                <div class="modal-background" @click="viewTaskResult = false"></div>
+                <div class="modal-content" style="background-color: #fff; padding: 10px;">
+                  <template-media
+                    v-if="campaign && campaign.info"
+                    :html="renderTemplate(
+                      campaign.info.template || 'No template found..',
+                      {})"
+                  />
+                </div>
+                <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
+              </div>
+            </div>
           </div>
         </div>
         <div class="column is-one-third">
@@ -158,6 +218,7 @@ import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
+const jsonexport = require('jsonexport/dist')
 import SuccessModal from '@/components/SuccessModal'
 
 export default {
@@ -182,7 +243,13 @@ export default {
       loading: false,
       joinCampaignPopup: false,
       reserveTask: false,
-      successMessage: null
+      submissions: null,
+      page: 1,
+      perPage: 10,
+      pages: [],
+      viewTaskResult: false,
+      successMessage: null,
+      successTitle: null
     }
   },
   computed: {
@@ -191,7 +258,15 @@ export default {
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading,
       batchLoading: state => state.campaign.loadingBatch
-    })
+    }),
+    displayedSubmissions () {
+      return this.paginate(this.submissions)
+    }
+  },
+  watch: {
+    submissions () {
+      this.setPages()
+    }
   },
   mounted () {
     if (this.batchCompleted) {
@@ -203,6 +278,7 @@ export default {
     this.checkUserCampaign()
     this.getBatch()
     this.getCampaign()
+    this.setPages()
   },
   methods: {
     campaignModalChange (val) {
@@ -238,6 +314,14 @@ export default {
       }
       this.loading = false
     },
+    viewTask (sub) {
+      this.viewTaskResult = true
+      const data = {
+        task: 'results',
+        value: JSON.parse(sub.data)
+      }
+      window.postMessage(data, '*')
+    },
     submitTask (values) {
       console.log('Task submitted!', values)
     },
@@ -248,12 +332,62 @@ export default {
       await this.$store.dispatch('campaign/getBatch', { batchId: this.batchId })
       this.batch = this.batches.find(b => b.batch_id === this.batchId)
       // todo: make tab for submissiosn and reservations
-      const submissions = this.$blockchain.getTaskSubmissionsForBatch(this.batchId)
-      console.log('batch submissions:', submissions)
+      const submissions = await this.$blockchain.getTaskSubmissionsForBatch(this.batchId)
+      this.submissions = submissions
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
+    },
+    generateRandomNumber (maxNum) {
+      return Math.ceil(Math.random() * maxNum)
+    },
+    downloadTaskResults () {
+      // add columns from data object to the submission object itself
+      const parsedSubmissions = this.submissions.map((x) => {
+        const sub = {}
+        sub.data = JSON.parse(x.data)
+        for (const result of Object.keys(sub.data)) {
+          x[result] = sub.data[result]
+        }
+        return x
+      })
+      jsonexport(parsedSubmissions, (err, csv) => {
+        if (err) {
+          return console.error(err)
+        }
+        const filename = `task_results_${this.batchId}.csv`
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+        if (navigator.msSaveBlob) { // IE 10+
+          navigator.msSaveBlob(blob, filename)
+        } else {
+          const link = document.createElement('a')
+          if (link.download !== undefined) { // feature detection
+            // Browsers that support HTML5 download attribute
+            const url = URL.createObjectURL(blob)
+            link.setAttribute('href', url)
+            link.setAttribute('download', filename)
+            link.style.visibility = 'hidden'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+          }
+        }
+      })
+    },
+    setPages () {
+      if (!this.submissions) { return }
+      const numberOfPages = Math.ceil(this.submissions.length / this.perPage)
+      for (let index = 1; index <= numberOfPages; index++) {
+        if (this.pages.length < index) {
+          this.pages.push(index)
+        }
+      }
+    },
+    paginate (transactions) {
+      const from = (this.page * this.perPage) - this.perPage
+      const to = (this.page * this.perPage)
+      return transactions.slice(from, to)
     }
   }
 }

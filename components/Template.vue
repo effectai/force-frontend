@@ -65,6 +65,11 @@ export default {
           // TaskContent handles submit
           this.$emit('submit', data.values)
           break
+        case 'results':
+          // eslint-disable-next-line no-case-declarations
+          const mediaFrame = document.getElementById('mediaFrame')
+          mediaFrame.contentWindow.postMessage(data, '*')
+          break
       }
     }
   }
