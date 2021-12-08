@@ -141,6 +141,9 @@
         </div>
       </div>
 
+      <!-- SuccessModal -->
+      <success-modal v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
+
       <!-- Reserve task -->
       <reserve-task v-if="reserveTask" :batch="batch" />
 
@@ -155,12 +158,14 @@ import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
+import SuccessModal from '@/components/SuccessModal'
 
 export default {
   components: {
     TemplateMedia,
     ReserveTask,
-    InstructionsModal
+    InstructionsModal,
+    SuccessModal
   },
   middleware: ['auth'],
   data () {
@@ -168,6 +173,7 @@ export default {
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       campaignId: parseInt(this.$route.params.id),
       batchId: parseInt(this.$route.params.batch),
+      batchCompleted: parseInt(this.$route.query.batchCompleted),
       campaign: undefined,
       batch: undefined,
       body: 'description',
@@ -175,7 +181,8 @@ export default {
       userJoined: null,
       loading: false,
       joinCampaignPopup: false,
-      reserveTask: false
+      reserveTask: false,
+      successMessage: null
     }
   },
   computed: {
@@ -187,6 +194,10 @@ export default {
     })
   },
   mounted () {
+    if (this.batchCompleted) {
+      this.successTitle = 'Batch is completed'
+      this.successMessage = 'All the tasks in this batch are done'
+    }
   },
   created () {
     this.checkUserCampaign()
