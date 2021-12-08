@@ -16,6 +16,8 @@
         @submit="submitTask"
       />
 
+      <!-- SuccessModal -->
+      <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
       <!-- Reserve task -->
       <reserve-task v-if="reserveNextTask" :batch="batch" />
     </div>
@@ -26,11 +28,13 @@ import { mapState } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
+import SuccessModal from '@/components/SuccessModal'
 
 export default {
   components: {
     'template-media': TemplateMedia,
-    'reserve-task': ReserveTask
+    'reserve-task': ReserveTask,
+    'success-modal': SuccessModal
   },
   middleware: ['auth'],
   data () {
@@ -44,7 +48,9 @@ export default {
       batch: undefined,
       task: undefined,
       reserveNextTask: false,
-      loading: false
+      loading: false,
+      successMessage: null,
+      successTitle: null
     }
   },
   computed: {
@@ -73,17 +79,25 @@ export default {
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
     },
     async submitTask (values) {
-      this.loading = true
-      this.reserveNextTask = false
-      const result = await this.$blockchain.submitTask(this.batch.batch_id, this.submissionId, JSON.stringify(values))
-      await this.$blockchain.waitForTransaction(result.transaction_id)
-      this.$store.dispatch('transaction/addTransaction', result)
-      this.loading = false
-      await this.getBatch()
-      if (this.batch.tasks_done === this.batch.num_tasks) {
-        this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id)
-      } else {
-        this.reserveNextTask = true
+      try {
+        this.loading = true
+        this.reserveNextTask = false
+
+        const result = await this.$blockchain.submitTask(this.batch.batch_id, this.submissionId, JSON.stringify(values))
+        this.successTitle = 'Task submitted successfully'
+        this.successMessage = 'Waiting for transaction to complete before continuing'
+        await this.$blockchain.waitForTransaction(result.transaction_id)
+        this.$store.dispatch('transaction/addTransaction', result)
+        this.loading = false
+
+        await this.getBatch()
+        if (this.batch.tasks_done === this.batch.num_tasks) {
+          this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '?batchCompleted=1')
+        } else {
+          this.reserveNextTask = true
+        }
+      } catch (e) {
+        throw new Error(e)
       }
     }
   }
