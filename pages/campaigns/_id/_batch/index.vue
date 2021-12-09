@@ -82,7 +82,7 @@
           <!-- Current Task Reservations  -->
           <div v-if="body === 'reservations'" class="block">
             <div v-if="campaign && campaign.info" class="content">
-              <div v-if="reservations">
+              <div v-if="reservations.length">
                 <table class="table" style="width: 100%">
                   <thead>
                     <tr>
@@ -111,14 +111,14 @@
                   </ul>
                 </nav>
               </div>
-              <span v-else>No results found</span>
+              <span v-else>No active reservations</span>
             </div>
           </div>
 
           <!-- Task results -->
           <div v-if="body === 'results'" class="block">
             <div v-if="campaign && campaign.info" class="content">
-              <div v-if="submissions">
+              <div v-if="submissions.length">
                 <table class="table" style="width: 100%">
                   <thead>
                     <tr>
@@ -157,7 +157,7 @@
                   Download Results
                 </button>
               </div>
-              <span v-else>No results found</span>
+              <span v-else>No submissions found</span>
               <div class="modal" :class="{'is-active': viewTaskResult}">
                 <div class="modal-background" @click="viewTaskResult = false"></div>
                 <div class="modal-content" style="background-color: #fff; padding: 10px;">
