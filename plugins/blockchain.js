@@ -282,8 +282,8 @@ export default (context, inject) => {
           this.efxPending = pending
         }
       },
-      async getBatches (nextKey, limit = 20) {
-        return await this.sdk.force.getBatches(nextKey, limit)
+      async getBatches (nextKey, limit = 20, processBatch = true) {
+        return await this.sdk.force.getBatches(nextKey, limit, processBatch)
       },
       async getCampaign (id) {
         return await this.sdk.force.getCampaign(id)
@@ -319,13 +319,13 @@ export default (context, inject) => {
         return await this.sdk.force.getReservations()
       },
       async getTaskSubmissionsForBatch (batchId) {
-        return await this.sdk.force.getTaskSubmissionsForBatch(batchId)
+        return await this.sdk.force.getSubmissionsOfBatch(batchId, 'submissions')
       },
       async getTaskReservationsForBatch (batchId) {
-        return await this.sdk.force.getTaskReservationsForBatch(batchId)
+        return await this.sdk.force.getSubmissionsOfBatch(batchId, 'reservations')
       },
       async getSubmissionsAndReservationsForBatch (batchId) {
-        return await this.sdk.force.getSubmissionsAndReservationsForBatch(batchId)
+        return await this.sdk.force.getSubmissionsOfBatch(batchId)
       },
       async getTaskIndexFromLeaf (campaignId, batchId, leafhash, tasks) {
         return await this.sdk.force.getTaskIndexFromLeaf(campaignId, batchId, leafhash, tasks)

@@ -47,7 +47,7 @@
                 <a @click.prevent="body = 'instruction'">Instructions</a>
               </li>
               <li v-if="campaign && campaign.owner[1] === this.$auth.user.accountName" :class="{'is-active': body === 'reservations'}">
-                <a @click.prevent="body = 'reservations'">Reservations</a>
+                <a @click.prevent="body = 'reservations'">Active Reservations</a>
               </li>
               <li v-if="campaign && campaign.owner[1] === this.$auth.user.accountName" :class="{'is-active': body === 'results'}">
                 <a @click.prevent="body = 'results'">Task Results</a>
@@ -197,15 +197,15 @@
             <div class="block">
               <b>Tasks</b>
               <br>
-              <template v-if="batch && batch.num_tasks - batch.tasks_done === 0">
+              <template v-if="batch && batch.num_tasks - batch.tasks_done === 0 && !batch.reservations.length">
                 <span>Done.</span>
               </template>
-              <template v-else-if="batch && batch.num_tasks - batch.tasks_done > 0">
+              <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations.length)">
                 <span>{{ batch.num_tasks - batch.tasks_done }}</span>
                 <span>/ {{ batch.num_tasks }} left</span>
               </template>
               <span v-else>...</span>
-              <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks: false}" :value="batch ? batch.tasks_done : undefined" :max="batch ? batch.num_tasks : undefined">
+              <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks && !batch.reservations.length : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || batch.reservations.length: false}" :value="batch ? batch.tasks_done : undefined" :max="batch ? batch.num_tasks : undefined">
                 Left
               </progress>
             </div>
