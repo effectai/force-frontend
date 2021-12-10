@@ -33,11 +33,13 @@ export default {
     }),
     hasCampaigns () {
       let hasCampaigns = false
-      this.campaigns.forEach((c) => {
-        if (c.owner[1] === this.$auth.user.accountName) {
-          hasCampaigns = true
-        }
-      })
+      if (this.campaigns) {
+        this.campaigns.forEach((c) => {
+          if (c.owner[1] === this.$auth.user.accountName) {
+            hasCampaigns = true
+          }
+        })
+      }
       return hasCampaigns
     }
   },
