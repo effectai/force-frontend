@@ -405,12 +405,12 @@ export default {
             reward: null
           }
         }
+        this.loading = false
+        this.submitted = true
+        this.$router.push(`/campaigns/${createdCampaign.id}`)
       } catch (error) {
         this.errors.push(error)
       }
-      this.loading = false
-      this.submitted = true
-      this.$router.push(`/campaigns/${createdCampaign.id}`)
     },
     // Helper method that generates JSON for string comparison
     formDataForComparison () {
