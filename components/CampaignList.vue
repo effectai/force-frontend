@@ -8,8 +8,7 @@
         :key="campaign.id"
         :to="'/campaigns/'+campaign.id"
         class="box p-4"
-        :class="{'is-disabled': campaign.info === null}"
-      >
+        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}">
         <div class="columns is-vcentered is-multiline is-mobile">
           <div class="column is-narrow is-mobile-1">
             <p class="image has-radius" style="width: 52px; height: 52px">
@@ -106,6 +105,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import CategoryFilters from './CategoryFilters'
 
@@ -118,7 +118,8 @@ export default {
   data () {
     return {
       filter: null,
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER
+      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
+      reservations: null
     }
   },
   computed: {
@@ -132,9 +133,14 @@ export default {
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded
     }),
     filteredCampaigns () {
-      let campaigns = this.campaignsByCategory(this.filter)
+      const campaigns = this.campaignsByCategory(this.filter)
+      let filteredCampaigns
+
       for (const i in campaigns) {
         const batches = this.batchByCampaignId(campaigns[i].id)
+        // get the reservations of the user for this campaign
+        const reservationsOfUser = _.intersectionBy(batches, this.reservations, 'batch_id')
+        campaigns[i].userHasReservation = (reservationsOfUser.length)
         if (batches) {
           campaigns[i].num_tasks = batches.reduce(function (a, b) {
             return a + b.num_tasks
@@ -145,18 +151,21 @@ export default {
         }
       }
       if (campaigns) {
+        filteredCampaigns = [...campaigns]
         if (this.active) {
-          campaigns = campaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+          filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+          // show the campaigns where the user has a resevation first
+          filteredCampaigns = _.orderBy(filteredCampaigns, ['userHasReservation', 'id'], ['desc', 'asc'])
         } else {
           // Show newest campaigns first when we are not filtering active campaigns
-          // campaigns.reverse()
+          filteredCampaigns.reverse()
         }
         if (this.owner) {
-          campaigns = campaigns.filter(c => c.owner[1] === this.owner)
+          filteredCampaigns = filteredCampaigns.filter(c => c.owner[1] === this.owner)
         }
       }
 
-      return campaigns
+      return filteredCampaigns
     }
   },
   created () {
@@ -168,6 +177,11 @@ export default {
       this.filter = category
     },
     async getCampaigns () {
+      this.reservations = await this.$blockchain.getMyReservations()
+      this.reservations = this.reservations.map(function (x) {
+        x.batch_id = parseInt(x.batch_id)
+        return x
+      })
       if (!this.campaigns || !this.allCampaignsLoaded) {
         await this.$store.dispatch('campaign/getCampaigns')
       }
@@ -187,6 +201,10 @@ export default {
       opacity: 0.5;
     }
     background-color: rgba(#DEE0E6, 0.5);
+  }
+  // not sure about this styling
+  &.has-reservation {
+    box-shadow: 0px 0px 14px 5px rgba(17,72,235,0.5);
   }
 }
 </style>
