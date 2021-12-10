@@ -9,8 +9,8 @@
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
           <li>
-            <nuxt-link to="/campaigns">
-              All Campaigns
+            <nuxt-link to="/">
+              Campaigns
             </nuxt-link>
           </li>
           <li class="is-active">

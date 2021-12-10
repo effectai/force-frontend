@@ -5,7 +5,7 @@
         <ul>
           <li>
             <nuxt-link to="/">
-              All Campaigns
+              Campaigns
             </nuxt-link>
           </li>
           <li>
