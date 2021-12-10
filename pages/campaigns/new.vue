@@ -409,6 +409,7 @@ export default {
         this.submitted = true
         this.$router.push(`/campaigns/${createdCampaign.id}`)
       } catch (error) {
+        this.loading = false
         this.errors.push(error)
       }
     },
