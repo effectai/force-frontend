@@ -169,7 +169,8 @@
                     v-if="campaign && campaign.info && viewTaskResult"
                     :html="renderTemplate(
                       campaign.info.template || 'No template found..',
-                      viewTaskResult)"
+                      viewTaskResult.placeholders)"
+                    @templateLoaded="postResults(viewTaskResult.results)"
                   />
                 </div>
                 <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
@@ -365,15 +366,22 @@ export default {
       }
       this.loading = false
     },
+    postResults (results) {
+      const frame = document.getElementById('mediaFrame')
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { task: 'results', value: results },
+          '*'
+        )
+      }
+    },
     async viewTask (sub) {
       const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, sub.leaf_hash, this.batch.tasks)
-      console.log(taskIndex, this.batch.tasks[taskIndex])
-      this.viewTaskResult = this.batch.tasks[taskIndex]
-      const data = {
-        task: 'results',
-        value: JSON.parse(sub.data)
+      this.viewTaskResult =
+      {
+        placeholders: this.batch.tasks[taskIndex],
+        results: JSON.parse(sub.data)
       }
-      window.postMessage(data, '*')
     },
     submitTask (values) {
       console.log('Task submitted!', values)
