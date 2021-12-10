@@ -166,10 +166,10 @@
                 <div class="modal-background" @click="viewTaskResult = false" />
                 <div class="modal-content" style="background-color: #fff; padding: 10px;">
                   <template-media
-                    v-if="campaign && campaign.info"
+                    v-if="campaign && campaign.info && viewTaskResult"
                     :html="renderTemplate(
                       campaign.info.template || 'No template found..',
-                      {})"
+                      viewTaskResult)"
                   />
                 </div>
                 <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
@@ -365,8 +365,10 @@ export default {
       }
       this.loading = false
     },
-    viewTask (sub) {
-      this.viewTaskResult = true
+    async viewTask (sub) {
+      const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, sub.leaf_hash, this.batch.tasks)
+      console.log(taskIndex, this.batch.tasks[taskIndex])
+      this.viewTaskResult = this.batch.tasks[taskIndex]
       const data = {
         task: 'results',
         value: JSON.parse(sub.data)
