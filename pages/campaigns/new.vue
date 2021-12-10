@@ -404,10 +404,10 @@ export default {
             version: 1,
             reward: null
           }
+          this.loading = false
+          this.submitted = true
+          this.$router.push(`/campaigns/${createdCampaign.id}`)
         }
-        this.loading = false
-        this.submitted = true
-        this.$router.push(`/campaigns/${createdCampaign.id}`)
       } catch (error) {
         this.loading = false
         this.errors.push(error)
