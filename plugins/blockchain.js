@@ -288,6 +288,9 @@ export default (context, inject) => {
       async getCampaign (id) {
         return await this.sdk.force.getCampaign(id)
       },
+      async getMyLastCampaign () {
+        return await this.sdk.force.getMyLastCampaign()
+      },
       async getCampaigns (nextKey, limit = 20, processCampaign = true) {
         return await this.sdk.force.getCampaigns(nextKey, limit, processCampaign)
       },

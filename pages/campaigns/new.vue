@@ -1,6 +1,10 @@
 <template>
   <section class="section">
     <div class="container">
+      <div v-if="loading" class="loader-wrapper is-active">
+        <div class="loader is-loading" />
+        <br>Waiting for the transaction to complete...
+      </div>
       <p class="is-pulled-right">
         <span class="has-text-info"><b>*</b></span>
         <i> is required</i>
@@ -9,7 +13,7 @@
         New Campaign
       </h1>
       <div v-if="errors.length">
-        <div v-for="error in errors" :key="error" class="notification is-danger is-light">
+        <div v-for="error in errors" :key="toString(error)" class="notification is-danger is-light">
           {{ error }}
         </div>
       </div>
@@ -184,14 +188,10 @@
             </button>
           </div>
         </div>
-        <div v-if="errors.length === 0 && submitted" class="notification is-success is-light">
-          {{ message }}
-          <span v-if="transactionUrl">
-            <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
-          </span>
-        </div>
       </form>
     </div>
+    <!-- SuccessModal -->
+    <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
   </section>
 </template>
 
@@ -200,6 +200,7 @@ import VueSimplemde from 'vue-simplemde'
 import { Template } from '@effectai/effect-js'
 import InstructionsModal from '@/components/InstructionsModal'
 import TemplateMedia from '@/components/Template'
+import SuccessModal from '@/components/SuccessModal'
 
 function getMatches (string, regex, index) {
   index || (index = 1) // default to the first capturing group
@@ -215,7 +216,8 @@ export default {
   components: {
     VueSimplemde,
     TemplateMedia,
-    InstructionsModal
+    InstructionsModal,
+    SuccessModal
   },
 
   filters: {
@@ -262,8 +264,9 @@ export default {
       uploadingFile: false,
       selectedFile: null,
       submitted: false,
-      message: null,
-      errors: []
+      errors: [],
+      successMessage: null,
+      successTitle: null
     }
   },
   computed: {
@@ -372,16 +375,22 @@ export default {
     },
     async createCampaign () {
       this.loading = true
+      let createdCampaign
       try {
         if (this.checkForm()) {
           const campaignIpfs = { ...this.campaignIpfs }
           const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
           const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
-          console.log('CAMPAIGNRESULT', result)
+
+          // Wait for transaction and reload campaigns
+          this.successTitle = 'Campaign submitted successfully'
+          this.successMessage = 'Waiting for transaction to complete before continuing'
+          await this.$blockchain.waitForTransaction(result.transaction_id)
+          await this.$store.dispatch('campaign/getCampaigns')
+          createdCampaign = await this.$blockchain.getMyLastCampaign()
+
           this.$store.dispatch('transaction/addTransaction', result)
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
-          this.message = 'Campaign created successfully! Check your transaction here: '
-          this.success = true
 
           // reset campaign
           this.campaignIpfs = {
@@ -401,14 +410,14 @@ export default {
       }
       this.loading = false
       this.submitted = true
-      this.$router.push('/')
+      this.$router.push(`/campaigns/${createdCampaign.id}`)
     },
     // Helper method that generates JSON for string comparison
     formDataForComparison () {
       return JSON.stringify({ campaign: this.campaign, campaignIpfs: this.campaignIpfs })
     },
     checkClose (event) {
-      if (this.hasChanged && !this.loading && !this.success) {
+      if (this.hasChanged && !this.loading && !this.submitted) {
         const warningMessage = 'You have unsaved changes. Are you sure you wish to leave?'
         if (!confirm(warningMessage)) {
           event.preventDefault()
