@@ -149,7 +149,7 @@ export default {
           campaigns = campaigns.filter(c => c.num_tasks - c.tasks_done > 0)
         } else {
           // Show newest campaigns first when we are not filtering active campaigns
-          campaigns.reverse()
+          // campaigns.reverse()
         }
         if (this.owner) {
           campaigns = campaigns.filter(c => c.owner[1] === this.owner)
