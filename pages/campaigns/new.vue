@@ -359,6 +359,7 @@ export default {
       if (!this.campaignIpfs.template) {
         this.errors.push('Template is required.')
       }
+      return false
     },
     cacheFormData () {
       // save this in the store instead?
@@ -374,10 +375,10 @@ export default {
       window.addEventListener('beforeunload', this.checkClose)
     },
     async createCampaign () {
-      this.loading = true
       let createdCampaign
       try {
         if (this.checkForm()) {
+          this.loading = true
           const campaignIpfs = { ...this.campaignIpfs }
           const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
           const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
