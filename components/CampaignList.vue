@@ -132,7 +132,9 @@ export default {
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded
     }),
     filteredCampaigns () {
-      let campaigns = this.campaignsByCategory(this.filter)
+      const campaigns = this.campaignsByCategory(this.filter)
+      let filteredCampaigns
+
       for (const i in campaigns) {
         const batches = this.batchByCampaignId(campaigns[i].id)
         if (batches) {
@@ -145,18 +147,19 @@ export default {
         }
       }
       if (campaigns) {
+        filteredCampaigns = [...campaigns]
         if (this.active) {
-          campaigns = campaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+          filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
         } else {
           // Show newest campaigns first when we are not filtering active campaigns
-          // campaigns.reverse()
+          filteredCampaigns.reverse()
         }
         if (this.owner) {
-          campaigns = campaigns.filter(c => c.owner[1] === this.owner)
+          filteredCampaigns = filteredCampaigns.filter(c => c.owner[1] === this.owner)
         }
       }
 
-      return campaigns
+      return filteredCampaigns
     }
   },
   created () {
