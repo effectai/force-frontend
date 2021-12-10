@@ -46,10 +46,10 @@
               <li :class="{'is-active': body === 'instruction'}">
                 <a @click.prevent="body = 'instruction'">Instructions</a>
               </li>
-              <li v-if="campaign && campaign.owner[1] === this.$auth.user.accountName" :class="{'is-active': body === 'reservations'}">
+              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'reservations'}">
                 <a @click.prevent="body = 'reservations'">Active Reservations</a>
               </li>
-              <li v-if="campaign && campaign.owner[1] === this.$auth.user.accountName" :class="{'is-active': body === 'results'}">
+              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'results'}">
                 <a @click.prevent="body = 'results'">Task Results</a>
               </li>
             </ul>
@@ -126,7 +126,7 @@
                       <th>Account ID</th>
                       <th>Data</th>
                       <th>Paid</th>
-                      <th></th>
+                      <th />
                     </tr>
                   </thead>
                   <tbody>
@@ -138,7 +138,11 @@
                       <td>{{ sub.account_id }}</td>
                       <td>{{ sub.data }}</td>
                       <td>{{ sub.paid ? "yes" : "no" }}</td>
-                      <td><button class="button" @click.prevent="viewTask(sub)">View</button></td>
+                      <td>
+                        <button class="button" @click.prevent="viewTask(sub)">
+                          View
+                        </button>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -159,7 +163,7 @@
               </div>
               <span v-else>No submissions found</span>
               <div class="modal" :class="{'is-active': viewTaskResult}">
-                <div class="modal-background" @click="viewTaskResult = false"></div>
+                <div class="modal-background" @click="viewTaskResult = false" />
                 <div class="modal-content" style="background-color: #fff; padding: 10px;">
                   <template-media
                     v-if="campaign && campaign.info"
@@ -289,7 +293,8 @@ export default {
       pages: [],
       viewTaskResult: false,
       successMessage: null,
-      successTitle: null
+      successTitle: null,
+      reservations: null
     }
   },
   computed: {
