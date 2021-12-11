@@ -45,13 +45,28 @@
             </div>
           </div>
         </div>
-        <div>
-          <nuxt-link to="/deposit" class="button is-accent is-pulled-left">
-            Deposit
-          </nuxt-link>
-          <nuxt-link to="/withdraw" class="button is-secondary is-pulled-right">
-            Withdraw
-          </nuxt-link>
+        <div class="columns">
+          <div class="column is-4">
+            <nuxt-link to="/deposit" class="button is-accent is-pulled-left">
+              Deposit
+            </nuxt-link>
+          </div>
+          <div class="column is-4 is-flex is-justify-content-center">
+            <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-medium is-primary is-pulsing" @click.prevent="payout()">
+              <p v-if="!loading">Cash in <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
+            </button>
+            <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-medium is-primary">
+              <p>Nothing to cash in..</p>
+            </button>
+            <button v-else disabled="disabled" class="button is-medium is-primary">
+              <p>... EFX</p>
+            </button>
+          </div>
+          <div class="column is-4">
+            <nuxt-link to="/withdraw" class="button is-secondary is-pulled-right">
+              Withdraw
+            </nuxt-link>
+          </div>
         </div>
       </div>
     </div>
@@ -62,7 +77,25 @@
 export default {
   name: 'Balances',
   middleware: ['auth'],
-  computed: {
+  data () {
+    return {
+      pending: 0,
+      finalAmount: 0,
+      loading: false
+    }
+  },
+  methods: {
+    payout () {
+      this.loading = true
+      try {
+        const result = this.$blockchain.payout()
+        this.$store.dispatch('transaction/addTransaction', result)
+        this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+      } catch (error) {
+        throw new Error(error)
+      }
+      this.$router.push('/')
+    }
   }
 }
 </script>
