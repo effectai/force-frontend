@@ -5,7 +5,7 @@
         <ul>
           <li>
             <nuxt-link to="/">
-              All Campaigns
+              Campaigns
             </nuxt-link>
           </li>
           <li>
@@ -46,7 +46,10 @@
               <li :class="{'is-active': body === 'instruction'}">
                 <a @click.prevent="body = 'instruction'">Instructions</a>
               </li>
-              <li v-if="campaign && campaign.owner[1] === this.$auth.user.accountName" :class="{'is-active': body === 'results'}">
+              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'reservations'}">
+                <a @click.prevent="body = 'reservations'">Active Reservations</a>
+              </li>
+              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'results'}">
                 <a @click.prevent="body = 'results'">Task Results</a>
               </li>
             </ul>
@@ -75,10 +78,47 @@
               ...
             </p>
           </div>
+
+          <!-- Current Task Reservations  -->
+          <div v-if="body === 'reservations'" class="block">
+            <div v-if="campaign && campaign.info" class="content">
+              <div v-if="reservations.length">
+                <table class="table" style="width: 100%">
+                  <thead>
+                    <tr>
+                      <th>Reservation ID</th>
+                      <th>Account ID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="sub in displayedReservations"
+                      :key="sub.id"
+                    >
+                      <td>{{ sub.id }}</td>
+                      <td>{{ sub.account_id }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <nav class="pagination" role="navigation" aria-label="pagination">
+                  <a v-if="page != 1" class="pagination-previous" @click="page--">Previous</a>
+                  <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
+                  <ul class="pagination-list">
+                    <li v-for="pageNumber in pages" :key="pageNumber">
+                      <a class="pagination-link" @click="page = pageNumber">{{ pageNumber }}</a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+              <span v-else>No active reservations</span>
+            </div>
+          </div>
+
           <!-- Task results -->
           <div v-if="body === 'results'" class="block">
             <div v-if="campaign && campaign.info" class="content">
-              <div v-if="submissions">
+              <div v-if="submissions.length">
                 <table class="table" style="width: 100%">
                   <thead>
                     <tr>
@@ -86,7 +126,7 @@
                       <th>Account ID</th>
                       <th>Data</th>
                       <th>Paid</th>
-                      <th></th>
+                      <th />
                     </tr>
                   </thead>
                   <tbody>
@@ -98,7 +138,11 @@
                       <td>{{ sub.account_id }}</td>
                       <td>{{ sub.data }}</td>
                       <td>{{ sub.paid ? "yes" : "no" }}</td>
-                      <td><button class="button" @click.prevent="viewTask(sub)">View</button></td>
+                      <td>
+                        <button class="button" @click.prevent="viewTask(sub)">
+                          View
+                        </button>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -117,15 +161,16 @@
                   Download Results
                 </button>
               </div>
-              <span v-else>No results found</span>
+              <span v-else>No submissions found</span>
               <div class="modal" :class="{'is-active': viewTaskResult}">
-                <div class="modal-background" @click="viewTaskResult = false"></div>
+                <div class="modal-background" @click="viewTaskResult = false" />
                 <div class="modal-content" style="background-color: #fff; padding: 10px;">
                   <template-media
-                    v-if="campaign && campaign.info"
+                    v-if="campaign && campaign.info && viewTaskResult"
                     :html="renderTemplate(
                       campaign.info.template || 'No template found..',
-                      {})"
+                      viewTaskResult.placeholders)"
+                    @templateLoaded="postResults(viewTaskResult.results)"
                   />
                 </div>
                 <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
@@ -157,15 +202,15 @@
             <div class="block">
               <b>Tasks</b>
               <br>
-              <template v-if="batch && batch.num_tasks - batch.tasks_done === 0">
+              <template v-if="batch && batch.num_tasks - batch.tasks_done === 0 && !batch.reservations.length">
                 <span>Done.</span>
               </template>
-              <template v-else-if="batch && batch.num_tasks - batch.tasks_done > 0">
+              <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations.length)">
                 <span>{{ batch.num_tasks - batch.tasks_done }}</span>
                 <span>/ {{ batch.num_tasks }} left</span>
               </template>
               <span v-else>...</span>
-              <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks: false}" :value="batch ? batch.tasks_done : undefined" :max="batch ? batch.num_tasks : undefined">
+              <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks && !batch.reservations.length : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || batch.reservations.length: false}" :value="batch ? batch.tasks_done : undefined" :max="batch ? batch.num_tasks : undefined">
                 Left
               </progress>
             </div>
@@ -218,8 +263,8 @@ import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
-const jsonexport = require('jsonexport/dist')
 import SuccessModal from '@/components/SuccessModal'
+const jsonexport = require('jsonexport/dist')
 
 export default {
   components: {
@@ -249,7 +294,8 @@ export default {
       pages: [],
       viewTaskResult: false,
       successMessage: null,
-      successTitle: null
+      successTitle: null,
+      reservations: null
     }
   },
   computed: {
@@ -261,10 +307,16 @@ export default {
     }),
     displayedSubmissions () {
       return this.paginate(this.submissions)
+    },
+    displayedReservations () {
+      return this.paginate(this.reservations)
     }
   },
   watch: {
     submissions () {
+      this.setPages()
+    },
+    reservations () {
       this.setPages()
     }
   },
@@ -314,13 +366,22 @@ export default {
       }
       this.loading = false
     },
-    viewTask (sub) {
-      this.viewTaskResult = true
-      const data = {
-        task: 'results',
-        value: JSON.parse(sub.data)
+    postResults (results) {
+      const frame = document.getElementById('mediaFrame')
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { task: 'results', value: results },
+          '*'
+        )
       }
-      window.postMessage(data, '*')
+    },
+    async viewTask (sub) {
+      const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, sub.leaf_hash, this.batch.tasks)
+      this.viewTaskResult =
+      {
+        placeholders: this.batch.tasks[taskIndex],
+        results: JSON.parse(sub.data)
+      }
     },
     submitTask (values) {
       console.log('Task submitted!', values)
@@ -331,9 +392,13 @@ export default {
     async getBatch () {
       await this.$store.dispatch('campaign/getBatch', { batchId: this.batchId })
       this.batch = this.batches.find(b => b.batch_id === this.batchId)
-      // todo: make tab for submissiosn and reservations
-      const submissions = await this.$blockchain.getTaskSubmissionsForBatch(this.batchId)
-      this.submissions = submissions
+      const allSubmissions = await this.$blockchain.getSubmissionsAndReservationsForBatch(this.batchId)
+      this.submissions = allSubmissions.filter(function (sub) {
+        return sub.data
+      })
+      this.reservations = allSubmissions.filter(function (sub) {
+        return !sub.data
+      })
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
@@ -384,10 +449,10 @@ export default {
         }
       }
     },
-    paginate (transactions) {
+    paginate (submissions) {
       const from = (this.page * this.perPage) - this.perPage
       const to = (this.page * this.perPage)
-      return transactions.slice(from, to)
+      return submissions.slice(from, to)
     }
   }
 }
