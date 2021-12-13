@@ -95,15 +95,10 @@
               <span v-else>.....</span>
             </div>
             <div class="block">
-              <b>Number of Tasks</b>
-              <br>
-              <span v-if="batch">{{ batch.num_tasks }}</span>
-            </div>
-            <div class="block">
               <b>Tasks</b>
               <br>
               <template v-if="batch && batch.num_tasks - batch.tasks_done === 0">
-                <span>Done.</span>
+                <span>{{ batch.num_tasks }} Tasks done.</span>
               </template>
               <template v-else-if="batch && batch.num_tasks - batch.tasks_done > 0">
                 <span>{{ batch.num_tasks - batch.tasks_done }}</span>
