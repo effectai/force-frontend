@@ -1,7 +1,7 @@
 <template>
   <div>
     <client-only>
-      <category-filters v-if="!owner" @clicked="onFilter" />
+      <category-filters v-if="categoryFilter" @clicked="onFilter" />
     </client-only>
     <template v-for="campaign in filteredCampaigns">
       <nuxt-link
@@ -114,7 +114,7 @@ export default {
   components: {
     CategoryFilters
   },
-  props: ['active', 'owner'],
+  props: ['active', 'owner', 'categoryFilter'],
   data () {
     return {
       filter: null,
@@ -132,7 +132,9 @@ export default {
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded
     }),
     filteredCampaigns () {
-      let campaigns = this.campaignsByCategory(this.filter)
+      const campaigns = this.campaignsByCategory(this.filter)
+      let filteredCampaigns
+
       for (const i in campaigns) {
         const batches = this.batchByCampaignId(campaigns[i].id)
         if (batches) {
@@ -144,14 +146,20 @@ export default {
           }, 0)
         }
       }
-      if (campaigns && this.active) {
-        campaigns = campaigns.filter(c => c.num_tasks - c.tasks_done > 0)
-      }
-      if (campaigns && this.owner) {
-        campaigns = campaigns.filter(c => c.owner[1] === this.owner)
+      if (campaigns) {
+        filteredCampaigns = [...campaigns]
+        if (this.active) {
+          filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+        } else {
+          // Show newest campaigns first when we are not filtering active campaigns
+          filteredCampaigns.reverse()
+        }
+        if (this.owner) {
+          filteredCampaigns = filteredCampaigns.filter(c => c.owner[1] === this.owner)
+        }
       }
 
-      return campaigns
+      return filteredCampaigns
     }
   },
   created () {

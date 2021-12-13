@@ -7,24 +7,42 @@
         </span>
         <span>Create Campaign</span>
       </nuxt-link>
-      <nuxt-link class="button is-ghost is-pulled-right" to="/campaigns">
-        <span>All Campaigns</span>
+      <nuxt-link v-if="hasCampaigns" class="button is-ghost is-pulled-right" to="/campaigns">
+        <span>My Campaigns</span>
       </nuxt-link>
       <h2 class="title">
         Active Tasks
       </h2>
-      <campaign-list :active="true" />
+      <campaign-list :category-filter="true" :active="true" />
     </div>
   </section>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 import CampaignList from '@/components/CampaignList'
 export default {
   components: {
     CampaignList
   },
   middleware: ['auth'],
+  computed: {
+    ...mapState({
+      campaigns: state => state.campaign.campaigns
+    }),
+    hasCampaigns () {
+      let hasCampaigns = false
+      if (this.campaigns) {
+        this.campaigns.forEach((c) => {
+          if (c.owner[1] === this.$auth.user.accountName) {
+            hasCampaigns = true
+          }
+        })
+      }
+      return hasCampaigns
+    }
+  },
   created () {
   },
   methods: {

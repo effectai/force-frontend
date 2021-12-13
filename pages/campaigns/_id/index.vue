@@ -9,8 +9,8 @@
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
           <li>
-            <nuxt-link to="/campaigns">
-              All Campaigns
+            <nuxt-link to="/">
+              Campaigns
             </nuxt-link>
           </li>
           <li class="is-active">
@@ -99,13 +99,13 @@
                       </h2>
                     </div>
                     <div class="column">
-                      <p v-if="batch.num_tasks - batch.tasks_done === 0" class="has-text-grey is-size-7">
+                      <p v-if="batch.num_tasks - batch.tasks_done === 0 && !batch.reservations.length" class="has-text-grey is-size-7">
                         Tasks <small>(<b class="has-text-success">Done</b>)</small>
                       </p>
                       <p v-else class="has-text-grey is-size-7">
                         Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
                       </p>
-                      <progress class="progress is-small mt-2" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false }" :value="batch.tasks_done" :max="batch.num_tasks" />
+                      <progress class="progress is-small mt-2" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks && !batch.reservations.length: false }" :value="batch.tasks_done" :max="batch.num_tasks" />
                     </div>
                   </div>
                 </nuxt-link>

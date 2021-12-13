@@ -11,9 +11,13 @@
         <span>Active Campaigns</span>
       </nuxt-link>
       <h2 class="title">
-        All Campaigns
+        <span v-if="myCampaigns">My</span><span v-else>All</span> Campaigns
       </h2>
-      <campaign-list />
+      <label class="checkbox">
+        <input v-model="myCampaigns" type="checkbox">
+        Show only my campaigns
+      </label>
+      <campaign-list :owner="myCampaigns ? $auth.user.accountName : null" :filters="false" />
     </div>
   </section>
 </template>
@@ -25,6 +29,11 @@ export default {
     CampaignList
   },
   middleware: ['auth'],
+  data () {
+    return {
+      myCampaigns: true
+    }
+  },
   created () {
   },
   methods: {

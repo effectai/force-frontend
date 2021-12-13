@@ -7,9 +7,10 @@ export default (context, inject) => {
   const blockchain = new Vue({
     data () {
       // Initialize empty SDK, reinitialize when connecting wallet
+      const eosHost = process.env.NUXT_ENV_EOS_NODE_URL.includes('localhost') ? `http://${process.env.NUXT_ENV_EOS_NODE_URL}:8888` : `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
       const sdkOptions = {
         network: process.env.NUXT_ENV_EOS_NETWORK,
-        host: `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
+        host: eosHost
       }
       return {
         account: null,
@@ -20,7 +21,7 @@ export default (context, inject) => {
         efxPending: 0,
         eos,
         bsc,
-        sdk: new effectSdk.EffectClient('jungle', sdkOptions),
+        sdk: new effectSdk.EffectClient(process.env.NUXT_ENV_EOS_NETWORK, sdkOptions),
         error: null,
         waitForSignatureFrom: null,
         waitForSignature: 0,
@@ -281,14 +282,17 @@ export default (context, inject) => {
           this.efxPending = pending
         }
       },
-      async getBatches (nextKey, limit = 20) {
-        return await this.sdk.force.getBatches(nextKey, limit)
+      async getBatches (nextKey, limit = 20, processBatch = true) {
+        return await this.sdk.force.getBatches(nextKey, limit, processBatch)
       },
       async getCampaign (id) {
         return await this.sdk.force.getCampaign(id)
       },
-      async getCampaigns (nextKey, limit = 20) {
-        return await this.sdk.force.getCampaigns(nextKey, limit)
+      async getMyLastCampaign () {
+        return await this.sdk.force.getMyLastCampaign()
+      },
+      async getCampaigns (nextKey, limit = 20, processCampaign = true) {
+        return await this.sdk.force.getCampaigns(nextKey, limit, processCampaign)
       },
       async getCampaignJoins (campaignId) {
         return await this.sdk.force.getCampaignJoins(campaignId)
@@ -318,7 +322,13 @@ export default (context, inject) => {
         return await this.sdk.force.getReservations()
       },
       async getTaskSubmissionsForBatch (batchId) {
-        return await this.sdk.force.getTaskSubmissionsForBatch(batchId)
+        return await this.sdk.force.getSubmissionsOfBatch(batchId, 'submissions')
+      },
+      async getTaskReservationsForBatch (batchId) {
+        return await this.sdk.force.getSubmissionsOfBatch(batchId, 'reservations')
+      },
+      async getSubmissionsAndReservationsForBatch (batchId) {
+        return await this.sdk.force.getSubmissionsOfBatch(batchId)
       },
       async getTaskIndexFromLeaf (campaignId, batchId, leafhash, tasks) {
         return await this.sdk.force.getTaskIndexFromLeaf(campaignId, batchId, leafhash, tasks)
