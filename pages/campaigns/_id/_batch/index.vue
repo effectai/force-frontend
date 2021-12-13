@@ -413,6 +413,8 @@ export default {
         const parsedSubmissions = await Promise.all(this.submissions.map(async (x) => {
           const sub = {}
           sub.data = JSON.parse(x.data)
+
+          // add answers as seperate columns
           for (const result of Object.keys(sub.data)) {
             x[result] = sub.data[result]
           }
@@ -426,7 +428,7 @@ export default {
             x[result] = task[result]
           }
 
-          // remove unnecassary keys for
+          // remove unnecassary keys for csv
           delete x.content
           delete x.batch_id
           delete x.id
