@@ -153,7 +153,7 @@ export default {
       if (campaigns) {
         filteredCampaigns = [...campaigns]
         if (this.active) {
-          filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+          filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0 || c.userHasReservation)
           // show the campaigns where the user has a resevation first
           filteredCampaigns = _.orderBy(filteredCampaigns, ['userHasReservation', 'id'], ['desc', 'asc'])
         } else {
