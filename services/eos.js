@@ -8,9 +8,9 @@ const appName = 'therealforce'
 const accessContext = initAccessContext({
   appName,
   network: {
-    host: process.env.NUXT_ENV_EOS_NODE_URL,
-    port: 443,
-    protocol: 'https',
+    host: (process.env.NUXT_ENV_EOS_NETWORK.includes('local') ? 'localhost' : process.env.NUXT_ENV_EOS_NODE_URL),
+    port: (process.env.NUXT_ENV_EOS_NETWORK.includes('local') ? 8888 : 443),
+    protocol: (process.env.NUXT_ENV_EOS_NETWORK.includes('local') ? 'http' : 'https'),
     chainId: process.env.NUXT_ENV_EOS_CHAIN_ID
   },
   walletProviders: [
