@@ -58,14 +58,7 @@
           </label>
           <div class="field has-addons">
             <div class="control">
-              <input
-                v-model="campaignIpfs.reward"
-                class="input"
-                type="number"
-                min="0.0001"
-                step="0.0001"
-                placeholder="Reward per task"
-              >
+              <input v-model="campaignIpfs.reward" class="input" type="number" placeholder="Reward per task">
             </div>
             <div class="control">
               <a class="button is-primary">
