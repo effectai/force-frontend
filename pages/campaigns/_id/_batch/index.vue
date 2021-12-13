@@ -203,7 +203,7 @@
               <b>Tasks</b>
               <br>
               <template v-if="batch && batch.num_tasks - batch.tasks_done === 0 && !batch.reservations.length">
-                <span>Done.</span>
+                <span>{{ batch.num_tasks }} Tasks done.</span>
               </template>
               <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations.length)">
                 <span>{{ batch.num_tasks - batch.tasks_done }}</span>

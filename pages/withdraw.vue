@@ -8,7 +8,7 @@
         {{ message }}
         <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
       </div>
-      <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount)">
+      <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount, memo)">
         <div class="field">
           <label class="label">Destination Account</label>
           <div class="control">
@@ -35,6 +35,17 @@
             <p class="control">
               <span class="button is-primary" :disabled="amount == -1" @click.prevent="tokenAmount = amount">{{ amount }} EFX</span>
             </p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="" class="label">Memo</label>
+          <div class="control">
+            <input
+              v-model="memo"
+              class="input"
+              type="text"
+            >
           </div>
         </div>
 
@@ -65,6 +76,7 @@ export default {
       message: null,
       err: false,
       tokenAmount: null,
+      memo: null,
       transactionUrl: null
     }
   },
@@ -74,7 +86,7 @@ export default {
     }
   },
   methods: {
-    async withdraw (account, tokenAmount) {
+    async withdraw (account, tokenAmount, memo) {
       this.loading = true
       if (this.tokenAmount > this.amount || this.tokenAmount < 0) {
         this.message = 'Quantity cannot be higher than your balance.'
@@ -83,7 +95,7 @@ export default {
       }
 
       try {
-        const result = await this.$blockchain.withdraw(account, parseFloat(tokenAmount).toFixed(4))
+        const result = await this.$blockchain.withdraw(account, parseFloat(tokenAmount).toFixed(4), memo)
         if (result) {
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
           this.message = 'Withdrawing has been successful. Check your transaction here: '
