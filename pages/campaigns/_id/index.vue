@@ -188,11 +188,18 @@
                   return a + b.num_tasks
                 },0) - campaignBatches.reduce(function(a,b){
                   return a + b.tasks_done
-                },0) > 0"
+                },0) > 0 && !userReservation"
                 class="button is-primary"
                 @click.prevent="reserveTask"
               >
                 Make Task Reservation
+              </button>
+              <button
+                v-else-if="campaignBatches && userReservation"
+                class="button is-primary"
+                @click.prevent="reserveTask"
+              >
+                Go To Task
               </button>
             </div>
           </div>
@@ -226,7 +233,8 @@ export default {
       loading: false,
       joinCampaignPopup: false,
       showReserveTask: false,
-      batch: null
+      batch: null,
+      userReservation: null
     }
   },
   computed: {
@@ -293,6 +301,12 @@ export default {
     },
     async getBatches () {
       await this.$store.dispatch('campaign/getBatches')
+
+      // check if user has reservation for a batch in this campaign
+      for (const batch of this.campaignBatches) {
+        const reservations = await this.$blockchain.getTaskReservationsForBatch(batch.batch_id)
+        this.userReservation = reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id)
+      }
     },
     async checkUserCampaign () {
       this.loading = true
