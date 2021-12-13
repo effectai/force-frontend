@@ -197,7 +197,7 @@
               <button
                 v-else-if="campaignBatches && userReservation"
                 class="button is-primary"
-                @click.prevent="reserveTask"
+                @click.prevent="goToTask"
               >
                 Go To Task
               </button>
@@ -271,6 +271,18 @@ export default {
       }
       this.batch = this.campaignBatches.find((b) => {
         return b.batch_id === batch.batch_id
+      })
+      this.showReserveTask = true
+    },
+    async goToTask () {
+      const batch = this.campaignBatches.find((b) => {
+        return parseInt(b.batch_id) === parseInt(this.userReservation.batch_id)
+      })
+      await this.$store.dispatch('campaign/getBatchTasks', batch)
+
+      // TODO: is tthere a better way than to do the same find twice?
+      this.batch = this.campaignBatches.find((b) => {
+        return parseInt(b.batch_id) === parseInt(this.userReservation.batch_id)
       })
       this.showReserveTask = true
     },
