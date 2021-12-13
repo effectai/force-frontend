@@ -238,8 +238,11 @@
               <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                 Join Campaign
               </button>
-              <button v-else-if="batch && batch.num_tasks - batch.tasks_done !== 0" class="button is-primary" @click.prevent="reserveTask = true">
+              <button v-else-if="batch && batch.num_tasks - batch.tasks_done !== 0 && !userReservation" class="button is-primary" @click.prevent="reserveTask = true">
                 Make Task Reservation
+              </button>
+              <button v-else-if="batch && userReservation" class="button is-primary" @click.prevent="reserveTask = true">
+                Go To Task
               </button>
             </div>
           </div>
@@ -295,7 +298,8 @@ export default {
       viewTaskResult: false,
       successMessage: null,
       successTitle: null,
-      reservations: null
+      reservations: null,
+      userReservation: false
     }
   },
   computed: {
@@ -399,6 +403,7 @@ export default {
       this.reservations = allSubmissions.filter(function (sub) {
         return !sub.data
       })
+      this.userReservation = this.reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id)
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
