@@ -8,7 +8,7 @@
         :key="campaign.id"
         :to="'/campaigns/'+campaign.id"
         class="box p-4"
-        :class="{'is-disabled': campaign.info === null}"
+        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
       >
         <div class="columns is-vcentered is-multiline is-mobile">
           <div class="column is-narrow is-mobile-1">
@@ -86,8 +86,9 @@
             </h2>
           </div>
           <div class="column has-text-right is-12-mobile">
-            <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null, 'is-outlined': campaign.info === null}">
-              <span class="">View</span>
+            <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null}">
+              <span v-if="campaign.userHasReservation">Go to Task</span>
+              <span v-else>View</span>
             </button>
           </div>
         </div>
@@ -106,6 +107,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import CategoryFilters from './CategoryFilters'
 
@@ -118,7 +120,8 @@ export default {
   data () {
     return {
       filter: null,
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER
+      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
+      reservations: null
     }
   },
   computed: {
@@ -137,6 +140,9 @@ export default {
 
       for (const i in campaigns) {
         const batches = this.batchByCampaignId(campaigns[i].id)
+        // get the reservations of the user for this campaign
+        const reservationsOfUser = _.intersectionBy(batches, this.reservations, 'batch_id')
+        campaigns[i].userHasReservation = (reservationsOfUser.length)
         if (batches) {
           campaigns[i].num_tasks = batches.reduce(function (a, b) {
             return a + b.num_tasks
@@ -149,7 +155,9 @@ export default {
       if (campaigns) {
         filteredCampaigns = [...campaigns]
         if (this.active) {
-          filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+          filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0 || c.userHasReservation)
+          // show the campaigns where the user has a resevation first
+          filteredCampaigns = _.orderBy(filteredCampaigns, ['userHasReservation', 'id'], ['desc', 'asc'])
         } else {
           // Show newest campaigns first when we are not filtering active campaigns
           filteredCampaigns.reverse()
@@ -171,6 +179,11 @@ export default {
       this.filter = category
     },
     async getCampaigns () {
+      this.reservations = await this.$blockchain.getMyReservations()
+      this.reservations = this.reservations.map(function (x) {
+        x.batch_id = parseInt(x.batch_id)
+        return x
+      })
       if (!this.campaigns || !this.allCampaignsLoaded) {
         await this.$store.dispatch('campaign/getCampaigns')
       }
@@ -190,6 +203,10 @@ export default {
       opacity: 0.5;
     }
     background-color: rgba(#DEE0E6, 0.5);
+  }
+  // not sure about this styling
+  &.has-reservation {
+    box-shadow: 0px 0px 14px 5px rgba(17,72,235,0.5);
   }
 }
 </style>

@@ -3,7 +3,7 @@
     <!-- Instructions modal -->
     <instructions-modal v-if="campaign && campaign.info" :show="joinCampaignPopup" :campaign="campaign" :info="campaign.info" @clicked="campaignModalChange" />
     <!-- Reserve task -->
-    <reserve-task v-if="showReserveTask" :batch="batch" />
+    <reserve-task v-if="showReserveTask" :batch="reserveInBatch" />
 
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
@@ -76,12 +76,6 @@
                 <b>Batches</b>
               </h4>
               <div class="block mt-5">
-                <div v-if="campaignBatches === null">
-                  Loading..
-                </div>
-                <div v-else-if="!campaignBatches.length">
-                  No Batches
-                </div>
                 <nuxt-link
                   v-for="batch in campaignBatches"
                   :key="batch.id"
@@ -180,20 +174,36 @@
               <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-primary is-light">
                 Edit Campaign
               </nuxt-link>
-              <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" :disabled="userJoined" @click.prevent="joinCampaignPopup = true">
+              <button v-if="loading || userReservation === null || campaignBatches === null" class="button is-primary is-loading">
+                Loading
+              </button>
+              <button v-else-if="userJoined === false" class="button is-primary" @click.prevent="joinCampaignPopup = true">
                 Join Campaign
               </button>
               <button
-                v-else-if="campaignBatches && campaignBatches.reduce(function(a,b){
+                v-else-if="campaignBatches.reduce(function(a,b){
                   return a + b.num_tasks
                 },0) - campaignBatches.reduce(function(a,b){
                   return a + b.tasks_done
-                },0) > 0"
+                },0) > 0 && !userReservation"
                 class="button is-primary"
                 @click.prevent="reserveTask"
               >
                 Make Task Reservation
               </button>
+              <button
+                v-else-if="userReservation"
+                class="button is-accent has-text-weight-semibold"
+                @click.prevent="goToTask"
+              >
+                Go To Task
+              </button>
+              <template v-else>
+                <button v-if="userJoined" class="button is-primary" :disabled="true">
+                  Joined Campaign
+                </button>
+                <p>No active tasks currently</p>
+              </template>
             </div>
           </div>
         </div>
@@ -226,7 +236,8 @@ export default {
       loading: false,
       joinCampaignPopup: false,
       showReserveTask: false,
-      batch: null
+      reserveInBatch: null,
+      userReservation: null
     }
   },
   computed: {
@@ -261,9 +272,16 @@ export default {
         alert('Could not find batch with active tasks')
         return
       }
-      this.batch = this.campaignBatches.find((b) => {
-        return b.batch_id === batch.batch_id
+      this.reserveInBatch = batch
+      this.showReserveTask = true
+    },
+    async goToTask () {
+      const batch = this.campaignBatches.find((b) => {
+        return parseInt(b.batch_id) === parseInt(this.userReservation.batch_id)
       })
+      await this.$store.dispatch('campaign/getBatchTasks', batch)
+
+      this.reserveInBatch = batch
       this.showReserveTask = true
     },
     renderTemplate (template, placeholders = {}, options = {}) {
@@ -293,6 +311,12 @@ export default {
     },
     async getBatches () {
       await this.$store.dispatch('campaign/getBatches')
+
+      // check if user has reservation for a batch in this campaign
+      for (const batch of this.campaignBatches) {
+        const reservations = await this.$blockchain.getTaskReservationsForBatch(batch.batch_id)
+        this.userReservation = reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id)
+      }
     },
     async checkUserCampaign () {
       this.loading = true

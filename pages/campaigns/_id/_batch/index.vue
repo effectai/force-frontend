@@ -203,7 +203,7 @@
               <b>Tasks</b>
               <br>
               <template v-if="batch && batch.num_tasks - batch.tasks_done === 0 && !batch.reservations.length">
-                <span>Done.</span>
+                <span>{{ batch.num_tasks }} Tasks done.</span>
               </template>
               <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations.length)">
                 <span>{{ batch.num_tasks - batch.tasks_done }}</span>
@@ -235,12 +235,24 @@
               <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
             </div>
             <div class="block">
-              <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
+              <button v-if="loading || userReservation === null || campaignLoading || batchLoading || !batch" class="button is-primary is-loading">
+                Loading
+              </button>
+              <button v-else-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                 Join Campaign
               </button>
-              <button v-else-if="batch && batch.num_tasks - batch.tasks_done !== 0" class="button is-primary" @click.prevent="reserveTask = true">
+              <button v-else-if="batch.num_tasks - batch.tasks_done !== 0 && !userReservation" class="button is-primary" @click.prevent="reserveTask = true">
                 Make Task Reservation
               </button>
+              <button v-else-if="userReservation" class="button is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
+                Go To Task
+              </button>
+              <template v-else>
+                <button v-if="userJoined" class="button is-primary" :disabled="true">
+                  Joined Campaign
+                </button>
+                <p>No active tasks currently</p>
+              </template>
             </div>
           </div>
         </div>
@@ -295,7 +307,8 @@ export default {
       viewTaskResult: false,
       successMessage: null,
       successTitle: null,
-      reservations: null
+      reservations: null,
+      userReservation: null
     }
   },
   computed: {
@@ -399,6 +412,7 @@ export default {
       this.reservations = allSubmissions.filter(function (sub) {
         return !sub.data
       })
+      this.userReservation = this.reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id)
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
@@ -407,38 +421,67 @@ export default {
     generateRandomNumber (maxNum) {
       return Math.ceil(Math.random() * maxNum)
     },
-    downloadTaskResults () {
-      // add columns from data object to the submission object itself
-      const parsedSubmissions = this.submissions.map((x) => {
-        const sub = {}
-        sub.data = JSON.parse(x.data)
-        for (const result of Object.keys(sub.data)) {
-          x[result] = sub.data[result]
-        }
-        return x
-      })
-      jsonexport(parsedSubmissions, (err, csv) => {
-        if (err) {
-          return console.error(err)
-        }
-        const filename = `task_results_${this.batchId}.csv`
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-        if (navigator.msSaveBlob) { // IE 10+
-          navigator.msSaveBlob(blob, filename)
-        } else {
-          const link = document.createElement('a')
-          if (link.download !== undefined) { // feature detection
-            // Browsers that support HTML5 download attribute
-            const url = URL.createObjectURL(blob)
-            link.setAttribute('href', url)
-            link.setAttribute('download', filename)
-            link.style.visibility = 'hidden'
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
+    async downloadTaskResults () {
+      try {
+        // add columns from data object to the submission object itself
+        const parsedSubmissions = await Promise.all(this.submissions.map(async (x) => {
+          const sub = {}
+          sub.data = JSON.parse(x.data)
+
+          // add answers as seperate columns
+          for (const result of Object.keys(sub.data)) {
+            x[result] = sub.data[result]
           }
-        }
-      })
+
+          // add placeholders
+          const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, x.leaf_hash, this.batch.tasks)
+          const task = this.batch.tasks[taskIndex]
+          x.placeholders = JSON.stringify(task)
+
+          for (const result of Object.keys(task)) {
+            x[result] = task[result]
+          }
+
+          // remove unnecassary keys for csv
+          delete x.content
+          delete x.batch_id
+          delete x.id
+          delete x.leaf_hash
+
+          // put these attributes first
+          const columnOrder = {
+            link_id: null,
+            account_id: null
+          }
+          x = Object.assign(columnOrder, x)
+
+          return x
+        }))
+        await jsonexport(parsedSubmissions, (err, csv) => {
+          if (err) {
+            return console.error(err)
+          }
+          const filename = `task_results_${this.batchId}.csv`
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+          if (navigator.msSaveBlob) { // IE 10+
+            navigator.msSaveBlob(blob, filename)
+          } else {
+            const link = document.createElement('a')
+            if (link.download !== undefined) { // feature detection
+              // Browsers that support HTML5 download attribute
+              const url = URL.createObjectURL(blob)
+              link.setAttribute('href', url)
+              link.setAttribute('download', filename)
+              link.style.visibility = 'hidden'
+              document.body.appendChild(link)
+              link.click()
+              document.body.removeChild(link)
+            }
+          }
+        })
+      } catch (error) {
+        console.error(error)
+      }
     },
     setPages () {
       if (!this.submissions) { return }

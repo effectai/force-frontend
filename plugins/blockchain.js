@@ -343,6 +343,9 @@ export default (context, inject) => {
       async payout () {
         return await this.sdk.force.payout()
       },
+      async getMyReservations () {
+        return await this.sdk.force.getMyReservations()
+      },
       async getTaskSubmissionsForBatch (batchId) {
         return await this.sdk.force.getSubmissionsOfBatch(batchId, 'submissions')
       },
