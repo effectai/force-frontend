@@ -52,6 +52,7 @@
               </button>
             </div>
             <br>
+            <h2 class="subtitle is-5 mb-3">Import tasks</h2>
             <div class="file has-name">
               <label class="file-label">
                 <input class="file-input" type="file" name="csvtasks" @change="uploadFile">
@@ -189,8 +190,12 @@ export default {
         reader.onload = (e) => {
           this.file.content = this.csvToJson(e.target.result)
           this.file.content.forEach((element) => {
-            this.task = element
-            this.createTask(element)
+            this.placeholders.forEach((placeholder) => {
+              if (element[placeholder]) {
+                this.task[placeholder] = element[placeholder]
+                this.createTask()
+              }
+            })
           })
         }
         reader.readAsText(event.target.files[0])
