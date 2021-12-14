@@ -51,6 +51,23 @@
                 Create Task
               </button>
             </div>
+            <br>
+            <h2 class="subtitle is-5 mb-3">Import tasks</h2>
+            <div class="file has-name">
+              <label class="file-label">
+                <input class="file-input" type="file" name="csvtasks" @change="uploadFile">
+                <span class="file-cta">
+                  <span class="file-label">
+                    Choose a .csv file…
+                  </span>
+                </span>
+                <span v-if="file.name" class="file-name">
+                  {{ file.name }}
+                </span>
+              </label>
+            </div>
+            <p class="has-text-danger" v-if="error">{{ error }}</p>
+            <br>
           </div>
         </form>
         <form @submit.prevent="uploadBatch">
@@ -100,7 +117,12 @@ export default {
       task: {},
       tasks: [],
       placeholders: null,
-      campaign: null
+      campaign: null,
+      file: {
+        name: null,
+        content: null
+      },
+      error: null
     }
   },
   computed: {
@@ -155,6 +177,52 @@ export default {
     },
     cancel () {
       this.$router.push('/campaigns/' + this.campaignId)
+    },
+    uploadFile (event) {
+      this.file = {
+        name: null,
+        content: null
+      }
+      this.error = null
+      if (event.target.files[0].type === 'text/csv') {
+        this.file.name = event.target.files[0].name
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          this.file.content = this.csvToJson(e.target.result)
+          this.file.content.forEach((element) => {
+            this.placeholders.forEach((placeholder) => {
+              if (element[placeholder]) {
+                this.task[placeholder] = element[placeholder]
+                this.createTask()
+              }
+            })
+          })
+          if (this.tasks.length === 0) {
+            this.error = 'File doesnt contain any tasks, or doesnt have the right placeholders'
+          }
+        }
+        reader.readAsText(event.target.files[0])
+      } else {
+        this.error = 'Unsupported file type'
+        this.file = null
+      }
+    },
+    /**
+     * From: https://stackoverflow.com/questions/59218548/what-is-the-best-way-to-convert-from-csv-to-json-when-commas-and-quotations-may/59219146#59219146
+     * Takes a raw CSV string and converts it to a JavaScript object.
+     */
+    csvToJson (string, headers, quoteChar = '"', delimiter = ',') {
+      const regex = new RegExp(`\\s*(${quoteChar})?(.*?)\\1\\s*(?:${delimiter}|$)`, 'gs')
+      const match = string => [...string.matchAll(regex)].map(match => match[2])
+        .filter((_, i, a) => i < a.length - 1) // cut off blank match at end
+
+      const lines = string.split('\n')
+      const heads = headers || match(lines.splice(0, 1)[0])
+
+      return lines.map(line => match(line).reduce((acc, cur, i) => ({
+        ...acc,
+        [heads[i] || `extra_${i}`]: (cur.length > 0) ? (Number(cur) || cur) : null
+      }), {}))
     }
   }
 }
