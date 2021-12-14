@@ -1,7 +1,7 @@
 <template>
   <div>
     <client-only>
-      <category-filters v-if="categoryFilter" @clicked="onFilter" />
+      <category-filters v-if="categoryFilter" @clicked="onFilter" @sorted="onSort" />
     </client-only>
     <template v-for="campaign in filteredCampaigns">
       <nuxt-link
@@ -177,6 +177,10 @@ export default {
   methods: {
     onFilter (category) {
       this.filter = category
+    },
+    onSort (type) {
+      this.sort = type
+      console.log('sort: ', type)
     },
     async getCampaigns () {
       this.reservations = await this.$blockchain.getMyReservations()
