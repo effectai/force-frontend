@@ -120,7 +120,7 @@
           <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
           <ul class="pagination-list">
             <li v-for="pageNumber in pages" :key="pageNumber">
-              <a class="pagination-link" @click="page = pageNumber">{{ pageNumber }}</a>
+              <a class="pagination-link" :class="{'is-current': page === pageNumber}" @click="page = pageNumber">{{ pageNumber }}</a>
             </li>
           </ul>
         </nav>
