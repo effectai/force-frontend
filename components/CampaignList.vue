@@ -8,7 +8,8 @@
         :key="campaign.id"
         :to="'/campaigns/'+campaign.id"
         class="box p-4"
-        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}">
+        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
+      >
         <div class="columns is-vcentered is-multiline is-mobile">
           <div class="column is-narrow is-mobile-1">
             <p class="image has-radius" style="width: 52px; height: 52px">
@@ -85,8 +86,9 @@
             </h2>
           </div>
           <div class="column has-text-right is-12-mobile">
-            <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null, 'is-outlined': campaign.info === null}">
-              <span class="">View</span>
+            <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null}">
+              <span v-if="campaign.userHasReservation">Go to Task</span>
+              <span v-else>View</span>
             </button>
           </div>
         </div>

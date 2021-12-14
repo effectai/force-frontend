@@ -235,15 +235,24 @@
               <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
             </div>
             <div class="block">
-              <button v-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
+              <button v-if="loading || userReservation === null || campaignLoading || batchLoading || !batch" class="button is-primary is-loading">
+                Loading
+              </button>
+              <button v-else-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                 Join Campaign
               </button>
-              <button v-else-if="batch && batch.num_tasks - batch.tasks_done !== 0 && !userReservation" class="button is-primary" @click.prevent="reserveTask = true">
+              <button v-else-if="batch.num_tasks - batch.tasks_done !== 0 && !userReservation" class="button is-primary" @click.prevent="reserveTask = true">
                 Make Task Reservation
               </button>
-              <button v-else-if="batch && userReservation" class="button is-primary" @click.prevent="reserveTask = true">
+              <button v-else-if="userReservation" class="button is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
                 Go To Task
               </button>
+              <template v-else>
+                <button v-if="userJoined" class="button is-primary" :disabled="true">
+                  Joined Campaign
+                </button>
+                <p>No active tasks currently</p>
+              </template>
             </div>
           </div>
         </div>
@@ -299,7 +308,7 @@ export default {
       successMessage: null,
       successTitle: null,
       reservations: null,
-      userReservation: false
+      userReservation: null
     }
   },
   computed: {
