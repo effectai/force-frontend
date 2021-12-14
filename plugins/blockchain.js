@@ -266,8 +266,7 @@ export default (context, inject) => {
           const balance = await contract.methods.balanceOf(address).call()
           return this.bsc.web3.utils.fromWei(balance.toString())
         } catch (error) {
-          console.log(error)
-          this.handleError(error)
+          console.error('Could not retrieve balance', error)
         }
       },
       async getPendingBalance () {
