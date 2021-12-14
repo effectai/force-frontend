@@ -14,17 +14,23 @@
           ...
         </p>
         <label class="checkbox">
-          <input v-model="tac" type="checkbox">
+          <input v-if="readonly" checked type="checkbox" disabled>
+          <input v-else v-model="tac" type="checkbox">
           I agree to the <a href="#">terms and conditions</a>
         </label>
       </section>
       <footer class="modal-card-foot">
-        <button class="button is-primary" :disabled="!tac || !campaign || !info || !functional" @click.prevent="onClick()">
-          Join Campaign
+        <button v-if="readonly" class="button is-primary" :disabled="!functional" @click.prevent="onCancel()">
+          OK
         </button>
-        <button class="button" :disabled="!functional" @click.prevent="onCancel()">
-          Cancel
-        </button>
+        <template v-else>
+          <button class="button is-primary" :disabled="!tac || !campaign || !info || !functional" @click.prevent="onClick()">
+            Join Campaign
+          </button>
+          <button class="button" :disabled="!functional" @click.prevent="onCancel()">
+            Cancel
+          </button>
+        </template>
       </footer>
     </div>
   </div>
@@ -54,6 +60,11 @@ export default {
       type: Boolean,
       required: false,
       default: true
+    },
+    readonly: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
