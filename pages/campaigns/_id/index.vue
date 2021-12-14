@@ -3,7 +3,7 @@
     <!-- Instructions modal -->
     <instructions-modal v-if="campaign && campaign.info" :show="joinCampaignPopup" :campaign="campaign" :info="campaign.info" @clicked="campaignModalChange" />
     <!-- Reserve task -->
-    <reserve-task v-if="showReserveTask" :batch="batch" />
+    <reserve-task v-if="showReserveTask" :batch="reserveInBatch" />
 
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
@@ -233,7 +233,7 @@ export default {
       loading: false,
       joinCampaignPopup: false,
       showReserveTask: false,
-      batch: null,
+      reserveInBatch: null,
       userReservation: null
     }
   },
@@ -269,9 +269,7 @@ export default {
         alert('Could not find batch with active tasks')
         return
       }
-      this.batch = this.campaignBatches.find((b) => {
-        return b.batch_id === batch.batch_id
-      })
+      this.reserveInBatch = batch
       this.showReserveTask = true
     },
     async goToTask () {
@@ -280,10 +278,7 @@ export default {
       })
       await this.$store.dispatch('campaign/getBatchTasks', batch)
 
-      // TODO: is tthere a better way than to do the same find twice?
-      this.batch = this.campaignBatches.find((b) => {
-        return parseInt(b.batch_id) === parseInt(this.userReservation.batch_id)
-      })
+      this.reserveInBatch = batch
       this.showReserveTask = true
     },
     renderTemplate (template, placeholders = {}, options = {}) {
