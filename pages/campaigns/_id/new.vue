@@ -79,7 +79,7 @@
           </div> -->
           <div class="field is-grouped">
             <div class="control">
-              <button type="submit" class="button is-link" :disabled="!tasks.length && !file.content">
+              <button type="submit" class="button is-link" :disabled="!tasks.length">
                 Submit
               </button>
             </div>
@@ -197,6 +197,9 @@ export default {
               }
             })
           })
+          if (this.tasks.length === 0) {
+            this.error = 'File doesnt contain any tasks, or doesnt have the right placeholders'
+          }
         }
         reader.readAsText(event.target.files[0])
       } else {
