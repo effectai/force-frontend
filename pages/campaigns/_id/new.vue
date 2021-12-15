@@ -72,6 +72,9 @@
               {{ error }}
             </p>
             <br>
+            <div>
+              <a id="downloadlink" ref="csvfiledownload" href="" :download="'tasks_example'+campaignId+'.csv'">download example csv</a>
+            </div>
           </div>
         </form>
         <form @submit.prevent="uploadBatch">
@@ -138,10 +141,23 @@ export default {
       batchByCampaignId: 'campaign/batchByCampaignId'
     })
   },
-  created () {
+  mounted () {
     this.getCampaign()
   },
   methods: {
+    generateCsvData (placeholders) {
+      const link = this.$refs.csvfiledownload
+      let csvContent = 'data:text/csv;charset=utf-8,'
+      csvContent += [
+        Object.values(placeholders).join(','),
+        placeholders.map(item => item + '-value-task-1'),
+        placeholders.map(item => item + '-value-task-2'),
+        placeholders.map(item => item + '-value-task-3')
+      ].join('\n')
+        .replace(/(^\[)|(\]$)/gm, '')
+      console.log('TEST', csvContent)
+      link.href = encodeURI(csvContent)
+    },
     createTask () {
       this.tasks.push(this.task)
       this.task = this.getEmptyTask(this.placeholders)
@@ -165,6 +181,9 @@ export default {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
       this.getPlaceholders(this.campaign.info.template)
+      this.$nextTick(() => {
+        this.generateCsvData(this.placeholders)
+      })
       this.task = this.getEmptyTask(this.placeholders)
     },
     async uploadBatch () {
@@ -188,6 +207,7 @@ export default {
         content: null
       }
       this.error = null
+      console.log(event)
       if (event.target.files[0]) {
         this.file.name = event.target.files[0].name
         const reader = new FileReader()
