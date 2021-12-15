@@ -11,17 +11,26 @@ export default {
     SET_BATCHES (state, batches) {
       state.batches = batches
     },
+    SET_SUBMISSIONS (state, submissions) {
+      state.submissions = submissions
+    },
     SET_LOADING (state, loading) {
       state.loading = loading
     },
     SET_LOADING_BATCH (state, loading) {
       state.loadingBatch = loading
     },
+    SET_LOADING_SUBMISSIONS (state, loading) {
+      state.loadingSubmissions = loading
+    },
     SET_ALL_CAMPAIGNS_LOADED (state, allCampaignsLoaded) {
       state.allCampaignsLoaded = allCampaignsLoaded
     },
     SET_ALL_BATCHES_LOADED (state, allBatchesLoaded) {
       state.allBatchesLoaded = allBatchesLoaded
+    },
+    SET_ALL_SUBMISSIONS_LOADED (state, allSubmissionsLoaded) {
+      state.allSubmissionsLoaded = allSubmissionsLoaded
     },
     SET_CAMPAIGN_INFO (state, { id, info }) {
       const index = state.campaigns.findIndex(campaign => campaign.id === id)
@@ -64,10 +73,20 @@ export default {
     },
     campaignsByCategory (state) {
       return category => state.campaigns && category ? state.campaigns.filter(c => c.info ? c.info.category === category : false) : state.campaigns
+    },
+    submissionsByBatchId (state) {
+      return id => state.submissions ? state.submissions.filter(s => s.batch_id === id) : null
+    },
+    submissionsByAccountId (state) {
+      return id => state.submissions ? state.submissions.filter(s => s.account_id === id) : null
     }
   },
   actions: {
     async getBatches ({ dispatch, commit, state }, nextKey) {
+      if (!nextKey && state.loadingBatch) {
+        console.log('Already retrieving batches somewhere else, aborting..')
+        return
+      }
       commit('SET_LOADING_BATCH', true)
       try {
         const data = await this.$blockchain.getBatches(nextKey)
@@ -136,6 +155,10 @@ export default {
       }
     },
     async getCampaigns ({ dispatch, commit, state }, nextKey) {
+      if (!nextKey && state.loading) {
+        console.log('Already retrieving campaigns somewhere else, aborting..')
+        return
+      }
       commit('SET_LOADING', true)
       try {
         const data = await this.$blockchain.getCampaigns(nextKey, 20, false)
@@ -179,6 +202,34 @@ export default {
         commit('SET_CAMPAIGN_INFO', { id: campaign.id, info: null })
       }
     },
+    async getSubmissions ({ dispatch, commit, state }, nextKey) {
+      if (!nextKey && state.loadingSubmissions) {
+        console.log('Already retrieving submissions somewhere else, aborting..')
+        return
+      }
+      commit('SET_LOADING_SUBMISSIONS', true)
+      try {
+        const data = await this.$blockchain.getSubmissions(nextKey, 20, false)
+        let submissions = state.submissions
+        if (!nextKey) {
+          submissions = data.rows
+        } else {
+          submissions = submissions.concat(data.rows)
+        }
+        commit('SET_SUBMISSIONS', submissions)
+
+        if (data.more) {
+          await dispatch('getSubmissions', data.next_key)
+        } else {
+          // No more campaigns, we are done
+          commit('SET_ALL_SUBMISSIONS_LOADED', true)
+          commit('SET_LOADING_SUBMISSIONS', false)
+        }
+      } catch (error) {
+        this.$blockchain.handleError(error)
+        commit('SET_LOADING_SUBMISSIONS', false)
+      }
+    },
     async getBatchTasks ({ commit }, batch) {
       try {
         // field_0 represents the content type where:
@@ -197,10 +248,13 @@ export default {
     return {
       batches: null,
       campaigns: null,
+      submissions: null,
       loading: false,
       loadingBatch: false,
+      loadingSubmissions: false,
       allCampaignsLoaded: false,
-      allBatchesLoaded: false
+      allBatchesLoaded: false,
+      allSubmissionsLoaded: false
     }
   }
 }

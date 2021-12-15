@@ -26,7 +26,8 @@ export default (context, inject) => {
         waitForSignatureFrom: null,
         waitForSignature: 0,
         efxPrice: null,
-        refreshInterval: null
+        userRefreshInterval: null,
+        forceRefreshInterval: null
       }
     },
     computed: {
@@ -50,20 +51,30 @@ export default (context, inject) => {
       }
     },
     created () {
-      this.updateBlockchainInfo()
-      if (!this.refreshInterval) {
-        this.refreshInterval = setInterval(this.updateBlockchainInfo, parseInt(process.env.NUXT_ENV_BLOCKCHAIN_UPDATE_RATE, 10))
+      this.updateUserInfo()
+      if (!this.userRefreshInterval) {
+        this.userRefreshInterval = setInterval(this.updateUserInfo, parseInt(process.env.NUXT_ENV_USER_UPDATE_RATE, 10))
+      }
+      if (!this.forceRefreshInterval) {
+        this.forceRefreshInterval = setInterval(this.updateForceInfo, parseInt(process.env.NUXT_ENV_FORCE_UPDATE_RATE, 10))
       }
     },
 
     beforeDestroy () {
-      clearInterval(this.refreshInterval)
+      clearInterval(this.userRefreshInterval)
+      clearInterval(this.forceRefreshInterval)
     },
 
     methods: {
-      updateBlockchainInfo () {
+      updateForceInfo () {
+        console.log('updating campaigns and batches..')
+        context.store.dispatch('campaign/getCampaigns')
+        context.store.dispatch('campaign/getBatches')
+      },
+      updateUserInfo () {
         this.getEfxPrice()
         if (context.$auth.loggedIn) {
+          console.log('updating user and balance..')
           context.$auth.fetchUser()
           this.getAccountBalance()
           this.getPendingBalance()
@@ -292,6 +303,9 @@ export default (context, inject) => {
       },
       async getCampaigns (nextKey, limit = 20, processCampaign = true) {
         return await this.sdk.force.getCampaigns(nextKey, limit, processCampaign)
+      },
+      getSubmissions (nextKey, limit = 20) {
+        alert('NOT IMPLEMENTED YET')
       },
       async getCampaignJoins (campaignId) {
         return await this.sdk.force.getCampaignJoins(campaignId)
