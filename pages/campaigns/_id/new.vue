@@ -52,7 +52,9 @@
               </button>
             </div>
             <br>
-            <h2 class="subtitle is-5 mb-3">Import tasks</h2>
+            <h2 class="subtitle is-5 mb-3">
+              Import tasks
+            </h2>
             <div class="file has-name">
               <label class="file-label">
                 <input class="file-input" type="file" name="csvtasks" @change="uploadFile">
@@ -61,12 +63,14 @@
                     Choose a .csv file…
                   </span>
                 </span>
-                <span v-if="file.name" class="file-name">
+                <span v-if="file && file.name" class="file-name">
                   {{ file.name }}
                 </span>
               </label>
             </div>
-            <p class="has-text-danger" v-if="error">{{ error }}</p>
+            <p v-if="error" class="has-text-danger">
+              {{ error }}
+            </p>
             <br>
           </div>
         </form>
@@ -84,7 +88,7 @@
               </button>
             </div>
             <div class="control">
-              <button @click.prevent="cancel" class="button is-link is-light">
+              <button class="button is-link is-light" @click.prevent="cancel">
                 Cancel
               </button>
             </div>
@@ -184,7 +188,7 @@ export default {
         content: null
       }
       this.error = null
-      if (event.target.files[0].type === 'text/csv') {
+      if (event.target.files[0]) {
         this.file.name = event.target.files[0].name
         const reader = new FileReader()
         reader.onload = (e) => {
@@ -203,7 +207,7 @@ export default {
         }
         reader.readAsText(event.target.files[0])
       } else {
-        this.error = 'Unsupported file type'
+        this.error = 'Could not find file'
         this.file = null
       }
     },
