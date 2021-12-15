@@ -106,10 +106,10 @@
                 <div v-if="batchesLoading">
                   Batches loading..
                 </div>
-                <div v-else-if="batches && !batches.length">
+                <div v-else-if="campaignBatches && !campaignBatches.length">
                   No batches
                 </div>
-                <div v-else-if="!batches">
+                <div v-else-if="!campaignBatches">
                   Could not retrieve batches
                 </div>
               </div>
@@ -311,6 +311,10 @@ export default {
     },
     async getBatches () {
       await this.$store.dispatch('campaign/getBatches')
+
+      if (!this.campaignBatches.length) {
+        this.userReservation = false
+      }
 
       // check if user has reservation for a batch in this campaign
       for (const batch of this.campaignBatches) {
