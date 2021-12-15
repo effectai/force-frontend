@@ -43,7 +43,7 @@
             <div v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
               <label class="label">{{ placeholder }}</label>
               <div class="control">
-                <input v-model="task[placeholder]" type="text" class="input">
+                <input v-model="newTask[placeholder]" type="text" class="input">
               </div>
             </div>
             <div class="control">
@@ -121,7 +121,7 @@ export default {
     return {
       campaignId: parseInt(this.$route.params.id),
       repetitions: 1,
-      task: {},
+      newTask: {},
       tasks: [],
       placeholders: null,
       campaign: null,
@@ -159,8 +159,8 @@ export default {
       link.href = encodeURI(csvContent)
     },
     createTask () {
-      this.tasks.push(this.task)
-      this.task = this.getEmptyTask(this.placeholders)
+      this.tasks.push(this.newTask)
+      this.newTask = this.getEmptyTask(this.placeholders)
     },
     getEmptyTask (placeholders) {
       const emptyTask = {}
@@ -184,7 +184,7 @@ export default {
       this.$nextTick(() => {
         this.generateCsvData(this.placeholders)
       })
-      this.task = this.getEmptyTask(this.placeholders)
+      this.newTask = this.getEmptyTask(this.placeholders)
     },
     async uploadBatch () {
       try {
@@ -216,7 +216,7 @@ export default {
           this.file.content.forEach((element) => {
             this.placeholders.forEach((placeholder) => {
               if (element[placeholder]) {
-                this.task[placeholder] = element[placeholder]
+                this.newTask[placeholder] = element[placeholder]
                 this.createTask()
               }
             })
