@@ -1,12 +1,27 @@
 <template>
-  <div>
-    <span>Sort</span><br>
-    <div class="select is-normal">
-      <select v-model="selectSort" @change="onSort(selectSort)">
-        <option v-for="(sort) in sort_options" :key="sort.name" :value="sort" class="column">
-          {{ sort.name }}
-        </option>
-      </select>
+  <div class="columns is-align-items-center is-justify-content-space-between">
+    <!-- Filters -->
+    <div>
+      <input class="input" type="text" @keydown="onSearch()" v-model="search" placeholder="Search campaign...">
+      <div class="select is-normal">
+        <select v-model="selectSort" @change="onSort(selectSort)">
+          <option v-for="(sort) in sort_options" :key="sort.name" :value="sort" class="column">
+            {{ sort.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Sort -->
+    <div>
+      <span>Sort</span><br>
+      <div class="select is-normal">
+        <select v-model="selectSort" @change="onSort(selectSort)">
+          <option v-for="(sort) in sort_options" :key="sort.name" :value="sort" class="column">
+            {{ sort.name }}
+          </option>
+        </select>
+      </div>
     </div>
   </div>
 </template>
@@ -16,6 +31,7 @@ export default {
   data () {
     return {
       selectSort: null,
+      search: null,
       sort_options: {
         tasks_desc: {
           value: 'num_tasks',
@@ -58,6 +74,9 @@ export default {
   methods: {
     onSort (type) {
       this.$emit('sorted', type)
+    },
+    onSearch () {
+      this.$emit('search', this.search)
     }
   }
 }

@@ -1,8 +1,8 @@
 <template>
   <div>
     <client-only>
-      <category-filters v-if="categoryFilter" @clicked="onFilter " @sorted="onSort" />
-      <sort-filters v-if="sortCampaigns" @sorted="onSort" />
+      <category-filters v-if="categoryFilter" @clicked="onFilter" />
+      <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @filtered="onFilter" />
       <hr>
     </client-only>
     <template v-for="campaign in filteredCampaigns">
@@ -125,6 +125,7 @@ export default {
     return {
       filter: null,
       sort: null,
+      search: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       reservations: null
     }
@@ -172,6 +173,13 @@ export default {
         }
       }
 
+      // Search campaigns
+      if (this.search !== null) {
+        filteredCampaigns = filteredCampaigns.filter((c) => {
+          return c.info.title.toLowerCase().includes(this.search.toLowerCase()) || c.info.description.toLowerCase().includes(this.search.toLowerCase())
+        })
+      }
+
       // Sort campaigns
       if (this.sort) {
         filteredCampaigns = _.orderBy(filteredCampaigns, [(campaign) => {
@@ -196,6 +204,9 @@ export default {
     },
     onSort (sort) {
       this.sort = sort
+    },
+    onSearch (input) {
+      this.search = input
     },
     async getCampaigns () {
       this.reservations = await this.$blockchain.getMyReservations()
