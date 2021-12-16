@@ -4,10 +4,12 @@ export default {
   mutations: {
     ADD_TRANSACTION (state, transaction) {
       if (state.transactions === null) { state.transactions = {} }
-      if (state.transactions[this.$auth.user.vAccountRows[0].id]) {
-        state.transactions[this.$auth.user.vAccountRows[0].id].push(transaction)
-      } else {
-        state.transactions[this.$auth.user.vAccountRows[0].id] = [transaction]
+      if (transaction && transaction.processed) {
+        if (state.transactions[this.$auth.user.vAccountRows[0].id]) {
+          state.transactions[this.$auth.user.vAccountRows[0].id].push(transaction)
+        } else {
+          state.transactions[this.$auth.user.vAccountRows[0].id] = [transaction]
+        }
       }
     }
   },
