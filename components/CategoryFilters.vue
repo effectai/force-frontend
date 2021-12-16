@@ -23,22 +23,6 @@
         </a>
       </slide>
     </carousel>
-    <div>
-      <span>Sort</span><br>
-      <div class="select is-normal">
-        <select @change="onSort(selectSort)" v-model="selectSort">
-          <option>-</option>
-          <option value="tasks_desc">Number of Tasks (descending)</option>
-          <option value="tasks_asc">Number of Tasks (ascending)</option>
-          <option value="reward">EFX Reward</option>
-          <option value="title_asc">Title (ascending)</option>
-          <option value="title_desc">Title (descending)</option>
-          <option value="id_asc">ID (ascending)</option>
-          <option value="id_desc">ID (descending)</option>
-        </select>
-      </div>
-      <hr>
-    </div>
   </div>
 </template>
 <script>
@@ -86,9 +70,6 @@ export default {
     onClick (category) {
       this.filter = category
       this.$emit('clicked', this.filter)
-    },
-    onSort (type) {
-      this.$emit('sorted', type)
     }
   }
 }

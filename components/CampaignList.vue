@@ -1,7 +1,9 @@
 <template>
   <div>
     <client-only>
-      <category-filters v-if="categoryFilter" @clicked="onFilter" @sorted="onSort" />
+      <category-filters v-if="categoryFilter" @clicked="onFilter " @sorted="onSort" />
+      <sort-filters v-if="sortCampaigns" @sorted="onSort" />
+      <hr>
     </client-only>
     <template v-for="campaign in filteredCampaigns">
       <nuxt-link
@@ -110,16 +112,19 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import CategoryFilters from './CategoryFilters'
+import SortFilters from './SortAndFilters'
 
 export default {
   name: 'CampaignList',
   components: {
-    CategoryFilters
+    CategoryFilters,
+    SortFilters
   },
-  props: ['active', 'owner', 'categoryFilter'],
+  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns'],
   data () {
     return {
       filter: null,
+      sort: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       reservations: null
     }
@@ -167,6 +172,17 @@ export default {
         }
       }
 
+      // Sort campaigns
+      if (this.sort) {
+        filteredCampaigns = _.orderBy(filteredCampaigns, [(campaign) => {
+          if (typeof _.get(campaign, `${this.sort.value}`) === 'string') {
+            return _.get(campaign, `${this.sort.value}`).toLowerCase()
+          } else {
+            return _.get(campaign, `${this.sort.value}`)
+          }
+        }, 'userHasReservation'], [this.sort.order, 'desc'])
+      }
+
       return filteredCampaigns
     }
   },
@@ -178,9 +194,8 @@ export default {
     onFilter (category) {
       this.filter = category
     },
-    onSort (type) {
-      this.sort = type
-      console.log('sort: ', type)
+    onSort (sort) {
+      this.sort = sort
     },
     async getCampaigns () {
       this.reservations = await this.$blockchain.getMyReservations()
