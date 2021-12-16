@@ -38,6 +38,13 @@
         </div>
       </div>
     </section>
+    <section class="py-3 has-background-light">
+      <div class="container has-text-centered">
+        <button class="button is-danger" @click.prevent="releaseTask(submissionId)">
+          Stop Task
+        </button>
+      </div>
+    </section>
     <section class="section">
       <div class="container">
         <div v-if="loading" class="loader-wrapper is-active">
@@ -123,6 +130,11 @@ export default {
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
+    },
+    async releaseTask (id) {
+      const data = await this.$blockchain.releaseTask(id)
+      this.$store.dispatch('transaction/addTransaction', data)
+      this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id)
     },
     async submitTask (values) {
       try {

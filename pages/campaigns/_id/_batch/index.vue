@@ -88,6 +88,7 @@
                     <tr>
                       <th>Reservation ID</th>
                       <th>Account ID</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -96,7 +97,15 @@
                       :key="sub.id"
                     >
                       <td>{{ sub.id }}</td>
-                      <td>{{ sub.account_id }}</td>
+                      <td>
+                        <p v-if="sub.account_id">
+                          {{ sub.account_id }}
+                        </p>
+                        <p v-else />
+                      </td>
+                      <td>
+                        <button v-if="sub.account_id !== null" class="button is-primary" @click.prevent="releaseTask(sub.id)">Release Task</button>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -205,12 +214,16 @@
               <template v-if="batch && batch.num_tasks - batch.tasks_done === 0 && !batch.reservations.length">
                 <span>{{ batch.num_tasks }} Tasks done.</span>
               </template>
+              <template v-if="batch && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations.length) && releasedReservations">
+                <span>{{ batch.num_tasks - (batch.tasks_done - releasedReservations.length) }}</span>
+                <span>/ {{ batch.num_tasks }} left</span>
+              </template>
               <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations.length)">
                 <span>{{ batch.num_tasks - batch.tasks_done }}</span>
                 <span>/ {{ batch.num_tasks }} left</span>
               </template>
               <span v-else>...</span>
-              <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks && !batch.reservations.length : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || batch.reservations.length: false}" :value="batch ? batch.tasks_done : undefined" :max="batch ? batch.num_tasks : undefined">
+              <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks && !batch.reservations.length : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || batch.reservations.length: false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
                 Left
               </progress>
             </div>
@@ -241,11 +254,11 @@
               <button v-else-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                 Join Campaign
               </button>
-              <button v-else-if="batch.num_tasks - batch.tasks_done !== 0 && !userReservation" class="button is-primary" @click.prevent="reserveTask = true">
-                Make Task Reservation
-              </button>
               <button v-else-if="userReservation" class="button is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
-                Go To Task
+                Resume Task
+              </button>
+              <button v-else-if="batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations" class="button is-primary" @click.prevent="reserveTask = true">
+                Make Task Reservation
               </button>
               <template v-else>
                 <button v-if="userJoined" class="button is-primary" :disabled="true">
@@ -308,7 +321,8 @@ export default {
       successMessage: null,
       successTitle: null,
       reservations: null,
-      userReservation: null
+      userReservation: null,
+      releasedReservations: null
     }
   },
   computed: {
@@ -368,6 +382,10 @@ export default {
         this.$blockchain.handleError(e)
       }
     },
+    async releaseTask (id) {
+      const data = await this.$blockchain.releaseTask(id)
+      this.$store.dispatch('transaction/addTransaction', data)
+    },
     async checkUserCampaign () {
       this.loading = true
       try {
@@ -412,6 +430,7 @@ export default {
       this.reservations = allSubmissions.filter(function (sub) {
         return !sub.data
       })
+      this.releasedReservations = this.reservations.filter(r => r.account_id === null)
       this.userReservation = this.reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id)
     },
     async getCampaign () {
