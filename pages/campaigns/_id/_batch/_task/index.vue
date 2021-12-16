@@ -132,7 +132,7 @@ export default {
         const result = await this.$blockchain.submitTask(this.batch.batch_id, this.submissionId, JSON.stringify(values))
         this.successTitle = 'Task submitted successfully'
         this.successMessage = 'Waiting for transaction to complete before continuing'
-        await this.$blockchain.waitForTransaction(result.transaction_id)
+        await this.$blockchain.waitForTransaction(result)
         this.$store.dispatch('transaction/addTransaction', result)
         this.loading = false
 
