@@ -238,7 +238,6 @@ export default {
       userJoined: null,
       loading: false,
       joinCampaignPopup: false,
-      hasBatches: true,
       showReserveTask: false,
       reserveInBatch: null,
       userReservation: null,
