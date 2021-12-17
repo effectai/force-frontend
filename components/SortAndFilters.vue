@@ -137,7 +137,6 @@ export default {
       this.$emit('sorted', type)
     },
     onSearch (event) {
-      console.log('onsearch', event.target.value)
       this.$emit('search', event.target.value)
     }
   }
