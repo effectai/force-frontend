@@ -1,7 +1,7 @@
 <template>
   <div>
     <client-only>
-      <category-filters v-if="categoryFilter" @clicked="onFilter" @sorted="onSort" />
+      <category-filters v-if="categoryFilter" @clicked="onFilter" />
     </client-only>
     <template v-for="campaign in filteredCampaigns">
       <nuxt-link
