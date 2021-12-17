@@ -11,6 +11,7 @@
       <span>Category</span><br>
       <div class="select is-normal">
         <select v-model="category" @change="onCategoryFilter(category.value)">
+          <option value="" selected>-</option>
           <option v-for="(category) in effect_dapps" :key="category.value" :value="category" class="column">
             {{ category.name }}
           </option>
@@ -23,6 +24,7 @@
       <span>Status</span><br>
       <div class="select is-normal">
         <select v-model="status" @change="onStatusFilter(status.value)">
+          <option value="" selected>-</option>
           <option v-for="(status) in statuses" :key="status.value" :value="status" class="column">
             {{ status.name }}
           </option>
@@ -35,6 +37,7 @@
       <span>Sort</span><br>
       <div class="select is-normal">
         <select v-model="selectSort" @change="onSort(selectSort)">
+          <option value="" selected>-</option>
           <option v-for="(sort) in sort_options" :key="sort.name" :value="sort" class="column">
             {{ sort.name }}
           </option>
@@ -139,3 +142,11 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.select {
+  width: 100%;
+  select {
+    width: 100%
+  }
+}
+</style>
