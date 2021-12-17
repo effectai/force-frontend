@@ -391,7 +391,6 @@ export default {
           createdCampaign = await this.$blockchain.getMyLastCampaign()
 
           this.$store.dispatch('transaction/addTransaction', result)
-          this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
 
           // reset campaign
           this.campaignIpfs = {
