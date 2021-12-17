@@ -106,10 +106,10 @@
                 <div v-if="batchesLoading">
                   Batches loading..
                 </div>
-                <div v-else-if="batches && !batches.length">
+                <div v-else-if="campaignBatches && !campaignBatches.length">
                   No batches
                 </div>
-                <div v-else-if="!batches">
+                <div v-else-if="!campaignBatches">
                   Could not retrieve batches
                 </div>
               </div>
@@ -266,12 +266,12 @@ export default {
       const batch = this.campaignBatches.find((b) => {
         return b.num_tasks - b.tasks_done > 0
       })
-      await this.$store.dispatch('campaign/getBatchTasks', batch)
 
       if (!batch) {
-        alert('Could not find batch with active tasks')
+        console.error('Could not find batch with active tasks')
         return
       }
+      await this.$store.dispatch('campaign/getBatchTasks', batch)
       this.reserveInBatch = batch
       this.showReserveTask = true
     },
@@ -292,13 +292,13 @@ export default {
     },
     async joinCampaign () {
       try {
-      // function that makes the user join this campaign.
+        // function that makes the user join this campaign.
         const data = await this.$blockchain.joinCampaign(this.id)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
           this.joinCampaignPopup = false
-          await this.$blockchain.waitForTransaction(data.transaction_id)
+          await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
           if (this.userJoined) {
             this.reserveTask()
@@ -311,6 +311,10 @@ export default {
     },
     async getBatches () {
       await this.$store.dispatch('campaign/getBatches')
+
+      if (!this.campaignBatches.length) {
+        this.userReservation = false
+      }
 
       // check if user has reservation for a batch in this campaign
       for (const batch of this.campaignBatches) {

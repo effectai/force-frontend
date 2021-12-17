@@ -101,9 +101,9 @@
                   target="_blank"
                 >{{ transaction.transaction_id }}</a>
               </td>
-              <td>{{ transaction.processed.action_traces[0].act.name }}</td>
-              <td>{{ new Date(transaction.processed.block_time).toLocaleString() }}</td>
-              <td>{{ transaction.processed.receipt.status }}</td>
+              <td><span v-if="transaction.processed && transaction.processed.action_traces">{{ transaction.processed.action_traces[0].act.name }}</span></td>
+              <td><span v-if="transaction.processed">{{ new Date(transaction.processed.block_time).toLocaleString() }}</span></td>
+              <td><span v-if="transaction.processed && transaction.processed.receipt">{{ transaction.processed.receipt.status }}</span></td>
               <th>
                 <a
                   :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
@@ -120,7 +120,7 @@
           <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
           <ul class="pagination-list">
             <li v-for="pageNumber in pages" :key="pageNumber">
-              <a class="pagination-link" @click="page = pageNumber">{{ pageNumber }}</a>
+              <a class="pagination-link" :class="{'is-current': page === pageNumber}" @click="page = pageNumber">{{ pageNumber }}</a>
             </li>
           </ul>
         </nav>

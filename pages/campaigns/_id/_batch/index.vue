@@ -106,7 +106,7 @@
                   <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
                   <ul class="pagination-list">
                     <li v-for="pageNumber in pages" :key="pageNumber">
-                      <a class="pagination-link" @click="page = pageNumber">{{ pageNumber }}</a>
+                      <a class="pagination-link" :class="{'is-current': page === pageNumber}" @click="page = pageNumber">{{ pageNumber }}</a>
                     </li>
                   </ul>
                 </nav>
@@ -152,7 +152,7 @@
                   <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
                   <ul class="pagination-list">
                     <li v-for="pageNumber in pages" :key="pageNumber">
-                      <a class="pagination-link" @click="page = pageNumber">{{ pageNumber }}</a>
+                      <a class="pagination-link" :class="{'is-current': page === pageNumber}" @click="page = pageNumber">{{ pageNumber }}</a>
                     </li>
                   </ul>
                 </nav>
@@ -357,7 +357,7 @@ export default {
         if (data) {
           this.loading = true
           this.joinCampaignPopup = false
-          await this.$blockchain.waitForTransaction(data.transaction_id)
+          await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
           if (this.userJoined) {
             this.reserveTask = true
