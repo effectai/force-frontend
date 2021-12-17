@@ -17,7 +17,7 @@
         <input v-model="myCampaigns" type="checkbox">
         Show only my campaigns
       </label>
-      <campaign-list :owner="myCampaigns ? $auth.user.accountName : null" :filters="false" />
+      <campaign-list :owner="myCampaigns ? $auth.user.accountName : null" :filters="false" :sort-campaigns="true" />
     </div>
   </section>
 </template>

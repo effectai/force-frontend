@@ -2,6 +2,8 @@
   <div>
     <client-only>
       <category-filters v-if="categoryFilter" @clicked="onFilter" />
+      <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
+      <hr>
     </client-only>
     <template v-for="campaign in filteredCampaigns">
       <nuxt-link
@@ -110,16 +112,21 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import CategoryFilters from './CategoryFilters'
+import SortFilters from './SortAndFilters'
 
 export default {
   name: 'CampaignList',
   components: {
-    CategoryFilters
+    CategoryFilters,
+    SortFilters
   },
-  props: ['active', 'owner', 'categoryFilter'],
+  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns'],
   data () {
     return {
       filter: null,
+      sort: null,
+      search: null,
+      status: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       reservations: null
     }
@@ -167,6 +174,39 @@ export default {
         }
       }
 
+      // Search campaigns
+      if (this.search !== null) {
+        filteredCampaigns = filteredCampaigns.filter((c) => {
+          return c.info.title.toLowerCase().includes(this.search.toLowerCase()) || c.info.description.toLowerCase().includes(this.search.toLowerCase())
+        })
+      }
+
+      // Filter by status
+      if (this.status) {
+        switch (this.status) {
+          case 'active':
+            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+            break
+          case 'ended':
+            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === 0)
+            break
+          case 'notstarted':
+            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === c.num_tasks)
+            break
+        }
+      }
+
+      // Sort campaigns
+      if (this.sort) {
+        filteredCampaigns = _.orderBy(filteredCampaigns, [(campaign) => {
+          if (typeof _.get(campaign, `${this.sort.value}`) === 'string') {
+            return _.get(campaign, `${this.sort.value}`).toLowerCase()
+          } else {
+            return _.get(campaign, `${this.sort.value}`)
+          }
+        }, 'userHasReservation'], [this.sort.order, 'desc'])
+      }
+
       return filteredCampaigns
     }
   },
@@ -177,6 +217,15 @@ export default {
   methods: {
     onFilter (category) {
       this.filter = category
+    },
+    onStatusFilter (status) {
+      this.status = status
+    },
+    onSort (sort) {
+      this.sort = sort
+    },
+    onSearch (input) {
+      this.search = input
     },
     async getCampaigns () {
       this.reservations = await this.$blockchain.getMyReservations()
