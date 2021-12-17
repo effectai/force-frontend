@@ -33,6 +33,11 @@
       <h1 class="title mt-5">
         Edit Campaign
       </h1>
+      <div v-if="errors.length">
+        <div v-for="error in errors" :key="toString(error)" class="notification is-danger is-light">
+          {{ error }}
+        </div>
+      </div>
       <div class="tabs">
         <ul>
           <li :class="{'is-active': formGroup === 'basic-info'}">
@@ -120,7 +125,7 @@
                   Raw Markdown
                   <span class="has-text-info">*</span>
                 </label>
-                <div class="control">
+                <div v-if="campaign && campaignIpfs" class="control">
                   <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" required :configs="{promptURLs: true, spellChecker: false}" />
                 </div>
               </div>
@@ -139,11 +144,18 @@
           <div class="field">
             <label class="label">Template</label>
             <div class="control">
-              <textarea v-model="campaignIpfs.template" class="textarea" required />
+              <textarea v-model="campaignIpfs.template" class="textarea" />
             </div>
           </div>
-          <div class="field">
+          <div v-if="Object.keys(campaignIpfs.example_task).length" class="field">
             <label class="label">Example Task</label>
+          </div>
+          <div v-else>
+            Add placeholders to your template. For example:
+            <pre>${placeholder}</pre>
+          </div>
+          <div>
+            To learn more about templates and placeholders, visit the <a href="https://effectai.github.io/developer-docs/effect_network/template.html" target="_blank">documentation</a>.
           </div>
           <div v-for="(placeholder, key) in campaignIpfs.example_task" :key="key" class="field is-horizontal">
             <div class="field-label is-small">
@@ -157,6 +169,14 @@
               </div>
             </div>
           </div>
+          <h2 class="subtitle mt-5">
+            Task Preview
+          </h2>
+          <template-media
+            :html="renderTemplate(
+              campaignIpfs.template || 'No template found..',
+              campaignIpfs.example_task || {})"
+          />
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
@@ -189,20 +209,20 @@
             </button>
           </div>
         </div>
-        <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
-          {{ message }}
-          <span v-if="transactionUrl">
-            <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
-          </span>
-        </div>
       </form>
     </div>
+    <!-- SuccessModal -->
+    <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
   </section>
 </template>
 
 <script>
 import _ from 'lodash'
+import VueSimplemde from 'vue-simplemde'
+import { Template } from '@effectai/effect-js'
 import InstructionsModal from '@/components/InstructionsModal'
+import TemplateMedia from '@/components/Template'
+import SuccessModal from '@/components/SuccessModal'
 
 function getMatches (string, regex, index) {
   index || (index = 1) // default to the first capturing group
@@ -216,7 +236,10 @@ function getMatches (string, regex, index) {
 
 export default {
   components: {
-    InstructionsModal
+    VueSimplemde,
+    TemplateMedia,
+    InstructionsModal,
+    SuccessModal
   },
 
   filters: {
@@ -262,8 +285,9 @@ export default {
       uploadingFile: false,
       selectedFile: null,
       submitted: false,
-      message: null,
-      err: false,
+      errors: [],
+      successMessage: null,
+      successTitle: null,
       campaignLoading: null
     }
   },
@@ -309,7 +333,7 @@ export default {
         reader.onload = (res) => {
           this.campaignIpfs = JSON.parse(res.target.result)
         }
-        reader.onerror = err => console.error(err)
+        reader.onerror = err => this.errors.push(err)
         reader.readAsText(file)
       }
     },
@@ -320,6 +344,9 @@ export default {
       link.download = 'campaign'
       link.click()
       URL.revokeObjectURL(link.href)
+    },
+    renderTemplate (template, placeholders = {}, options = {}) {
+      return new Template(template, placeholders, options).render()
     },
     async getCampaign () {
       this.campaignLoading = true
@@ -333,9 +360,7 @@ export default {
           this.$router.push('/campaigns/' + this.id)
         }
       } catch (error) {
-        console.error(error)
-        this.message = error
-        this.err = true
+        this.errors.push(error)
       }
       this.campaignLoading = false
     },
@@ -350,17 +375,22 @@ export default {
       try {
         const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
         const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward)
+
+        // Wait for transaction and reload campaigns
+        this.successTitle = 'Campaign submitted successfully!'
+        this.successMessage = 'Waiting for transaction to complete before continuing'
+        await this.$blockchain.waitForTransaction(result)
+        await this.$store.dispatch('campaign/getCampaign', this.id)
+
         this.$store.dispatch('transaction/addTransaction', result)
-        this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
-        this.message = 'Campaign edited successfully! Check your transaction here: '
         this.success = true
+        this.loading = false
+        this.submitted = true
+        this.$router.push('/campaigns/' + this.id)
       } catch (error) {
-        this.message = error
-        this.err = true
+        this.loading = false
+        this.errors.push(error)
       }
-      this.loading = false
-      this.submitted = true
-      this.$router.push('/campaigns/' + this.id)
     },
     checkClose (event) {
       if (this.hasChanged && !this.loading && !this.success) {

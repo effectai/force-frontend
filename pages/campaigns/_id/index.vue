@@ -226,7 +226,6 @@ export default {
     return {
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       id: parseInt(this.$route.params.id),
-      campaign: undefined,
       accountId: this.$auth.user.vAccountRows[0].id,
       body: 'description',
       userJoined: null,
@@ -248,6 +247,12 @@ export default {
     }),
     campaignBatches () {
       return this.batchByCampaignId(this.id)
+    },
+    campaign () {
+      if (this.campaigns) {
+        return this.campaigns.find(c => c.id === this.id)
+      }
+      return undefined
     }
   },
   mounted () {
@@ -334,7 +339,7 @@ export default {
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.id)
-      this.campaign = this.campaigns.find(c => c.id === this.id)
+      // this.campaign = this.campaigns.find(c => c.id === this.id)
     }
   }
 }
