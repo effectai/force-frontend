@@ -179,7 +179,10 @@ export default {
       // Search campaigns
       if (this.search !== null) {
         filteredCampaigns = filteredCampaigns.filter((c) => {
-          return c.info.title.toLowerCase().includes(this.search.toLowerCase()) || c.info.description.toLowerCase().includes(this.search.toLowerCase())
+          if (c && c.info) {
+            return c.info.title.toLowerCase().includes(this.search.toLowerCase()) || c.info.description.toLowerCase().includes(this.search.toLowerCase())
+          }
+          return false
         })
       }
 
@@ -190,7 +193,7 @@ export default {
             filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
             break
           case 'ended':
-            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === 0)
+            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === 0 && c.num_tasks !== 0)
             break
           case 'notstarted':
             filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === c.num_tasks)

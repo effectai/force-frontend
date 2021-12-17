@@ -3,7 +3,7 @@
     <!-- Search bar -->
     <div class="column">
       Search
-      <input class="input" type="text" placeholder="Search campaign..." @keydown="onSearch()" v-model="search">
+      <input class="input" type="text" placeholder="Search campaign..." @keyup="onSearch">
     </div>
 
     <!-- Filter category -->
@@ -136,8 +136,9 @@ export default {
     onSort (type) {
       this.$emit('sorted', type)
     },
-    onSearch () {
-      this.$emit('search', this.search)
+    onSearch (event) {
+      console.log('onsearch', event.target.value)
+      this.$emit('search', event.target.value)
     }
   }
 }
