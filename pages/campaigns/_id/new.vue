@@ -214,16 +214,18 @@ export default {
         reader.onload = (e) => {
           this.file.content = this.csvToJson(e.target.result)
           this.file.content.forEach((element) => {
+            this.newTask = element
+            this.createTask()
+            let containsPlaceholder = false
             this.placeholders.forEach((placeholder) => {
               if (element[placeholder]) {
-                this.newTask[placeholder] = element[placeholder]
-                this.createTask()
+                containsPlaceholder = true
               }
             })
+            if (!containsPlaceholder) {
+              this.error = 'Placeholder not found in CSV'
+            }
           })
-          if (this.tasks.length === 0) {
-            this.error = 'File doesnt contain any tasks, or doesnt have the right placeholders'
-          }
         }
         reader.readAsText(event.target.files[0])
       } else {
