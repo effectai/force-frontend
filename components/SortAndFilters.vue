@@ -121,7 +121,7 @@ export default {
         },
         notstarted: {
           value: 'notstarted',
-          name: 'Not started'
+          name: 'Not Started'
         }
       }
     }
