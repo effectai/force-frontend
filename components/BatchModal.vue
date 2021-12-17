@@ -48,8 +48,8 @@ export default {
       get () {
         return this.show
       },
-      set (val) {
-        this.$emit('clicked', val)
+      set () {
+        this.$emit('cancelled')
       }
     }
   },

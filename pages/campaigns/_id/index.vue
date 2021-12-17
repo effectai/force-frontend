@@ -5,7 +5,7 @@
     <!-- Reserve task -->
     <reserve-task v-if="showReserveTask" :batch="reserveInBatch" />
     <!-- Batch modal -->
-    <batch-modal v-if="campaign && campaignBatches" :show="noBatchesPopup" @clicked="batchModalChange" />
+    <batch-modal v-if="campaign && campaignBatches" :show="noBatchesPopup && !cancelledBatchesPopup" @cancelled="cancelBatchModal" />
 
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
@@ -241,7 +241,8 @@ export default {
       hasBatches: true,
       showReserveTask: false,
       reserveInBatch: null,
-      userReservation: null
+      userReservation: null,
+      cancelledBatchesPopup: false
     }
   },
   computed: {
@@ -264,11 +265,7 @@ export default {
       return undefined
     },
     noBatchesPopup () {
-      if (this.hasBatches) {
-        return this.$auth.user.accountName === this.campaign.owner[1] && this.campaignBatches.length === 0
-      } else {
-        return false
-      }
+      return this.$auth.user.accountName === this.campaign.owner[1] && this.campaignBatches.length === 0
     }
   },
   mounted () {
@@ -307,8 +304,8 @@ export default {
     campaignModalChange (val) {
       this.joinCampaignPopup = val
     },
-    batchModalChange (val) {
-      this.hasBatches = val
+    cancelBatchModal () {
+      this.cancelledBatchesPopup = true
     },
     async joinCampaign () {
       try {
