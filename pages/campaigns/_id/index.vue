@@ -24,11 +24,8 @@
         <div class="loader is-loading" />
         <br>Waiting for the transaction to complete...
       </div>
-      <div v-if="campaignLoading">
+      <div v-if="!campaign">
         Campaign loading..
-      </div>
-      <div v-else-if="!campaign">
-        Could not retrieve campaign
       </div>
       <div v-else class="columns">
         <div class="column is-two-thirds">
@@ -247,8 +244,7 @@ export default {
     ...mapState({
       batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
-      campaignLoading: state => state.campaign.loading,
-      batchesLoading: state => !state.campaign.batches || state.campaign.batches.loading
+      batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded
     }),
     campaignBatches () {
       return this.batchByCampaignId(this.id)

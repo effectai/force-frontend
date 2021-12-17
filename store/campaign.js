@@ -1,12 +1,28 @@
 import Vue from 'vue'
-// const API_BASE = process.env.NUXT_ENV_BACKEND_URL
 
 export default {
   namespaced: true,
   modules: {},
   mutations: {
-    SET_CAMPAIGNS (state, campaigns) {
-      state.campaigns = campaigns
+    UPSERT_CAMPAIGNS (state, campaigns) {
+      if (!state.campaigns) {
+        // We have no campaigns yet
+        state.campaigns = campaigns
+      } else {
+        for (let i = 0; i < campaigns.length; i++) {
+          const index = state.campaigns.findIndex(c => c.id === campaigns[i].id)
+          if (index !== -1) {
+            if (campaigns[i].content.field_1 === state.campaigns[index].content.field_1) {
+              campaigns[i].info = state.campaigns[index].info
+            }
+            // Update existing campaign
+            Vue.set(state.campaigns, index, campaigns[i])
+          } else {
+            // Insert new campaign
+            state.campaigns.push(campaigns[i])
+          }
+        }
+      }
     },
     SET_BATCHES (state, batches) {
       state.batches = batches
@@ -35,8 +51,11 @@ export default {
     SET_CAMPAIGN_INFO (state, { id, info }) {
       const index = state.campaigns.findIndex(campaign => campaign.id === id)
       const campaign = state.campaigns[index]
-      campaign.info = info
-      Vue.set(state.campaigns, index, campaign)
+      if (JSON.stringify(info) !== JSON.stringify(campaign.info)) {
+        // Info has changed, update
+        campaign.info = info
+        Vue.set(state.campaigns, index, campaign)
+      }
     },
     SET_BATCH_TASKS (state, { batchId, tasks }) {
       const index = state.batches.findIndex(batch => batch.batch_id === batchId)
@@ -163,12 +182,8 @@ export default {
       try {
         const data = await this.$blockchain.getCampaigns(nextKey, 20, false)
         let campaigns = state.campaigns
-        if (!nextKey) {
-          campaigns = data.rows
-        } else {
-          campaigns = campaigns.concat(data.rows)
-        }
-        commit('SET_CAMPAIGNS', campaigns);
+        campaigns = data.rows
+        commit('UPSERT_CAMPAIGNS', campaigns);
 
         // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
         (async () => {

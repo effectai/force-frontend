@@ -24,11 +24,8 @@
         <div class="loader is-loading" />
         <br>Waiting for the transaction to complete...
       </div>
-      <div v-if="campaignLoading || batchLoading">
+      <div v-if="!campaign">
         Campaign loading..
-      </div>
-      <div v-else-if="!campaign || !batch">
-        Could not retrieve campaign
       </div>
       <div class="columns">
         <div class="column is-two-thirds">
@@ -235,7 +232,7 @@
               <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
             </div>
             <div class="block">
-              <button v-if="loading || userReservation === null || campaignLoading || batchLoading || !batch" class="button is-primary is-loading">
+              <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-primary is-loading">
                 Loading
               </button>
               <button v-else-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
@@ -315,7 +312,7 @@ export default {
     ...mapState({
       batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
-      campaignLoading: state => state.campaign.loading,
+      campaignLoading: state => state.campaign.loading && !state.campaign.allCampaignsLoaded,
       batchLoading: state => state.campaign.loadingBatch
     }),
     displayedSubmissions () {
