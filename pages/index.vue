@@ -13,7 +13,7 @@
       <h2 class="title">
         Active Tasks
       </h2>
-      <campaign-list :category-filter="true" :active="true" :sort-campaigns="true"/>
+      <campaign-list :category-filter="true" :active="true" />
     </div>
   </section>
 </template>

@@ -2,7 +2,7 @@
   <div>
     <client-only>
       <category-filters v-if="categoryFilter" @clicked="onFilter" />
-      <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @filtered="onFilter" />
+      <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
       <hr>
     </client-only>
     <template v-for="campaign in filteredCampaigns">
@@ -126,6 +126,7 @@ export default {
       filter: null,
       sort: null,
       search: null,
+      status: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       reservations: null
     }
@@ -180,6 +181,21 @@ export default {
         })
       }
 
+      // Filter by status
+      if (this.status) {
+        switch (this.status) {
+          case 'active':
+            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+            break
+          case 'ended':
+            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === 0)
+            break
+          case 'notstarted':
+            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === c.num_tasks)
+            break
+        }
+      }
+
       // Sort campaigns
       if (this.sort) {
         filteredCampaigns = _.orderBy(filteredCampaigns, [(campaign) => {
@@ -201,6 +217,9 @@ export default {
   methods: {
     onFilter (category) {
       this.filter = category
+    },
+    onStatusFilter (status) {
+      this.status = status
     },
     onSort (sort) {
       this.sort = sort

@@ -1,19 +1,37 @@
 <template>
-  <div class="columns is-align-items-center is-justify-content-space-between">
-    <!-- Filters -->
-    <div>
-      <input class="input" type="text" @keydown="onSearch()" v-model="search" placeholder="Search campaign...">
+  <div class="columns is-align-items-center is-justify-content-space-between mt-3">
+    <!-- Search bar -->
+    <div class="column">
+      Search
+      <input class="input" type="text" placeholder="Search campaign..." @keydown="onSearch()" v-model="search">
+    </div>
+
+    <!-- Filter category -->
+    <div class="column">
+      <span>Category</span><br>
       <div class="select is-normal">
-        <select v-model="selectSort" @change="onSort(selectSort)">
-          <option v-for="(sort) in sort_options" :key="sort.name" :value="sort" class="column">
-            {{ sort.name }}
+        <select v-model="category" @change="onCategoryFilter(category.value)">
+          <option v-for="(category) in effect_dapps" :key="category.value" :value="category" class="column">
+            {{ category.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Filter status -->
+    <div class="column">
+      <span>Status</span><br>
+      <div class="select is-normal">
+        <select v-model="status" @change="onStatusFilter(status.value)">
+          <option v-for="(status) in statuses" :key="status.value" :value="status" class="column">
+            {{ status.name }}
           </option>
         </select>
       </div>
     </div>
 
     <!-- Sort -->
-    <div>
+    <div class="column">
       <span>Sort</span><br>
       <div class="select is-normal">
         <select v-model="selectSort" @change="onSort(selectSort)">
@@ -32,6 +50,26 @@ export default {
     return {
       selectSort: null,
       search: null,
+      status: null,
+      category: null,
+      effect_dapps: {
+        dao: {
+          value: 'dao',
+          name: 'DAO'
+        },
+        socials: {
+          value: 'socials',
+          name: 'Socials'
+        },
+        translate: {
+          value: 'translate',
+          name: 'Translate'
+        },
+        captions: {
+          value: 'captions',
+          name: 'Captions'
+        }
+      },
       sort_options: {
         tasks_desc: {
           value: 'num_tasks',
@@ -68,10 +106,30 @@ export default {
           name: 'ID (descending)',
           order: 'desc'
         }
+      },
+      statuses: {
+        active: {
+          value: 'active',
+          name: 'Active'
+        },
+        ended: {
+          value: 'ended',
+          name: 'Ended'
+        },
+        notstarted: {
+          value: 'notstarted',
+          name: 'Not started'
+        }
       }
     }
   },
   methods: {
+    onStatusFilter (status) {
+      this.$emit('status', status)
+    },
+    onCategoryFilter (category) {
+      this.$emit('category', category)
+    },
     onSort (type) {
       this.$emit('sorted', type)
     },
