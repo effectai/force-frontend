@@ -178,10 +178,6 @@ export default {
     onFilter (category) {
       this.filter = category
     },
-    onSort (type) {
-      this.sort = type
-      console.log('sort: ', type)
-    },
     async getCampaigns () {
       this.reservations = await this.$blockchain.getMyReservations()
       this.reservations = this.reservations.map(function (x) {
