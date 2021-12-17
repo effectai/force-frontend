@@ -100,6 +100,9 @@
     <div v-if="campaignsLoading" class="subtitle">
       Campaigns loading..
     </div>
+    <div v-else-if="!allBatchesLoaded">
+      Batches loading..
+    </div>
     <div v-else-if="filteredCampaigns && !filteredCampaigns.length" class="subtitle">
       No <span v-if="active">active</span> campaigns
     </div>
@@ -141,7 +144,8 @@ export default {
     ...mapState({
       campaigns: state => state.campaign.campaigns,
       campaignsLoading: state => state.campaign.loading,
-      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded
+      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
+      allBatchesLoaded: state => state.campaign.allBatchesLoaded
     }),
     filteredCampaigns () {
       const campaigns = this.campaignsByCategory(this.filter)
