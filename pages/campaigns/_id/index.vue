@@ -4,6 +4,8 @@
     <instructions-modal v-if="campaign && campaign.info" :show="joinCampaignPopup" :campaign="campaign" :info="campaign.info" @clicked="campaignModalChange" />
     <!-- Reserve task -->
     <reserve-task v-if="showReserveTask" :batch="reserveInBatch" />
+    <!-- Batch modal -->
+    <batch-modal v-if="campaign && campaignBatches" :show="noBatchesPopup && !cancelledBatchesPopup" @cancelled="cancelBatchModal" />
 
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
@@ -214,12 +216,14 @@ import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
+import BatchModal from '@/components/BatchModal'
 
 export default {
   components: {
     TemplateMedia,
     ReserveTask,
-    InstructionsModal
+    InstructionsModal,
+    BatchModal
   },
   middleware: ['auth'],
   data () {
@@ -233,7 +237,8 @@ export default {
       joinCampaignPopup: false,
       showReserveTask: false,
       reserveInBatch: null,
-      userReservation: null
+      userReservation: null,
+      cancelledBatchesPopup: false
     }
   },
   computed: {
@@ -253,6 +258,9 @@ export default {
         return this.campaigns.find(c => c.id === this.id)
       }
       return undefined
+    },
+    noBatchesPopup () {
+      return this.$auth.user.accountName === this.campaign.owner[1] && this.campaignBatches.length === 0
     }
   },
   mounted () {
@@ -290,6 +298,9 @@ export default {
     },
     campaignModalChange (val) {
       this.joinCampaignPopup = val
+    },
+    cancelBatchModal () {
+      this.cancelledBatchesPopup = true
     },
     async joinCampaign () {
       try {
