@@ -189,13 +189,15 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    async processCampaign ({ commit }, campaign) {
+    async processCampaign ({ commit, rootGetters, dispatch }, campaign) {
       try {
         // field_0 represents the content type where:
         // 0: IPFS
         if (campaign.content.field_0 === 0) {
           // field_1 represents the IPFS hash
-          const info = await this.$blockchain.sdk.force.getIpfsContent(campaign.content.field_1)
+          // Save IPFS content it in the store if its not there yet
+          await dispatch('ipfs/getIpfsContent', campaign.content.field_1, { root: true })
+          const info = rootGetters['ipfs/ipfsContentByHash'](campaign.content.field_1)
           commit('SET_CAMPAIGN_INFO', { id: campaign.id, info })
         }
       } catch (e) {
@@ -230,13 +232,15 @@ export default {
         commit('SET_LOADING_SUBMISSIONS', false)
       }
     },
-    async getBatchTasks ({ commit }, batch) {
+    async getBatchTasks ({ commit, rootGetters, dispatch }, batch) {
       try {
         // field_0 represents the content type where:
         // 0: IPFS
         if (batch.content.field_0 === 0) {
           // field_1 represents the IPFS hash
-          const tasks = await this.$blockchain.sdk.force.getIpfsContent(batch.content.field_1)
+          // Save IPFS content it in the store if its not there yet
+          await dispatch('ipfs/getIpfsContent', batch.content.field_1, { root: true })
+          const tasks = rootGetters['ipfs/ipfsContentByHash'](batch.content.field_1)
           commit('SET_BATCH_TASKS', { batchId: batch.batch_id, tasks: tasks.tasks })
         }
       } catch (e) {
