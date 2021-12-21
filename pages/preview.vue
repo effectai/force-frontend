@@ -1,44 +1,44 @@
 <template>
   <section class="section">
     <div class="container">
-       <div class="block task-group">
-          <div class="field">
-            <label class="label">Template Preview Tool</label>
-            <div class="control">
-              <textarea v-model="campaignIpfs.template" class="textarea" />
-            </div>
+      <div class="block task-group">
+        <div class="field">
+          <label class="label">Template Preview Tool</label>
+          <div class="control">
+            <textarea v-model="campaignIpfs.template" class="textarea" />
           </div>
-          <div v-if="Object.keys(campaignIpfs.example_task).length" class="field">
-            <label class="label">Example Task</label>
+        </div>
+        <div v-if="Object.keys(campaignIpfs.example_task).length" class="field">
+          <label class="label">Example Task</label>
+        </div>
+        <div v-else>
+          Add placeholders to your template. For example:
+          <pre>${placeholder}</pre>
+        </div>
+        <div>
+          To learn more about templates and placeholders, visit the <a href="https://effectai.github.io/developer-docs/effect_network/template.html" target="_blank">documentation</a>.
+        </div>
+        <div v-for="(placeholder, key) in campaignIpfs.example_task" :key="key" class="field is-horizontal">
+          <div class="field-label is-small">
+            <label class="label">{{ key }}</label>
           </div>
-          <div v-else>
-            Add placeholders to your template. For example:
-            <pre>${placeholder}</pre>
-          </div>
-          <div>
-            To learn more about templates and placeholders, visit the <a href="https://effectai.github.io/developer-docs/effect_network/template.html" target="_blank">documentation</a>.
-          </div>
-          <div v-for="(placeholder, key) in campaignIpfs.example_task" :key="key" class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label">{{ key }}</label>
-            </div>
-            <div class="field-body is-small">
-              <div class="field">
-                <div class="control">
-                  <input v-model="campaignIpfs.example_task[key]" class="input is-small" type="text">
-                </div>
+          <div class="field-body is-small">
+            <div class="field">
+              <div class="control">
+                <input v-model="campaignIpfs.example_task[key]" class="input is-small" type="text">
               </div>
             </div>
           </div>
-          <h2 class="subtitle mt-5">
-            Task Preview
-          </h2>
-          <template-media
-            :html="renderTemplate(
-              campaignIpfs.template || 'No template found..',
-              campaignIpfs.example_task || {})"
-          />
         </div>
+        <h2 class="subtitle mt-5">
+          Task Preview
+        </h2>
+        <template-media
+          :html="renderTemplate(
+            campaignIpfs.template || 'No template found..',
+            campaignIpfs.example_task || {})"
+        />
+      </div>
     </div>
   </section>
 </template>
