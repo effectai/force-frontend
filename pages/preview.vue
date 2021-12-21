@@ -1,9 +1,12 @@
 <template>
   <section class="section">
     <div class="container">
+      <h2 class="title">
+        Template Preview Tool
+      </h2>
       <div class="block task-group">
         <div class="field">
-          <label class="label">Template Preview Tool</label>
+          <label class="label">Template</label>
           <div class="control">
             <textarea v-model="campaignIpfs.template" class="textarea" />
           </div>
@@ -37,7 +40,17 @@
           :html="renderTemplate(
             campaignIpfs.template || 'No template found..',
             campaignIpfs.example_task || {})"
+          @submit="showSubmission"
         />
+        <div class="mt-5">
+          <h2 class="subtitle">
+            Submission Answer
+          </h2>
+          <pre v-if="answer">{{ answer }}</pre>
+          <p v-else>
+            Make sure your template has a submit button so that users can submit their answers
+          </p>
+        </div>
       </div>
     </div>
   </section>
@@ -89,7 +102,8 @@ export default {
       submitted: false,
       errors: [],
       successMessage: null,
-      successTitle: null
+      successTitle: null,
+      answer: null
     }
   },
   computed: {
@@ -123,6 +137,9 @@ export default {
   methods: {
     renderTemplate (template, placeholders = {}, options = {}) {
       return new Template(template, placeholders, options).render()
+    },
+    showSubmission (values) {
+      this.answer = values
     }
   }
 }
