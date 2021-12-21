@@ -155,7 +155,17 @@
             :html="renderTemplate(
               campaignIpfs.template || 'No template found..',
               campaignIpfs.example_task || {})"
+            @submit="showSubmission"
           />
+          <div class="mt-5">
+            <h2 class="subtitle">
+              Submission Answer
+            </h2>
+            <pre v-if="answer">{{ answer }}</pre>
+            <p v-else>
+              Make sure your template has a submit button so that users can submit their answers
+            </p>
+          </div>
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
@@ -182,8 +192,8 @@
               Cancel
             </nuxt-link>
           </div>
-          <div class="control">
-            <button type="submit" class="button is-primary is-wide" :class="{'is-loading': loading}">
+          <div class="control" :class="{'has-tooltip-arrow': !answer}" :data-tooltip="!answer ? 'submit your template in the task\npreview to test your template' : null">
+            <button type="submit" :class="{'is-loading': loading}" :disabled="!answer" class="button is-primary is-wide">
               Save Campaign
             </button>
           </div>
@@ -266,7 +276,8 @@ export default {
       submitted: false,
       errors: [],
       successMessage: null,
-      successTitle: null
+      successTitle: null,
+      answer: null
     }
   },
   computed: {
@@ -310,6 +321,9 @@ export default {
   },
 
   methods: {
+    showSubmission (values) {
+      this.answer = values
+    },
     importCampaign (event) {
       const file = event.target.files[0]
       const reader = new FileReader()

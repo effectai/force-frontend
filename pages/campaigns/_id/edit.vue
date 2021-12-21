@@ -176,7 +176,17 @@
             :html="renderTemplate(
               campaignIpfs.template || 'No template found..',
               campaignIpfs.example_task || {})"
+            @submit="showSubmission"
           />
+          <div class="mt-5">
+            <h2 class="subtitle">
+              Submission Answer
+            </h2>
+            <pre v-if="answer">{{ answer }}</pre>
+            <p v-else>
+              Make sure your template has a submit button so that users can submit their answers
+            </p>
+          </div>
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
@@ -288,7 +298,8 @@ export default {
       errors: [],
       successMessage: null,
       successTitle: null,
-      campaignLoading: null
+      campaignLoading: null,
+      answer: null
     }
   },
   computed: {
@@ -326,6 +337,9 @@ export default {
   },
 
   methods: {
+    showSubmission (values) {
+      this.answer = values
+    },
     importCampaign (event) {
       const file = event.target.files[0]
       const reader = new FileReader()
