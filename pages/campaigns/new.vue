@@ -250,9 +250,7 @@ export default {
   middleware: ['auth'],
   data () {
     return {
-      advanced: false,
       success: false,
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       loading: false,
       preview: false,
       campaignIpfs: {

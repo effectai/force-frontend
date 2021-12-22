@@ -76,11 +76,7 @@ export default {
   },
   data () {
     return {
-      advanced: false,
-      success: false,
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       loading: false,
-      preview: false,
       campaignIpfs: {
         title: '',
         description: '',
@@ -96,19 +92,8 @@ export default {
       campaign: {
         content_hash: null
       },
-      formGroup: 'basic-info',
-      cachedFormData: null,
-      uploadingFile: false,
-      selectedFile: null,
-      submitted: false,
-      errors: [],
-      successMessage: null,
-      successTitle: null,
       answer: null
     }
-  },
-  computed: {
-
   },
   watch: {
     'campaignIpfs.template' (template) {
@@ -121,21 +106,24 @@ export default {
         newPlaceholders[placeholder] = this.campaignIpfs.example_task[placeholder] || ''
       })
       this.campaignIpfs.example_task = newPlaceholders
-    },
-    campaign: {
-      deep: true,
-      handler (campaign) {
-        window.localStorage.setItem('cached_campaign', JSON.stringify(campaign))
-      }
-    },
-    campaignIpfs: {
-      deep: true,
-      handler (campaignIpfs) {
-        window.localStorage.setItem('cached_campaignIpfs', JSON.stringify(campaignIpfs))
-      }
     }
   },
+  created () {
+    this.retrieveTemplate(this.$route.query)
+  },
   methods: {
+    async retrieveTemplate (params) {
+      if (params.templateUrl) {
+        this.campaignIpfs.template = 'Retrieving template..'
+        const response = await this.$axios.get(params.templateUrl)
+        this.campaignIpfs.template = response.data
+      } else if (params.template) {
+        this.campaignIpfs.template = decodeURI(params.template)
+      }
+      if (params.placeholders) {
+        this.campaignIpfs.example_task = JSON.parse(params.placeholders)
+      }
+    },
     renderTemplate (template, placeholders = {}, options = {}) {
       return new Template(template, placeholders, options).render()
     },
@@ -145,9 +133,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-div.instructions-group .textarea {
-  overflow-y: scroll
-}
-</style>
