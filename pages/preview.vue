@@ -85,7 +85,8 @@ export default {
         title: '',
         description: '',
         instructions: '',
-        template: 'Edit your template here. 🖋',
+        // eslint-disable-next-line no-template-curly-in-string
+        template: '<h2>Placeholder example: ${placeholder} </h2>\n<input type="text" required placeholder="\'name\' attribute is required on input fields" name="test" /><input type="submit" />',
         image: '',
         category: '',
         example_task: {},
