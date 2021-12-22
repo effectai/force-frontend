@@ -48,7 +48,7 @@
           </h2>
           <pre v-if="answer">{{ answer }}</pre>
           <p v-else>
-            Make sure your template has a submit button so that users can submit their answers
+            Make sure your template has a <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/submit" target="_blank">submit</a> button so that users can submit their answers
           </p>
         </div>
       </div>
