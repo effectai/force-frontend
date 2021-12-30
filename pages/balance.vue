@@ -69,6 +69,8 @@
           </div>
         </div>
       </div>
+      <!-- SuccessModal -->
+      <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
     </div>
   </section>
 </template>
@@ -81,20 +83,23 @@ export default {
     return {
       pending: 0,
       finalAmount: 0,
-      loading: false
+      loading: false,
+      successMessage: null,
+      successTitle: null
     }
   },
   methods: {
-    payout () {
+    async payout () {
       this.loading = true
       try {
-        const result = this.$blockchain.payout()
+        const result = await this.$blockchain.payout()
         this.$store.dispatch('transaction/addTransaction', result)
         this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+        this.successTitle = 'Payout completed'
+        this.successMessage = 'All your available pending payouts have been completed and are added to your account'
       } catch (error) {
         throw new Error(error)
       }
-      this.$router.push('/')
     }
   }
 }
