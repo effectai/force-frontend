@@ -97,18 +97,17 @@ export default {
       try {
         const result = await this.$blockchain.withdraw(account, parseFloat(tokenAmount).toFixed(4), memo)
         if (result) {
+          this.err = false
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
           this.message = 'Withdrawing has been successful. Check your transaction here: '
-          await this.$blockchain.waitForTransaction(result.transaction_id)
-          this.$blockchain.updateBlockchainInfo()
+          await this.$blockchain.waitForTransaction(result)
+          this.$blockchain.updateUserInfo()
+          this.submitted = true
         }
       } catch (error) {
         this.$blockchain.handleError(error)
-        this.message = error
-        this.err = true
       }
       this.loading = false
-      this.submitted = true
     },
     clearFields () {
       this.tokenAmount = null

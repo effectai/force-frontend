@@ -4,6 +4,8 @@
     <instructions-modal v-if="campaign && campaign.info" :show="joinCampaignPopup" :campaign="campaign" :info="campaign.info" @clicked="campaignModalChange" />
     <!-- Reserve task -->
     <reserve-task v-if="showReserveTask" :batch="reserveInBatch" />
+    <!-- Batch modal -->
+    <batch-modal v-if="campaign && campaignBatches" :show="noBatchesPopup && !cancelledBatchesPopup" @cancelled="cancelBatchModal" />
 
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
@@ -24,11 +26,8 @@
         <div class="loader is-loading" />
         <br>Waiting for the transaction to complete...
       </div>
-      <div v-if="campaignLoading">
+      <div v-if="!campaign">
         Campaign loading..
-      </div>
-      <div v-else-if="!campaign">
-        Could not retrieve campaign
       </div>
       <div v-else class="columns">
         <div class="column is-two-thirds">
@@ -106,10 +105,10 @@
                 <div v-if="batchesLoading">
                   Batches loading..
                 </div>
-                <div v-else-if="batches && !batches.length">
+                <div v-else-if="campaignBatches && !campaignBatches.length">
                   No batches
                 </div>
-                <div v-else-if="!batches">
+                <div v-else-if="!campaignBatches">
                   Could not retrieve batches
                 </div>
               </div>
@@ -217,19 +216,20 @@ import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
+import BatchModal from '@/components/BatchModal'
 
 export default {
   components: {
     TemplateMedia,
     ReserveTask,
-    InstructionsModal
+    InstructionsModal,
+    BatchModal
   },
   middleware: ['auth'],
   data () {
     return {
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       id: parseInt(this.$route.params.id),
-      campaign: undefined,
       accountId: this.$auth.user.vAccountRows[0].id,
       body: 'description',
       userJoined: null,
@@ -237,7 +237,8 @@ export default {
       joinCampaignPopup: false,
       showReserveTask: false,
       reserveInBatch: null,
-      userReservation: null
+      userReservation: null,
+      cancelledBatchesPopup: false
     }
   },
   computed: {
@@ -247,11 +248,19 @@ export default {
     ...mapState({
       batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
-      campaignLoading: state => state.campaign.loading,
-      batchesLoading: state => !state.campaign.batches || state.campaign.batches.loading
+      batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded
     }),
     campaignBatches () {
       return this.batchByCampaignId(this.id)
+    },
+    campaign () {
+      if (this.campaigns) {
+        return this.campaigns.find(c => c.id === this.id)
+      }
+      return undefined
+    },
+    noBatchesPopup () {
+      return this.$auth.user.accountName === this.campaign.owner[1] && this.campaignBatches.length === 0
     }
   },
   mounted () {
@@ -266,12 +275,12 @@ export default {
       const batch = this.campaignBatches.find((b) => {
         return b.num_tasks - b.tasks_done > 0
       })
-      await this.$store.dispatch('campaign/getBatchTasks', batch)
 
       if (!batch) {
-        alert('Could not find batch with active tasks')
+        console.error('Could not find batch with active tasks')
         return
       }
+      await this.$store.dispatch('campaign/getBatchTasks', batch)
       this.reserveInBatch = batch
       this.showReserveTask = true
     },
@@ -290,15 +299,18 @@ export default {
     campaignModalChange (val) {
       this.joinCampaignPopup = val
     },
+    cancelBatchModal () {
+      this.cancelledBatchesPopup = true
+    },
     async joinCampaign () {
       try {
-      // function that makes the user join this campaign.
+        // function that makes the user join this campaign.
         const data = await this.$blockchain.joinCampaign(this.id)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
           this.joinCampaignPopup = false
-          await this.$blockchain.waitForTransaction(data.transaction_id)
+          await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
           if (this.userJoined) {
             this.reserveTask()
@@ -311,6 +323,10 @@ export default {
     },
     async getBatches () {
       await this.$store.dispatch('campaign/getBatches')
+
+      if (!this.campaignBatches.length) {
+        this.userReservation = false
+      }
 
       // check if user has reservation for a batch in this campaign
       for (const batch of this.campaignBatches) {
@@ -334,7 +350,7 @@ export default {
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.id)
-      this.campaign = this.campaigns.find(c => c.id === this.id)
+      // this.campaign = this.campaigns.find(c => c.id === this.id)
     }
   }
 }
