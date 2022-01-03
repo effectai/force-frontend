@@ -5,6 +5,11 @@
         <h4 class="title is-spaced">
           Your EFX Balance
         </h4>
+        <div v-if="errors.length">
+          <div v-for="error in errors" :key="toString(error)" class="notification is-danger is-light">
+            {{ error }}
+          </div>
+        </div>
         <div class="columns is-multiline">
           <div class="column is-half">
             <div class="box">
@@ -85,7 +90,8 @@ export default {
       finalAmount: 0,
       loading: false,
       successMessage: null,
-      successTitle: null
+      successTitle: null,
+      errors: []
     }
   },
   methods: {
@@ -98,8 +104,10 @@ export default {
         this.successTitle = 'Payout completed'
         this.successMessage = 'All your available pending payouts have been completed and are added to your account'
       } catch (error) {
-        throw new Error(error)
+        this.loading = false
+        this.errors.push(error)
       }
+      this.loading = false
     }
   }
 }
