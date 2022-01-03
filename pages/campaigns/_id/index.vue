@@ -5,7 +5,7 @@
     <!-- Reserve task -->
     <reserve-task v-if="showReserveTask" :batch="reserveInBatch" />
     <!-- Batch modal -->
-    <batch-modal v-if="campaign && campaignBatches" :show="noBatchesPopup && !cancelledBatchesPopup" @cancelled="cancelBatchModal" />
+    <batch-modal v-if="campaign && campaignBatches" :show="$auth.user.accountName === campaign.owner[1] && showBatchesPopup && !cancelledBatchesPopup" @cancelled="cancelBatchModal" />
 
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
@@ -238,7 +238,8 @@ export default {
       showReserveTask: false,
       reserveInBatch: null,
       userReservation: null,
-      cancelledBatchesPopup: false
+      cancelledBatchesPopup: false,
+      showBatchesPopup: false
     }
   },
   computed: {
@@ -258,9 +259,6 @@ export default {
         return this.campaigns.find(c => c.id === this.id)
       }
       return undefined
-    },
-    noBatchesPopup () {
-      return this.$auth.user.accountName === this.campaign.owner[1] && this.campaignBatches.length === 0
     }
   },
   mounted () {
@@ -332,6 +330,9 @@ export default {
       for (const batch of this.campaignBatches) {
         const reservations = await this.$blockchain.getTaskReservationsForBatch(batch.batch_id)
         this.userReservation = reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id)
+      }
+      if (this.campaignBatches.length === 0) {
+        this.showBatchesPopup = true
       }
     },
     async checkUserCampaign () {
