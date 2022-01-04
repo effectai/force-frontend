@@ -18,7 +18,9 @@ export default (context, inject) => {
         provider: null,
         loginModal: false,
         efxAvailable: null,
+        efxPayout: 0,
         efxPending: 0,
+        validationPeriod: 259200,
         eos,
         bsc,
         sdk: new effectSdk.EffectClient(process.env.NUXT_ENV_EOS_NETWORK, sdkOptions),
@@ -78,6 +80,7 @@ export default (context, inject) => {
           context.$auth.fetchUser()
           this.getAccountBalance()
           this.getPendingBalance()
+          this.getPayoutBalance()
         }
       },
       async getEfxPrice (currency = 'usd') {
@@ -104,6 +107,7 @@ export default (context, inject) => {
             })
             this.getAccountBalance()
             this.getPendingBalance()
+            this.getPayoutBalance()
             // Needed because there is a redirect bug when going to a protected route from the login page
             const path = context.$auth.$storage.getUniversal('redirect') || '/'
             context.$auth.$storage.setUniversal('redirect', null)
@@ -292,6 +296,21 @@ export default (context, inject) => {
           this.efxPending = pending
         }
       },
+      async getPayoutBalance () {
+        if (context.$auth.loggedIn) {
+          const data = await this.sdk.force.getPendingBalance(context.$auth.user.vAccountRows[0].id)
+          let pending = 0
+          if (data) {
+            data.rows.forEach((entry) => {
+              if (((new Date(new Date(entry.last_submission_time) + 'UTC').getTime() / 1000) + this.validationPeriod) < ((Date.now() / 1000))) {
+                pending = pending + parseFloat(entry.pending.quantity)
+              }
+            })
+          }
+          this.efxPayout = pending
+          return this.efxPayout
+        }
+      },
       async getBatches (nextKey, limit = 20, processBatch = true) {
         return await this.sdk.force.getBatches(nextKey, limit, processBatch)
       },
@@ -333,6 +352,9 @@ export default (context, inject) => {
       },
       async getReservations () {
         return await this.sdk.force.getReservations()
+      },
+      async payout () {
+        return await this.sdk.force.payout()
       },
       async getMyReservations () {
         return await this.sdk.force.getMyReservations()
