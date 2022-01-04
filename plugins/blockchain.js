@@ -235,8 +235,8 @@ export default (context, inject) => {
         return await this.sdk.account.withdraw(toAccount, amount, memo)
       },
 
-      async vTransfer (toAccount, toAccountId, amount) {
-        return await this.sdk.account.vtransfer(toAccount, toAccountId, amount, { permission: this.account.permission, address: context.$auth.user.address })
+      async vTransfer (toAccountId, amount) {
+        return await this.sdk.account.vtransfer(toAccountId, amount)
       },
 
       async logout () {
