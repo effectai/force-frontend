@@ -2,6 +2,8 @@
   <div>
     <client-only>
       <category-filters v-if="categoryFilter" @clicked="onFilter" />
+      <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
+      <hr>
     </client-only>
     <template v-for="campaign in filteredCampaigns">
       <nuxt-link
@@ -14,6 +16,7 @@
           <div class="column is-narrow is-mobile-1">
             <p class="image has-radius" style="width: 52px; height: 52px">
               <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
+              <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
             </p>
           </div>
           <div class="column is-4-desktop is-5-widescreen is-12-touch">
@@ -97,6 +100,9 @@
     <div v-if="campaignsLoading" class="subtitle">
       Campaigns loading..
     </div>
+    <div v-else-if="!allBatchesLoaded">
+      Batches loading..
+    </div>
     <div v-else-if="filteredCampaigns && !filteredCampaigns.length" class="subtitle">
       No <span v-if="active">active</span> campaigns
     </div>
@@ -110,18 +116,24 @@
 import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import CategoryFilters from './CategoryFilters'
+import SortFilters from './SortAndFilters'
 
 export default {
   name: 'CampaignList',
   components: {
-    CategoryFilters
+    CategoryFilters,
+    SortFilters
   },
-  props: ['active', 'owner', 'categoryFilter'],
+  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns'],
   data () {
     return {
       filter: null,
+      sort: null,
+      search: null,
+      status: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
-      reservations: null
+      reservations: null,
+      categories: ['translate', 'captions', 'socials', 'dao']
     }
   },
   computed: {
@@ -132,7 +144,8 @@ export default {
     ...mapState({
       campaigns: state => state.campaign.campaigns,
       campaignsLoading: state => state.campaign.loading,
-      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded
+      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
+      allBatchesLoaded: state => state.campaign.allBatchesLoaded
     }),
     filteredCampaigns () {
       const campaigns = this.campaignsByCategory(this.filter)
@@ -167,6 +180,42 @@ export default {
         }
       }
 
+      // Search campaigns
+      if (this.search !== null) {
+        filteredCampaigns = filteredCampaigns.filter((c) => {
+          if (c && c.info) {
+            return c.info.title.toLowerCase().includes(this.search.toLowerCase()) || c.info.description.toLowerCase().includes(this.search.toLowerCase())
+          }
+          return false
+        })
+      }
+
+      // Filter by status
+      if (this.status) {
+        switch (this.status) {
+          case 'active':
+            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+            break
+          case 'ended':
+            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === 0 && c.num_tasks !== 0)
+            break
+          case 'notstarted':
+            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === c.num_tasks)
+            break
+        }
+      }
+
+      // Sort campaigns
+      if (this.sort) {
+        filteredCampaigns = _.orderBy(filteredCampaigns, [(campaign) => {
+          if (typeof _.get(campaign, `${this.sort.value}`) === 'string') {
+            return _.get(campaign, `${this.sort.value}`).toLowerCase()
+          } else {
+            return _.get(campaign, `${this.sort.value}`)
+          }
+        }, 'userHasReservation'], [this.sort.order, 'desc'])
+      }
+
       return filteredCampaigns
     }
   },
@@ -177,6 +226,15 @@ export default {
   methods: {
     onFilter (category) {
       this.filter = category
+    },
+    onStatusFilter (status) {
+      this.status = status
+    },
+    onSort (sort) {
+      this.sort = sort
+    },
+    onSearch (input) {
+      this.search = input
     },
     async getCampaigns () {
       this.reservations = await this.$blockchain.getMyReservations()

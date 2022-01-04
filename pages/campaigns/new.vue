@@ -62,7 +62,7 @@
           </label>
           <div class="field has-addons">
             <div class="control">
-              <input v-model="campaignIpfs.reward" class="input" type="number" placeholder="Reward per task">
+              <input v-model="campaignIpfs.reward" class="input" type="number" placeholder="Reward per task" step="0.0001">
             </div>
             <div class="control">
               <a class="button is-primary">
@@ -155,7 +155,17 @@
             :html="renderTemplate(
               campaignIpfs.template || 'No template found..',
               campaignIpfs.example_task || {})"
+            @submit="showSubmission"
           />
+          <div class="mt-5">
+            <h2 class="subtitle">
+              Submission Answer
+            </h2>
+            <pre v-if="answer">{{ answer }}</pre>
+            <p v-else>
+              Make sure your template has a submit button so that users can submit their answers
+            </p>
+          </div>
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control">
@@ -182,8 +192,8 @@
               Cancel
             </nuxt-link>
           </div>
-          <div class="control">
-            <button type="submit" class="button is-primary is-wide" :class="{'is-loading': loading}">
+          <div class="control" :class="{'has-tooltip-arrow': !answer}" :data-tooltip="!answer ? 'submit your template in the task\npreview to test your template' : null">
+            <button type="submit" :class="{'is-loading': loading}" :disabled="!answer" class="button is-primary is-wide">
               Save Campaign
             </button>
           </div>
@@ -240,16 +250,15 @@ export default {
   middleware: ['auth'],
   data () {
     return {
-      advanced: false,
       success: false,
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       loading: false,
       preview: false,
       campaignIpfs: {
         title: '',
         description: '',
         instructions: '',
-        template: '',
+        // eslint-disable-next-line no-template-curly-in-string
+        template: '<h2>Placeholder example: ${placeholder} </h2>\n<input type="text" required placeholder="\'name\' attribute is required on input fields" name="test" /><input type="submit" />',
         image: '',
         category: '',
         example_task: {},
@@ -266,7 +275,8 @@ export default {
       submitted: false,
       errors: [],
       successMessage: null,
-      successTitle: null
+      successTitle: null,
+      answer: null
     }
   },
   computed: {
@@ -310,6 +320,9 @@ export default {
   },
 
   methods: {
+    showSubmission (values) {
+      this.answer = values
+    },
     importCampaign (event) {
       const file = event.target.files[0]
       const reader = new FileReader()
@@ -391,7 +404,6 @@ export default {
           createdCampaign = await this.$blockchain.getMyLastCampaign()
 
           this.$store.dispatch('transaction/addTransaction', result)
-          this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
 
           // reset campaign
           this.campaignIpfs = {

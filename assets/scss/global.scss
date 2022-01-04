@@ -210,6 +210,22 @@ a.box {
   animation: pulse-green 2s infinite;
 }
 
+.is-pulsing {
+  animation: pulse-default 2s infinite;
+}
+
+@keyframes pulse-default {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 29, 86, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(51, 217, 178, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(51, 217, 178, 0);
+  }
+}
+
 @keyframes pulse-green {
   0% {
     box-shadow: 0 0 0 0 rgba(51, 217, 178, 0.7);

@@ -1,27 +1,29 @@
 <template>
-  <carousel :pagination-enabled="false" :per-page-custom="[[768, 3], [1024, 5]]" class="columns">
-    <slide v-for="(dapp, index) in effect_dapps" :key="dapp.value" class="column">
-      <a
-        href="#"
-        :class="['dapp-' + index, filter === dapp.value ? 'is-active' : null]"
-        class="card is-flat"
-        @mouseover="dapp.hover = true"
-        @mouseleave="dapp.hover = false"
-        @click.prevent="onClick(dapp.value)"
-      >
-        <div class="card-image has-text-centered">
-          <img class="dapp-logo block" :src="dapp.hover || filter === dapp.value ? dapp.whiteUrl : dapp.normalUrl" alt="Image">
-        </div>
-      </a>
-    </slide>
-    <slide class="column is-2">
-      <a href="#" class="card is-flat dapp-null" @click.prevent="onClick(null)">
-        <div class="card-image has-text-centered">
-          <h4 class="is-size-5"><b>Show All</b></h4>
-        </div>
-      </a>
-    </slide>
-  </carousel>
+  <div>
+    <carousel :pagination-enabled="false" :per-page-custom="[[768, 3], [1024, 5]]" class="columns">
+      <slide v-for="(dapp, index) in effect_dapps" :key="dapp.value" class="column">
+        <a
+          href="#"
+          :class="['dapp-' + index, filter === dapp.value ? 'is-active' : null]"
+          class="card is-flat"
+          @mouseover="dapp.hover = true"
+          @mouseleave="dapp.hover = false"
+          @click.prevent="onClick(dapp.value)"
+        >
+          <div class="card-image has-text-centered">
+            <img class="dapp-logo block" :src="dapp.hover || filter === dapp.value ? dapp.whiteUrl : dapp.normalUrl" alt="Image">
+          </div>
+        </a>
+      </slide>
+      <slide class="column is-2">
+        <a href="#" class="card is-flat dapp-null" @click.prevent="onClick(null)">
+          <div class="card-image has-text-centered">
+            <h4 class="is-size-5"><b>Show All</b></h4>
+          </div>
+        </a>
+      </slide>
+    </carousel>
+  </div>
 </template>
 <script>
 import { Carousel, Slide } from 'vue-carousel'
@@ -35,6 +37,7 @@ export default {
   data () {
     return {
       filter: null,
+      selectSort: null,
       effect_dapps: {
         dao: {
           hover: false,
