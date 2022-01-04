@@ -302,7 +302,7 @@ export default (context, inject) => {
           let pending = 0
           if (data) {
             data.rows.forEach((entry) => {
-              if (((new Date(entry.last_submission_time).getTime() / 1000) + this.validationPeriod) < ((Date.now() / 1000))) {
+              if (((new Date(new Date(entry.last_submission_time) + 'UTC').getTime() / 1000) + this.validationPeriod) < ((Date.now() / 1000))) {
                 pending = pending + parseFloat(entry.pending.quantity)
               }
             })
