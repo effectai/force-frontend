@@ -298,7 +298,7 @@ export default {
         if (data) {
           this.loading = true
           this.joinCampaignPopup = false
-          await this.$blockchain.waitForTransaction(data.transaction_id)
+          await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
           if (this.userJoined) {
             this.reserveTask()

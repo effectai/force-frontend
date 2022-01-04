@@ -386,7 +386,7 @@ export default {
           // Wait for transaction and reload campaigns
           this.successTitle = 'Campaign submitted successfully'
           this.successMessage = 'Waiting for transaction to complete before continuing'
-          await this.$blockchain.waitForTransaction(result.transaction_id)
+          await this.$blockchain.waitForTransaction(result)
           await this.$store.dispatch('campaign/getCampaigns')
           createdCampaign = await this.$blockchain.getMyLastCampaign()
 

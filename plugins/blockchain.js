@@ -360,8 +360,8 @@ export default (context, inject) => {
         const account = this.account
         return await this.sdk.connectAccount(chain === 'eos' ? this.eos.wallet.provider.signatureProvider : this.bsc.web3, account)
       },
-      async waitForTransaction (transactionId) {
-        return await this.sdk.force.waitTransaction(transactionId)
+      async waitForTransaction (transaction) {
+        return await this.sdk.force.waitTransaction(transaction)
       },
 
       async recoverPublicKey () {

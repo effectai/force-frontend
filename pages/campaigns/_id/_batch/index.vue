@@ -111,11 +111,11 @@
                 </table>
 
                 <nav class="pagination" role="navigation" aria-label="pagination">
-                  <a v-if="page != 1" class="pagination-previous" @click="page--">Previous</a>
-                  <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
+                  <a v-if="pageR != 1" class="pagination-previous" @click="pageR--">Previous</a>
+                  <a v-if="pageR < pagesR.length" class="pagination-next" @click="pageR++">Next page</a>
                   <ul class="pagination-list">
-                    <li v-for="pageNumber in pages" :key="pageNumber">
-                      <a class="pagination-link" :class="{'is-current': page === pageNumber}" @click="page = pageNumber">{{ pageNumber }}</a>
+                    <li v-for="pageNumber in pagesR" :key="pageNumber">
+                      <a class="pagination-link" :class="{'is-current': pageR === pageNumber}" @click="pageR = pageNumber">{{ pageNumber }}</a>
                     </li>
                   </ul>
                 </nav>
@@ -315,8 +315,10 @@ export default {
       reserveTask: false,
       submissions: null,
       page: 1,
+      pageR: 1,
       perPage: 10,
       pages: [],
+      pagesR: [],
       viewTaskResult: false,
       successMessage: null,
       successTitle: null,
@@ -336,7 +338,7 @@ export default {
       return this.paginate(this.submissions)
     },
     displayedReservations () {
-      return this.paginate(this.reservations)
+      return this.paginate(this.reservations.filter(x => x.account_id))
     }
   },
   watch: {
@@ -344,7 +346,7 @@ export default {
       this.setPages()
     },
     reservations () {
-      this.setPages()
+      this.setPagesR()
     }
   },
   mounted () {
@@ -371,7 +373,7 @@ export default {
         if (data) {
           this.loading = true
           this.joinCampaignPopup = false
-          await this.$blockchain.waitForTransaction(data.transaction_id)
+          await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
           if (this.userJoined) {
             this.reserveTask = true
@@ -384,7 +386,12 @@ export default {
     },
     async releaseTask (id) {
       const data = await this.$blockchain.releaseTask(id)
+      await this.$blockchain.waitForTransaction(data)
       this.$store.dispatch('transaction/addTransaction', data)
+      const allReservations = await this.$blockchain.getTaskReservationsForBatch(this.batchId)
+      this.reservations = allReservations.filter(function (sub) {
+        return sub.account_id
+      })
     },
     async checkUserCampaign () {
       this.loading = true
@@ -428,7 +435,7 @@ export default {
         return sub.data
       })
       this.reservations = allSubmissions.filter(function (sub) {
-        return !sub.data
+        return !sub.data && sub.account_id
       })
       this.releasedReservations = this.reservations.filter(r => r.account_id === null)
       this.userReservation = this.reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id)
@@ -508,6 +515,15 @@ export default {
       for (let index = 1; index <= numberOfPages; index++) {
         if (this.pages.length < index) {
           this.pages.push(index)
+        }
+      }
+    },
+    setPagesR () {
+      if (!this.reservations) { return }
+      const numberOfPages = Math.ceil(this.reservations.length / this.perPage)
+      for (let index = 1; index <= numberOfPages; index++) {
+        if (this.pagesR.length < index) {
+          this.pagesR.push(index)
         }
       }
     },
