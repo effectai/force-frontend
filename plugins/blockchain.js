@@ -7,7 +7,7 @@ export default (context, inject) => {
   const blockchain = new Vue({
     data () {
       // Initialize empty SDK, reinitialize when connecting wallet
-      const eosHost = process.env.NUXT_ENV_EOS_NODE_URL.includes('localhost') ? `http://${process.env.NUXT_ENV_EOS_NODE_URL}:8888` : `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
+      const eosHost = process.env.NUXT_ENV_EOS_NETWORK.includes('local') ? `http://${process.env.NUXT_ENV_EOS_NODE_URL}:8888` : `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
       const sdkOptions = {
         network: process.env.NUXT_ENV_EOS_NETWORK,
         host: eosHost
@@ -337,6 +337,12 @@ export default (context, inject) => {
       },
       async reserveTask (batchId, campaignId, taskIndex, tasks) {
         return await this.sdk.force.reserveTask(batchId, taskIndex, campaignId, tasks)
+      },
+      async releaseTask (taskId) {
+        return await this.sdk.force.releaseTask(taskId)
+      },
+      async reclaimTask (taskId) {
+        return await this.sdk.force.reclaimTask(taskId)
       },
       async submitTask (batchId, submissionId, data) {
         return await this.sdk.force.submitTask(batchId, submissionId, data)

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="wrapper">
     <instructions-modal
       v-if="campaign && campaign.info"
       :readonly="true"
@@ -38,7 +38,7 @@
         </div>
       </div>
     </section>
-    <section class="section">
+    <section class="section template-section">
       <div class="container">
         <div v-if="loading" class="loader-wrapper is-active">
           <div class="loader is-loading" />
@@ -59,6 +59,13 @@
         <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
         <!-- Reserve task -->
         <reserve-task v-if="reserveNextTask" :batch="batch" />
+      </div>
+    </section>
+    <section class="py-3 has-background-light">
+      <div class="container has-text-centered">
+        <button class="button is-danger" @click.prevent="releaseTask(submissionId)">
+          Stop Task
+        </button>
       </div>
     </section>
   </div>
@@ -124,6 +131,11 @@ export default {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
     },
+    async releaseTask (id) {
+      const data = await this.$blockchain.releaseTask(id)
+      this.$store.dispatch('transaction/addTransaction', data)
+      this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id)
+    },
     async submitTask (values) {
       try {
         this.loading = true
@@ -149,3 +161,14 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.wrapper {
+  min-height: calc(100vh - 66px);
+  display: flex;
+  flex-direction: column;
+
+  section.template-section {
+    flex: 1;
+  }
+}
+</style>
