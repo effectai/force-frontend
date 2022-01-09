@@ -71,7 +71,7 @@ export default (context, inject) => {
       updateForceInfo () {
         console.log('updating campaigns and batches..')
         context.store.dispatch('campaign/getCampaigns')
-        context.store.dispatch('campaign/getBatches')
+        // context.store.dispatch('campaign/getBatches')
       },
       updateUserInfo () {
         this.getEfxPrice()
