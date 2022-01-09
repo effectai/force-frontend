@@ -79,7 +79,7 @@
           <!-- Current Task Reservations  -->
           <div v-if="body === 'reservations'" class="block">
             <div v-if="campaign && campaign.info" class="content">
-              <div v-if="reservations.length">
+              <div v-if="reservations && reservations.length">
                 <table class="table" style="width: 100%">
                   <thead>
                     <tr>
@@ -101,7 +101,9 @@
                         <p v-else />
                       </td>
                       <td>
-                        <button v-if="sub.account_id !== null" class="button is-primary" @click.prevent="releaseTask(sub.id)">Release Task</button>
+                        <button v-if="sub.account_id !== null" class="button is-primary" @click.prevent="releaseTask(sub.id)">
+                          Release Task
+                        </button>
                       </td>
                     </tr>
                   </tbody>
@@ -208,19 +210,19 @@
             <div class="block">
               <b>Tasks</b>
               <br>
-              <template v-if="batch && batch.num_tasks - batch.tasks_done === 0 && !batch.reservations.length">
+              <template v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batch.reservations && !batch.reservations.length">
                 <span>{{ batch.num_tasks }} Tasks done.</span>
               </template>
-              <template v-if="batch && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations.length) && releasedReservations">
+              <template v-if="batch && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
                 <span>{{ batch.num_tasks - (batch.tasks_done - releasedReservations.length) }}</span>
                 <span>/ {{ batch.num_tasks }} left</span>
               </template>
-              <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations.length)">
+              <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations && batch.reservations.length)">
                 <span>{{ batch.num_tasks - batch.tasks_done }}</span>
                 <span>/ {{ batch.num_tasks }} left</span>
               </template>
               <span v-else>...</span>
-              <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks && !batch.reservations.length : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || batch.reservations.length: false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
+              <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks && batch.reservations && !batch.reservations.length : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || (batch.reservations && batch.reservations.length): false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
                 Left
               </progress>
             </div>
