@@ -5,7 +5,7 @@
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
       <hr>
     </client-only>
-    <template v-for="campaign in filteredCampaigns">
+    <template v-for="campaign in paginatedCampaigns">
       <nuxt-link
         :key="campaign.id"
         :to="'/campaigns/'+campaign.id"
@@ -97,6 +97,13 @@
         </div>
       </nuxt-link>
     </template>
+    <pagination
+      v-if="filteredCampaigns"
+      :items="filteredCampaigns.length"
+      :page="page"
+      :per-page="perPage"
+      @setPage="setPage"
+    />
     <div v-if="campaignsLoading" class="subtitle">
       Campaigns loading..
     </div>
@@ -117,18 +124,22 @@ import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import CategoryFilters from './CategoryFilters'
 import SortFilters from './SortAndFilters'
+import Pagination from './Pagination.vue'
 
 export default {
   name: 'CampaignList',
   components: {
     CategoryFilters,
-    SortFilters
+    SortFilters,
+    Pagination
   },
   props: ['active', 'owner', 'categoryFilter', 'sortCampaigns'],
   data () {
     return {
       filter: null,
       sort: null,
+      page: 1,
+      perPage: 30,
       search: null,
       status: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
@@ -215,15 +226,33 @@ export default {
           }
         }, 'userHasReservation'], [this.sort.order, 'desc'])
       }
-
       return filteredCampaigns
+    },
+    paginatedCampaigns () {
+      const start = (this.page - 1) * this.perPage
+      if (this.filteredCampaigns) {
+        return this.filteredCampaigns.slice(start, start + this.perPage)
+      }
+      return []
+    }
+  },
+  watch: {
+    filteredCampaigns () {
+      if (!this.campaignsLoading) {
+        // TODO: now jumps back to page 1 when last call to refresh campaigns is being made. fix.
+        // this.page = 1
+      }
     }
   },
   created () {
+    // this.getReservations()
     this.getCampaigns()
-    this.getBatches()
+    // this.getBatches()
   },
   methods: {
+    setPage (newPage) {
+      this.page = newPage
+    },
     onFilter (category) {
       this.filter = category
     },
@@ -236,12 +265,14 @@ export default {
     onSearch (input) {
       this.search = input
     },
-    async getCampaigns () {
+    async getReservations () {
       this.reservations = await this.$blockchain.getMyReservations()
       this.reservations = this.reservations.map(function (x) {
         x.batch_id = parseInt(x.batch_id)
         return x
       })
+    },
+    async getCampaigns () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
         await this.$store.dispatch('campaign/getCampaigns')
       }

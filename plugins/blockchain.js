@@ -311,7 +311,7 @@ export default (context, inject) => {
           return this.efxPayout
         }
       },
-      async getBatches (nextKey, limit = 20, processBatch = true) {
+      async getBatches (nextKey, limit = 50, processBatch = true) {
         return await this.sdk.force.getBatches(nextKey, limit, processBatch)
       },
       async getCampaign (id) {
@@ -320,10 +320,10 @@ export default (context, inject) => {
       async getMyLastCampaign () {
         return await this.sdk.force.getMyLastCampaign()
       },
-      async getCampaigns (nextKey, limit = 20, processCampaign = true) {
+      async getCampaigns (nextKey, limit = 50, processCampaign = true) {
         return await this.sdk.force.getCampaigns(nextKey, limit, processCampaign)
       },
-      getSubmissions (nextKey, limit = 20) {
+      getSubmissions (nextKey, limit = 50) {
         alert('NOT IMPLEMENTED YET')
       },
       async getCampaignJoins (campaignId) {

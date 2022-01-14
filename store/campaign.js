@@ -180,7 +180,7 @@ export default {
       }
       commit('SET_LOADING', true)
       try {
-        const data = await this.$blockchain.getCampaigns(nextKey, 20, false)
+        const data = await this.$blockchain.getCampaigns(nextKey, 50, false)
         let campaigns = state.campaigns
         campaigns = data.rows
         commit('UPSERT_CAMPAIGNS', campaigns);
@@ -226,7 +226,7 @@ export default {
       }
       commit('SET_LOADING_SUBMISSIONS', true)
       try {
-        const data = await this.$blockchain.getSubmissions(nextKey, 20, false)
+        const data = await this.$blockchain.getSubmissions(nextKey, 50, false)
         let submissions = state.submissions
         if (!nextKey) {
           submissions = data.rows

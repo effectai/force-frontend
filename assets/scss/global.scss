@@ -246,3 +246,7 @@ a.box {
 .page-leave-to {
   opacity: 0;
 }
+
+.pagination-previous[disabled], .pagination-next[disabled], .pagination-link[disabled] {
+  pointer-events: none;
+}
