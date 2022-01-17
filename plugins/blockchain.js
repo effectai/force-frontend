@@ -68,10 +68,10 @@ export default (context, inject) => {
     },
 
     methods: {
-      updateForceInfo () {
+      async updateForceInfo () {
         console.log('updating campaigns and batches..')
-        // context.store.dispatch('campaign/getCampaigns')
-        context.store.dispatch('campaign/getBatches')
+        await context.store.dispatch('campaign/getCampaigns')
+        await context.store.dispatch('campaign/getBatches')
         context.store.dispatch('campaign/getSubmissions')
       },
       updateUserInfo () {

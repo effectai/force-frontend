@@ -143,21 +143,25 @@ export default {
       search: null,
       status: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
-      reservations: null,
       categories: ['translate', 'captions', 'socials', 'dao']
     }
   },
   computed: {
     ...mapGetters({
       batchByCampaignId: 'campaign/batchByCampaignId',
-      campaignsByCategory: 'campaign/campaignsByCategory'
+      campaignsByCategory: 'campaign/campaignsByCategory',
+      reservationsByAccountId: 'campaign/reservationsByAccountId'
     }),
     ...mapState({
       campaigns: state => state.campaign.campaigns,
       campaignsLoading: state => state.campaign.loading,
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
-      allBatchesLoaded: state => state.campaign.allBatchesLoaded
+      allBatchesLoaded: state => state.campaign.allBatchesLoaded,
+      allSubmissionsLoaded: state => state.campaign.allCampaignsLoaded
     }),
+    reservations () {
+      return this.reservationsByAccountId(this.$auth.user.vAccountRows[0].id)
+    },
     filteredCampaigns () {
       const campaigns = this.campaignsByCategory(this.filter)
       let filteredCampaigns
@@ -237,9 +241,7 @@ export default {
     }
   },
   created () {
-    // this.getReservations()
-    this.getCampaigns()
-    this.getBatches()
+    this.getForceInfo()
   },
   methods: {
     setPage (newPage) {
@@ -257,20 +259,16 @@ export default {
     onSearch (input) {
       this.search = input
     },
-    async getReservations () {
-      this.reservations = await this.$blockchain.getMyReservations()
-      this.reservations = this.reservations.map(function (x) {
-        x.batch_id = parseInt(x.batch_id)
-        return x
-      })
-    },
-    async getCampaigns () {
+    async getForceInfo () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
         await this.$store.dispatch('campaign/getCampaigns')
       }
-    },
-    async getBatches () {
-      await this.$store.dispatch('campaign/getBatches')
+      if (!this.allBatchesLoaded) {
+        await this.$store.dispatch('campaign/getBatches')
+      }
+      if (!this.allSubmissionsLoaded) {
+        await this.$store.dispatch('campaign/getSubmissions')
+      }
     }
   }
 

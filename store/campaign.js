@@ -123,6 +123,9 @@ export default {
     campaignsByCategory (state) {
       return category => state.campaigns && category ? state.campaigns.filter(c => c.info ? c.info.category === category : false) : state.campaigns
     },
+    reservationsByAccountId (state) {
+      return id => state.submissions ? state.submissions.filter(s => s.account_id === id && !s.data) : null
+    },
     submissionsByBatchId (state) {
       return id => state.submissions ? state.submissions.filter(s => s.batch_id === id) : null
     },
@@ -213,7 +216,7 @@ export default {
           for (const campaign of data.rows.slice().reverse()) {
             // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
             // a short sleep helps for some reason to make interface less laggy
-            await sleep(10)
+            await sleep(1)
             await dispatch('processCampaign', campaign)
           }
         })()
@@ -252,8 +255,12 @@ export default {
       }
       commit('SET_LOADING_SUBMISSIONS', true)
       try {
-        const data = await this.$blockchain.getSubmissions(nextKey, 50, false)
-        commit('UPSERT_SUBMISSIONS', data.rows)
+        const data = await this.$blockchain.getSubmissions(nextKey, 200, false)
+        const submissions = data.rows.map(function (x) {
+          x.batch_id = parseInt(x.batch_id)
+          return x
+        })
+        commit('UPSERT_SUBMISSIONS', submissions)
 
         if (data.more) {
           await dispatch('getSubmissions', data.next_key)
