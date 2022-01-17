@@ -24,6 +24,22 @@ export default {
         }
       }
     },
+    UPSERT_BATCHES (state, batches) {
+      if (!state.batches) {
+        state.batches = batches
+      } else {
+        for (let i = 0; i < batches.length; i++) {
+          const index = state.batches.findIndex(c => c.batch_id === batches[i].batch_id)
+          if (index !== -1) {
+            // Update existing batches
+            Vue.set(state.batches, index, batches[i])
+          } else {
+            // Insert new batches
+            state.batches.push(batches[i])
+          }
+        }
+      }
+    },
     SET_BATCHES (state, batches) {
       state.batches = batches
     },
@@ -110,12 +126,8 @@ export default {
       try {
         const data = await this.$blockchain.getBatches(nextKey)
         let batches = state.batches
-        if (!nextKey) {
-          batches = data.rows
-        } else {
-          batches = batches.concat(data.rows)
-        }
-        commit('SET_BATCHES', batches)
+        batches = data.rows
+        commit('UPSERT_BATCHES', batches)
 
         if (data.more) {
           await dispatch('getBatches', data.next_key)
