@@ -45,8 +45,12 @@
               <li :class="{'is-active': body === 'instruction'}">
                 <a @click.prevent="body = 'instruction'">Instructions</a>
               </li>
+              <li :class="{'is-active': body === 'preview'}">
+                <a @click.prevent="body = 'preview'">Preview</a>
+              </li>
             </ul>
           </div>
+
           <div v-if="body === 'description'" class="block">
             <p v-if="campaign.info">
               {{ campaign.info.description }}
@@ -54,16 +58,6 @@
             <p v-else>
               ...
             </p>
-            <h2 class="subtitle mt-5">
-              Task Preview
-            </h2>
-            <template-media
-              v-if="campaign && campaign.info"
-              :html="renderTemplate(
-                campaign.info.template || 'No template found..',
-                campaign.info.example_task || {})"
-              @submit="submitTask"
-            />
             <div class="mt-5">
               <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" class="button is-primary is-pulled-right" :to="`/campaigns/${id}/new`">
                 <span class="icon">
@@ -119,6 +113,15 @@
             <p v-else>
               ...
             </p>
+          </div>
+          <div v-if="body === 'preview'" class="block">
+            <template-media
+              v-if="campaign && campaign.info"
+              :html="renderTemplate(
+                campaign.info.template || 'No template found..',
+                campaign.info.example_task || {})"
+              @submit="submitTask"
+            />
           </div>
         </div>
         <div class="column is-one-third">
