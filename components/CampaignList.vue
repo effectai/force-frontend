@@ -236,14 +236,6 @@ export default {
       return []
     }
   },
-  watch: {
-    filteredCampaigns () {
-      if (!this.campaignsLoading) {
-        // TODO: now jumps back to page 1 when last call to refresh campaigns is being made. fix.
-        // this.page = 1
-      }
-    }
-  },
   created () {
     // this.getReservations()
     this.getCampaigns()

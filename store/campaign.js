@@ -1,5 +1,7 @@
 import Vue from 'vue'
-
+function sleep (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 export default {
   namespaced: true,
   modules: {},
@@ -180,14 +182,18 @@ export default {
       }
       commit('SET_LOADING', true)
       try {
-        const data = await this.$blockchain.getCampaigns(nextKey, 50, false)
+        const data = await this.$blockchain.getCampaigns(nextKey, 500, false)
         let campaigns = state.campaigns
         campaigns = data.rows
-        commit('UPSERT_CAMPAIGNS', campaigns);
+        commit('UPSERT_CAMPAIGNS', campaigns)
 
         // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
-        (async () => {
-          for (const campaign of campaigns) {
+        ;(async () => {
+          // reverse campaigns array so newer campaigns are processed first
+          for (const campaign of campaigns.slice().reverse()) {
+            // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
+            // a short sleep helps for some reason to make interface less laggy
+            await sleep(10)
             await dispatch('processCampaign', campaign)
           }
         })()

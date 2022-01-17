@@ -57,6 +57,11 @@ export default {
     maxPage () {
       return Math.ceil(this.items / this.perPage)
     }
+  },
+  watch: {
+    items () {
+      this.$emit('setPage', 1)
+    }
   }
 }
 </script>
