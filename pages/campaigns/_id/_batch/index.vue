@@ -202,6 +202,12 @@
               </div>
             </div>
             <div class="block">
+              <b>Status</b>
+              <br>
+              <span v-if="batch">{{ batch.status }}</span>
+              <span v-else>...</span>
+            </div>
+            <div class="block">
               <b>Reward</b>
               <br>
               <span v-if="campaign">{{ campaign.reward.quantity }}</span>
@@ -210,16 +216,19 @@
             <div class="block">
               <b>Tasks</b>
               <br>
-              <template v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batch.reservations && !batch.reservations.length">
+              <template v-if="batch && batch.status === 'Completed' && batch.reservations && !batch.reservations.length">
                 <span>{{ batch.num_tasks }} Tasks done.</span>
               </template>
-              <template v-if="batch && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
+              <template v-else-if="batch && batch.status === 'Active' && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
                 <span>{{ batch.num_tasks - (batch.tasks_done - releasedReservations.length) }}</span>
                 <span>/ {{ batch.num_tasks }} left</span>
               </template>
               <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations && batch.reservations.length)">
                 <span>{{ batch.num_tasks - batch.tasks_done }}</span>
                 <span>/ {{ batch.num_tasks }} left</span>
+              </template>
+              <template v-else-if="batch && batch.status === 'Paused'">
+                <span>{{ batch.tasks_done}} task<span v-if="batch.tasks_done > 1">s</span> completed</span>
               </template>
               <span v-else>...</span>
               <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks && batch.reservations && !batch.reservations.length : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || (batch.reservations && batch.reservations.length): false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
@@ -247,23 +256,29 @@
               <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
             </div>
             <div class="block">
+              <template v-if="campaign && $auth.user.accountName === campaign.owner[1]">
+                <button v-if="batch && batch.status !== 'Completed'" class="button is-primary is-light" @click.prevent="handleBatch">
+                  <span v-if="batch.status === 'Active'">Pause Batch</span>
+                  <span v-else-if="batch.status === 'Paused'">Resume Batch</span>
+                </button>
+              </template>
               <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-primary is-loading">
                 Loading
               </button>
               <button v-else-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                 Join Campaign
               </button>
-              <button v-else-if="userReservation" class="button is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
+              <button v-else-if="userReservation && batch.status === 'Active'" class="button is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
                 Resume Task
               </button>
-              <button v-else-if="batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations" class="button is-primary" @click.prevent="reserveTask = true">
+              <button v-else-if="batch.status === 'Active' && !userReservation || batch.status === 'Active' && releasedReservations" class="button is-primary" @click.prevent="reserveTask = true">
                 Make Task Reservation
               </button>
               <template v-else>
                 <button v-if="userJoined" class="button is-primary" :disabled="true">
                   Joined Campaign
                 </button>
-                <p>No active tasks currently</p>
+                <p class="pt-3">No active tasks currently</p>
               </template>
             </div>
           </div>
@@ -363,6 +378,25 @@ export default {
   methods: {
     campaignModalChange (val) {
       this.joinCampaignPopup = val
+    },
+    async handleBatch () {
+      let data
+      try {
+        if (this.batch.status === 'Active') {
+          data = await this.$blockchain.pauseBatch(this.batch)
+        } else if (this.batch.status === 'Paused') {
+          data = await this.$blockchain.resumeBatch(this.batch)
+        }
+        this.$store.dispatch('transaction/addTransaction', data)
+        if (data) {
+          this.loading = true
+          this.joinCampaignPopup = false
+          await this.$blockchain.waitForTransaction(data)
+          this.$router.push(`/campaigns/${this.campaign.id}`)
+        }
+      } catch (e) {
+        this.$blockchain.handleError(e)
+      }
     },
     async joinCampaign () {
       try {
