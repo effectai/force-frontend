@@ -239,7 +239,7 @@ export default {
   created () {
     // this.getReservations()
     this.getCampaigns()
-    // this.getBatches()
+    this.getBatches()
   },
   methods: {
     setPage (newPage) {

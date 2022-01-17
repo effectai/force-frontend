@@ -70,8 +70,9 @@ export default (context, inject) => {
     methods: {
       updateForceInfo () {
         console.log('updating campaigns and batches..')
-        context.store.dispatch('campaign/getCampaigns')
-        // context.store.dispatch('campaign/getBatches')
+        // context.store.dispatch('campaign/getCampaigns')
+        context.store.dispatch('campaign/getBatches')
+        context.store.dispatch('campaign/getSubmissions')
       },
       updateUserInfo () {
         this.getEfxPrice()
@@ -323,8 +324,8 @@ export default (context, inject) => {
       async getCampaigns (nextKey, limit = 50, processCampaign = true) {
         return await this.sdk.force.getCampaigns(nextKey, limit, processCampaign)
       },
-      getSubmissions (nextKey, limit = 50) {
-        alert('NOT IMPLEMENTED YET')
+      async getSubmissions (nextKey, limit = 50) {
+        return await this.sdk.force.getSubmissions(nextKey, limit)
       },
       async getCampaignJoins (campaignId) {
         return await this.sdk.force.getCampaignJoins(campaignId)
