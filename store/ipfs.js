@@ -18,7 +18,8 @@ export default {
   },
   actions: {
     async getIpfsContent ({ commit, getters }, hash) {
-      if (!getters.ipfsContentByHash(hash)) {
+      // there are a couple campaigns where field_1 has 'TypeError: Failed to fetch' as value instead of an IPFS hash
+      if (!getters.ipfsContentByHash(hash) && hash !== 'TypeError: Failed to fetch') {
         const info = await this.$blockchain.sdk.force.getIpfsContent(hash)
         if (info) {
           commit('ADD_IPFS_CONTENT', { hash, info })
