@@ -85,6 +85,7 @@
                     <tr>
                       <th>Reservation ID</th>
                       <th>Account ID</th>
+                      <th>Submitted on</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -99,6 +100,9 @@
                           {{ sub.account_id }}
                         </p>
                         <p v-else />
+                      </td>
+                      <td>
+                        <p>{{ sub.submitted_on }}</p>
                       </td>
                       <td>
                         <button v-if="sub.account_id !== null" class="button is-primary" @click.prevent="releaseTask(sub.id)">
