@@ -1,7 +1,7 @@
 import Vue from 'vue'
-function sleep (ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
+// function sleep (ms) {
+//   return new Promise(resolve => setTimeout(resolve, ms))
+// }
 export default {
   namespaced: true,
   modules: {},
@@ -182,7 +182,11 @@ export default {
     async getCampaign ({ dispatch, commit, state }, id) {
       commit('SET_LOADING', true)
       try {
-        if (!state.campaigns || !state.campaigns.find(c => c.id === id)) {
+        let campaign
+        if (state.campaigns) {
+          campaign = state.campaigns.find(c => c.id === id)
+        }
+        if (!campaign) {
           const data = await this.$blockchain.getCampaigns(id, 1, false)
 
           if (data.rows.length > 0) {
@@ -191,6 +195,8 @@ export default {
           } else {
             throw new Error('Cannot find campaign with the given id.')
           }
+        } else if (!campaign.info) {
+          await dispatch('processCampaign', campaign)
         }
 
         // No more campaign, we are done
@@ -216,7 +222,7 @@ export default {
           for (const campaign of data.rows.slice().reverse()) {
             // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
             // a short sleep helps for some reason to make interface less laggy
-            await sleep(1)
+            // await sleep(0)
             await dispatch('processCampaign', campaign)
           }
         })()
