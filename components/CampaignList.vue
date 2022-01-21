@@ -17,6 +17,7 @@
             <p class="image has-radius" style="width: 52px; height: 52px">
               <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
               <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+              <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
             </p>
           </div>
           <div class="column is-4-desktop is-5-widescreen is-12-touch">
