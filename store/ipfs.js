@@ -4,26 +4,29 @@ export default {
   mutations: {
     ADD_IPFS_CONTENT (state, ipfs) {
       if (state.ipfsContent === null) { state.ipfsContent = {} }
-      if (ipfs.info) {
-        if (!state.ipfsContent[ipfs.hash]) {
-          state.ipfsContent[ipfs.hash] = ipfs.info
-        }
+      if (!state.ipfsContent[ipfs.hash] || ipfs.info) {
+        state.ipfsContent[ipfs.hash] = ipfs.info
       }
     }
   },
   getters: {
     ipfsContentByHash (state) {
-      return hash => state.ipfsContent && state.ipfsContent[hash] ? state.ipfsContent[hash] : null
+      return hash => state.ipfsContent && state.ipfsContent[hash] ? state.ipfsContent[hash] : undefined
     }
   },
   actions: {
     async getIpfsContent ({ commit, getters }, hash) {
-      // there are a couple campaigns where field_1 has 'TypeError: Failed to fetch' as value instead of an IPFS hash
-      if (!getters.ipfsContentByHash(hash) && hash !== 'TypeError: Failed to fetch') {
-        const info = await this.$blockchain.sdk.force.getIpfsContent(hash)
-        if (info) {
-          commit('ADD_IPFS_CONTENT', { hash, info })
+      if (typeof getters.ipfsContentByHash(hash) === 'undefined') {
+        let info
+        try {
+          // TODO: properly check for valid IPFS hash
+          if (hash && !hash.includes(' ')) {
+            info = await this.$blockchain.sdk.force.getIpfsContent(hash)
+          }
+        } catch (e) {
+          console.error('could not retrieve IPFS', e)
         }
+        commit('ADD_IPFS_CONTENT', { hash, info })
       }
     }
   },

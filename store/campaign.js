@@ -1,5 +1,7 @@
 import Vue from 'vue'
-
+function sleep (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 export default {
   namespaced: true,
   modules: {},
@@ -40,11 +42,23 @@ export default {
         }
       }
     },
-    SET_BATCHES (state, batches) {
-      state.batches = batches
-    },
-    SET_SUBMISSIONS (state, submissions) {
-      state.submissions = submissions
+    UPSERT_SUBMISSIONS (state, submissions) {
+      if (!state.submissions) {
+        state.submissions = submissions
+      } else {
+        for (let i = 0; i < submissions.length; i++) {
+          const index = state.submissions.findIndex(s => s.id === submissions[i].id)
+          if (index !== -1) {
+            if (state.submissions[index].paid !== 1) {
+              // Submission was not paid yet, so could be updated.
+              Vue.set(state.submissions, index, submissions[i])
+            }
+          } else {
+            // Insert new submissions
+            state.submissions.push(submissions[i])
+          }
+        }
+      }
     },
     SET_LOADING (state, loading) {
       state.loading = loading
@@ -109,6 +123,9 @@ export default {
     campaignsByCategory (state) {
       return category => state.campaigns && category ? state.campaigns.filter(c => c.info ? c.info.category === category : false) : state.campaigns
     },
+    reservationsByAccountId (state) {
+      return id => state.submissions ? state.submissions.filter(s => s.account_id === id && !s.data) : null
+    },
     submissionsByBatchId (state) {
       return id => state.submissions ? state.submissions.filter(s => s.batch_id === id) : null
     },
@@ -124,10 +141,8 @@ export default {
       }
       commit('SET_LOADING_BATCH', true)
       try {
-        const data = await this.$blockchain.getBatches(nextKey)
-        let batches = state.batches
-        batches = data.rows
-        commit('UPSERT_BATCHES', batches)
+        const data = await this.$blockchain.getBatches(nextKey, 200, false)
+        commit('UPSERT_BATCHES', data.rows)
 
         if (data.more) {
           await dispatch('getBatches', data.next_key)
@@ -192,14 +207,16 @@ export default {
       }
       commit('SET_LOADING', true)
       try {
-        const data = await this.$blockchain.getCampaigns(nextKey, 20, false)
-        let campaigns = state.campaigns
-        campaigns = data.rows
-        commit('UPSERT_CAMPAIGNS', campaigns);
+        const data = await this.$blockchain.getCampaigns(nextKey, 500, false)
+        commit('UPSERT_CAMPAIGNS', data.rows)
 
         // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
-        (async () => {
-          for (const campaign of campaigns) {
+        ;(async () => {
+          // reverse campaigns array so newer campaigns are processed first
+          for (const campaign of data.rows.slice().reverse()) {
+            // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
+            // a short sleep helps for some reason to make interface less laggy
+            await sleep(1)
             await dispatch('processCampaign', campaign)
           }
         })()
@@ -238,14 +255,12 @@ export default {
       }
       commit('SET_LOADING_SUBMISSIONS', true)
       try {
-        const data = await this.$blockchain.getSubmissions(nextKey, 20, false)
-        let submissions = state.submissions
-        if (!nextKey) {
-          submissions = data.rows
-        } else {
-          submissions = submissions.concat(data.rows)
-        }
-        commit('SET_SUBMISSIONS', submissions)
+        const data = await this.$blockchain.getSubmissions(nextKey, 200, false)
+        const submissions = data.rows.map(function (x) {
+          x.batch_id = parseInt(x.batch_id)
+          return x
+        })
+        commit('UPSERT_SUBMISSIONS', submissions)
 
         if (data.more) {
           await dispatch('getSubmissions', data.next_key)

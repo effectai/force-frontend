@@ -5,7 +5,7 @@
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
       <hr>
     </client-only>
-    <template v-for="campaign in filteredCampaigns">
+    <template v-for="campaign in paginatedCampaigns">
       <nuxt-link
         :key="campaign.id"
         :to="'/campaigns/'+campaign.id"
@@ -98,6 +98,13 @@
         </div>
       </nuxt-link>
     </template>
+    <pagination
+      v-if="filteredCampaigns"
+      :items="filteredCampaigns.length"
+      :page="page"
+      :per-page="perPage"
+      @setPage="setPage"
+    />
     <div v-if="campaignsLoading" class="subtitle">
       Campaigns loading..
     </div>
@@ -118,36 +125,44 @@ import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
 import CategoryFilters from './CategoryFilters'
 import SortFilters from './SortAndFilters'
+import Pagination from './Pagination.vue'
 
 export default {
   name: 'CampaignList',
   components: {
     CategoryFilters,
-    SortFilters
+    SortFilters,
+    Pagination
   },
   props: ['active', 'owner', 'categoryFilter', 'sortCampaigns'],
   data () {
     return {
       filter: null,
       sort: null,
+      page: 1,
+      perPage: 30,
       search: null,
       status: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
-      reservations: null,
       categories: ['translate', 'captions', 'socials', 'dao']
     }
   },
   computed: {
     ...mapGetters({
       batchByCampaignId: 'campaign/batchByCampaignId',
-      campaignsByCategory: 'campaign/campaignsByCategory'
+      campaignsByCategory: 'campaign/campaignsByCategory',
+      reservationsByAccountId: 'campaign/reservationsByAccountId'
     }),
     ...mapState({
       campaigns: state => state.campaign.campaigns,
       campaignsLoading: state => state.campaign.loading,
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
-      allBatchesLoaded: state => state.campaign.allBatchesLoaded
+      allBatchesLoaded: state => state.campaign.allBatchesLoaded,
+      allSubmissionsLoaded: state => state.campaign.allCampaignsLoaded
     }),
+    reservations () {
+      return this.reservationsByAccountId(this.$auth.user.vAccountRows[0].id)
+    },
     filteredCampaigns () {
       const campaigns = this.campaignsByCategory(this.filter)
       let filteredCampaigns
@@ -216,15 +231,23 @@ export default {
           }
         }, 'userHasReservation'], [this.sort.order, 'desc'])
       }
-
       return filteredCampaigns
+    },
+    paginatedCampaigns () {
+      const start = (this.page - 1) * this.perPage
+      if (this.filteredCampaigns) {
+        return this.filteredCampaigns.slice(start, start + this.perPage)
+      }
+      return []
     }
   },
   created () {
-    this.getCampaigns()
-    this.getBatches()
+    this.getForceInfo()
   },
   methods: {
+    setPage (newPage) {
+      this.page = newPage
+    },
     onFilter (category) {
       this.filter = category
     },
@@ -237,18 +260,16 @@ export default {
     onSearch (input) {
       this.search = input
     },
-    async getCampaigns () {
-      this.reservations = await this.$blockchain.getMyReservations()
-      this.reservations = this.reservations.map(function (x) {
-        x.batch_id = parseInt(x.batch_id)
-        return x
-      })
+    async getForceInfo () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
         await this.$store.dispatch('campaign/getCampaigns')
       }
-    },
-    async getBatches () {
-      await this.$store.dispatch('campaign/getBatches')
+      if (!this.allBatchesLoaded) {
+        await this.$store.dispatch('campaign/getBatches')
+      }
+      if (!this.allSubmissionsLoaded) {
+        await this.$store.dispatch('campaign/getSubmissions')
+      }
     }
   }
 

@@ -43,6 +43,9 @@
               <li :class="{'is-active': body === 'instruction'}">
                 <a @click.prevent="body = 'instruction'">Instructions</a>
               </li>
+              <li :class="{'is-active': body === 'preview'}">
+                <a @click.prevent="body = 'preview'">Preview</a>
+              </li>
               <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'reservations'}">
                 <a @click.prevent="body = 'reservations'">Active Reservations</a>
               </li>
@@ -58,9 +61,14 @@
             <p v-else>
               ...
             </p>
-            <h2 class="subtitle mt-5">
-              Task Preview
-            </h2>
+          </div>
+          <div v-if="body === 'instruction'" class="block">
+            <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
+            <p v-else>
+              ...
+            </p>
+          </div>
+          <div v-if="body === 'preview'" class="block">
             <template-media
               v-if="campaign && campaign.info"
               :html="renderTemplate(
@@ -68,12 +76,6 @@
                 campaign.info.example_task || {})"
               @submit="submitTask"
             />
-          </div>
-          <div v-if="body === 'instruction'" class="block">
-            <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
-            <p v-else>
-              ...
-            </p>
           </div>
 
           <!-- Current Task Reservations  -->
@@ -185,6 +187,9 @@
               </div>
             </div>
           </div>
+          <nuxt-link :to="`/campaigns/${campaignId}`">
+            &lt; Back to all batches of campaign
+          </nuxt-link>
         </div>
         <div class="column is-one-third">
           <div class="box">
