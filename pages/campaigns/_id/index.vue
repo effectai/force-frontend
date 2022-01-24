@@ -273,6 +273,10 @@ export default {
   },
   methods: {
     async reserveTask () {
+      await this.prepareReserveTask()
+      this.showReserveTask = true
+    },
+    async prepareReserveTask () {
       const batch = this.campaignBatches.find((b) => {
         return b.num_tasks - b.tasks_done > 0
       })
@@ -283,7 +287,6 @@ export default {
       }
       await this.$store.dispatch('campaign/getBatchTasks', batch)
       this.reserveInBatch = batch
-      this.showReserveTask = true
     },
     async goToTask () {
       const batch = this.campaignBatches.find((b) => {
@@ -306,17 +309,19 @@ export default {
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
-        const data = await this.$blockchain.joinCampaign(this.id)
+        this.loading = true
+        await this.prepareReserveTask()
+        this.joinCampaignPopup = false
+        const data = await this.$blockchain.joinCampaignAndReserveTask(this.id, this.reserveInBatch.id, this.reserveInBatch.tasks_done, this.reserveInBatch.tasks)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
-          this.loading = true
-          this.joinCampaignPopup = false
           await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
           if (this.userJoined) {
             this.reserveTask()
           }
         }
+        this.loading = false
         this.joinCampaignPopup = false
       } catch (e) {
         this.$blockchain.handleError(e)
