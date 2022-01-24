@@ -149,7 +149,7 @@ export default {
         this.loading = false
 
         await this.getBatch()
-        if (this.batch.tasks_done === this.batch.num_tasks) {
+        if (this.batch.tasks_done === this.batch.num_tasks || this.taskIndex + 1 === this.batch.num_tasks) {
           this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '?batchCompleted=1')
         } else {
           this.reserveNextTask = true
