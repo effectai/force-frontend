@@ -59,7 +59,7 @@ export default {
         }
 
         if (rvObj.reservation && rvObj.isReleased === false && rvObj.isExpired === true) {
-          const result = await this.$blockchain.releaseExpiredTask(rvObj.reservation.id)
+          const result = await this.$blockchain.claimExpiredTask(rvObj.reservation.id)
           this.$store.dispatch('transaction/addTransaction', result)
 
           // get reservations and see if this user has a reservation
