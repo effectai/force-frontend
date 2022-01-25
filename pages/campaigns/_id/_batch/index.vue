@@ -92,7 +92,7 @@
                   </thead>
                   <tbody>
                     <tr
-                      v-for="sub in displayedReservations"
+                      v-for="sub in paginatedReservations"
                       :key="sub.id"
                     >
                       <td>{{ sub.id }}</td>
@@ -110,16 +110,13 @@
                     </tr>
                   </tbody>
                 </table>
-
-                <nav class="pagination" role="navigation" aria-label="pagination">
-                  <a v-if="pageR != 1" class="pagination-previous" @click="pageR--">Previous</a>
-                  <a v-if="pageR < pagesR.length" class="pagination-next" @click="pageR++">Next page</a>
-                  <ul class="pagination-list">
-                    <li v-for="pageNumber in pagesR" :key="pageNumber">
-                      <a class="pagination-link" :class="{'is-current': pageR === pageNumber}" @click="pageR = pageNumber">{{ pageNumber }}</a>
-                    </li>
-                  </ul>
-                </nav>
+                <pagination
+                  v-if="reservations"
+                  :items="reservations.length"
+                  :page="pageR"
+                  :per-page="perPage"
+                  @setPage="setPage"
+                />
               </div>
               <span v-else>No active reservations</span>
             </div>
@@ -141,7 +138,7 @@
                   </thead>
                   <tbody>
                     <tr
-                      v-for="sub in displayedSubmissions"
+                      v-for="sub in paginatedSubmissions"
                       :key="sub.id"
                     >
                       <td>{{ sub.id }}</td>
@@ -157,15 +154,13 @@
                   </tbody>
                 </table>
 
-                <nav class="pagination" role="navigation" aria-label="pagination">
-                  <a v-if="page != 1" class="pagination-previous" @click="page--">Previous</a>
-                  <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
-                  <ul class="pagination-list">
-                    <li v-for="pageNumber in pages" :key="pageNumber">
-                      <a class="pagination-link" :class="{'is-current': page === pageNumber}" @click="page = pageNumber">{{ pageNumber }}</a>
-                    </li>
-                  </ul>
-                </nav>
+                <pagination
+                  v-if="submissions"
+                  :items="submissions.length"
+                  :page="page"
+                  :per-page="perPage"
+                  @setPage="setPage"
+                />
 
                 <button class="button is-primary" @click.prevent="downloadTaskResults()">
                   Download Results
@@ -293,6 +288,7 @@ import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
 import SuccessModal from '@/components/SuccessModal'
+import Pagination from '@/components/Pagination'
 const jsonexport = require('jsonexport/dist')
 
 export default {
@@ -300,7 +296,8 @@ export default {
     TemplateMedia,
     ReserveTask,
     InstructionsModal,
-    SuccessModal
+    SuccessModal,
+    Pagination
   },
   middleware: ['auth'],
   data () {
@@ -318,9 +315,9 @@ export default {
       joinCampaignPopup: false,
       reserveTask: false,
       submissions: null,
-      page: 1,
       pageR: 1,
-      perPage: 10,
+      page: 1,
+      perPage: 30,
       pages: [],
       pagesR: [],
       viewTaskResult: false,
@@ -338,19 +335,19 @@ export default {
       campaignLoading: state => state.campaign.loading && !state.campaign.allCampaignsLoaded,
       batchLoading: state => state.campaign.loadingBatch
     }),
-    displayedSubmissions () {
-      return this.paginate(this.submissions)
+    paginatedSubmissions () {
+      const start = (this.page - 1) * this.perPage
+      if (this.submissions) {
+        return this.submissions.slice(start, start + this.perPage)
+      }
+      return []
     },
-    displayedReservations () {
-      return this.paginate(this.reservations.filter(x => x.account_id))
-    }
-  },
-  watch: {
-    submissions () {
-      this.setPages()
-    },
-    reservations () {
-      this.setPagesR()
+    paginatedReservations () {
+      const start = (this.page - 1) * this.perPage
+      if (this.reservations.filter(x => x.account_id)) {
+        return this.reservations.filter(x => x.account_id).slice(start, start + this.perPage)
+      }
+      return []
     }
   },
   mounted () {
@@ -363,7 +360,6 @@ export default {
     this.checkUserCampaign()
     this.getBatch()
     this.getCampaign()
-    this.setPages()
   },
   methods: {
     campaignModalChange (val) {
@@ -513,28 +509,11 @@ export default {
         console.error(error)
       }
     },
-    setPages () {
-      if (!this.submissions) { return }
-      const numberOfPages = Math.ceil(this.submissions.length / this.perPage)
-      for (let index = 1; index <= numberOfPages; index++) {
-        if (this.pages.length < index) {
-          this.pages.push(index)
-        }
-      }
+    setPage (newPage) {
+      this.page = newPage
     },
-    setPagesR () {
-      if (!this.reservations) { return }
-      const numberOfPages = Math.ceil(this.reservations.length / this.perPage)
-      for (let index = 1; index <= numberOfPages; index++) {
-        if (this.pagesR.length < index) {
-          this.pagesR.push(index)
-        }
-      }
-    },
-    paginate (submissions) {
-      const from = (this.page * this.perPage) - this.perPage
-      const to = (this.page * this.perPage)
-      return submissions.slice(from, to)
+    setPageR (newPage) {
+      this.pageR = newPage
     }
   }
 }

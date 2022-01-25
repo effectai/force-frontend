@@ -178,11 +178,6 @@ export default {
     },
     setPage (newPage) {
       this.page = newPage
-    },
-    paginate (transactions) {
-      const from = (this.page * this.perPage) - this.perPage
-      const to = (this.page * this.perPage)
-      return transactions.slice(from, to)
     }
   }
 }
