@@ -77,6 +77,7 @@
           My Campaigns
         </h2>
         <campaign-list class="mb-6" :owner="$auth.user.accountName" />
+        <hr>
         <h4 class="title is-4 is-spaced">
           Transactions
         </h4>
@@ -92,7 +93,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="transaction in displayedTransactions"
+              v-for="transaction in paginatedTransactions"
               :key="transaction.transaction_id"
             >
               <td>
@@ -114,17 +115,13 @@
           </tbody>
         </table>
         <span v-else>No transactions found</span>
-
-        <nav v-if="transactions" class="pagination" role="navigation" aria-label="pagination">
-          <a v-if="page != 1" class="pagination-previous" @click="page--">Previous</a>
-          <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
-          <ul class="pagination-list">
-            <li v-for="pageNumber in pages" :key="pageNumber">
-              <a class="pagination-link" :class="{'is-current': page === pageNumber}" @click="page = pageNumber">{{ pageNumber }}</a>
-            </li>
-          </ul>
-        </nav>
-
+        <pagination
+          v-if="transactions"
+          :items="transactions.length"
+          :page="page"
+          :per-page="perPage"
+          @setPage="setPage"
+        />
         <hr>
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
@@ -135,11 +132,12 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
 
 export default {
-  components: { Balance, CampaignList },
+  components: { Balance, CampaignList, Pagination },
   filters: {
     hide (value, show) {
       if (show) {
@@ -166,30 +164,20 @@ export default {
     transactions () {
       return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)
     },
-    displayedTransactions () {
-      return this.paginate(this.transactions)
+    paginatedTransactions () {
+      const start = (this.page - 1) * this.perPage
+      if (this.transactions) {
+        return this.transactions.slice(start, start + this.perPage)
+      }
+      return []
     }
-  },
-  watch: {
-    transactions () {
-      this.setPages()
-    }
-  },
-  created () {
-    this.setPages()
   },
   methods: {
     async logout () {
       await this.$auth.logout()
     },
-    setPages () {
-      if (!this.transactions) { return }
-      const numberOfPages = Math.ceil(this.transactions.length / this.perPage)
-      for (let index = 1; index <= numberOfPages; index++) {
-        if (this.pages.length < index) {
-          this.pages.push(index)
-        }
-      }
+    setPage (newPage) {
+      this.page = newPage
     },
     paginate (transactions) {
       const from = (this.page * this.perPage) - this.perPage
