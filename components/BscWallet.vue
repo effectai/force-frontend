@@ -9,7 +9,7 @@
         </div>
         <header class="modal-card-head">
           <p class="modal-card-title">
-            Select your BSC wallet
+            Choose your BSC login method
           </p>
           <button class="delete" aria-label="close" @click="$blockchain.loginModal = false; burnerWallet = false; showKeypairDetails = false" />
         </header>
@@ -26,9 +26,9 @@
             </div>
             <div class="">
               <button class="button is-primary is-fullwidth" :disabled="!privateKey" @click.prevent="importPrivateKey">
-                <span>import private key</span>
+                <span>Import Private Key</span>
               </button>
-              <span>No Private key? <a class="is-size-6" @click.prevent="createKeypair">Generate a keypair</a></span>
+              <span class="mt-3">No Private key? <a class="is-size-6" @click.prevent="createKeypair">Generate a keypair</a></span>
             </div>
           </div>
           <div v-if="burnerWallet == true && showKeypairDetails == true" class="content">
@@ -64,7 +64,7 @@
             </div>
           </div>
           <div v-if="burnerWallet == false && showKeypairDetails == false" class="columns is-multiline">
-            <div class="column is-half is-offset-3">
+            <div class="column is-half">
               <div v-if="isMetaMaskInstalled" class="provider has-radius disabled" @click="selectWallet('metamask')">
                 <img src="@/assets/img/providers/metamask.png">
                 MetaMask
@@ -105,18 +105,18 @@
                 WalletConnect
               </div>
             </div> -->
-            <div class="column is-full has-text-centered">
+            <!-- <div class="column is-full has-text-centered">
               <div class="title">
                 - OR -
               </div>
               <p>
                 Use the <span class="has-text-primary"><b>Effect Wallet</b></span>, This is a wallet stored <b class="has-text-danger">in your browser</b>. To use this wallet, import your private key from an existing BSC address into it, or create a newly generated keypair.
               </p>
-            </div>
-            <div class="column is-6 is-offset-3">
+            </div> -->
+            <div class="column is-half">
               <div class="provider has-radius is-mobile" to="/burner-wallet" @click.prevent="burnerWallet = true">
-                <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/2666.png">
-                <span class="has-text-dark">Effect Wallet</span>
+                <img src="@/assets/img/icons/key.svg">
+                <span class="has-text-dark">Private Key</span>
               </div>
             </div>
           </div>
