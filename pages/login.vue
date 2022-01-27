@@ -77,7 +77,7 @@
         </div>
         <div class="column is-8">
           <a v-if="$blockchain.account" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout();">switch wallet</a>
-          <span v-else>No wallet? <a target="_blank" class="is-size-6" href="" @click.prevent="$blockchain.loginModal = 'bsc'">Create a wallet</a></span>
+          <!-- <span v-else>No wallet? <a target="_blank" class="is-size-6" href="" @click.prevent="$blockchain.loginModal = 'bsc'">Create a wallet</a></span> -->
         </div>
       </div>
     </div>
