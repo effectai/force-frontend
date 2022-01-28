@@ -158,7 +158,7 @@ export default {
       campaignsLoading: state => state.campaign.loading,
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
       allBatchesLoaded: state => state.campaign.allBatchesLoaded,
-      allSubmissionsLoaded: state => state.campaign.allCampaignsLoaded
+      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded
     }),
     reservations () {
       return this.reservationsByAccountId(this.$auth.user.vAccountRows[0].id)
@@ -236,7 +236,11 @@ export default {
     paginatedCampaigns () {
       const start = (this.page - 1) * this.perPage
       if (this.filteredCampaigns) {
-        return this.filteredCampaigns.slice(start, start + this.perPage)
+        const pageCampaigns = this.filteredCampaigns.slice(start, start + this.perPage)
+        for (const campaign of pageCampaigns) {
+          this.$store.dispatch('campaign/processCampaign', campaign)
+        }
+        return pageCampaigns
       }
       return []
     }
