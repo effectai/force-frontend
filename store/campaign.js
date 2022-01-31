@@ -206,7 +206,7 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    async getCampaigns ({ dispatch, commit, state }, nextKey) {
+    async getCampaigns ({ dispatch, commit, state }, { processAllCampaigns = false, nextKey }) {
       if (!nextKey && state.loading) {
         console.log('Already retrieving campaigns somewhere else, aborting..')
         return
@@ -217,15 +217,17 @@ export default {
         commit('UPSERT_CAMPAIGNS', data.rows)
 
         // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
-        // ;(async () => {
-        //   // reverse campaigns array so newer campaigns are processed first
-        //   for (const campaign of data.rows.slice().reverse()) {
-        //     // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
-        //     // a short sleep helps for some reason to make interface less laggy
-        //     // await sleep(0)
-        //     await dispatch('processCampaign', campaign)
-        //   }
-        // })()
+        if (processAllCampaigns) {
+          ;(async () => {
+            // reverse campaigns array so newer campaigns are processed first
+            for (const campaign of data.rows.slice().reverse()) {
+              // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
+              // a short sleep helps for some reason to make interface less laggy
+              // await sleep(0)
+              await dispatch('processCampaign', campaign)
+            }
+          })()
+        }
 
         if (data.more) {
           await dispatch('getCampaigns', data.next_key)

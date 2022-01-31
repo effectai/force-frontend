@@ -134,7 +134,7 @@ export default {
     SortFilters,
     Pagination
   },
-  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns'],
+  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns'],
   data () {
     return {
       filter: null,
@@ -238,7 +238,9 @@ export default {
       if (this.filteredCampaigns) {
         const pageCampaigns = this.filteredCampaigns.slice(start, start + this.perPage)
         for (const campaign of pageCampaigns) {
-          this.$store.dispatch('campaign/processCampaign', campaign)
+          if (!this.loadAllCampaigns) {
+            this.$store.dispatch('campaign/processCampaign', campaign)
+          }
         }
         return pageCampaigns
       }
@@ -266,7 +268,8 @@ export default {
     },
     async getForceInfo () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
-        await this.$store.dispatch('campaign/getCampaigns')
+        // on the requester campaign list process all campaigns
+        await this.$store.dispatch('campaign/getCampaigns', { processAllCampaigns: this.loadAllCampaigns ? this.loadAllCampaigns : null })
       }
       if (!this.allBatchesLoaded) {
         await this.$store.dispatch('campaign/getBatches')
