@@ -24,7 +24,7 @@
       </nav>
       <div v-if="loading" class="loader-wrapper is-active">
         <div class="loader is-loading" />
-        <br>Waiting for the transaction to complete...
+        <br><span v-if="waitingOnTransaction">Waiting for the transaction to complete...</span>
       </div>
       <div v-if="!campaign">
         Campaign loading..
@@ -242,7 +242,8 @@ export default {
       reserveInBatch: null,
       userReservation: null,
       cancelledBatchesPopup: false,
-      showBatchesPopup: false
+      showBatchesPopup: false,
+      waitingOnTransaction: false
     }
   },
   computed: {
@@ -311,12 +312,14 @@ export default {
         if (data) {
           this.loading = true
           this.joinCampaignPopup = false
+          this.waitingOnTransaction = true
           await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
           if (this.userJoined) {
             this.reserveTask()
           }
         }
+        this.waitingOnTransaction = false
         this.joinCampaignPopup = false
       } catch (e) {
         this.$blockchain.handleError(e)
