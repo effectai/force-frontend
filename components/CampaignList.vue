@@ -23,7 +23,6 @@
           <div class="column is-4-desktop is-5-widescreen is-12-touch">
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
               <div>
-                <small class="blockchain-address">#{{ campaign.id }}</small>
                 <span
                   v-if="campaign.info && campaign.info.category"
                   class="tag is-light"
@@ -52,7 +51,7 @@
           </div>
           <div class="column">
             <p class="has-text-grey is-size-7">
-              Requester
+              Requester:
             </p>
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
               <nuxt-link :to="'/profile/' + campaign.owner[1]">
@@ -62,7 +61,7 @@
           </div>
           <div class="column">
             <p class="has-text-grey is-size-7">
-              Reward
+              Reward:
             </p>
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
               {{ campaign.reward.quantity }}
@@ -70,7 +69,7 @@
           </div>
           <div class="column">
             <p class="has-text-grey is-size-7">
-              Tasks
+              Tasks:
             </p>
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
               <span v-if="batchByCampaignId(campaign.id) === null">
@@ -85,12 +84,11 @@
                   return a + b.num_tasks
                 },0) }} left
                 <br>
-                <small class="is-size-7">({{ batchByCampaignId(campaign.id).length }} batch<template v-if="batchByCampaignId(campaign.id).length !== 1">es</template>)</small>
               </span>
             </h2>
           </div>
           <div class="column has-text-right is-12-mobile">
-            <button class="button is-wide is-secondary has-text-weight-semibold is-fullwidth-mobile" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null}">
+            <button class="button is-wide is-primary has-text-weight-semibold is-fullwidth-mobile" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null}">
               <span v-if="campaign.userHasReservation">Go to Task</span>
               <span v-else>View</span>
             </button>
@@ -294,6 +292,13 @@ export default {
   // not sure about this styling
   &.has-reservation {
     box-shadow: 0px 0px 14px 5px rgba(17,72,235,0.5);
+  }
+  .image {
+    border: 1px solid #D2D9EB;
+  }
+  .tag {
+    padding: 5px 15px;
+    text-transform: capitalize;
   }
 }
 </style>

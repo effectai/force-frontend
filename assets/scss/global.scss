@@ -96,8 +96,10 @@ a.card {
 }
 
 .button {
+  height: 2.6em;
+  border-radius: 8px;
   &.is-wide {
-    min-width: 150px;
+    min-width: 140px;
   }
   &.is-wider {
     min-width: 200px;
@@ -113,6 +115,8 @@ a.card {
 }
 .box {
   border: 1px solid transparent;
+  box-shadow: 0px 4px 8px rgb(43 47 59 / 10%);
+  border-radius: 8px;
 }
 a.box {
   &:hover, &:focus {
