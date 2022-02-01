@@ -2,15 +2,15 @@
   <section class="section">
     <div class="container is-max-widescreen">
       <h1 class="title mt-5">
-        Withdraw tokens
+        Transfer tokens
       </h1>
       <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
         {{ message }}
         <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
       </div>
-      <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount, memo)">
+      <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="vtransfer(account, tokenAmount, memo)">
         <div class="field">
-          <label class="label">Destination Account</label>
+          <label class="label">Destination VAccount</label>
           <div class="control">
             <input v-model="account" class="input" type="text" required>
           </div>
@@ -38,17 +38,6 @@
           </div>
         </div>
 
-        <div class="field">
-          <label for="" class="label">Memo</label>
-          <div class="control">
-            <input
-              v-model="memo"
-              class="input"
-              type="text"
-            >
-          </div>
-        </div>
-
         <div class="field is-grouped is-grouped-right">
           <div class="control">
             <button class="button is-link is-light" @click.prevent="clearFields()">
@@ -57,7 +46,7 @@
           </div>
           <div class="control">
             <button :disabled="!tokenAmount || !account" type="submit" class="button is-link" :class="{'is-loading': loading}">
-              Withdraw
+              vtransfer
             </button>
           </div>
         </div>
@@ -76,7 +65,6 @@ export default {
       message: null,
       err: false,
       tokenAmount: null,
-      memo: null,
       transactionUrl: null
     }
   },
@@ -86,7 +74,7 @@ export default {
     }
   },
   methods: {
-    async withdraw (account, tokenAmount, memo) {
+    async vtransfer (account, tokenAmount, memo) {
       this.loading = true
       if (this.tokenAmount > this.amount || this.tokenAmount < 0) {
         this.message = 'Quantity cannot be higher than your balance.'
@@ -95,11 +83,12 @@ export default {
       }
 
       try {
-        const result = await this.$blockchain.withdraw(account, parseFloat(tokenAmount).toFixed(4), memo)
+        const vaccount = await this.$blockchain.getVAccountByName(account)
+        const result = await this.$blockchain.vtransfer(vaccount.vAccountRows[0].id, parseFloat(tokenAmount).toFixed(4))
         if (result) {
           this.err = false
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
-          this.message = 'Withdrawing has been successful. Check your transaction here: '
+          this.message = 'vtransfering has been successful. Check your transaction here: '
           await this.$blockchain.waitForTransaction(result)
           this.$blockchain.updateUserInfo()
           this.submitted = true
