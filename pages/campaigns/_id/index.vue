@@ -130,83 +130,89 @@
               <b>Information</b>
             </h4>
 
-            <div class="block">
-              <b>Requester</b>
-              <br>
-              <div class="blockchain-address">
-                <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                  {{ campaign.owner[1] }}
-                </nuxt-link>
+            <div class="columns">
+              <div class="column is-half">
+                <div v-if="campaign.info" class="block">
+                  <br>
+                  <span
+                    v-if="campaign.info && campaign.info.category"
+                    class="tag is-light is-medium"
+                    :class="{'is-secondary': campaign.info.category === 'translation', 'is-info': campaign.info.category === 'image_classification', 'is-warning': campaign.info.category === 'text_classification', 'is-danger': campaign.info.category === 'video_classification'}"
+                  >{{ campaign.info.category }}</span>
+                  <span v-else class="tag is-info is-light is-medium">...</span>
+                </div>
+                <div class="block">
+                  Reward
+                  <br>
+                  <b><span>{{ campaign.reward.quantity }}</span></b>
+                </div>
+                <div class="block">
+                  <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-primary is-light">
+                    Edit Campaign
+                  </nuxt-link>
+                  <button v-if="loading || userReservation === null || campaignBatches === null" class="button is-primary is-loading">
+                    Loading
+                  </button>
+                  <button v-else-if="userJoined === false" class="button is-primary" @click.prevent="joinCampaignPopup = true">
+                    Join Campaign
+                  </button>
+                  <button
+                    v-else-if="campaignBatches.reduce(function(a,b){
+                      return a + b.num_tasks
+                    },0) - campaignBatches.reduce(function(a,b){
+                      return a + b.tasks_done
+                    },0) > 0 && !userReservation"
+                    class="button is-primary"
+                    @click.prevent="reserveTask"
+                  >
+                    Make Task Reservation
+                  </button>
+                  <button
+                    v-else-if="userReservation"
+                    class="button is-accent has-text-weight-semibold"
+                    @click.prevent="goToTask"
+                  >
+                    Go To Task
+                  </button>
+                  <template v-else>
+                    <button v-if="userJoined" class="button is-primary" :disabled="true">
+                      Joined Campaign
+                    </button>
+                    <p>No active tasks currently</p>
+                  </template>
+                </div>
+              </div>
+              <div class="column is-half">
+                <div class="block">
+                  <b>Requester</b>
+                  <br>
+                  <div class="blockchain-address">
+                    <nuxt-link :to="'/profile/' + campaign.owner[1]">
+                      {{ campaign.owner[1] }}
+                    </nuxt-link>
+                  </div>
+                </div>
+                <div class="block">
+                  <b>IPFS</b>
+                  <br>
+                  <div class="blockchain-address">
+                    <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
+                  </div>
+                </div>
+                <div class="block">
+                  <b>Blockchain</b>
+                  <br>
+                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
+                </div>
+                <div class="block">
+                  <b>Batches</b>
+                  <br>
+                  <span v-if="campaignBatches === null">Loading..</span>
+                  <span v-else>{{ campaignBatches.length }}</span>
+                </div>
               </div>
             </div>
-            <div class="block">
-              <b>Reward</b>
-              <br>
-              <span>{{ campaign.reward.quantity }}</span>
-            </div>
-            <div class="block">
-              <b>Batches</b>
-              <br>
-              <span v-if="campaignBatches === null">Loading..</span>
-              <span v-else>{{ campaignBatches.length }}</span>
-            </div>
-            <div v-if="campaign.info" class="block">
-              <b>Category</b>
-              <br>
-              <span
-                v-if="campaign.info && campaign.info.category"
-                class="tag is-light is-medium"
-                :class="{'is-secondary': campaign.info.category === 'translation', 'is-info': campaign.info.category === 'image_classification', 'is-warning': campaign.info.category === 'text_classification', 'is-danger': campaign.info.category === 'video_classification'}"
-              >{{ campaign.info.category }}</span>
-              <span v-else class="tag is-info is-light is-medium">...</span>
-            </div>
-            <div class="block">
-              <b>IPFS</b>
-              <br>
-              <div class="blockchain-address">
-                <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
-              </div>
-            </div>
-            <div class="block">
-              <b>Blockchain</b>
-              <br>
-              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View Campaign on Explorer</a>
-            </div>
-            <div class="block">
-              <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-primary is-light">
-                Edit Campaign
-              </nuxt-link>
-              <button v-if="loading || userReservation === null || campaignBatches === null" class="button is-primary is-loading">
-                Loading
-              </button>
-              <button v-else-if="userJoined === false" class="button is-primary" @click.prevent="joinCampaignPopup = true">
-                Join Campaign
-              </button>
-              <button
-                v-else-if="campaignBatches.reduce(function(a,b){
-                  return a + b.num_tasks
-                },0) - campaignBatches.reduce(function(a,b){
-                  return a + b.tasks_done
-                },0) > 0 && !userReservation"
-                class="button is-primary"
-                @click.prevent="reserveTask"
-              >
-                Make Task Reservation
-              </button>
-              <button
-                v-else-if="userReservation"
-                class="button is-accent has-text-weight-semibold"
-                @click.prevent="goToTask"
-              >
-                Go To Task
-              </button>
-              <template v-else>
-                <button v-if="userJoined" class="button is-primary" :disabled="true">
-                  Joined Campaign
-                </button>
-                <p>No active tasks currently</p>
-              </template>
-            </div>
+
           </div>
         </div>
       </div>
