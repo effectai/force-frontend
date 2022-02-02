@@ -146,41 +146,6 @@
                   <br>
                   <b><span>{{ campaign.reward.quantity }}</span></b>
                 </div>
-                <div class="block">
-                  <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-primary is-light">
-                    Edit Campaign
-                  </nuxt-link>
-                  <button v-if="loading || userReservation === null || campaignBatches === null" class="button is-primary is-loading">
-                    Loading
-                  </button>
-                  <button v-else-if="userJoined === false" class="button is-primary" @click.prevent="joinCampaignPopup = true">
-                    Join Campaign
-                  </button>
-                  <button
-                    v-else-if="campaignBatches.reduce(function(a,b){
-                      return a + b.num_tasks
-                    },0) - campaignBatches.reduce(function(a,b){
-                      return a + b.tasks_done
-                    },0) > 0 && !userReservation"
-                    class="button is-primary"
-                    @click.prevent="reserveTask"
-                  >
-                    Make Task Reservation
-                  </button>
-                  <button
-                    v-else-if="userReservation"
-                    class="button is-accent has-text-weight-semibold"
-                    @click.prevent="goToTask"
-                  >
-                    Go To Task
-                  </button>
-                  <template v-else>
-                    <button v-if="userJoined" class="button is-primary" :disabled="true">
-                      Joined Campaign
-                    </button>
-                    <p>No active tasks currently</p>
-                  </template>
-                </div>
               </div>
               <div class="column is-half">
                 <div class="block">
@@ -212,6 +177,41 @@
                 </div>
               </div>
             </div>
+                <div class="block">
+                  <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light">
+                    Edit Campaign
+                  </nuxt-link>
+                  <button v-if="loading || userReservation === null || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
+                    Loading
+                  </button>
+                  <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="joinCampaignPopup = true">
+                    Join Campaign
+                  </button>
+                  <button
+                    v-else-if="campaignBatches.reduce(function(a,b){
+                      return a + b.num_tasks
+                    },0) - campaignBatches.reduce(function(a,b){
+                      return a + b.tasks_done
+                    },0) > 0 && !userReservation"
+                    class="button is-fullwidth is-primary"
+                    @click.prevent="reserveTask"
+                  >
+                    Make Task Reservation
+                  </button>
+                  <button
+                    v-else-if="userReservation"
+                    class="button is-fullwidth is-accent has-text-weight-semibold"
+                    @click.prevent="goToTask"
+                  >
+                    Go To Task
+                  </button>
+                  <template v-else>
+                    <button v-if="userJoined" class="button is-fullwidth is-primary" :disabled="true">
+                      Joined Campaign
+                    </button>
+                    <p>No active tasks currently</p>
+                  </template>
+                </div>
 
           </div>
         </div>
