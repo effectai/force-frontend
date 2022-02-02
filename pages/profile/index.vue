@@ -96,17 +96,11 @@
                 <a
                   :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
                   target="_blank"
-                >{{ transaction.transaction_id }}</a>
+                >{{ transaction.transaction_id.substr(0, 30) }}&hellip;</a>
               </td>
               <td><span v-if="transaction.processed && transaction.processed.action_traces">{{ transaction.processed.action_traces[0].act.name }}</span></td>
               <td><span v-if="transaction.processed">{{ new Date(transaction.processed.block_time).toLocaleString() }}</span></td>
               <td><span v-if="transaction.processed && transaction.processed.receipt">{{ transaction.processed.receipt.status }}</span></td>
-              <th>
-                <a
-                  :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
-                  target="_blank"
-                >View on explorer</a>
-              </th>
             </tr>
           </tbody>
         </table>
