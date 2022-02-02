@@ -1,5 +1,5 @@
 <template>
-  <div class="columns is-vcentered">
+  <div class="columns is-desktop is-tablet is-vcentered">
     <div class="column">
       <div class="box">
         Total

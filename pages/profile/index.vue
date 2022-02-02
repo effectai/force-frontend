@@ -6,71 +6,67 @@
           Effect Account
         </h4>
         <balance />
-        <div class="block">
-          <div class="has-text-weight-bold is-size-6">
-            Effect Account Name:
+        <div class="columns is-desktop">
+          <div class="column">
+            <div class="block">
+              <div class="has-text-weight-bold is-size-6">
+                Account Name:
+              </div>
+                <a
+                  :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
+                  target="_blank"
+                >{{ $auth.user.accountName }}</a>
+            </div>
           </div>
-          <div class="subtitle">
-            {{ $auth.user.accountName }}
+          <div class="column">
+            <div class="block">
+              <div class="has-text-weight-bold is-size-6">
+                {{ $auth.user.blockchain === 'bsc' ? 'BSC Address' : 'EOS Account Name' }}:
+              </div>
+                <a
+                  v-if="$auth.user.blockchain === 'bsc'"
+                  :href="$blockchain.bsc.explorer + '/address/'+ $auth.user.address"
+                  target="_blank"
+                  class="blockchain-address"
+                >{{ $auth.user.address }}</a>
+                <a
+                  v-else
+                  :href="$blockchain.eos.explorer + '/address/'+ $auth.user.accountName"
+                  target="_blank"
+                  class="blockchain-address"
+                >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
+            </div>
           </div>
+          <div class="column">
+          <div class="block">
+            <div class="has-text-weight-bold is-size-6">
+              Account ID:
+            </div>
+              {{ $auth.user.vAccountRows[0].id }}
+          </div>
+          </div>
+          <!-- TODO I think we should remove this, it's redundant information -->
+          <!-- <div class="column">
+          <div class="block">
+            <div class="has-text-weight-bold is-size-6">
+              Wallet Connection:
+            </div>
+            <div class="subtitle">
+              {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
+            </div>
+          </div>
+          </div> -->
         </div>
-        <div class="block">
-          <div class="has-text-weight-bold is-size-6">
-            {{ $auth.user.blockchain === 'bsc' ? 'BSC Address' : 'EOS Account Name' }}:
-          </div>
-          <div class="subtitle">
-            <a
-              v-if="$auth.user.blockchain === 'bsc'"
-              :href="$blockchain.bsc.explorer + '/address/'+ $auth.user.address"
-              target="_blank"
-              class="blockchain-address"
-            >{{ $auth.user.address }}</a>
-            <a
-              v-else
-              :href="$blockchain.eos.explorer + '/address/'+ $auth.user.accountName"
-              target="_blank"
-              class="blockchain-address"
-            >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
-          </div>
-        </div>
-        <div v-if="$auth.user.provider ==='burner-wallet'" class="block">
-          <div class="has-text-weight-bold is-size-6">
-            Private key:
-          </div>
-          <div class="subtitle">
-            <span class="has-text-link">{{ $auth.user.privateKey | hide(showPK) }}</span>
-          </div>
-          <button class="button is-light" @click="showPK = !showPK">
-            <span v-if="showPK">Hide</span>
-            <span v-else>Show</span>
-          </button>
-        </div>
-        <div class="block">
-          <div class="has-text-weight-bold is-size-6">
-            Effect Account ID:
-          </div>
-          <div class="subtitle">
-            {{ $auth.user.vAccountRows[0].id }}
-          </div>
-        </div>
-        <div class="block">
-          <div class="has-text-weight-bold is-size-6">
-            Wallet Connection:
-          </div>
-          <div class="subtitle">
-            {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
-          </div>
-        </div>
-        <div class="block">
-          <div class="has-text-weight-bold is-size-6">
-            Blockchain:
-          </div>
-          <div class="subtitle">
-            <a
-              :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
-              target="_blank"
-            >View on explorer</a>
-          </div>
+
+        <div v-if="$auth.user.provider ==='burner-wallet'" class="block is-vcentered">
+          <span>
+            <button class="button is-info is-light" @click="showPK = !showPK">
+              <span v-if="showPK">Hide PrivateKey</span>
+              <span v-else>Show PrivateKey</span>
+            </button>
+          </span>
+          &nbsp;&nbsp;&nbsp;
+          <span class="has-text-link">{{ $auth.user.privateKey | hide(showPK) }}</span>
         </div>
         <hr>
         <h2 class="title is-4">
