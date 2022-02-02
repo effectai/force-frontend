@@ -192,22 +192,6 @@
               <b>Information</b>
             </h4>
             <div class="block">
-              <b>Requester</b>
-              <br>
-              <div class="blockchain-address">
-                <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
-                  {{ campaign.owner[1] }}
-                </nuxt-link>
-                <span v-else>.....</span>
-              </div>
-            </div>
-            <div class="block">
-              <b>Reward</b>
-              <br>
-              <span v-if="campaign">{{ campaign.reward.quantity }}</span>
-              <span v-else>.....</span>
-            </div>
-            <div class="block">
               <b>Tasks</b>
               <br>
               <template v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batch.reservations && !batch.reservations.length">
@@ -226,47 +210,68 @@
                 Left
               </progress>
             </div>
-            <div class="block">
-              <b>Category</b>
-              <br>
-              <span v-if="campaign && campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
-              <span v-else class="tag is-info is-light is-medium">...</span>
-            </div>
-            <div class="block">
-              <b>IPFS</b>
-              <br>
-              <div v-if="batch" class="blockchain-address">
-                <a target="_blank" :href="`${ipfsExplorer}/ipfs/${batch.content.field_1}`">{{ batch.content.field_1 }}</a>
-              </div>
-              <span v-else>.....</span>
-            </div>
 
-            <div class="block">
-              <b>Blockchain</b>
-              <br>
-              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
+            <div class="columns">
+              <div class="column is-half">
+                <div class="block">
+                  <br>
+                  <span v-if="campaign && campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
+                  <span v-else class="tag is-info is-light is-medium">...</span>
+                </div>
+                <div class="block">
+                  Reward
+                  <br>
+                  <span v-if="campaign"><b>{{ campaign.reward.quantity }}</b></span>
+                  <span v-else>.....</span>
+                </div>
+              </div>
+              <div class="column is-half">
+                <div class="block">
+                  <b>Requester</b>
+                  <br>
+                  <div class="blockchain-address">
+                    <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
+                      {{ campaign.owner[1] }}
+                    </nuxt-link>
+                    <span v-else>.....</span>
+                  </div>
+                </div>
+                <div class="block">
+                  <b>IPFS</b>
+                  <br>
+                  <div v-if="batch" class="blockchain-address">
+                    <a target="_blank" :href="`${ipfsExplorer}/ipfs/${batch.content.field_1}`">{{ batch.content.field_1 }}</a>
+                  </div>
+                  <span v-else>.....</span>
+                </div>
+                <div class="block">
+                  <b>Blockchain</b>
+                  <br>
+                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View in Explorer</a>
+                </div>
+              </div>
             </div>
-            <div class="block">
-              <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-primary is-loading">
+            <div class="block is-vcentered">
+              <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
                 Loading
               </button>
-              <button v-else-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
+              <button v-else-if="!userJoined" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                 Join Campaign
               </button>
-              <button v-else-if="userReservation" class="button is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
+              <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
                 Resume Task
               </button>
-              <button v-else-if="batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations" class="button is-primary" @click.prevent="reserveTask = true">
+              <button v-else-if="batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations" class="button is-fullwidth is-primary" @click.prevent="reserveTask = true">
                 Make Task Reservation
               </button>
               <template v-else>
-                <button v-if="userJoined" class="button is-primary" :disabled="true">
+                <button v-if="userJoined" class="button is-fullwidth is-primary" :disabled="true">
                   Joined Campaign
                 </button>
                 <p>No active tasks currently</p>
               </template>
             </div>
-          </div>
+            </div>
         </div>
       </div>
 
