@@ -59,6 +59,7 @@
         </div>
 
         <div v-if="$auth.user.provider ==='burner-wallet'" class="block is-vcentered">
+          // TODO figure out how to properly show the privatekey
           <span>
             <button class="button is-info is-light" @click="showPK = !showPK">
               <span v-if="showPK">Hide PrivateKey</span>
