@@ -3,7 +3,7 @@
     <div class="container">
       <div class="text-center">
         <h4 class="title is-spaced">
-          Your Effect Account
+          Effect Account
         </h4>
         <balance />
         <div class="block">
