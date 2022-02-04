@@ -29,10 +29,10 @@
         <div id="navbar" class="navbar-menu is-align-items-center" :class="{'is-active': mobileMenu}">
           <div class="navbar-start is-justify-content-center" style="width: 100%">
             <div class="navbar-item" @click="mobileMenu = false, showBalanceModal = true">
-              <nuxt-link v-if="$auth.loggedIn" to="/balance" class="button is-white is-flex is-align-items-center is-justify-content-center" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
-                <span><b>{{ ($blockchain.efxTotal !== null ? $blockchain.efxTotal.toFixed(2) : '...') }}</b><span v-if="$blockchain.efxLoading">..</span> EFX</span>
-                <span v-if="$blockchain.efxTotal !== null && $blockchain.efxPrice" class="is-size-7 pl-2">| $<b>{{ ($blockchain.efxTotal * $blockchain.efxPrice).toFixed(2) }}</b></span>
-              </nuxt-link>
+              <button v-if="$auth.loggedIn" class="button balance-btn is-white is-flex is-align-items-center is-justify-content-center" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
+                <span><b>{{ ($blockchain.efxTotal !== null ? $blockchain.efxTotal.toFixed(2) : '...') }}</b><span v-if="$blockchain.efxLoading">..</span> <span class="has-text-weight-light">EFX</span></span>
+                <span v-if="$blockchain.efxTotal !== null && $blockchain.efxPrice" class="pl-2"> <span class="has-text-weight-light">$</span><b>{{ ($blockchain.efxTotal * $blockchain.efxPrice).toFixed(2) }}</b></span>
+              </button>
             </div>
           </div>
           <div class="navbar-end">
@@ -57,69 +57,62 @@
     <div class="modal balance-modal" :class="{ 'is-active': showBalanceModal }">
       <div class="modal-background" @click="showBalanceModal = false"></div>
       <div class="modal-card">
+        <div class="arrow-up"></div>
         <section class="modal-card-body">
           <div class="content">
             <div class="columns is-multiline">
-              <div class="column">
-                <div class="box">
-                  <p>
-                    Total Balance
-                  </p>
-                  <span to="/balance" class="is-flex is-align-items-center">
-                    <span><b>{{ ($blockchain.efxTotal !== null ? $blockchain.efxTotal.toFixed(2) : '...') }}<span v-if="$blockchain.efxLoading">..</span> EFX</b></span>
-                  </span>
-                </div>
+              <div class="box">
+                <p class="is-size-7">
+                  Total Balance
+                </p>
+                <span to="/balance" class="is-flex is-align-items-center">
+                  <span><b>{{ ($blockchain.efxTotal !== null ? $blockchain.efxTotal.toFixed(2) : '...') }}<span v-if="$blockchain.efxLoading">..</span> EFX</b></span>
+                </span>
               </div>
-              <div class="column">
-                <div class="box">
-                  <p>
-                    Pending Tasks
-                  </p>
-                  <b><span v-if="$blockchain.efxPending !== null">{{ $blockchain.efxPending.toFixed(2) }}</span><span v-else>.....</span><span>  EFX</span></b>
-                </div>
+              <div class="box">
+                <p class="is-size-7">
+                  vAccount Contract Balance
+                </p>
+                <b>
+                  <span v-if="$blockchain.vefxAvailable !== null">{{ $blockchain.vefxAvailable.toFixed(2) }}</span>
+                  <span v-else>.....</span><span>  EFX</span>
+                </b>
               </div>
-              <div class="column">
-                <div class="box">
-                  <p>
-                    vAccount Contract Balance
-                  </p>
-                  <b>
-                    <span v-if="$blockchain.vefxAvailable !== null">{{ $blockchain.vefxAvailable.toFixed(2) }}</span>
-                    <span v-else>.....</span><span>  EFX</span>
-                  </b>
-                </div>
+              <div class="box">
+                <p class="is-size-7">
+                  Pending Tasks
+                </p>
+                <b><span v-if="$blockchain.efxPending !== null">{{ $blockchain.efxPending.toFixed(2) }}</span><span v-else>.....</span><span>  EFX</span></b>
               </div>
-              <div class="column">
-                <div class="box">
-                  <p>
-                    Wallet
-                  </p>
-                  <b>
-                    <span v-if="$blockchain.efxAvailable !== null">{{ $blockchain.efxAvailable.toFixed(2) }}</span>
-                    <span v-else>.....</span><span>  EFX</span>
-                  </b>
-                </div>
+              <div class="box">
+                <p class="is-size-7">
+                  Wallet
+                </p>
+                <b>
+                  <span v-if="$blockchain.efxAvailable !== null">{{ $blockchain.efxAvailable.toFixed(2) }}</span>
+                  <span v-else>.....</span><span>  EFX</span>
+                </b>
               </div>
             </div>
             <div class="columns">
-              <div class="column is-4">
-                <nuxt-link to="/deposit" class="button is-primary is-pulled-left is-wider">
-                  Deposit
-                </nuxt-link>
-              </div>
               <div class="column is-4 is-flex is-justify-content-center">
-                <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-medium is-primary is-pulsing" @click.prevent="payout()">
-                  <p v-if="!loading">Cash in <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
+                <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-secondary is-pulsing" @click.prevent="payout()">
+                  <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
                 </button>
-                <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-medium is-primary">
-                  <p>Nothing to cash in..</p>
+                <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-secondary is-wide">
+                  <p class="is-size-7">Nothing to cash out</p>
                 </button>
-                <button v-else disabled="disabled" class="button is-medium is-primary">
+                <button v-else disabled="disabled" class="button is-secondary">
                   <p>... EFX</p>
                 </button>
               </div>
               <div class="column is-4">
-                <nuxt-link to="/withdraw" class="button is-wider is-primary is-outlined is-pulled-right">
+                <nuxt-link to="/deposit" class="button is-primary is-wide">
+                  Deposit
+                </nuxt-link>
+              </div>
+              <div class="column is-4">
+                <nuxt-link to="/withdraw" class="button is-wide is-primary is-outlined">
                   Withdraw
                 </nuxt-link>
               </div>
@@ -217,21 +210,47 @@ export default {
   .navbar-menu {
     box-shadow: none;
   }
+  .balance-btn {
+    color: #81889D;
+  }
+}
+.modal-background {
+  background: #101D56;
+  opacity: .7;
 }
 .balance-modal .modal-card {
-  border-radius: 8px;
   position: absolute;
   top: 65px;
   width: auto !important;
+  .arrow-up {
+    margin: 0 auto;
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 15px solid #fff;
+  }
+
+  .modal-card-body {
+    border-radius: 8px;
+  }
 
   .box {
     background: #F7FBFF;
     box-shadow: none;
     padding: 6px 8px;
+    margin: 0.7rem;
+    margin-bottom: 15px !important;
     p {
       font-size: 14px;
       margin-bottom: 0px;
     }
+  }
+  .balance-item {
+    padding: 0.75rem;
+  }
+  .button {
+    width: 100%;
   }
 }
 </style>
