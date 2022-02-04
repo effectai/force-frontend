@@ -28,7 +28,7 @@
         </div>
         <div id="navbar" class="navbar-menu is-align-items-center" :class="{'is-active': mobileMenu}">
           <div class="navbar-start is-justify-content-center" style="width: 100%">
-            <div class="navbar-item" @click="mobileMenu = false">
+            <div class="navbar-item" @click="mobileMenu = false, showBalanceModal = true">
               <nuxt-link v-if="$auth.loggedIn" to="/balance" class="button is-white is-flex is-align-items-center is-justify-content-center" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span><b>{{ ($blockchain.efxTotal !== null ? $blockchain.efxTotal.toFixed(2) : '...') }}</b><span v-if="$blockchain.efxLoading">..</span> EFX</span>
                 <span v-if="$blockchain.efxTotal !== null && $blockchain.efxPrice" class="is-size-7 pl-2">| $<b>{{ ($blockchain.efxTotal * $blockchain.efxPrice).toFixed(2) }}</b></span>
@@ -54,6 +54,80 @@
         </div>
       </div>
     </nav>
+    <div class="modal balance-modal" :class="{ 'is-active': showBalanceModal }">
+      <div class="modal-background" @click="showBalanceModal = false"></div>
+      <div class="modal-card">
+        <section class="modal-card-body">
+          <div class="content">
+            <div class="columns is-multiline">
+              <div class="column">
+                <div class="box">
+                  <p>
+                    Total Balance
+                  </p>
+                  <span to="/balance" class="is-flex is-align-items-center">
+                    <span><b>{{ ($blockchain.efxTotal !== null ? $blockchain.efxTotal.toFixed(2) : '...') }}<span v-if="$blockchain.efxLoading">..</span> EFX</b></span>
+                  </span>
+                </div>
+              </div>
+              <div class="column">
+                <div class="box">
+                  <p>
+                    Pending Tasks
+                  </p>
+                  <b><span v-if="$blockchain.efxPending !== null">{{ $blockchain.efxPending.toFixed(2) }}</span><span v-else>.....</span><span>  EFX</span></b>
+                </div>
+              </div>
+              <div class="column">
+                <div class="box">
+                  <p>
+                    vAccount Contract Balance
+                  </p>
+                  <b>
+                    <span v-if="$blockchain.vefxAvailable !== null">{{ $blockchain.vefxAvailable.toFixed(2) }}</span>
+                    <span v-else>.....</span><span>  EFX</span>
+                  </b>
+                </div>
+              </div>
+              <div class="column">
+                <div class="box">
+                  <p>
+                    Wallet
+                  </p>
+                  <b>
+                    <span v-if="$blockchain.efxAvailable !== null">{{ $blockchain.efxAvailable.toFixed(2) }}</span>
+                    <span v-else>.....</span><span>  EFX</span>
+                  </b>
+                </div>
+              </div>
+            </div>
+            <div class="columns">
+              <div class="column is-4">
+                <nuxt-link to="/deposit" class="button is-primary is-pulled-left is-wider">
+                  Deposit
+                </nuxt-link>
+              </div>
+              <div class="column is-4 is-flex is-justify-content-center">
+                <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-medium is-primary is-pulsing" @click.prevent="payout()">
+                  <p v-if="!loading">Cash in <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
+                </button>
+                <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-medium is-primary">
+                  <p>Nothing to cash in..</p>
+                </button>
+                <button v-else disabled="disabled" class="button is-medium is-primary">
+                  <p>... EFX</p>
+                </button>
+              </div>
+              <div class="column is-4">
+                <nuxt-link to="/withdraw" class="button is-wider is-primary is-outlined is-pulled-right">
+                  Withdraw
+                </nuxt-link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
     <div v-if="showNotifications" class="drawer-backdrop" @click="showNotifications = false" />
     <aside class="drawer is-marginless" :class="{'is-active': showNotifications}">
       <header class="drawer-header">
@@ -78,7 +152,8 @@ export default {
     return {
       mobileMenu: false,
       newNotifications: null,
-      showNotifications: false
+      showNotifications: false,
+      showBalanceModal: false
     }
   },
 
@@ -141,6 +216,22 @@ export default {
   }
   .navbar-menu {
     box-shadow: none;
+  }
+}
+.balance-modal .modal-card {
+  border-radius: 8px;
+  position: absolute;
+  top: 65px;
+  width: auto !important;
+
+  .box {
+    background: #F7FBFF;
+    box-shadow: none;
+    padding: 6px 8px;
+    p {
+      font-size: 14px;
+      margin-bottom: 0px;
+    }
   }
 }
 </style>

@@ -96,6 +96,7 @@ a.card {
 }
 
 .button {
+  font-weight: 600;
   height: 2.6em;
   border-radius: 8px;
   &.is-wide {
@@ -103,6 +104,9 @@ a.card {
   }
   &.is-wider {
     min-width: 200px;
+  }
+  &.is-outlined {
+    border-width: 3px;
   }
 }
 @media screen and (max-width: 768px), print {
