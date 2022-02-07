@@ -8,6 +8,11 @@ a {
   outline: 0;
 }
 
+hr {
+  height: 1px;
+  background-color: #E8EEFF;
+}
+
 .has-limited-width {
   width: 670px;
   max-width: 100%;
@@ -119,7 +124,7 @@ a.card {
 }
 .box {
   border: 1px solid transparent;
-  box-shadow: 0px 4px 8px rgb(43 47 59 / 10%);
+  box-shadow: 2px 2px 9px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
 }
 a.box {

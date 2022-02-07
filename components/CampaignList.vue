@@ -25,7 +25,7 @@
               <div>
                 <span
                   v-if="campaign.info && campaign.info.category"
-                  class="tag is-light"
+                  class="tag is-light mb-2"
                   :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
                 >{{ campaign.info.category }}</span>
               </div>
@@ -297,7 +297,10 @@ export default {
     border: 1px solid #D2D9EB;
   }
   .tag {
-    padding: 5px 15px;
+    padding: 4px 13px;
+    padding-top: 5px;
+    border-radius: 6px;
+    border: 1px solid;
     text-transform: capitalize;
   }
 }
