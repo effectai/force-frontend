@@ -1,6 +1,6 @@
 <template>
   <nav
-    v-if="items"
+    v-if="items && items > perPage"
     class="pagination"
     role="navigation"
     aria-label="pagination"
