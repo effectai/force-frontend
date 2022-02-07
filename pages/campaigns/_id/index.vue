@@ -30,9 +30,9 @@
         Campaign loading..
       </div>
       <div v-else class="columns">
-        <div class="column is-two-thirds">
-          <div class="title">
-            <span>#{{ id }}: </span>
+        <div class="column is-three-fifths">
+          <div class="title has-text-weight-bold mb-6">
+            <span>#{{ id }} </span>
             <span v-if="campaign.info">{{ campaign.info.title }}</span>
             <span v-else-if="campaign.info !== null">Loading..</span>
             <span v-else class="has-text-danger-dark">Could not load campaign info</span>
@@ -65,8 +65,9 @@
                 </span>
                 <span>Create Batch</span>
               </nuxt-link>
-              <h4 class="is-size-4">
-                <b>Batches</b>
+              <h4 class="is-size-6 mb-0 has-text-weight-bold">
+                Batches
+                <hr class="mt-2 mb-5">
               </h4>
               <div class="block mt-5">
                 <nuxt-link
@@ -124,59 +125,28 @@
             />
           </div>
         </div>
-        <div class="column is-one-third">
-          <div class="box">
-            <h4 class="box-title is-size-4">
-              <b>Information</b>
-            </h4>
-
-            <div class="columns">
+        <div class="column is-two-fifths">
+          <div class="information-block">
+            <div class="information-header has-text-centered">
+              <h4 class="p-5 is-size-4">
+                <b>Information</b>
+              </h4>
+            </div>
+            <div class="columns p-5">
               <div class="column is-half">
                 <div v-if="campaign.info" class="block">
-                  <br>
                   <span
                     v-if="campaign.info && campaign.info.category"
-                    class="tag is-light is-medium"
+                    class="tag is-light is-medium mb-5"
                     :class="{'is-secondary': campaign.info.category === 'translation', 'is-info': campaign.info.category === 'image_classification', 'is-warning': campaign.info.category === 'text_classification', 'is-danger': campaign.info.category === 'video_classification'}"
                   >{{ campaign.info.category }}</span>
                   <span v-else class="tag is-info is-light is-medium">...</span>
                 </div>
-                <div class="block">
+                <div class="block mb-6">
                   Reward
                   <br>
                   <b><span>{{ campaign.reward.quantity }}</span></b>
                 </div>
-              </div>
-              <div class="column is-half">
-                <div class="block">
-                  <b>Requester</b>
-                  <br>
-                  <div class="blockchain-address">
-                    <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                      {{ campaign.owner[1] }}
-                    </nuxt-link>
-                  </div>
-                </div>
-                <div class="block">
-                  <b>IPFS</b>
-                  <br>
-                  <div class="blockchain-address">
-                    <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
-                  </div>
-                </div>
-                <div class="block">
-                  <b>Blockchain</b>
-                  <br>
-                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
-                </div>
-                <div class="block">
-                  <b>Batches</b>
-                  <br>
-                  <span v-if="campaignBatches === null">Loading..</span>
-                  <span v-else>{{ campaignBatches.length }}</span>
-                </div>
-              </div>
-            </div>
                 <div class="block">
                   <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light">
                     Edit Campaign
@@ -212,7 +182,37 @@
                     <p>No active tasks currently</p>
                   </template>
                 </div>
-
+              </div>
+              <div class="column is-half">
+                <div class="block">
+                  Requester
+                  <br>
+                  <div class="blockchain-address">
+                    <nuxt-link :to="'/profile/' + campaign.owner[1]">
+                      {{ campaign.owner[1] }}
+                    </nuxt-link>
+                  </div>
+                </div>
+                <div class="block">
+                  IPFS
+                  <br>
+                  <div class="blockchain-address">
+                    <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
+                  </div>
+                </div>
+                <div class="block">
+                  Blockchain
+                  <br>
+                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
+                </div>
+                <div class="block">
+                  Batches
+                  <br>
+                  <span v-if="campaignBatches === null">Loading..</span>
+                  <span v-else>{{ campaignBatches.length }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -377,5 +377,33 @@ export default {
 }
 .progress::-webkit-progress-value {
   transition: width 0.5s ease;
+}
+.tabs {
+  li {
+    font-weight: 500;
+    a {
+      padding-left: 35px;
+      padding-right: 35px;
+    }
+    &.is-active {
+      a {
+        border-bottom-width: 2px;
+        border-bottom-color: #1977F3;
+        color: #151A1F;
+        font-weight: 600;
+      }
+    }
+  }
+}
+.information-block {
+  border: 1px solid #E8EEFF;
+  border-radius: 8px;
+  .block {
+    margin-bottom: 10px
+  }
+
+  .information-header {
+    background: #F7FBFF;
+  }
 }
 </style>

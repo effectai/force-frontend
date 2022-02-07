@@ -20,7 +20,7 @@
               <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
             </p>
           </div>
-          <div class="column is-4-desktop is-5-widescreen is-12-touch">
+          <div class="column is-4-desktop is-4-widescreen is-12-touch">
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
               <div>
                 <span
@@ -49,13 +49,13 @@
               </div>
             </div>
           </div>
-          <div class="column">
+          <div class="column is-2-desktop">
             <p class="has-text-grey is-size-7">
               Requester:
             </p>
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
               <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                <span :class="{'is-size-7': campaign.owner[0] === 'address'}">{{ campaign.owner[1] }}</span>
+                <span class="is-ellipsis">{{ campaign.owner[1] }}</span>
               </nuxt-link>
             </h2>
           </div>
@@ -291,17 +291,10 @@ export default {
   }
   // not sure about this styling
   &.has-reservation {
-    box-shadow: 0px 0px 14px 5px rgba(17,72,235,0.5);
+    box-shadow: 0px 0px 14px 5px rgba(17,72,235,0.3);
   }
   .image {
     border: 1px solid #D2D9EB;
-  }
-  .tag {
-    padding: 4px 13px;
-    padding-top: 5px;
-    border-radius: 6px;
-    border: 1px solid;
-    text-transform: capitalize;
   }
 }
 </style>

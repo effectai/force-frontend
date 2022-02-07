@@ -89,7 +89,7 @@ $drawer-divider: 2px solid $lightblue;
 $drawer-header-height: 63px;
 $drawer-shadow: -5px 0px 12px 0 rgba($primary, 0.10);
 
-$navbar-height: 3.9rem;
+$navbar-height: 5rem;
 
 $control-border-width: 2px;
 
@@ -104,3 +104,5 @@ $effectColors: (
   "network": ($network-color, $network-color-invert, $network-color-light, $network-color-dark)
 );
 $colors: map-merge($colors, $effectColors);
+
+$fullhd: 1440px + (2 * $gap)
