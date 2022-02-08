@@ -42,18 +42,49 @@
                 <img src="~assets/img/icons/notification.svg" style="height: 26px">
               </div>
             </div>
-            <div class="navbar-item" @click="mobileMenu = false">
-              <nuxt-link :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" to="/profile" exact-active-class="is-active">
+            <div class="navbar-item is-hidden-touch" @click="mobileMenu = false, showUserModal = !showUserModal">
+              <button :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/user.svg" style="height: 24px">
                 </span>
                 <span v-if="mobileMenu">Profile</span>
-              </nuxt-link>
+              </button>
+            </div>
+            <!--- User Modal -->
+            <div class="modal user-modal is-hidden-touch" :class="{ 'is-active': showUserModal }" @focusout="showUserModal = false" tabindex="0">
+              <div class="modal-card">
+                <div class="arrow-up"></div>
+                <section class="modal-card-body has-shadow">
+                  <ul>
+                    <li>
+                      <nuxt-link to="/profile">
+                        <span class="icon">
+                          <img src="~assets/img/icons/user.svg" style="height: 20px">
+                        </span>
+                        View Profile
+                      </nuxt-link>
+                    </li>
+                    <!-- <li>
+                      <span class="icon">
+                        <img src="~assets/img/icons/settings.svg" style="height: 22px">
+                      </span>
+                      Settings
+                    </li> -->
+                    <li @click="logout">
+                      <span class="icon">
+                        <img src="~assets/img/icons/logout.svg" style="height: 22px">
+                      </span>
+                      Logout
+                    </li>
+                  </ul>
+                </section>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </nav>
+    <!--- Balance Modal -->
     <div class="modal balance-modal" :class="{ 'is-active': showBalanceModal }">
       <div class="modal-background" @click="showBalanceModal = false"></div>
       <div class="modal-card">
@@ -146,17 +177,25 @@ export default {
       mobileMenu: false,
       newNotifications: null,
       showNotifications: false,
-      showBalanceModal: false
+      showBalanceModal: false,
+      showUserModal: false
     }
   },
-
   created () {
     if (this.$auth.loggedIn) {
       this.countNewNotifications()
     }
   },
 
+  watch: {
+    $route () {
+      this.showUserModal = false
+    }
+  },
   methods: {
+    async logout () {
+      await this.$auth.logout()
+    },
     async countNewNotifications () {
       try {
         const response = await this.$axios.$get(process.env.NUXT_ENV_BACKEND_URL + '/user/notifications/new')
@@ -219,10 +258,19 @@ export default {
   opacity: .7;
 }
 .balance-modal .modal-card {
+  .balance-item {
+    padding: 0.75rem;
+  }
+  .button {
+    width: 100%;
+  }
+}
+
+.balance-modal .modal-card, .user-modal .modal-card {
   position: absolute;
-  top: 65px;
-  width: auto !important;
+  top: $navbar-height;
   .arrow-up {
+    filter: drop-shadow(0px -3px 3px rgba(129, 136, 157, 0.1));
     margin: 0 auto;
     width: 0;
     height: 0;
@@ -246,11 +294,45 @@ export default {
       margin-bottom: 0px;
     }
   }
-  .balance-item {
-    padding: 0.75rem;
+}
+.navbar-end {
+  position: relative;
+}
+.user-modal {
+  width: 170px;
+  z-index: -1;
+  position: absolute;
+  overflow: visible;
+  li {
+    color: #6C7786;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 10px 0;
+    display: flex;
+    border-bottom: 1px solid #F1F5FA;
+    cursor: pointer;
+    span {
+      margin-right: 10px;
+    }
+    &:last-child {
+      border-bottom: none;
+    }
   }
-  .button {
-    width: 100%;
+  .modal-card {
+    overflow: visible;
+    top: calc(5rem - 25px);
+    right: 5px;
+    border-radius: 11px;
+
+    a {
+      display: flex;
+      color: #6C7786;
+    }
+
+    .modal-card-body {
+      box-shadow: 0px 10px 32px 7px rgb(129 136 157 / 20%);
+      padding: 8px 20px;
+    }
   }
 }
 </style>
