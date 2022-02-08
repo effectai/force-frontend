@@ -4,7 +4,7 @@
       <div class="text-center">
         <h4 class="title is-spaced">
           <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->
-          Effect Account - {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
+          Effect Account | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
         </h4>
         <balance />
         <div class="columns">
@@ -26,7 +26,7 @@
                 <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
                 <span v-if="$auth.user.blockchain === 'bsc'">
                   <button class="button is-info is-light is-small" @click="showPK = !showPK">
-                    BSC PrivateKey
+                    <strong>BSC PrivateKey</strong>
                   </button>
                   <span>&nbsp;BSC Address:</span>
                   </span>
@@ -59,11 +59,11 @@
             </div>
           </div>
         </div>
-        <hr>
+        <!-- <hr>
         <h2 class="title is-4">
-          Pending Transactions
-        </h2>
-        <pending-transactions class="mb-6" :owner="$auth.user.accountName"/>
+          Pending Payout
+        </h2> -->
+        <!-- <pending-payout class="mb-6" :owner="$auth.user.accountName"/> -->
         <hr>
         <h2 class="title is-4">
           My Campaigns
@@ -114,8 +114,7 @@
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
       </div>
-      <!-- <success-modal v-if="showPK" @close="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" /> -->
-      <key-modal v-if="showPK" @close="showPK = false" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" />
+      <key-modal v-if="showPK" @close="showPK = !showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" />
     </div>
   </section>
 </template>
@@ -126,11 +125,10 @@ import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
 import KeyModal from '@/components/KeyModal.vue'
-// import SuccessModal from '~/components/SuccessModal'
-import PendingTransactions from '~/components/PendingTransactions.vue'
+// import PendingPayout from '~/components/PendingPayout.vue'
 
 export default {
-  components: { Balance, CampaignList, Pagination, KeyModal, /* SuccessModal , */ PendingTransactions },
+  components: { Balance, CampaignList, Pagination, KeyModal /* , PendingPayout */ },
   filters: {
     hide (value, show) {
       if (show) {
@@ -146,7 +144,8 @@ export default {
       page: 1,
       perPage: 10,
       showPK: false,
-      pages: []
+      pages: [],
+      pending: []
     }
   },
   computed: {

@@ -104,10 +104,7 @@
       @setPage="setPage"
     />
     <div v-if="campaignsLoading" class="subtitle">
-      Campaigns loading..
-    </div>
-    <div v-else-if="!allBatchesLoaded">
-      Batches loading..
+      Pending Payout loading..
     </div>
     <div v-else-if="filteredCampaigns && !filteredCampaigns.length" class="subtitle">
       No <span v-if="active">active</span> campaigns

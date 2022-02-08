@@ -312,6 +312,15 @@ export default (context, inject) => {
           return this.efxPayout
         }
       },
+      async getPendingTx () {
+        const data = await this.sdk.force.getPending(context.$auth.user.vAccountRows[0].id)
+        console.log('getPendingTx', data)
+        if (data) {
+          return data.rows
+        } else {
+          return []
+        }
+      },
       async getBatches (nextKey, limit = 50, processBatch = true) {
         return await this.sdk.force.getBatches(nextKey, limit, processBatch)
       },
