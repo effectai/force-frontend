@@ -1,18 +1,20 @@
 <template>
   <section class="section">
-    <div class="container">
+    <div class="container mt-5">
       <div class="text-center">
         <h4 class="title is-spaced">
-          Effect Account
+          <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->
+          Effect Account - {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
         </h4>
         <balance />
-        <div class="columns is-desktop">
+        <div class="columns">
           <div class="column">
             <div class="block">
               <div class="has-text-weight-bold is-size-6">
                 Account Name:
               </div>
                 <a
+                  class="is-flex is-clipped"
                   :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
                   target="_blank"
                 >{{ $auth.user.accountName }}</a>
@@ -20,54 +22,42 @@
           </div>
           <div class="column">
             <div class="block">
-              <div class="has-text-weight-bold is-size-6">
-                {{ $auth.user.blockchain === 'bsc' ? 'BSC Address' : 'EOS Account Name' }}:
+              <div class="has-text-weight-bold is-size-6 is-vecentered">
+                <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
+                <span v-if="$auth.user.blockchain === 'bsc'">
+                  <button class="button is-info is-light is-small" @click="showPK = !showPK">
+                    BSC PrivateKey
+                  </button>
+                  <span> - Address:</span>
+                  </span>
               </div>
-                <a
-                  v-if="$auth.user.blockchain === 'bsc'"
-                  :href="$blockchain.bsc.explorer + '/address/'+ $auth.user.address"
-                  target="_blank"
-                  class="blockchain-address"
-                >{{ $auth.user.address }}</a>
-                <a
-                  v-else
-                  :href="$blockchain.eos.explorer + '/address/'+ $auth.user.accountName"
-                  target="_blank"
-                  class="blockchain-address"
-                >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
+              <a
+                v-if="$auth.user.blockchain === 'bsc'"
+                :href="$blockchain.bsc.explorer + '/address/'+ $auth.user.address"
+                target="_blank"
+                class="blockchain-address is-flex is-clipped"
+              >{{ $auth.user.address }}</a>
+              <a
+                v-else
+                :href="$blockchain.eos.explorer + '/address/'+ $auth.user.accountName"
+                target="_blank"
+                class="blockchain-address"
+              >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
             </div>
           </div>
           <div class="column">
           <div class="block">
             <div class="has-text-weight-bold is-size-6">
-              Account ID:
+              ID:
             </div>
               {{ $auth.user.vAccountRows[0].id }}
           </div>
           </div>
-          <!-- TODO I think we should remove this, it's redundant information -->
-          <!-- <div class="column">
-          <div class="block">
-            <div class="has-text-weight-bold is-size-6">
-              Wallet Connection:
-            </div>
-            <div class="subtitle">
-              {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
+          <div class="column">
+            <div class="block">
+
             </div>
           </div>
-          </div> -->
-        </div>
-
-        <div v-if="$auth.user.provider ==='burner-wallet'" class="block is-vcentered">
-          // TODO figure out how to properly show the privatekey
-          <span>
-            <button class="button is-info is-light" @click="showPK = !showPK">
-              <span v-if="showPK">Hide PrivateKey</span>
-              <span v-else>Show PrivateKey</span>
-            </button>
-          </span>
-          &nbsp;&nbsp;&nbsp;
-          <span class="has-text-link">{{ $auth.user.privateKey | hide(showPK) }}</span>
         </div>
         <hr>
         <h2 class="title is-4">
@@ -78,33 +68,35 @@
         <h4 class="title is-4 is-spaced">
           Transactions
         </h4>
-        <table v-if="transactions" class="table" style="width: 100%">
-          <thead>
-            <tr>
-              <th>Transaction ID</th>
-              <th>Type</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="transaction in paginatedTransactions"
-              :key="transaction.transaction_id"
-            >
-              <td>
-                <a
-                  :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
-                  target="_blank"
-                >{{ transaction.transaction_id.substr(0, 30) }}&hellip;</a>
-              </td>
-              <td><span v-if="transaction.processed && transaction.processed.action_traces">{{ transaction.processed.action_traces[0].act.name }}</span></td>
-              <td><span v-if="transaction.processed">{{ new Date(transaction.processed.block_time).toLocaleString() }}</span></td>
-              <td><span v-if="transaction.processed && transaction.processed.receipt">{{ transaction.processed.receipt.status }}</span></td>
-            </tr>
-          </tbody>
-        </table>
+        <div v-if="transactions" class="table-container">
+          <table class="table" style="width: 100%">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="transaction in paginatedTransactions"
+                :key="transaction.transaction_id"
+              >
+                <td>
+                  <a
+                    :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
+                    target="_blank"
+                  >{{ transaction.transaction_id.substr(0, 30) }}&hellip;</a>
+                </td>
+                <td><span v-if="transaction.processed && transaction.processed.action_traces">{{ transaction.processed.action_traces[0].act.name }}</span></td>
+                <td><span v-if="transaction.processed">{{ new Date(transaction.processed.block_time).toLocaleString() }}</span></td>
+                <td><span v-if="transaction.processed && transaction.processed.receipt">{{ transaction.processed.receipt.status }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <span v-else>No transactions found</span>
         <pagination
           v-if="transactions"
@@ -117,6 +109,8 @@
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
       </div>
+      <success-modal v-if="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" />
+      <key-modal v-if="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" :toggle="showPK" />
     </div>
   </section>
 </template>
@@ -126,16 +120,17 @@ import { mapGetters } from 'vuex'
 import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
+import KeyModal from '@/components/KeyModal.vue'
+import SuccessModal from '~/components/SuccessModal'
 
 export default {
-  components: { Balance, CampaignList, Pagination },
+  components: { Balance, CampaignList, Pagination, KeyModal, SuccessModal },
   filters: {
     hide (value, show) {
       if (show) {
         return value
       } else {
-        value = value.toString()
-        return value.split('').map(function (char) { char = '•'; return char }).join('')
+        return value.toString().split('').map(() => '•').join('')
       }
     }
   },

@@ -1,10 +1,10 @@
 <template>
-  <div class="columns is-desktop is-tablet is-vcentered">
+  <div class="columns is-touch is-tablet is-desktop">
     <div class="column">
       <div class="box">
         Total
         <br>
-        <span class="is-flex is-align-items-center">
+        <span class="">
           <span><b>{{ ($blockchain.efxTotal !== null ? $blockchain.efxTotal.toFixed(2) : '...') }} EFX</b><span v-if="$blockchain.efxLoading">..</span></span>
           <!-- <span v-if="$blockchain.efxTotal !== null && $blockchain.efxPrice" class="is-size-7 pl-2">| $<b>{{ ($blockchain.efxTotal * $blockchain.efxPrice).toFixed(2) }}</b></span> -->
         </span>
@@ -41,14 +41,19 @@
       </div>
     </div>
     <div class="column">
-      <nuxt-link to="/deposit" class="button is-primary is-medium">
-        Deposit
-      </nuxt-link>
-    </div>
-    <div class="column">
-      <nuxt-link to="/withdraw" class="button is-primary is-medium is-outlined">
-        Withdraw
-      </nuxt-link>
+      <div class="field is-horizontal is-grouped-centered has-text-centered is-vcentered">
+            <span class="control">
+              <nuxt-link to="/deposit" class="button is-primary ">
+                Deposit
+              </nuxt-link>
+            </span>
+            <span>&nbsp;</span>
+            <span class="control">
+              <nuxt-link to="/withdraw" class="button is-primary is-outlined">
+                Withdraw
+              </nuxt-link>
+            </span>
+        </div>
     </div>
   </div>
 </template>
