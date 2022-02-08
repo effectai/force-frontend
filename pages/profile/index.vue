@@ -61,9 +61,9 @@
         </div>
         <hr>
         <h2 class="title is-4">
-          Pending Transactions
+          Pending Payout
         </h2>
-        <pending-transactions class="mb-6" :owner="$auth.user.accountName"/>
+        <pending-payout class="mb-6" :owner="$auth.user.accountName"/>
         <hr>
         <h2 class="title is-4">
           My Campaigns
@@ -114,7 +114,7 @@
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
       </div>
-      <key-modal v-if="showPK" @close="showPK = false" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" />
+      <key-modal v-if="showPK" @close="showPK = !showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" />
     </div>
   </section>
 </template>
@@ -126,10 +126,10 @@ import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
 import KeyModal from '@/components/KeyModal.vue'
 // import SuccessModal from '~/components/SuccessModal'
-import PendingTransactions from '~/components/PendingTransactions.vue'
+import PendingPayout from '~/components/PendingPayout.vue'
 
 export default {
-  components: { Balance, CampaignList, Pagination, KeyModal, /* SuccessModal , */ PendingTransactions },
+  components: { Balance, CampaignList, Pagination, KeyModal, /* SuccessModal , */ PendingPayout },
   filters: {
     hide (value, show) {
       if (show) {
@@ -145,7 +145,8 @@ export default {
       page: 1,
       perPage: 10,
       showPK: false,
-      pages: []
+      pages: [],
+      pending: []
     }
   },
   computed: {
