@@ -59,11 +59,11 @@
             </div>
           </div>
         </div>
-        <hr>
+        <!-- <hr>
         <h2 class="title is-4">
           Pending Payout
-        </h2>
-        <pending-payout class="mb-6" :owner="$auth.user.accountName"/>
+        </h2> -->
+        <!-- <pending-payout class="mb-6" :owner="$auth.user.accountName"/> -->
         <hr>
         <h2 class="title is-4">
           My Campaigns
@@ -125,11 +125,10 @@ import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
 import KeyModal from '@/components/KeyModal.vue'
-// import SuccessModal from '~/components/SuccessModal'
-import PendingPayout from '~/components/PendingPayout.vue'
+// import PendingPayout from '~/components/PendingPayout.vue'
 
 export default {
-  components: { Balance, CampaignList, Pagination, KeyModal, /* SuccessModal , */ PendingPayout },
+  components: { Balance, CampaignList, Pagination, KeyModal /* , PendingPayout */ },
   filters: {
     hide (value, show) {
       if (show) {
