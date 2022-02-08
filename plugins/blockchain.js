@@ -82,6 +82,7 @@ export default (context, inject) => {
           this.getAccountBalance()
           this.getPendingBalance()
           this.getPayoutBalance()
+          this.getPendingPayouts()
         }
       },
       async getEfxPrice (currency = 'usd') {
@@ -312,8 +313,8 @@ export default (context, inject) => {
           return this.efxPayout
         }
       },
-      async getPendingTx () {
-        const data = await this.sdk.force.getPending(context.$auth.user.vAccountRows[0].id)
+      async getPendingPayouts () {
+        const data = await this.sdk.force.getPendingBalance(context.$auth.user.vAccountRows[0].id)
         console.log('getPendingTx', data)
         if (data) {
           return data.rows
