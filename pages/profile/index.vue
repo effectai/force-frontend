@@ -28,7 +28,7 @@
                   <button class="button is-info is-light is-small" @click="showPK = !showPK">
                     BSC PrivateKey
                   </button>
-                  <span> - Address:</span>
+                  <span>&nbsp;BSC Address:</span>
                   </span>
               </div>
               <a
@@ -59,6 +59,11 @@
             </div>
           </div>
         </div>
+        <hr>
+        <h2 class="title is-4">
+          Pending Transactions
+        </h2>
+        <pending-transactions class="mb-6" :owner="$auth.user.accountName"/>
         <hr>
         <h2 class="title is-4">
           My Campaigns
@@ -109,8 +114,8 @@
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
       </div>
-      <success-modal v-if="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" />
-      <key-modal v-if="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" :toggle="showPK" />
+      <!-- <success-modal v-if="showPK" @close="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" /> -->
+      <key-modal v-if="showPK" @close="showPK = false" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" />
     </div>
   </section>
 </template>
@@ -121,10 +126,11 @@ import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
 import KeyModal from '@/components/KeyModal.vue'
-import SuccessModal from '~/components/SuccessModal'
+// import SuccessModal from '~/components/SuccessModal'
+import PendingTransactions from '~/components/PendingTransactions.vue'
 
 export default {
-  components: { Balance, CampaignList, Pagination, KeyModal, SuccessModal },
+  components: { Balance, CampaignList, Pagination, KeyModal, /* SuccessModal , */ PendingTransactions },
   filters: {
     hide (value, show) {
       if (show) {
