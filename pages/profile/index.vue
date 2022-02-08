@@ -4,7 +4,7 @@
       <div class="text-center">
         <h4 class="title is-spaced">
           <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->
-          Effect Account - {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
+          Effect Account | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
         </h4>
         <balance />
         <div class="columns">
@@ -26,7 +26,7 @@
                 <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
                 <span v-if="$auth.user.blockchain === 'bsc'">
                   <button class="button is-info is-light is-small" @click="showPK = !showPK">
-                    BSC PrivateKey
+                    <strong>BSC PrivateKey</strong>
                   </button>
                   <span>&nbsp;BSC Address:</span>
                   </span>
@@ -114,7 +114,6 @@
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
       </div>
-      <!-- <success-modal v-if="showPK" @close="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" /> -->
       <key-modal v-if="showPK" @close="showPK = false" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" />
     </div>
   </section>
