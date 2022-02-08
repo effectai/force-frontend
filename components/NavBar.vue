@@ -42,12 +42,20 @@
                 <img src="~assets/img/icons/notification.svg" style="height: 26px">
               </div>
             </div>
-            <div class="navbar-item is-hidden-touch" @click="mobileMenu = false, showUserModal = !showUserModal">
+            <div class="navbar-item" @click="mobileMenu = false, showUserModal = !showUserModal">
               <button :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/user.svg" style="height: 24px">
                 </span>
                 <span v-if="mobileMenu">Profile</span>
+              </button>
+            </div>
+            <div class="navbar-item is-hidden-desktop" @click="logout">
+              <button :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
+                <span class="icon">
+                  <img src="~assets/img/icons/logout.svg" style="height: 24px">
+                </span>
+                <span v-if="mobileMenu">Logout</span>
               </button>
             </div>
             <!--- User Modal -->
@@ -162,14 +170,18 @@
       </header>
       <notifications v-if="showNotifications" @get-notifications="countNewNotifications" />
     </aside>
+    <!-- SuccessModal -->
+    <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
   </div>
 </template>
 
 <script>
 import Notifications from '@/components/Notifications'
+import SuccessModal from '@/components/SuccessModal'
 export default {
   components: {
-    Notifications
+    Notifications,
+    SuccessModal
   },
 
   data () {
@@ -178,18 +190,25 @@ export default {
       newNotifications: null,
       showNotifications: false,
       showBalanceModal: false,
-      showUserModal: false
-    }
-  },
-  created () {
-    if (this.$auth.loggedIn) {
-      this.countNewNotifications()
+      showUserModal: false,
+
+      pending: 0,
+      finalAmount: 0,
+      loading: false,
+      successMessage: null,
+      successTitle: null,
+      errors: []
     }
   },
 
   watch: {
     $route () {
       this.showUserModal = false
+    }
+  },
+  created () {
+    if (this.$auth.loggedIn) {
+      this.countNewNotifications()
     }
   },
   methods: {
@@ -210,6 +229,20 @@ export default {
       } else {
         this.$router.push('/')
       }
+    },
+    async payout () {
+      this.loading = true
+      try {
+        const result = await this.$blockchain.payout()
+        this.$store.dispatch('transaction/addTransaction', result)
+        this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+        this.successTitle = 'Payout Completed'
+        this.successMessage = 'All your available pending payouts have been completed and are added to your Effect account'
+      } catch (error) {
+        this.loading = false
+        this.errors.push(error)
+      }
+      this.loading = false
     }
   }
 }
