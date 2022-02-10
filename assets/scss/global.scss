@@ -8,6 +8,11 @@ a {
   outline: 0;
 }
 
+hr {
+  height: 1px;
+  background-color: #E8EEFF;
+}
+
 .has-limited-width {
   width: 670px;
   max-width: 100%;
@@ -96,11 +101,17 @@ a.card {
 }
 
 .button {
+  font-weight: 600;
+  height: 2.6em;
+  border-radius: 8px;
   &.is-wide {
-    min-width: 150px;
+    min-width: 140px;
   }
   &.is-wider {
     min-width: 200px;
+  }
+  &.is-outlined {
+    border-width: 3px;
   }
 }
 @media screen and (max-width: 768px), print {
@@ -113,6 +124,8 @@ a.card {
 }
 .box {
   border: 1px solid transparent;
+  box-shadow: 2px 2px 9px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 a.box {
   &:hover, &:focus {
@@ -249,4 +262,12 @@ a.box {
 
 .pagination-previous[disabled], .pagination-next[disabled], .pagination-link[disabled] {
   pointer-events: none;
+}
+
+.tag {
+  padding: 3px 13px;
+  padding-top: 4px;
+  border-radius: 6px;
+  border: 1px solid;
+  text-transform: capitalize;
 }

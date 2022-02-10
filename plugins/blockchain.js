@@ -70,7 +70,7 @@ export default (context, inject) => {
     methods: {
       async updateForceInfo () {
         console.log('updating campaigns and batches..')
-        await context.store.dispatch('campaign/getCampaigns')
+        await context.store.dispatch('campaign/getCampaigns', { processAllCampaigns: false })
         await context.store.dispatch('campaign/getBatches')
         context.store.dispatch('campaign/getSubmissions')
       },
@@ -310,6 +310,15 @@ export default (context, inject) => {
           }
           this.efxPayout = pending
           return this.efxPayout
+        }
+      },
+      async getPendingTx () {
+        const data = await this.sdk.force.getPending(context.$auth.user.vAccountRows[0].id)
+        console.log('getPendingTx', data)
+        if (data) {
+          return data.rows
+        } else {
+          return []
         }
       },
       async getBatches (nextKey, limit = 50, processBatch = true) {

@@ -1,7 +1,7 @@
 <template>
   <section class="section">
     <div class="container">
-      <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/new">
+      <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/templates">
         <span class="icon">
           +
         </span>
@@ -10,7 +10,7 @@
       <nuxt-link v-if="hasCampaigns" class="button is-ghost is-pulled-right" to="/campaigns">
         <span>My Campaigns</span>
       </nuxt-link>
-      <h2 class="title">
+      <h2 class="title mb-6 has-text-weight-bold is-full-mobile">
         Active Tasks
       </h2>
       <campaign-list :category-filter="true" :active="true" />
@@ -50,5 +50,11 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+  @media screen and (max-width: 768px), print {
+    .is-pulled-right {
+      float: none !important;
+      margin-bottom: 25px;
+    }
+  }
 </style>

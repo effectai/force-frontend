@@ -1,7 +1,7 @@
 <template>
   <section class="section">
     <div class="container">
-      <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/new">
+      <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/templates">
         <span class="icon">
           +
         </span>
@@ -17,7 +17,7 @@
         <input v-model="myCampaigns" type="checkbox">
         Show only my campaigns
       </label>
-      <campaign-list :owner="myCampaigns ? $auth.user.accountName : null" :filters="false" :sort-campaigns="true" />
+      <campaign-list :owner="myCampaigns ? $auth.user.accountName : null" :filters="false" :sort-campaigns="true" :load-all-campaigns="true" />
     </div>
   </section>
 </template>

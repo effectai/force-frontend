@@ -49,7 +49,7 @@
               </div>
             </div>
           </div>
-          <div class="column is-2-desktop is-full-mobile">
+          <div class="column is-2-desktop">
             <p class="has-text-grey is-size-7">
               Requester:
             </p>
@@ -104,10 +104,7 @@
       @setPage="setPage"
     />
     <div v-if="campaignsLoading" class="subtitle">
-      Campaigns loading..
-    </div>
-    <div v-else-if="!allBatchesLoaded">
-      Batches loading..
+      Pending Payout loading..
     </div>
     <div v-else-if="filteredCampaigns && !filteredCampaigns.length" class="subtitle">
       No <span v-if="active">active</span> campaigns
@@ -126,13 +123,13 @@ import SortFilters from './SortAndFilters'
 import Pagination from './Pagination.vue'
 
 export default {
-  name: 'CampaignList',
+  name: 'PendingTransactionList',
   components: {
     CategoryFilters,
     SortFilters,
     Pagination
   },
-  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns'],
+  props: ['active', 'owner'],
   data () {
     return {
       filter: null,
