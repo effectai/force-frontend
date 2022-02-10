@@ -151,7 +151,7 @@
                   <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light">
                     Edit Campaign
                   </nuxt-link>
-                  <button v-if="loading || userReservation === null || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
+                  <button v-if="loading || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
                     Loading
                   </button>
                   <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="joinCampaignPopup = true">
