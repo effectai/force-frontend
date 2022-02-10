@@ -19,14 +19,14 @@
       </div>
       <div class="tabs">
         <ul>
+          <li :class="{'is-active': formGroup === 'tasks'}">
+            <a @click.prevent="formGroup = 'tasks'">Design Tasks</a>
+          </li>
           <li :class="{'is-active': formGroup === 'basic-info'}">
             <a @click.prevent="formGroup = 'basic-info'">Basic Information</a>
           </li>
           <li :class="{'is-active': formGroup === 'instructions'}">
             <a @click.prevent="formGroup = 'instructions'">Instructions</a>
-          </li>
-          <li :class="{'is-active': formGroup === 'tasks'}">
-            <a @click.prevent="formGroup = 'tasks'">Design Tasks</a>
           </li>
         </ul>
       </div>
@@ -121,7 +121,7 @@
         </div>
         <div v-show="formGroup === 'tasks'" class="block task-group">
           <div class="field">
-            <label class="label">Template</label>
+            <label class="label">Template <span class="has-text-info"><b>*</b></span></label>
             <div class="control">
               <textarea v-model="campaignIpfs.template" class="textarea" />
             </div>
@@ -268,7 +268,7 @@ export default {
       campaign: {
         content_hash: null
       },
-      formGroup: 'basic-info',
+      formGroup: 'tasks',
       cachedFormData: null,
       uploadingFile: false,
       selectedFile: null,
@@ -320,6 +320,18 @@ export default {
   },
 
   methods: {
+    async retrieveTemplate (params) {
+      if (params.templateUrl) {
+        this.campaignIpfs.template = 'Retrieving template..'
+        const response = await this.$axios.get(params.templateUrl)
+        this.campaignIpfs.template = response.data
+      } else if (params.template) {
+        this.campaignIpfs.template = decodeURI(params.template)
+      }
+      if (params.placeholders) {
+        this.campaignIpfs.example_task = JSON.parse(params.placeholders)
+      }
+    },
     showSubmission (values) {
       this.answer = values
     },
@@ -384,6 +396,7 @@ export default {
       if (campaignIpfs) {
         this.campaignIpfs = JSON.parse(campaignIpfs)
       }
+      this.retrieveTemplate(this.$route.query)
       this.cachedFormData = this.formDataForComparison()
       window.addEventListener('beforeunload', this.checkClose)
     },
