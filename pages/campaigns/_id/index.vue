@@ -206,10 +206,21 @@
                   <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
                 </div>
                 <div class="block">
-                  Batches
+                  Tasks
                   <br>
-                  <span v-if="campaignBatches === null">Loading..</span>
-                  <span v-else>{{ campaignBatches.length }}</span>
+                  <span v-if="batchByCampaignId(campaign.id) === null">
+                    Loading..
+                  </span>
+                  <span v-else>
+                    {{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                      return a + b.num_tasks
+                    },0) - batchByCampaignId(campaign.id).reduce(function(a,b){
+                      return a + b.tasks_done
+                    },0) }}/{{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                      return a + b.num_tasks
+                    },0) }} left
+                    <br>
+                  </span>
                 </div>
               </div>
             </div>
