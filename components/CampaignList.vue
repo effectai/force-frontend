@@ -49,7 +49,7 @@
               </div>
             </div>
           </div>
-          <div class="column is-2-desktop">
+          <div class="column is-2-desktop is-full-mobile">
             <p class="has-text-grey is-size-7">
               Requester:
             </p>

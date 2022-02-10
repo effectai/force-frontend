@@ -42,13 +42,20 @@
                 <img src="~assets/img/icons/notification.svg" style="height: 26px">
               </div>
             </div>
-            <div class="navbar-item" @click="mobileMenu = false, showUserModal = !showUserModal">
+            <div class="navbar-item is-hidden-mobile" @click="mobileMenu = false, showUserModal = !showUserModal">
               <button :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/user.svg" style="height: 24px">
                 </span>
-                <span v-if="mobileMenu">Profile</span>
               </button>
+            </div>
+            <div class="navbar-item is-hidden-desktop" @click="logout">
+              <nuxt-link to="/profile" :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
+                <span class="icon">
+                  <img src="~assets/img/icons/user.svg" style="height: 24px">
+                </span>
+                <span v-if="mobileMenu">Profile</span>
+              </nuxt-link>
             </div>
             <div class="navbar-item is-hidden-desktop" @click="logout">
               <button :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
