@@ -1,7 +1,7 @@
 <template>
   <section class="section">
     <div class="container">
-      <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/new">
+      <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/templates">
         <span class="icon">
           +
         </span>
