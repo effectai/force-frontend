@@ -255,7 +255,7 @@
                 </div>
               </div>
               <div class="block is-vcentered">
-                <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
+                <button v-if="loading || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
                   Loading
                 </button>
                 <button v-else-if="!userJoined" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
