@@ -341,7 +341,10 @@ export default {
       // check if user has reservation for a batch in this campaign
       for (const batch of this.campaignBatches) {
         const reservations = await this.$blockchain.getTaskReservationsForBatch(batch.batch_id)
-        this.userReservation = reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id)
+        const userReservation = reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id)
+        if (userReservation) {
+          this.userReservation = userReservation
+        }
       }
       if (this.campaignBatches.length === 0) {
         this.showBatchesPopup = true
