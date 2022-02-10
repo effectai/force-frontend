@@ -69,10 +69,10 @@ export default (context, inject) => {
 
     methods: {
       async updateForceInfo () {
-        console.log('updating campaigns and batches..')
+        console.log('updating campaigns and batches and submissions..')
         await context.store.dispatch('campaign/getCampaigns', { processAllCampaigns: false })
-        await context.store.dispatch('campaign/getBatches')
-        context.store.dispatch('campaign/getSubmissions')
+        // await context.store.dispatch('campaign/getBatches')
+        // context.store.dispatch('campaign/getSubmissions')
       },
       updateUserInfo () {
         this.getEfxPrice()
