@@ -67,11 +67,11 @@
             <table class="table" style="width: 100%">
                 <thead>
                   <tr>
+                    <th>Time Remaining</th>
+                    <th>Pending EFX</th>
                     <th>Campaign ID</th>
                     <th>Batch ID</th>
                     <th>Processed</th>
-                    <th>Pending EFX</th>
-                    <th>Payout</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -79,13 +79,28 @@
                     v-for="pendingPayout in pendingPayoutsStore.payouts.rows"
                     :key="pendingPayout.id"
                   >
+                    <td>
+                      <!-- Time for the release of  -->
+                      <vue-countdown ref="vue" :auto-start="true" :time="calculatePendingTime(pendingPayout.last_submission_time)">
+                        <template slot-scope="props">{{props.minutes}}:{{ props.seconds }}</template>
+                      </vue-countdown>
+                    </td>
+                    <td>{{ pendingPayout.pending.quantity }}</td>
                     <td>{{ pendingPayout.id }}</td>
                     <td>{{ pendingPayout.batch_id }}</td>
                     <td>{{ pendingPayout.last_submission_time }}</td>
-                    <td>{{ pendingPayout.pending.quantity }}</td>
-                    <td><button class="button is-small is-primary" disabled="">Payout</button></td>
                   </tr>
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <th>Total</th>
+                    <td><strong>{{ $blockchain.efxPending }} EFX</strong></td>
+                  </tr>
+                  <tr>
+                    <th>Claimable</th>
+                    <td><button class="button is-primary"><span><strong>Claim: {{ $blockchain.efxPayout }}</strong></span></button></td>
+                  </tr>
+                </tfoot>
               </table>
            </div>
            <span v-else>No Pending Payouts</span>
@@ -147,14 +162,17 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import VueCountdown from '@chenfengyuan/vue-countdown/dist/vue-countdown.common'
 import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
 import KeyModal from '@/components/KeyModal.vue'
+// import CountDown from '~/components/CountDown.vue'
+// import CountDown from '@/components/CountDown.vue'
 // import PendingPayout from '~/components/PendingPayout.vue'
 
 export default {
-  components: { Balance, CampaignList, Pagination, KeyModal /* , PendingPayout */ },
+  components: { Balance, CampaignList, Pagination, KeyModal, VueCountdown },
   filters: {
     hide (value, show) {
       if (show) {
@@ -200,6 +218,11 @@ export default {
     },
     setPage (newPage) {
       this.page = newPage
+    },
+    calculatePendingTime (submissionTime) {
+      // Release time for payment at the moment is 1 hour, equal to 3600 Seconds.
+      // Here we take the submission  time, add 1 hour, substract time since.
+      return (new Date(submissionTime).getTime() + (3600 * 10e3)) - Date.now()
     }
   },
   mounted () {
