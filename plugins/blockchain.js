@@ -395,6 +395,9 @@ export default (context, inject) => {
       async waitForTransaction (transactionResult) {
         return await this.sdk.force.waitTransaction(transactionResult)
       },
+      async joinCampaignAndReserveTask (id, batchId, tasksDone, tasks) {
+        return await this.sdk.force.joinCampaignAndReserveTask(id, batchId, tasksDone, tasks)
+      },
 
       async recoverPublicKey () {
         const message = 'Effect Account'

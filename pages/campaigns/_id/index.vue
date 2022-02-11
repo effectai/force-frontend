@@ -148,6 +148,8 @@
                   <b><span>{{ campaign.reward.quantity }}</span></b>
                 </div>
                 <div class="block">
+                  loading: {{loading}}
+                  userReservatio: {{userReservation}}
                   <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light">
                     Edit Campaign
                   </nuxt-link>
@@ -291,6 +293,10 @@ export default {
   },
   methods: {
     async reserveTask () {
+      await this.prepareReserveTask()
+      this.showReserveTask = true
+    },
+    async prepareReserveTask () {
       const batch = this.campaignBatches.find((b) => {
         return b.num_tasks - b.tasks_done > 0
       })
@@ -301,7 +307,6 @@ export default {
       }
       await this.$store.dispatch('campaign/getBatchTasks', batch)
       this.reserveInBatch = batch
-      this.showReserveTask = true
     },
     async goToTask () {
       const batch = this.campaignBatches.find((b) => {
@@ -324,11 +329,13 @@ export default {
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
-        const data = await this.$blockchain.joinCampaign(this.id)
+        this.loading = true
+        await this.prepareReserveTask()
+        this.joinCampaignPopup = false
+        const data = await this.$blockchain.joinCampaignAndReserveTask(this.id, this.reserveInBatch.id, this.reserveInBatch.tasks_done, this.reserveInBatch.tasks)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
-          this.joinCampaignPopup = false
           this.waitingOnTransaction = true
           await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
@@ -336,6 +343,7 @@ export default {
             this.reserveTask()
           }
         }
+        this.loading = false
         this.waitingOnTransaction = false
         this.joinCampaignPopup = false
       } catch (e) {
