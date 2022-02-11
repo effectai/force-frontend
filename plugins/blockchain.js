@@ -20,8 +20,6 @@ export default (context, inject) => {
         efxAvailable: null,
         efxPayout: 0,
         efxPending: 0,
-        validationPeriod: 259200,
-        payoutDelay: 3600, // seconds
         pendingPayout: null,
         eos,
         bsc,
@@ -307,7 +305,7 @@ export default (context, inject) => {
           let pending = 0
           if (data) {
             data.rows.forEach((entry) => {
-              if (((new Date(new Date(entry.last_submission_time) + 'UTC').getTime() / 1000) + this.validationPeriod) < ((Date.now() / 1000))) {
+              if (((new Date(new Date(entry.last_submission_time) + 'UTC').getTime() / 1000) + this.sdk.force.config.payout_delay_sec) < ((Date.now() / 1000))) {
                 pending = pending + parseFloat(entry.pending.quantity)
               }
             })
