@@ -69,23 +69,7 @@ export default {
       template: null,
       selectedTemplate: null,
       previewTemplate: null,
-      templates: [
-        {
-          name: 'Tweet Sentiment',
-          url: 'https://raw.githubusercontent.com/effectai/effect-force-templates/master/templates/TweetSentiment/template.html',
-          placeholders: { tweet_id: 20 }
-        },
-        {
-          name: 'Image Viewer',
-          url: 'https://raw.githubusercontent.com/effectai/effect-force-templates/master/templates/ImageViewer/template.html',
-          placeholders: { url: 'https://s3-eu-west-1.amazonaws.com/prototype-mturk-hits/d/0041M9AEPITA0A6YIMIR69NSJ9HZGC.jpeg' }
-        },
-        {
-          name: 'Image Classifier',
-          url: 'https://raw.githubusercontent.com/effectai/effect-force-templates/master/templates/Image_Classifier/template.html',
-          placeholders: { ipfs: 'QmRKVfKi14UX5UnZm6EffMaa1RiTU64qPeHftzKDXZAhh3' }
-        }
-      ]
+      templates: null
     }
   },
   watch: {
