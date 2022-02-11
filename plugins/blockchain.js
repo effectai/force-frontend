@@ -21,6 +21,7 @@ export default (context, inject) => {
         efxPayout: 0,
         efxPending: 0,
         validationPeriod: 259200,
+        payoutDelay: 3600, // seconds
         pendingPayout: null,
         eos,
         bsc,
