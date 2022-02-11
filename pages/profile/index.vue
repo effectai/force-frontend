@@ -25,7 +25,7 @@
               <div class="has-text-weight-bold is-size-6 is-vecentered">
                 <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
                 <span v-if="$auth.user.blockchain === 'bsc'">
-                  <button class="button is-info is-light is-small" @click="showPK = !showPK">
+                  <button v-if="$auth.user.provider === 'burner-wallet'" class="button is-info is-light is-small" @click="showPK = !showPK">
                     <strong>BSC PrivateKey</strong>
                   </button>
                   <span>&nbsp;BSC Address:</span>
@@ -63,8 +63,33 @@
         <h2 class="title is-4">
           Pending Payout
         </h2>
-        <button @click="this.getPending">PendingPayout</button>
-        <pending-payout class="mb-6" :owner="$auth.user.accountName"/>
+          <div v-if="pendingPayoutsStore" class="table-container">
+            <table class="table" style="width: 100%">
+                <thead>
+                  <tr>
+                    <th>Campaign ID</th>
+                    <th>Batch ID</th>
+                    <th>Processed</th>
+                    <th>Pending EFX</th>
+                    <th>Payout</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="pendingPayout in pendingPayoutsStore.payouts.rows"
+                    :key="pendingPayout.id"
+                  >
+                    <td>{{ pendingPayout.id }}</td>
+                    <td>{{ pendingPayout.batch_id }}</td>
+                    <td>{{ pendingPayout.last_submission_time }}</td>
+                    <td>{{ pendingPayout.pending.quantity }}</td>
+                    <td><button class="button is-small is-primary" disabled="">Payout</button></td>
+                  </tr>
+                </tbody>
+              </table>
+           </div>
+           <span v-else>No Pending Payouts</span>
+          </div>
         <hr>
         <h2 class="title is-4">
           My Campaigns
@@ -126,10 +151,10 @@ import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
 import KeyModal from '@/components/KeyModal.vue'
-import PendingPayout from '~/components/PendingPayout.vue'
+// import PendingPayout from '~/components/PendingPayout.vue'
 
 export default {
-  components: { Balance, CampaignList, Pagination, KeyModal, PendingPayout },
+  components: { Balance, CampaignList, Pagination, KeyModal /* , PendingPayout */ },
   filters: {
     hide (value, show) {
       if (show) {
@@ -146,12 +171,14 @@ export default {
       perPage: 10,
       showPK: false,
       pages: [],
-      pending: []
+      pendingPayouts: []
     }
   },
   computed: {
     ...mapGetters({
-      transactionsByUser: 'transaction/transactionsByUser'
+      transactionsByUser: 'transaction/transactionsByUser',
+      getPendingPayouts: 'pendingPayout/getPendingPayouts'
+
     }),
     transactions () {
       return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)
@@ -162,6 +189,9 @@ export default {
         return this.transactions.slice(start, start + this.perPage)
       }
       return []
+    },
+    pendingPayoutsStore () {
+      return this.getPendingPayouts ?? null
     }
   },
   methods: {
@@ -170,13 +200,11 @@ export default {
     },
     setPage (newPage) {
       this.page = newPage
-    },
-    async getPending () {
-      const payouts = await this.$blockchain.getPendingPayouts()
-      console.log(payouts)
     }
   },
-  created () {
+  mounted () {
+    console.log('mounted')
+    this.$store.dispatch('pendingPayout/loadPendingPayouts')
   }
 }
 </script>
