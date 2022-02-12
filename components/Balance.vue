@@ -49,6 +49,12 @@
             </span>
             <span>&nbsp;</span>
             <span class="control">
+              <nuxt-link to="/vtransfer" class="button is-secondary is-outlined">
+                vTransfer
+              </nuxt-link>
+            </span>
+            <span>&nbsp;</span>
+            <span class="control">
               <nuxt-link to="/withdraw" class="button is-primary is-outlined">
                 Withdraw
               </nuxt-link>
