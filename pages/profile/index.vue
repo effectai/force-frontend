@@ -61,56 +61,56 @@
         <hr>
         <h2 class="title is-4 is-vcentered">
           Pending Payout
-          <span class="is-vcentered">
-            <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-secondary is-vcentered" @click.prevent="payout()">
-              <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
-            </button>
-            <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-secondary is-wide">
-              <p class="is-size-7">Nothing to cash out</p>
-            </button>
-            <button v-else disabled="disabled" class="button is-secondary">
-              <p>... EFX</p>
-            </button>
-          </span>
         </h2>
-          <div v-if="pendingPayoutsStore" class="table-container">
-            <table class="table" style="width: 100%">
-                <thead>
-                  <tr>
-                    <th>Countdown</th>
-                    <th>Pending</th>
-                    <th>Campaign</th>
-                    <th>Batch</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="pendingPayout in pendingPayoutsStore.payouts.rows"
-                    :key="pendingPayout.id"
-                  >
-                    <td>
-                      <!-- Time for the release of  -->
-                      <vue-countdown ref="pendingCountdown" :auto-start="true" :time="calculatePendingTime(pendingPayout.last_submission_time)" @end="this.$refs.pendingCountdown.stop()">
-                        <template slot-scope="props">{{props.minutes}}:{{ props.seconds }}</template>
-                      </vue-countdown>
-                    </td>
-                    <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }}</td>
-                    <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}`}">{{ pendingPayout.id }}</nuxt-link></td>
-                    <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}/${pendingPayout.batch_id}`}">{{ pendingPayout.batch_id }}</nuxt-link></td>
-                    <td>{{ pendingPayout.last_submission_time }}</td>
-                  </tr>
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th>Total</th>
-                    <td><strong>{{ $blockchain.efxPending }} EFX</strong></td>
-                  </tr>
-                </tfoot>
-              </table>
-           </div>
-           <span v-else>No Pending Payouts</span>
+        <span class="is-vcentered">
+          <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-secondary is-vcentered" @click.prevent="payout()">
+            <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
+          </button>
+          <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-secondary is-wide">
+            <p class="is-size-7">Nothing to cash out</p>
+          </button>
+          <button v-else disabled="disabled" class="button is-secondary">
+            <p>... EFX</p>
+          </button>
+        </span>
+        <div v-if="pendingPayoutsStore" class="table-container">
+          <table class="table" style="width: 100%">
+              <thead>
+                <tr>
+                  <th>Countdown</th>
+                  <th>Pending</th>
+                  <th>Campaign</th>
+                  <th>Batch</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="pendingPayout in pendingPayoutsStore.payouts.rows"
+                  :key="pendingPayout.id"
+                >
+                  <td>
+                    <!-- Time for the release of  -->
+                    <vue-countdown ref="countdown" :auto-start="true" :time="calculatePendingTime(pendingPayout.last_submission_time)">
+                      <template slot-scope="props">{{ props.hours }}:{{props.minutes}}:{{ props.seconds }}</template>
+                    </vue-countdown>
+                  </td>
+                  <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }}</td>
+                  <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}`}">{{ pendingPayout.id }}</nuxt-link></td>
+                  <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}/${pendingPayout.batch_id}`}">{{ pendingPayout.batch_id }}</nuxt-link></td>
+                  <td>{{ pendingPayout.last_submission_time }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Total</th>
+                  <td><strong>{{ $blockchain.efxPending }} EFX</strong></td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
+          <span v-else>No Pending Payouts</span>
+        </div>
         <hr>
         <h2 class="title is-4">
           My Campaigns
@@ -224,14 +224,19 @@ export default {
       this.page = newPage
     },
     calculatePendingTime (submissionTime) {
-      // Release time for payment at the moment is 1 hour, equal to 3600 Seconds.
       // Here we take the submission  time, add 1 hour, substract time since.
-
-      //  new Date(new Date(entry.last_submission_time) + 'UTC').getTime() / 1000) + this.sdk.force.config.payout_delay_sec) < ((Date.now() / 1000)
-
-      // const delta = new Date(new Date(submissionTime).getTime() + (3600 * 10e3) + 'UTC') - Date.now()
-      const delta = new Date(new Date(submissionTime).getTime() + (3600 * 10e3)) - Date.now()
-      return delta > 0 ? delta : 0
+      // Retrieve the submission time in UTC and convert to milliseconds
+      const subTimeSec = new Date(`${new Date(submissionTime)}UTC`).getTime()
+      // Release time for payment at the moment is 1 hour, equal to 3600e2 Seconds.
+      // Retrieve delay in milliseconds
+      const delaySec = 3600 * 10e2
+      // const delaySec = this.$blockchain.force.sdk.config.payout_delay_sec
+      // retrieve time now in milliseconds
+      const now = Date.now()
+      const endTime = subTimeSec + delaySec - now
+      // https://github.com/fengyuanchen/vue-countdown/tree/v1#time
+      // The value accepted for the `countdown` componenent, prop `time` can not be less than 0
+      return endTime < 0 ? 0 : endTime
     },
     async payout () {
       this.loading = true
@@ -244,7 +249,6 @@ export default {
         this.successMessage = 'All your available pending payouts have been completed and are added to your Effect account'
       } catch (error) {
         this.loading = false
-        this.errors.push(error)
       }
       this.loading = false
     }
