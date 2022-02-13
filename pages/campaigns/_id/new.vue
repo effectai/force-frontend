@@ -20,13 +20,15 @@
           </li>
         </ul>
       </nav>
-      <div v-if="campaignLoading">
+      <!-- This campaignLoading div is refreshing the page every time the info is updated -->
+      <!-- <div v-if="campaignLoading">
         Campaign loading..
       </div>
       <div v-else-if="!campaign">
         Could not retrieve campaign
-      </div>
-      <div v-else>
+      </div> -->
+      <!-- <div v-else> -->
+      <div>
         <div class="title">
           Tasks
         </div>
@@ -58,6 +60,7 @@
                     </td>
                     <!-- <td><span class="has-text-danger-dark is-size-5 has-text-weight-bold" @click="tasks.splice(index, 1)">x</span></td> -->
                     <td>
+                      <!-- TODO What the fuck -->
                       <button class="button is-danger is-outlined is-small is-rounded" @click="tasks.splice(index, 1)">
                         <!-- <span class="icon">
                           <i class="fas fa-check"></i>
@@ -69,7 +72,7 @@
                   <tr>
                     <td v-if="tasks.length"></td>
                     <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
-                      <input v-model="newTask[placeholder]" type="text" class="input is-info task-placeholder-value" placeholder="...">
+                      <input v-model="newTask[placeholder]" type="text" class="input is-info task-placeholder-value" placeholder="..." autofocus>
                     </td>
                     <td v-if="tasks.length"></td>
                   </tr>
@@ -83,13 +86,30 @@
                 </h1>
               </div>
               <div class="control has-text-centered">
-                <button type="submit" class="button is-primary" @keypress="enter">
+                <button type="submit" class="button is-primary" v-on:keyup.enter="createTask">
                   Create Task
                 </button>
               </div>
             </div>
 
             <hr>
+            <div v-if="tasks.length">
+              <div>
+                <h2>Batch Cost</h2>
+                <strong>{{ campaign.info.reward * tasks.length }} EFX</strong>
+              </div>
+              <div>
+                <h2>Available Balance</h2>
+                <!-- "user.vAccountRows.0.balance.quantity" -->
+                <!-- <strong>{{ $user.vAccountRows[0].balance.quantity}}</strong> -->
+                <!-- console.log(this.$blockchain.efxAvailable, this.$blockchain.vefxAvailable) -->
+                <strong>{{ efxAvailable }}</strong>
+              </div>
+              <div>
+                <h2>Batch Tasks possible</h2>
+                <strong>{{ maxAmountTask }}</strong>
+              </div>
+            </div>
             <br>
 
             <h2 class="subtitle is-5 mb-3">
@@ -125,6 +145,9 @@
             </div>
           </div> -->
           <div class="field is-grouped">
+            <div class="control">
+              <nuxt-link to="/deposit" class="button is-primary">Deposit</nuxt-link>
+            </div>
             <div class="control">
               <button type="submit" class="button is-link" :disabled="!tasks.length">
                 Submit
@@ -179,7 +202,13 @@ export default {
     }),
     ...mapGetters({
       batchByCampaignId: 'campaign/batchByCampaignId'
-    })
+    }),
+    efxAvailable () {
+      return this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable
+    },
+    maxAmountTask () {
+      return Math.floor((this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable) / this.campaign.info.reward)
+    }
   },
   mounted () {
     this.getCampaign()
@@ -199,8 +228,12 @@ export default {
       link.href = encodeURI(csvContent)
     },
     createTask () {
-      this.tasks.push(this.newTask)
-      this.newTask = this.getEmptyTask(this.placeholders)
+      if (this.tasks.length === this.maxAmountTask) {
+        alert('No more tasks available with current EFX Amount')
+      } else {
+        this.tasks.push(this.newTask)
+        this.newTask = this.getEmptyTask(this.placeholders)
+      }
     },
     getEmptyTask (placeholders) {
       const emptyTask = {}
