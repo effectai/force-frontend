@@ -31,27 +31,67 @@
           Tasks
         </div>
         <div>
-          <div v-for="(task,index) in tasks" :key="index">
+          <!-- <div v-for="(task,index) in tasks" :key="index">
             #{{ index }}: {{ task }} <span class="has-text-danger-dark is-size-5 has-text-weight-bold" @click="tasks.splice(index, 1)">x</span>
-          </div>
-          <div v-if="!tasks.length">
-            No tasks..
-          </div>
+          </div> -->
         </div>
         <form @submit.prevent="createTask">
           <div class="field">
-            <div v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
-              <label class="label">{{ placeholder }}</label>
-              <div class="control">
-                <input v-model="newTask[placeholder]" type="text" class="input">
+            <div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th v-if="tasks.length">Index</th>
+                    <th v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
+                      <!-- <input v-model="newTask[placeholder]" type="text" class="input"> -->
+                      {{ placeholder }}
+                    </th>
+                    <th v-if="tasks.length">Remove</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(task, index) in tasks" :key="index">
+                    <!-- <td>{{index}}: {{task}}</td> -->
+                    <td>{{index}}</td>
+                    <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
+                        {{ task[placeholder] }}
+                    </td>
+                    <!-- <td><span class="has-text-danger-dark is-size-5 has-text-weight-bold" @click="tasks.splice(index, 1)">x</span></td> -->
+                    <td>
+                      <button class="button is-danger is-outlined is-small is-rounded" @click="tasks.splice(index, 1)">
+                        <!-- <span class="icon">
+                          <i class="fas fa-check"></i>
+                        </span> -->
+                        <span>🗙</span>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td v-if="tasks.length"></td>
+                    <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
+                      <input v-model="newTask[placeholder]" type="text" class="input is-info task-placeholder-value" placeholder="...">
+                    </td>
+                    <td v-if="tasks.length"></td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                </tfoot>
+              </table>
+              <div v-if="!tasks.length" class="has-text-centered">
+                <h1>
+                  No tasks...
+                </h1>
+              </div>
+              <div class="control has-text-centered">
+                <button type="submit" class="button is-primary" @keypress="enter">
+                  Create Task
+                </button>
               </div>
             </div>
-            <div class="control">
-              <button type="submit" class="button">
-                Create Task
-              </button>
-            </div>
+
+            <hr>
             <br>
+
             <h2 class="subtitle is-5 mb-3">
               Import tasks
             </h2>
