@@ -37,7 +37,7 @@
             #{{ index }}: {{ task }} <span class="has-text-danger-dark is-size-5 has-text-weight-bold" @click="tasks.splice(index, 1)">x</span>
           </div> -->
         </div>
-        <form @submit.prevent="createTask">
+        <form>
           <div class="field">
             <div>
               <table class="table">
@@ -52,16 +52,16 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(task, index) in tasks" :key="index">
+                  <tr v-for="(task, index) in tasks" :key="task.id">
                     <!-- <td>{{index}}: {{task}}</td> -->
-                    <td>{{index}}</td>
+                    <td>{{index + 1}}</td>
                     <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
                         {{ task[placeholder] }}
                     </td>
                     <!-- <td><span class="has-text-danger-dark is-size-5 has-text-weight-bold" @click="tasks.splice(index, 1)">x</span></td> -->
                     <td>
                       <!-- TODO What the fuck -->
-                      <button class="button is-danger is-outlined is-small is-rounded" @click="tasks.splice(index, 1)">
+                      <button class="button is-danger is-outlined is-small is-rounded" @click.prevent="tasks.splice(index, 1)">
                         <!-- <span class="icon">
                           <i class="fas fa-check"></i>
                         </span> -->
@@ -71,8 +71,16 @@
                   </tr>
                   <tr>
                     <td v-if="tasks.length"></td>
-                    <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
-                      <input v-model="newTask[placeholder]" type="text" class="input is-info task-placeholder-value" placeholder="..." autofocus>
+                    <td v-for="(placeholder, placeindex) in placeholders" :key="placeholder" class="task-placeholder-value">
+                      <input
+                      v-model="newTask[placeholder]"
+                      type="text"
+                      class="input is-info task-placeholder-value"
+                      placeholder="..."
+                      :ref="`placeholder-${placeindex}`"
+                      @keydown.enter.prevent="createTask"
+                      >
+                      <!-- How the fuck do I use the keyup.enter event without engaging the other ones? -->
                     </td>
                     <td v-if="tasks.length"></td>
                   </tr>
@@ -86,28 +94,30 @@
                 </h1>
               </div>
               <div class="control has-text-centered">
-                <button type="submit" class="button is-primary" v-on:keyup.enter="createTask">
+                <button class="button is-primary" @click.prevent="createTask">
                   Create Task
                 </button>
+                <br>
+                <br>
+                <nuxt-link to="/deposit" class="button is-primary">Deposit</nuxt-link>
               </div>
             </div>
 
             <hr>
             <div v-if="tasks.length">
-              <div>
-                <h2>Batch Cost</h2>
-                <strong>{{ campaign.info.reward * tasks.length }} EFX</strong>
-              </div>
-              <div>
-                <h2>Available Balance</h2>
-                <!-- "user.vAccountRows.0.balance.quantity" -->
-                <!-- <strong>{{ $user.vAccountRows[0].balance.quantity}}</strong> -->
-                <!-- console.log(this.$blockchain.efxAvailable, this.$blockchain.vefxAvailable) -->
-                <strong>{{ efxAvailable }}</strong>
-              </div>
-              <div>
-                <h2>Batch Tasks possible</h2>
-                <strong>{{ maxAmountTask }}</strong>
+              <div class="columns">
+                <div class="column">
+                  <h2>Batch Cost</h2>
+                  <strong>{{ campaign.info.reward * tasks.length }} EFX</strong>
+                </div>
+                <div class="column">
+                  <h2>Available Balance</h2>
+                  <strong>{{ efxAvailable }}</strong>
+                </div>
+                <div class="column">
+                  <h2>Batch Tasks possible</h2>
+                  <strong>{{ maxAmountTask }}</strong>
+                </div>
               </div>
             </div>
             <br>
@@ -146,10 +156,7 @@
           </div> -->
           <div class="field is-grouped">
             <div class="control">
-              <nuxt-link to="/deposit" class="button is-primary">Deposit</nuxt-link>
-            </div>
-            <div class="control">
-              <button type="submit" class="button is-link" :disabled="!tasks.length">
+              <button type="submit" class="button is-link" :disabled="!tasks.length || tasks.length >= maxAmountTask">
                 Submit
               </button>
             </div>
@@ -228,12 +235,13 @@ export default {
       link.href = encodeURI(csvContent)
     },
     createTask () {
-      if (this.tasks.length === this.maxAmountTask) {
-        alert('No more tasks available with current EFX Amount')
-      } else {
-        this.tasks.push(this.newTask)
-        this.newTask = this.getEmptyTask(this.placeholders)
-      }
+      // An temp id is needed for :key=task.id
+      this.newTask.id = Date.now()
+      this.tasks.push(this.newTask)
+      this.newTask = this.getEmptyTask(this.placeholders)
+      this.$nextTick(() => {
+        this.$refs['placeholder-0'][0].focus()
+      })
     },
     getEmptyTask (placeholders) {
       const emptyTask = {}
@@ -288,6 +296,7 @@ export default {
           this.file.content = this.csvToJson(e.target.result)
           this.file.content.forEach((element) => {
             this.newTask = element
+            this.newTask.id = Date.now()
             this.createTask()
             let containsPlaceholder = false
             this.placeholders.forEach((placeholder) => {
