@@ -148,8 +148,6 @@
                   <b><span>{{ campaign.reward.quantity }}</span></b>
                 </div>
                 <div class="block">
-                  loading: {{loading}}
-                  userReservatio: {{userReservation}}
                   <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light">
                     Edit Campaign
                   </nuxt-link>
