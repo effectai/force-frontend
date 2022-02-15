@@ -267,7 +267,8 @@ export default {
       userReservation: null,
       cancelledBatchesPopup: false,
       showBatchesPopup: false,
-      waitingOnTransaction: false
+      waitingOnTransaction: false,
+      categories: ['translate', 'captions', 'socials', 'dao']
     }
   },
   computed: {

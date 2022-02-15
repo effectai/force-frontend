@@ -342,7 +342,8 @@ export default {
       reservations: null,
       userReservation: null,
       releasedReservations: null,
-      waitingOnTransaction: false
+      waitingOnTransaction: false,
+      categories: ['translate', 'captions', 'socials', 'dao']
     }
   },
   computed: {
