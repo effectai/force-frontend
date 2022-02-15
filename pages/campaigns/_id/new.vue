@@ -40,7 +40,7 @@
         <form>
           <div class="field">
             <div>
-              <table class="table">
+              <table class="table mx-auto">
                 <thead>
                   <tr>
                     <th v-if="tasks.length">Index</th>
