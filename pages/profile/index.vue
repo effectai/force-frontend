@@ -57,20 +57,24 @@
           </div>
         </div>
         <hr>
-        <h2 class="title is-4 is-vcentered">
-          Pending Payout
-        </h2>
-        <span class="is-vcentered">
-          <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-secondary is-vcentered" @click.prevent="payout()">
-            <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
-          </button>
-          <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-secondary is-wide">
-            <p class="is-size-7">Nothing to cash out</p>
-          </button>
-          <button v-else disabled="disabled" class="button is-secondary">
-            <p>... EFX</p>
-          </button>
-        </span>
+        <div>
+          <span>
+          <h2 class="title is-4 is-vcentered">
+              Pending Payout
+            </h2>
+          </span>
+          <span class="is-vcentered">
+            <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-secondary is-vcentered" @click.prevent="payout()">
+              <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
+            </button>
+            <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-secondary is-wide">
+              <p class="is-size-7">Nothing to cash out</p>
+            </button>
+            <button v-else disabled="disabled" class="button is-secondary">
+              <p>... EFX</p>
+            </button>
+          </span>
+        </div>
         <div v-if="pendingPayoutsStore" class="table-container">
           <table class="table" style="width: 100%">
               <thead>
@@ -84,13 +88,16 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="pendingPayout in pendingPayoutsStore.payouts.rows"
+                  v-for="pendingPayout in pendingPayoutsStore.payouts.rows.filter((el) => parseFloat(el.pending.quantity) > 0)"
                   :key="pendingPayout.id"
                 >
                   <td>
                     <!-- Time for the release of  -->
-                    <vue-countdown ref="countdown" :auto-start="true" :time="calculatePendingTime(pendingPayout.last_submission_time)">
-                      <template slot-scope="props">{{ props.hours }}:{{props.minutes}}:{{ props.seconds }}</template>
+                    <vue-countdown
+                      ref="countdown"
+                      :auto-start="true"
+                      :time="calculatePendingTime(pendingPayout.last_submission_time)">
+                        <template slot-scope="props">{{ props.hours }}:{{props.minutes}}:{{ props.seconds }}</template>
                     </vue-countdown>
                   </td>
                   <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }}</td>
