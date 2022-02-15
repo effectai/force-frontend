@@ -209,6 +209,7 @@ export default {
       repetitions: 1,
       newTask: {},
       tasks: [],
+      tempCounter: 0,
       taskModal: false,
       previewTask: false,
       placeholders: null,
@@ -254,7 +255,7 @@ export default {
     },
     createTask () {
       // An temp id is needed for :key=task.id
-      this.newTask.id = Date.now()
+      this.newTask.id = this.tempCounter++
       this.tasks.push(this.newTask)
       this.newTask = this.getEmptyTask(this.placeholders)
       this.$nextTick(() => {
@@ -330,7 +331,6 @@ export default {
           this.file.content = this.csvToJson(e.target.result)
           this.file.content.forEach((element) => {
             this.newTask = element
-            this.newTask.id = Date.now()
             this.createTask()
             let containsPlaceholder = false
             this.placeholders.forEach((placeholder) => {
