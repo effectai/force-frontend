@@ -8,6 +8,7 @@
       <br>
       <div class="has-text-centered">
         <button class="button" @click="copyToClipboard(messageContent)">{{ copy_message }}</button>
+        <br><br>
         <button class="button" @click="$emit('close')">OK</button>
       </div>
     </div>
@@ -37,6 +38,9 @@ export default {
     async copyToClipboard (content) {
       await navigator.clipboard.writeText(content).catch(console.error)
       this.copy_message = 'Copied!'
+      setTimeout(() => {
+        this.copy_message = 'Copy to clipboard'
+      }, 5e3)
     }
   }
 }
