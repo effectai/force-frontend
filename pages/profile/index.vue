@@ -70,7 +70,7 @@
                   <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
                 </button>
                 <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-primary is-wide">
-                  <p class="is-size-7">Nothing to cash out</p>
+                  <p class="">Nothing to cash out</p>
                 </button>
                 <button v-else disabled="disabled" class="button is-primary">
                   <p>... EFX</p>
@@ -85,8 +85,8 @@
                   <tr>
                     <th>Countdown</th>
                     <th>Pending</th>
-                    <th>Campaign</th>
-                    <th>Batch</th>
+                    <th>ID</th>
+                    <th>BatchCampaignID</th>
                     <th>Date</th>
                   </tr>
                 </thead>
@@ -101,13 +101,16 @@
                         ref="countdown"
                         :auto-start="true"
                         :time="calculatePendingTime(pendingPayout.last_submission_time)">
-                          <template slot-scope="props">{{ props.hours }}:{{props.minutes}}:{{ props.seconds }}</template>
+                          <template slot-scope="props">{{endTime(props) ? props.minutes : '✅'}}{{ props.minutes > 0 && props.seconds > 0 ? ':' + props.seconds : '' }}</template>
+                          <!-- <template v-else><font-awesome-icon :icon="['fas', 'fa-check']" /></template> -->
                       </vue-countdown>
                     </td>
                     <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }} EFX</td>
-                    <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}`}">{{ pendingPayout.id }}</nuxt-link></td>
-                    <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}/${pendingPayout.batch_id}`}">{{ pendingPayout.batch_id }}</nuxt-link></td>
-                    <td>{{ pendingPayout.last_submission_time }}</td>
+                    <!-- <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}`}">{{ pendingPayout.id }}</nuxt-link></td> -->
+                    <!-- <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}/${pendingPayout.batch_id}`}">{{ pendingPayout.batch_id }}</nuxt-link></td> -->
+                    <td>{{ pendingPayout.id }}</td>
+                    <td>{{ pendingPayout.batch_id }}</td>
+                    <td>{{ new Date(pendingPayout.last_submission_time).toLocaleDateString() }}</td>
                   </tr>
                 </tbody>
                 <tfoot>
@@ -264,6 +267,9 @@ export default {
       // https://github.com/fengyuanchen/vue-countdown/tree/v1#time
       // The value accepted for the `countdown` componenent, prop `time` can not be less than 0
       return endTime < 0 ? 0 : endTime
+    },
+    endTime (props) {
+      return props.minutes > 0 && props.seconds > 0
     },
     async payout () {
       this.loading = true
