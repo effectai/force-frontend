@@ -1,7 +1,7 @@
 <template>
   <div class="columns is-touch is-tablet is-desktop is-vcentered">
     <div class="column">
-      <div class="box">
+      <div class="box ">
         Total
         <br>
         <span class="">
@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="column">
-      <div class="box">
+      <div class="box ">
         vAccount
         <br>
         <b>
@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="column">
-      <div class="box">
+      <div class="box ">
         Wallet
         <br>
         <b>
@@ -31,7 +31,7 @@
       </div>
     </div>
     <div class="column">
-      <div class="box">
+      <div class="box ">
         Pending
         <br>
         <b>
@@ -75,5 +75,7 @@ export default {
 <style lang="scss" scoped>
   div.box {
     background: $balance-box-color;
+    padding: 5%;
+    border-radius: 8px;
   }
 </style>
