@@ -13,6 +13,13 @@ hr {
   background-color: #E8EEFF;
 }
 
+h4.title {
+  font-weight: $title-weight;
+  // font-family: $title-family;
+  font-family: $title-family;
+  color: $title-color;
+}
+
 .has-limited-width {
   width: 670px;
   max-width: 100%;
@@ -24,6 +31,7 @@ hr {
 .has-text-shadow {
   text-shadow: 2px 2px 4px #000000;
 }
+
 .card {
   //transition: box-shadow 0.2s;
   display: block;
