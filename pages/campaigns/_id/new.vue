@@ -49,6 +49,7 @@
                       {{ placeholder }}
                     </th>
                     <th v-if="tasks.length">Remove</th>
+                    <th v-if="tasks.length">Preview</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -68,6 +69,9 @@
                         <span>🗙</span>
                       </button>
                     </td>
+                    <td>
+                      <button class="button is-info is-outlined is-small is-rounded" @click.prevent="previewModal(index)">🔎</button>
+                    </td>
                   </tr>
                   <tr>
                     <td v-if="tasks.length"></td>
@@ -80,7 +84,6 @@
                       :ref="`placeholder-${placeindex}`"
                       @keydown.enter.prevent="createTask"
                       >
-                      <!-- How the fuck do I use the keyup.enter event without engaging the other ones? -->
                     </td>
                     <td v-if="tasks.length"></td>
                   </tr>
@@ -168,12 +171,28 @@
           </div>
         </form>
       </div>
+      <div class="modal" :class="{'is-active': previewTask}">
+        <div class="modal-background" @click="previewTask = false" />
+        <div class="modal-content" style="background-color: #fff; padding: 10px;">
+          <template-media
+            v-if="campaign && campaign.info && previewTask"
+            :html="renderTemplate(
+              campaign.info.template || 'No template found..',
+              previewTask)"
+            @templateLoaded="postResults(previewTask.results)"
+          />
+        </div>
+        <button class="modal-close is-large" aria-label="close" @click="previewTask = false" />
+      </div>
     </div>
   </section>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import { Template } from '@effectai/effect-js'
+import TemplateMedia from '@/components/Template'
+// import templatePreviewModal from '~/components/templatePreviewModal.vue'
 
 function getMatches (string, regex, index) {
   index || (index = 1) // default to the first capturing group
@@ -187,12 +206,18 @@ function getMatches (string, regex, index) {
 
 export default {
   middleware: ['auth'],
+  components: {
+    // templatePreviewModal
+    TemplateMedia
+  },
   data () {
     return {
       campaignId: parseInt(this.$route.params.id),
       repetitions: 1,
       newTask: {},
       tasks: [],
+      taskModal: false,
+      previewTask: null,
       placeholders: null,
       campaign: null,
       file: {
@@ -242,6 +267,22 @@ export default {
       this.$nextTick(() => {
         this.$refs['placeholder-0'][0].focus()
       })
+    },
+    previewModal (index) {
+      this.previewModal = true
+      this.previewTask = this.tasks[index]
+    },
+    renderTemplate (template, placeholders = {}, options = {}) {
+      return new Template(template, placeholders, options).render()
+    },
+    postResults (results) {
+      const frame = document.getElementById('mediaFrame')
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { task: 'results', value: results },
+          '*'
+        )
+      }
     },
     getEmptyTask (placeholders) {
       const emptyTask = {}
