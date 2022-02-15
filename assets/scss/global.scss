@@ -345,4 +345,7 @@ a.box {
   .is-marginless-left-mobile {
     margin-left : 0 !important;
   }
+  .no-float-mobile {
+    float: none !important;
+  }
 }

@@ -79,7 +79,7 @@
           </div>
 
           <!-- Current Task Reservations  -->
-          <div v-if="body === 'reservations'" class="block">
+          <div v-if="body === 'reservations'" class="block" style="overflow-x:auto;">
             <div v-if="campaign && campaign.info" class="content">
               <div v-if="reservations && reservations.length">
                 <table class="table" style="width: 100%">

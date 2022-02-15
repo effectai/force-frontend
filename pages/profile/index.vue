@@ -123,7 +123,7 @@
 
         <hr>
 
-        <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/templates">
+        <nuxt-link class="button is-primary is-pulled-right has-margin-bottom-mobile no-float-mobile" to="/campaigns/templates">
           <span class="icon">
             +
           </span>
