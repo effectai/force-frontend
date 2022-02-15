@@ -29,11 +29,18 @@
       </div>
       <div class="columns">
         <div class="column is-three-fifths">
-          <div class="title">
-            <span v-if="batch">#{{ campaignId }}.{{ batch.id }}: </span>
-            <span v-if="campaign && campaign.info">{{ campaign.info.title }}</span>
-            <span v-else-if="!campaign || campaign.info !== null">Loading..</span>
-            <span v-else class="has-text-danger-dark">Could not load campaign info</span>
+          <div class="is-flex is-align-items-center mb-6">
+            <p class="image has-radius mr-4" style="width: 52px; height: 52px" v-if="campaign">
+              <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
+              <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+              <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
+            </p>
+            <div class="title has-text-weight-bold">
+              <span v-if="batch">#{{ campaignId }}.{{ batch.id }}: </span>
+              <span v-if="campaign && campaign.info">{{ campaign.info.title }}</span>
+              <span v-else-if="!campaign || campaign.info !== null">Loading..</span>
+              <span v-else class="has-text-danger-dark">Could not load campaign info</span>
+            </div>
           </div>
           <div class="tabs">
             <ul>
@@ -123,7 +130,7 @@
           </div>
 
           <!-- Task results -->
-          <div v-if="body === 'results'" class="block">
+          <div v-if="body === 'results'" class="block" style="overflow-x:auto">
             <div v-if="campaign && campaign.info" class="content">
               <div v-if="submissions.length">
                 <table class="table" style="width: 100%">
@@ -335,7 +342,8 @@ export default {
       reservations: null,
       userReservation: null,
       releasedReservations: null,
-      waitingOnTransaction: false
+      waitingOnTransaction: false,
+      categories: ['translate', 'captions', 'socials', 'dao']
     }
   },
   computed: {

@@ -176,7 +176,7 @@
           </div>
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
-          <div class="control">
+          <div class="control has-margin-bottom-mobile">
             <button class="button is-secondary is-outlined is-small" @click.prevent="$refs.fileInput.click()">
               Import Campaign
             </button>
