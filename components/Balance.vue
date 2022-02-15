@@ -73,4 +73,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  div.box {
+    background: $balance-box-color;
+  }
 </style>
