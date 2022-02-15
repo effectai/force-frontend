@@ -219,8 +219,7 @@ export default {
         // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
         if (processAllCampaigns) {
           ;(async () => {
-            // reverse campaigns array so newer campaigns are processed first
-            for (const campaign of data.rows.slice().reverse()) {
+            for (const campaign of data.rows) {
               // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
               // a short sleep helps for some reason to make interface less laggy
               // await sleep(0)
@@ -232,7 +231,7 @@ export default {
         if (data.more) {
           console.log('retrieving more campaigns..')
           await sleep(100)
-          await dispatch('getCampaigns', { nextKey: data.next_key })
+          await dispatch('getCampaigns', { nextKey: data.next_key, processAllCampaigns })
         } else {
           // No more campaigns, we are done
           commit('SET_ALL_CAMPAIGNS_LOADED', true)
