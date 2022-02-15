@@ -217,7 +217,7 @@ export default {
       newTask: {},
       tasks: [],
       taskModal: false,
-      previewTask: null,
+      previewTask: false,
       placeholders: null,
       campaign: null,
       file: {
@@ -269,7 +269,7 @@ export default {
       })
     },
     previewModal (index) {
-      this.previewModal = true
+      this.previewTask = true
       this.previewTask = this.tasks[index]
     },
     renderTemplate (template, placeholders = {}, options = {}) {
