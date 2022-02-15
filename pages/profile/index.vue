@@ -63,7 +63,7 @@
         </h2> -->
         <!-- <pending-payout class="mb-6" :owner="$auth.user.accountName"/> -->
         <hr>
-        <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/templates">
+        <nuxt-link class="button is-primary is-pulled-right has-margin-bottom-mobile no-float-mobile" to="/campaigns/templates">
           <span class="icon">
             +
           </span>
@@ -184,10 +184,4 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-@media screen and (max-width: 768px) {
-  .is-pulled-right {
-    float: none !important;
-    margin-bottom: 25px;
-  }
-}
 </style>

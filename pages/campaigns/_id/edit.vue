@@ -432,4 +432,9 @@ export default {
 div.instructions-group .textarea {
   overflow-y: scroll
 }
+@media screen and (max-width: 768px) {
+  .is-grouped-right {
+    display: block !important;
+  }
+}
 </style>

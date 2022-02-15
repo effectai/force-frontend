@@ -59,7 +59,7 @@
               ...
             </p>
             <div class="mt-5">
-              <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" class="button is-primary is-pulled-right" :to="`/campaigns/${id}/new`">
+              <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" :to="`/campaigns/${id}/new`">
                 <span class="icon">
                   +
                 </span>
@@ -148,7 +148,7 @@
                   <b><span>{{ campaign.reward.quantity }}</span></b>
                 </div>
                 <div class="block">
-                  <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light">
+                  <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
                     Edit Campaign
                   </nuxt-link>
                   <button v-if="loading || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
