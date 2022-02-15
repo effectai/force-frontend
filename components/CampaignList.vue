@@ -267,16 +267,16 @@ export default {
     onSearch (input) {
       this.search = input
     },
-    async getForceInfo () {
+    getForceInfo () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
         // on the requester campaign list process all campaigns
-        await this.$store.dispatch('campaign/getCampaigns', { processAllCampaigns: this.loadAllCampaigns ? this.loadAllCampaigns : null })
+        this.$store.dispatch('campaign/getCampaigns', { processAllCampaigns: this.loadAllCampaigns ? this.loadAllCampaigns : null })
       }
       if (!this.allBatchesLoaded) {
-        await this.$store.dispatch('campaign/getBatches')
+        this.$store.dispatch('campaign/getBatches')
       }
       if (!this.allSubmissionsLoaded) {
-        await this.$store.dispatch('campaign/getSubmissions')
+        this.$store.dispatch('campaign/getSubmissions')
       }
     }
   }

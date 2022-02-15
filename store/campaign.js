@@ -218,14 +218,17 @@ export default {
 
         // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
         if (processAllCampaigns) {
-          ;(async () => {
-            for (const campaign of data.rows) {
-              // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
-              // a short sleep helps for some reason to make interface less laggy
-              // await sleep(0)
-              await dispatch('processCampaign', campaign)
-            }
-          })()
+          setTimeout(() => {
+            dispatch('processCampaigns', data.rows)
+          }, 0)
+          // ;(async () => {
+          //   for (const campaign of data.rows) {
+          //   // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
+          //   // a short sleep helps for some reason to make interface less laggy
+          //   // await sleep(0)
+          //     dispatch('processCampaign', campaign)
+          //   }
+          // })()
         }
 
         if (data.more) {
@@ -241,6 +244,24 @@ export default {
         this.$blockchain.handleError(error)
         commit('SET_LOADING', false)
       }
+    },
+    async processCampaigns ({ commit, rootGetters, dispatch }, campaigns) {
+      // field_0 represents the content type where:
+      // 0: IPFS
+      for (const campaign of campaigns) {
+        try {
+          if (campaign.content.field_0 === 0) {
+          // field_1 represents the IPFS hash
+          // Save IPFS content it in the store if its not there yet
+            await dispatch('ipfs/getIpfsContent', campaign.content.field_1, { root: true })
+            const info = rootGetters['ipfs/ipfsContentByHash'](campaign.content.field_1)
+            campaign.info = info
+          }
+        } catch (e) {
+          commit('SET_CAMPAIGN_INFO', { id: campaign.id, info: null })
+        }
+      }
+      commit('UPSERT_CAMPAIGNS', campaigns)
     },
     async processCampaign ({ commit, rootGetters, dispatch }, campaign) {
       try {
