@@ -77,5 +77,6 @@ export default {
     background: $balance-box-color;
     padding: 5%;
     border-radius: 8px;
+    box-shadow: none;
   }
 </style>

@@ -2,12 +2,12 @@
   <section class="section">
     <div class="container mt-5">
       <div class="text-center">
-        <h4 class="title is-spaced has-text-weight-bold is-full-mobile">
+        <h1 class="title is-spaced has-text-weight-bold is-full-mobile">
           <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->
           Effect Account | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
-        </h4>
+        </h1>
         <balance />
-        <div class="columns is-vcentered my-auto">
+        <div class="columns my-auto">
           <div class="column">
             <div class="block">
               <div class="has-text-weight-bold is-size-6">
@@ -129,15 +129,15 @@
           </span>
           <span>Create Campaign</span>
         </nuxt-link>
-        <h2 class="title is-4 has-text-weight-bold is-full-mobile">
+        <h2 class="title is-4 is-full-mobile">
           My Campaigns
         </h2>
         <campaign-list class="mb-6" :owner="$auth.user.accountName" />
         <hr>
 
-        <h4 class="title is-4 is-spaced">
+        <h2 class="title is-4 is-spaced">
           Transactions
-        </h4>
+        </h2>
         <div v-if="transactions" class="table-container">
           <table class="table" style="width: 100%">
             <thead>
