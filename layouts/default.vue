@@ -56,6 +56,9 @@ export default {
   background: $yellow;
   font-weight: bold;
   text-align: center;
+  @media screen and (max-width: 768px), print {
+    padding: 0.5rem;
+  }
 }
 
 </style>

@@ -49,7 +49,7 @@
                 </span>
               </button>
             </div>
-            <div class="navbar-item is-hidden-desktop" @click="logout">
+            <div class="navbar-item is-hidden-desktop">
               <nuxt-link :key="$auth.user ? $auth.user.vAccountRows[0].id : null" to="/profile" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/user.svg" style="height: 24px">
