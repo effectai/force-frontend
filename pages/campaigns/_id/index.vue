@@ -31,11 +31,18 @@
       </div>
       <div v-else class="columns">
         <div class="column is-three-fifths">
-          <div class="title has-text-weight-bold mb-6">
-            <span>#{{ id }} </span>
-            <span v-if="campaign.info">{{ campaign.info.title }}</span>
-            <span v-else-if="campaign.info !== null">Loading..</span>
-            <span v-else class="has-text-danger-dark">Could not load campaign info</span>
+          <div class="is-flex is-align-items-center mb-6">
+            <p class="image has-radius mr-4" style="width: 52px; height: 52px" v-if="campaign">
+              <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
+              <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+              <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
+            </p>
+            <div class="title has-text-weight-bold">
+              <span>#{{ id }} </span>
+              <span v-if="campaign.info">{{ campaign.info.title }}</span>
+              <span v-else-if="campaign.info !== null">Loading..</span>
+              <span v-else class="has-text-danger-dark">Could not load campaign info</span>
+            </div>
           </div>
           <div class="tabs">
             <ul>
