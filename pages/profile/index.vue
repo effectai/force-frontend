@@ -104,7 +104,7 @@
                           <template slot-scope="props">{{ props.hours }}:{{props.minutes}}:{{ props.seconds }}</template>
                       </vue-countdown>
                     </td>
-                    <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }}</td>
+                    <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }} EFX</td>
                     <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}`}">{{ pendingPayout.id }}</nuxt-link></td>
                     <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}/${pendingPayout.batch_id}`}">{{ pendingPayout.batch_id }}</nuxt-link></td>
                     <td>{{ pendingPayout.last_submission_time }}</td>
@@ -113,7 +113,11 @@
                 <tfoot>
                   <tr>
                     <th>Total</th>
-                    <td><strong>{{ $blockchain.efxPending }} EFX</strong></td>
+                    <td><strong>{{ parseFloat($blockchain.efxPending).toFixed(2) }} EFX</strong></td>
+                  </tr>
+                  <tr>
+                    <th>Claimable</th>
+                    <td><strong>{{ parseFloat($blockchain.efxPayout).toFixed(2) }} EFX</strong></td>
                   </tr>
                 </tfoot>
               </table>
