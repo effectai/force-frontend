@@ -59,22 +59,23 @@
         </div>
         <hr>
         <div>
-          <span>
-          <h2 class="title is-4 is-vcentered">
-              Pending Payout
+
+        <div class="level">
+            <h2 class="title is-4 is-pulled-left">
+                Pending Payout
             </h2>
-          </span>
-          <span class="is-vcentered">
-            <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-secondary is-vcentered" @click.prevent="payout()">
-              <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
-            </button>
-            <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-secondary is-wide">
-              <p class="is-size-7">Nothing to cash out</p>
-            </button>
-            <button v-else disabled="disabled" class="button is-secondary">
-              <p>... EFX</p>
-            </button>
-          </span>
+          <div class="is-pulled-right">
+              <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-secondary" @click.prevent="payout()">
+                <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
+              </button>
+              <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-secondary is-wide">
+                <p class="is-size-7">Nothing to cash out</p>
+              </button>
+              <button v-else disabled="disabled" class="button is-secondary">
+                <p>... EFX</p>
+              </button>
+            </div>
+          </div>
         </div>
         <div v-if="pendingPayoutsStore" class="table-container">
           <table class="table" style="width: 100%">
@@ -117,7 +118,9 @@
           </div>
           <span v-else>No Pending Payouts</span>
         </div>
+
         <hr>
+
         <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/templates">
           <span class="icon">
             +
