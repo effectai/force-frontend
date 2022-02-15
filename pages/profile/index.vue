@@ -2,7 +2,7 @@
   <section class="section">
     <div class="container mt-5">
       <div class="text-center">
-        <h4 class="title is-spaced">
+        <h4 class="title is-spaced has-text-weight-bold is-full-mobile">
           <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->
           Effect Account | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
         </h4>
@@ -129,7 +129,7 @@
           </span>
           <span>Create Campaign</span>
         </nuxt-link>
-        <h2 class="title is-4">
+        <h2 class="title is-4 has-text-weight-bold is-full-mobile">
           My Campaigns
         </h2>
         <campaign-list class="mb-6" :owner="$auth.user.accountName" />
@@ -176,7 +176,12 @@
           @setPage="setPage"
         />
         <hr>
-        <a class="button is-danger" @click="logout">Logout</a>
+        <button class="button is-white" exact-active-class="is-active" @click="logout">
+          <span class="icon">
+            <img src="~assets/img/icons/logout.svg" style="height: 24px">
+          </span>
+          <span>Logout</span>
+        </button>
         <br><br>
       </div>
       <key-modal v-if="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" @close="showPK = !showPK" />
@@ -283,4 +288,10 @@ button.button.is-small.is-info {
   border-radius: 8px;
 }
 
+@media screen and (max-width: 768px) {
+  .is-pulled-right {
+    float: none !important;
+    margin-bottom: 25px;
+  }
+}
 </style>

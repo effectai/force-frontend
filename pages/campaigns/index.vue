@@ -7,10 +7,10 @@
         </span>
         <span>Create Campaign</span>
       </nuxt-link>
-      <nuxt-link class="button is-ghost is-pulled-right" to="/">
+      <nuxt-link class="button is-ghost is-pulled-right is-paddingless-mobile" to="/">
         <span>Active Campaigns</span>
       </nuxt-link>
-      <h2 class="title">
+      <h2 class="title has-text-weight-bold is-full-mobile">
         <span v-if="myCampaigns">My</span><span v-else>All</span> Campaigns
       </h2>
       <label class="checkbox">
@@ -41,5 +41,11 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@media screen and (max-width: 768px) {
+  .is-pulled-right {
+    float: none !important;
+    margin-bottom: 25px;
+  }
+}
 </style>

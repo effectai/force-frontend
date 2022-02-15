@@ -279,3 +279,70 @@ a.box {
   border: 1px solid;
   text-transform: capitalize;
 }
+
+/* Mobile margins */
+@media screen and (max-width: 768px) {
+  .has-margin-mobile {
+    margin: 1rem !important;
+  }
+
+  .has-margin-vertical-mobile {
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .has-margin-horizontal-mobile {
+    margin-left: 1rem !important;
+    margin-right: 1rem !important;
+  }
+
+  .has-margin-top-mobile {
+    margin-top: 1rem !important;
+  }
+
+  .has-margin-right-mobile {
+    margin-right: 1rem !important;
+  }
+
+  .has-margin-bottom-mobile {
+    margin-bottom: 1rem !important;
+  }
+
+  .has-margin-left-mobile {
+    margin-left : 1rem !important;
+  }
+
+  .is-marginless-mobile {
+    margin: 0 !important;
+  }
+
+  .is-paddingless-mobile {
+    padding: 0 !important;
+  }
+
+  .is-marginless-vertical-mobile {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .is-marginless-horizontal-mobile {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .is-marginless-top-mobile {
+    margin-top: 0 !important;
+  }
+
+  .is-marginless-right-mobile {
+    margin-right: 0 !important;
+  }
+
+  .is-marginless-bottom-mobile {
+    margin-bottom: 0 !important;
+  }
+
+  .is-marginless-left-mobile {
+    margin-left : 0 !important;
+  }
+}

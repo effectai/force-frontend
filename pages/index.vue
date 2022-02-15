@@ -7,7 +7,7 @@
         </span>
         <span>Create Campaign</span>
       </nuxt-link>
-      <nuxt-link v-if="hasCampaigns" class="button is-ghost is-pulled-right" to="/campaigns">
+      <nuxt-link v-if="hasCampaigns" class="button is-ghost is-pulled-right is-paddingless-mobile" to="/campaigns">
         <span>My Campaigns</span>
       </nuxt-link>
       <h2 class="title mb-6 has-text-weight-bold is-full-mobile">
