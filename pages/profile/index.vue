@@ -7,7 +7,7 @@
           Effect Account | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
         </h4>
         <balance />
-        <div class="columns">
+        <div class="columns is-vcentered my-auto">
           <div class="column">
             <div class="block">
               <div class="has-text-weight-bold is-size-6">
@@ -59,65 +59,66 @@
           </div>
         </div>
         <hr>
-        <div>
 
-        <div class="level">
-            <h2 class="title is-4 is-pulled-left">
-                Pending Payout
-            </h2>
-          <div class="is-pulled-right">
-              <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-primary" @click.prevent="payout()">
-                <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
-              </button>
-              <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-primary is-wide">
-                <p class="is-size-7">Nothing to cash out</p>
-              </button>
-              <button v-else disabled="disabled" class="button is-primary">
-                <p>... EFX</p>
-              </button>
-            </div>
+        <div>
+          <div class="level">
+              <h2 class="title is-4">
+                  Pending Payout
+              </h2>
+            <div class="is-pulled-right no-float-mobile ">
+                <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-primary" @click.prevent="payout()">
+                  <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
+                </button>
+                <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-primary is-wide">
+                  <p class="is-size-7">Nothing to cash out</p>
+                </button>
+                <button v-else disabled="disabled" class="button is-primary">
+                  <p>... EFX</p>
+                </button>
+              </div>
           </div>
         </div>
-        <div v-if="pendingPayoutsStore" class="table-container">
-          <table class="table" style="width: 100%">
-              <thead>
-                <tr>
-                  <th>Countdown</th>
-                  <th>Pending</th>
-                  <th>Campaign</th>
-                  <th>Batch</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="pendingPayout in pendingPayoutsStore.payouts.rows.filter((el) => parseFloat(el.pending.quantity) > 0)"
-                  :key="pendingPayout.id"
-                >
-                  <td>
-                    <!-- Time for the release of  -->
-                    <vue-countdown
-                      ref="countdown"
-                      :auto-start="true"
-                      :time="calculatePendingTime(pendingPayout.last_submission_time)">
-                        <template slot-scope="props">{{ props.hours }}:{{props.minutes}}:{{ props.seconds }}</template>
-                    </vue-countdown>
-                  </td>
-                  <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }}</td>
-                  <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}`}">{{ pendingPayout.id }}</nuxt-link></td>
-                  <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}/${pendingPayout.batch_id}`}">{{ pendingPayout.batch_id }}</nuxt-link></td>
-                  <td>{{ pendingPayout.last_submission_time }}</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th>Total</th>
-                  <td><strong>{{ $blockchain.efxPending }} EFX</strong></td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-          <span v-else>No Pending Payouts</span>
+        <div class="is-full-mobile">
+          <div v-if="pendingPayoutsStore" class="table-container">
+            <table class="table" style="width: 100%">
+                <thead>
+                  <tr>
+                    <th>Countdown</th>
+                    <th>Pending</th>
+                    <th>Campaign</th>
+                    <th>Batch</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="pendingPayout in pendingPayoutsStore.payouts.rows.filter((el) => parseFloat(el.pending.quantity) > 0)"
+                    :key="pendingPayout.id"
+                  >
+                    <td>
+                      <!-- Time for the release of  -->
+                      <vue-countdown
+                        ref="countdown"
+                        :auto-start="true"
+                        :time="calculatePendingTime(pendingPayout.last_submission_time)">
+                          <template slot-scope="props">{{ props.hours }}:{{props.minutes}}:{{ props.seconds }}</template>
+                      </vue-countdown>
+                    </td>
+                    <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }}</td>
+                    <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}`}">{{ pendingPayout.id }}</nuxt-link></td>
+                    <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}/${pendingPayout.batch_id}`}">{{ pendingPayout.batch_id }}</nuxt-link></td>
+                    <td>{{ pendingPayout.last_submission_time }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th>Total</th>
+                    <td><strong>{{ $blockchain.efxPending }} EFX</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <span v-else>No Pending Payouts</span>
         </div>
 
         <hr>
@@ -131,9 +132,9 @@
         <h2 class="title is-4">
           My Campaigns
         </h2>
-
         <campaign-list class="mb-6" :owner="$auth.user.accountName" />
         <hr>
+
         <h4 class="title is-4 is-spaced">
           Transactions
         </h4>

@@ -33,9 +33,6 @@
           Tasks
         </div>
         <div>
-          <!-- <div v-for="(task,index) in tasks" :key="index">
-            #{{ index }}: {{ task }} <span class="has-text-danger-dark is-size-5 has-text-weight-bold" @click="tasks.splice(index, 1)">x</span>
-          </div> -->
         </div>
         <form>
           <div class="field">
@@ -61,7 +58,6 @@
                     <td>
                       <button class="button is-danger is-outlined is-small is-rounded" @click.prevent="tasks.splice(index, 1)">
                         <font-awesome-icon icon="fa-solid fa-trash-can" />
-                        <!-- <span>🗙</span> -->
                       </button>
                     </td>
                     <td>

@@ -1,5 +1,5 @@
 <template>
-  <div class="columns is-touch is-tablet is-desktop is-vcentered">
+  <div class="columns is-touch is-tablet is-desktop is-vcentered my-auto">
     <div class="column">
       <div class="box ">
         Total
@@ -41,7 +41,7 @@
       </div>
     </div>
     <div class="column">
-      <div class="field is-horizontal is-grouped-centered has-text-centered">
+      <div class="field is-horizontal is-grouped-centered has-text-centered mx-auto">
             <span class="control">
               <nuxt-link to="/deposit" class="button is-primary ">
                 Deposit
