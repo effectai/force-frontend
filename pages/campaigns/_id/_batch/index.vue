@@ -255,7 +255,7 @@
                 </div>
               </div>
               <div class="block is-vcentered">
-                <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
+                <button v-if="loading || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
                   Loading
                 </button>
                 <button v-else-if="!userJoined" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
@@ -378,7 +378,9 @@ export default {
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
-        const data = await this.$blockchain.joinCampaign(this.campaignId)
+        this.loading = true
+        this.joinCampaignPopup = false
+        const data = await this.$blockchain.joinCampaignAndReserveTask(this.campaignId, this.batch.id, this.batch.tasks_done, this.batch.tasks)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true

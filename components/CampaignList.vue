@@ -5,97 +5,96 @@
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
       <hr>
     </client-only>
-    <template v-for="campaign in paginatedCampaigns">
-      <nuxt-link
-        :key="campaign.id"
-        :to="'/campaigns/'+campaign.id"
-        class="box p-4"
-        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
-      >
-        <div class="columns is-vcentered is-multiline is-mobile">
-          <div class="column is-narrow is-mobile-1">
-            <p class="image has-radius" style="width: 52px; height: 52px">
-              <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
-              <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
-              <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
-            </p>
-          </div>
-          <div class="column is-4-desktop is-4-widescreen is-12-touch">
-            <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-              <div>
-                <span
-                  v-if="campaign.info && campaign.info.category"
-                  class="tag is-light mb-2"
-                  :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
-                >{{ campaign.info.category }}</span>
-              </div>
+    <nuxt-link
+      v-for="campaign in paginatedCampaigns"
+      :key="campaign.id"
+      :to="'/campaigns/'+campaign.id"
+      class="box p-4"
+      :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
+    >
+      <div class="columns is-vcentered is-multiline is-mobile">
+        <div class="column is-narrow is-mobile-1">
+          <p class="image has-radius" style="width: 52px; height: 52px">
+            <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
+            <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+            <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
+          </p>
+        </div>
+        <div class="column is-4-desktop is-4-widescreen is-12-touch">
+          <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+            <div>
+              <span
+                v-if="campaign.info && campaign.info.category"
+                class="tag is-light mb-2"
+                :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
+              >{{ campaign.info.category }}</span>
+            </div>
 
-              <span v-if="campaign.info">
-                <span v-if="campaign.info.title">{{ campaign.info.title }}</span>
-                <i v-else>- Untitled -</i>
-              </span>
-              <span v-else-if="campaign.info !== null">Loading..</span>
-              <span v-else class="has-text-danger-dark">Could not load campaign info</span>
-            </h2>
-            <div class="has-text-grey is-size-7">
-              <div v-if="campaign.info">
-                <div v-if="campaign.info.description" class="is-ellipsis">
-                  {{ campaign.info.description }}
-                </div>
-                <i v-else>- no description -</i>
+            <span v-if="campaign.info">
+              <span v-if="campaign.info.title">{{ campaign.info.title }}</span>
+              <i v-else>- Untitled -</i>
+            </span>
+            <span v-else-if="campaign.info !== null">Loading..</span>
+            <span v-else class="has-text-danger-dark">Could not load campaign info</span>
+          </h2>
+          <div class="has-text-grey is-size-7">
+            <div v-if="campaign.info">
+              <div v-if="campaign.info.description" class="is-ellipsis">
+                {{ campaign.info.description }}
               </div>
-              <div v-else-if="campaign.info !== null">
-                ........
-              </div>
+              <i v-else>- no description -</i>
+            </div>
+            <div v-else-if="campaign.info !== null">
+              ........
             </div>
           </div>
-          <div class="column is-2-desktop">
-            <p class="has-text-grey is-size-7">
-              Requester:
-            </p>
-            <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-              <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                <span class="is-ellipsis">{{ campaign.owner[1] }}</span>
-              </nuxt-link>
-            </h2>
-          </div>
-          <div class="column">
-            <p class="has-text-grey is-size-7">
-              Reward:
-            </p>
-            <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-              {{ campaign.reward.quantity }}
-            </h2>
-          </div>
-          <div class="column">
-            <p class="has-text-grey is-size-7">
-              Tasks:
-            </p>
-            <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-              <span v-if="batchByCampaignId(campaign.id) === null">
-                Loading..
-              </span>
-              <span v-else>
-                {{ batchByCampaignId(campaign.id).reduce(function(a,b){
-                  return a + b.num_tasks
-                },0) - batchByCampaignId(campaign.id).reduce(function(a,b){
-                  return a + b.tasks_done
-                },0) }}/{{ batchByCampaignId(campaign.id).reduce(function(a,b){
-                  return a + b.num_tasks
-                },0) }} left
-                <br>
-              </span>
-            </h2>
-          </div>
-          <div class="column has-text-right is-12-mobile">
-            <button class="button is-wide is-primary has-text-weight-semibold is-fullwidth-mobile" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null}">
-              <span v-if="campaign.userHasReservation">Go to Task</span>
-              <span v-else>View</span>
-            </button>
-          </div>
         </div>
-      </nuxt-link>
-    </template>
+        <div class="column is-2-desktop is-full-mobile">
+          <p class="has-text-grey is-size-7">
+            Requester:
+          </p>
+          <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+            <nuxt-link :to="'/profile/' + campaign.owner[1]">
+              <span class="is-ellipsis">{{ campaign.owner[1] }}</span>
+            </nuxt-link>
+          </h2>
+        </div>
+        <div class="column">
+          <p class="has-text-grey is-size-7">
+            Reward:
+          </p>
+          <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+            {{ campaign.reward.quantity }}
+          </h2>
+        </div>
+        <div class="column">
+          <p class="has-text-grey is-size-7">
+            Tasks:
+          </p>
+          <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+            <span v-if="batchByCampaignId(campaign.id) === null">
+              Loading..
+            </span>
+            <span v-else>
+              {{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                return a + b.num_tasks
+              },0) - batchByCampaignId(campaign.id).reduce(function(a,b){
+                return a + b.tasks_done
+              },0) }}/{{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                return a + b.num_tasks
+              },0) }} left
+              <br>
+            </span>
+          </h2>
+        </div>
+        <div class="column has-text-right is-12-mobile">
+          <button class="button is-wide is-primary has-text-weight-semibold is-fullwidth-mobile" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null}">
+            <span v-if="campaign.userHasReservation">Go to Task</span>
+            <span v-else>View</span>
+          </button>
+        </div>
+      </div>
+    </nuxt-link>
     <pagination
       v-if="filteredCampaigns"
       :items="filteredCampaigns.length"
@@ -235,11 +234,7 @@ export default {
       const start = (this.page - 1) * this.perPage
       if (this.filteredCampaigns) {
         const pageCampaigns = this.filteredCampaigns.slice(start, start + this.perPage)
-        for (const campaign of pageCampaigns) {
-          if (!this.loadAllCampaigns) {
-            this.$store.dispatch('campaign/processCampaign', campaign)
-          }
-        }
+        this.processCampaigns(pageCampaigns)
         return pageCampaigns
       }
       return []
@@ -249,6 +244,14 @@ export default {
     this.getForceInfo()
   },
   methods: {
+    async processCampaigns (campaigns) {
+      for (const campaign of campaigns) {
+        if (!this.loadAllCampaigns) {
+          // a short sleep helps for some reason to make interface less laggy
+          await this.$store.dispatch('campaign/processCampaign', campaign)
+        }
+      }
+    },
     setPage (newPage) {
       this.page = newPage
     },

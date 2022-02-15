@@ -42,13 +42,20 @@
                 <img src="~assets/img/icons/notification.svg" style="height: 26px">
               </div>
             </div>
-            <div class="navbar-item" @click="mobileMenu = false, showUserModal = !showUserModal">
+            <div class="navbar-item is-hidden-mobile" @click="mobileMenu = false, showUserModal = !showUserModal">
               <button :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/user.svg" style="height: 24px">
                 </span>
-                <span v-if="mobileMenu">Profile</span>
               </button>
+            </div>
+            <div class="navbar-item is-hidden-desktop" @click="logout">
+              <nuxt-link :key="$auth.user ? $auth.user.vAccountRows[0].id : null" to="/profile" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
+                <span class="icon">
+                  <img src="~assets/img/icons/user.svg" style="height: 24px">
+                </span>
+                <span v-if="mobileMenu">Profile</span>
+              </nuxt-link>
             </div>
             <div class="navbar-item is-hidden-desktop" @click="logout">
               <button :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
@@ -59,9 +66,9 @@
               </button>
             </div>
             <!--- User Modal -->
-            <div class="modal user-modal is-hidden-touch" :class="{ 'is-active': showUserModal }" @focusout="showUserModal = false" tabindex="0">
+            <div class="modal user-modal is-hidden-touch" :class="{ 'is-active': showUserModal }" tabindex="0" @focusout="showUserModal = false">
               <div class="modal-card">
-                <div class="arrow-up"></div>
+                <div class="arrow-up" />
                 <section class="modal-card-body has-shadow">
                   <ul>
                     <li>
@@ -94,9 +101,9 @@
     </nav>
     <!--- Balance Modal -->
     <div class="modal balance-modal" :class="{ 'is-active': showBalanceModal }">
-      <div class="modal-background" @click="showBalanceModal = false"></div>
+      <div class="modal-background" @click="showBalanceModal = false" />
       <div class="modal-card">
-        <div class="arrow-up"></div>
+        <div class="arrow-up" />
         <section class="modal-card-body">
           <div class="content">
             <div class="columns is-multiline">
@@ -136,10 +143,14 @@
             <div class="columns">
               <div class="column is-4 is-flex is-justify-content-center">
                 <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-secondary is-pulsing" @click.prevent="payout()">
-                  <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
+                  <p v-if="!loading">
+                    Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span>
+                  </p>
                 </button>
                 <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-secondary is-wide">
-                  <p class="is-size-7">Nothing to cash out</p>
+                  <p class="is-size-7">
+                    Nothing to cash out
+                  </p>
                 </button>
                 <button v-else disabled="disabled" class="button is-secondary">
                   <p>... EFX</p>
@@ -290,13 +301,16 @@ export default {
   background: #101D56;
   opacity: .7;
 }
-.balance-modal .modal-card {
+.balance-modal {
+  backdrop-filter: blur(2px);
+  .modal-card {
   .balance-item {
     padding: 0.75rem;
   }
   .button {
     width: 100%;
   }
+}
 }
 
 .balance-modal .modal-card, .user-modal .modal-card {

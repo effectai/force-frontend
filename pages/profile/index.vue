@@ -13,11 +13,11 @@
               <div class="has-text-weight-bold is-size-6">
                 Account Name:
               </div>
-                <a
-                  class="is-flex is-clipped"
-                  :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
-                  target="_blank"
-                >{{ $auth.user.accountName }}</a>
+              <a
+                class="is-flex is-clipped"
+                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
+                target="_blank"
+              >{{ $auth.user.accountName }}</a>
             </div>
           </div>
           <div class="column">
@@ -29,7 +29,7 @@
                     <strong>BSC PrivateKey</strong>
                   </button>
                   <span>&nbsp;BSC Address:</span>
-                  </span>
+                </span>
               </div>
               <a
                 v-if="$auth.user.blockchain === 'bsc'"
@@ -46,16 +46,14 @@
             </div>
           </div>
           <div class="column">
-          <div class="block">
-            <div class="has-text-weight-bold is-size-6">
-              ID:
-            </div>
+            <div class="block">
+              <div class="has-text-weight-bold is-size-6">
+                ID:
+              </div>
               {{ $auth.user.vAccountRows[0].id }}
-          </div>
+            </div>
           </div>
           <div class="column">
-            <div class="block">
-            </div>
           </div>
         </div>
         <hr>
@@ -112,9 +110,16 @@
           <span v-else>No Pending Payouts</span>
         </div>
         <hr>
+        <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/templates">
+          <span class="icon">
+            +
+          </span>
+          <span>Create Campaign</span>
+        </nuxt-link>
         <h2 class="title is-4">
           My Campaigns
         </h2>
+
         <campaign-list class="mb-6" :owner="$auth.user.accountName" />
         <hr>
         <h4 class="title is-4 is-spaced">
@@ -161,7 +166,7 @@
         <a class="button is-danger" @click="logout">Logout</a>
         <br><br>
       </div>
-      <key-modal v-if="showPK" @close="showPK = !showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" />
+      <key-modal v-if="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" @close="showPK = !showPK" />
     </div>
   </section>
 </template>

@@ -151,7 +151,7 @@
                   <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light">
                     Edit Campaign
                   </nuxt-link>
-                  <button v-if="loading || userReservation === null || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
+                  <button v-if="loading || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
                     Loading
                   </button>
                   <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="joinCampaignPopup = true">
@@ -206,10 +206,21 @@
                   <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
                 </div>
                 <div class="block">
-                  Batches
+                  Tasks
                   <br>
-                  <span v-if="campaignBatches === null">Loading..</span>
-                  <span v-else>{{ campaignBatches.length }}</span>
+                  <span v-if="batchByCampaignId(campaign.id) === null">
+                    Loading..
+                  </span>
+                  <span v-else>
+                    {{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                      return a + b.num_tasks
+                    },0) - batchByCampaignId(campaign.id).reduce(function(a,b){
+                      return a + b.tasks_done
+                    },0) }}/{{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                      return a + b.num_tasks
+                    },0) }} left
+                    <br>
+                  </span>
                 </div>
               </div>
             </div>
@@ -280,6 +291,10 @@ export default {
   },
   methods: {
     async reserveTask () {
+      await this.prepareReserveTask()
+      this.showReserveTask = true
+    },
+    async prepareReserveTask () {
       const batch = this.campaignBatches.find((b) => {
         return b.num_tasks - b.tasks_done > 0
       })
@@ -290,7 +305,6 @@ export default {
       }
       await this.$store.dispatch('campaign/getBatchTasks', batch)
       this.reserveInBatch = batch
-      this.showReserveTask = true
     },
     async goToTask () {
       const batch = this.campaignBatches.find((b) => {
@@ -313,11 +327,13 @@ export default {
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
-        const data = await this.$blockchain.joinCampaign(this.id)
+        this.loading = true
+        await this.prepareReserveTask()
+        this.joinCampaignPopup = false
+        const data = await this.$blockchain.joinCampaignAndReserveTask(this.id, this.reserveInBatch.id, this.reserveInBatch.tasks_done, this.reserveInBatch.tasks)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
-          this.joinCampaignPopup = false
           this.waitingOnTransaction = true
           await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
@@ -325,6 +341,7 @@ export default {
             this.reserveTask()
           }
         }
+        this.loading = false
         this.waitingOnTransaction = false
         this.joinCampaignPopup = false
       } catch (e) {

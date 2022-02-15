@@ -1,7 +1,7 @@
 import Vue from 'vue'
-// function sleep (ms) {
-//   return new Promise(resolve => setTimeout(resolve, ms))
-// }
+function sleep (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 export default {
   namespaced: true,
   modules: {},
@@ -213,7 +213,7 @@ export default {
       }
       commit('SET_LOADING', true)
       try {
-        const data = await this.$blockchain.getCampaigns(nextKey, 500, false)
+        const data = await this.$blockchain.getCampaigns(nextKey, 250, false)
         commit('UPSERT_CAMPAIGNS', data.rows)
 
         // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
@@ -230,7 +230,9 @@ export default {
         }
 
         if (data.more) {
-          await dispatch('getCampaigns', data.next_key)
+          console.log('retrieving more campaigns..')
+          await sleep(100)
+          await dispatch('getCampaigns', { nextKey: data.next_key })
         } else {
           // No more campaigns, we are done
           commit('SET_ALL_CAMPAIGNS_LOADED', true)
