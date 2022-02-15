@@ -123,7 +123,7 @@
           </div>
 
           <!-- Task results -->
-          <div v-if="body === 'results'" class="block">
+          <div v-if="body === 'results'" class="block" style="overflow-x:auto">
             <div v-if="campaign && campaign.info" class="content">
               <div v-if="submissions.length">
                 <table class="table" style="width: 100%">

@@ -104,6 +104,9 @@ a.card {
   font-weight: 600;
   height: 2.6em;
   border-radius: 8px;
+  &.is-small {
+    border-radius: 8px !important;
+  }
   &.is-wide {
     min-width: 140px;
   }
