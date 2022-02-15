@@ -163,23 +163,23 @@ export default {
     filteredCampaigns () {
       const campaigns = this.campaignsByCategory(this.filter)
       let filteredCampaigns
-
-      for (const i in campaigns) {
-        const batches = this.batchByCampaignId(campaigns[i].id)
-        // get the reservations of the user for this campaign
-        const reservationsOfUser = _.intersectionBy(batches, this.reservations, 'batch_id')
-        campaigns[i].userHasReservation = (reservationsOfUser.length)
-        if (batches) {
-          campaigns[i].num_tasks = batches.reduce(function (a, b) {
-            return a + b.num_tasks
-          }, 0)
-          campaigns[i].tasks_done = batches.reduce(function (a, b) {
-            return a + b.tasks_done
-          }, 0)
-        }
-      }
       if (campaigns) {
-        filteredCampaigns = [...campaigns]
+        filteredCampaigns = campaigns.map((c) => { return { ...c } })
+        for (const i in filteredCampaigns) {
+          const batches = this.batchByCampaignId(filteredCampaigns[i].id)
+          // get the reservations of the user for this campaign
+          const reservationsOfUser = _.intersectionBy(batches, this.reservations, 'batch_id')
+          filteredCampaigns[i].userHasReservation = (reservationsOfUser.length)
+          if (batches) {
+            filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
+              return a + b.num_tasks
+            }, 0)
+            filteredCampaigns[i].tasks_done = batches.reduce(function (a, b) {
+              return a + b.tasks_done
+            }, 0)
+          }
+        }
+
         if (this.active) {
           filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0 || c.userHasReservation)
           // show the campaigns where the user has a resevation first
@@ -191,43 +191,43 @@ export default {
         if (this.owner) {
           filteredCampaigns = filteredCampaigns.filter(c => c.owner[1] === this.owner)
         }
-      }
+        // Search campaigns
+        if (this.search !== null) {
+          filteredCampaigns = filteredCampaigns.filter((c) => {
+            if (c && c.info) {
+              return c.info.title.toLowerCase().includes(this.search.toLowerCase()) || c.info.description.toLowerCase().includes(this.search.toLowerCase())
+            }
+            return false
+          })
+        }
 
-      // Search campaigns
-      if (this.search !== null) {
-        filteredCampaigns = filteredCampaigns.filter((c) => {
-          if (c && c.info) {
-            return c.info.title.toLowerCase().includes(this.search.toLowerCase()) || c.info.description.toLowerCase().includes(this.search.toLowerCase())
+        // Filter by status
+        if (this.status) {
+          switch (this.status) {
+            case 'active':
+              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+              break
+            case 'ended':
+              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === 0 && c.num_tasks !== 0)
+              break
+            case 'notstarted':
+              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === c.num_tasks)
+              break
           }
-          return false
-        })
-      }
+        }
 
-      // Filter by status
-      if (this.status) {
-        switch (this.status) {
-          case 'active':
-            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
-            break
-          case 'ended':
-            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === 0 && c.num_tasks !== 0)
-            break
-          case 'notstarted':
-            filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === c.num_tasks)
-            break
+        // Sort campaigns
+        if (this.sort) {
+          filteredCampaigns = _.orderBy(filteredCampaigns, [(campaign) => {
+            if (typeof _.get(campaign, `${this.sort.value}`) === 'string') {
+              return _.get(campaign, `${this.sort.value}`).toLowerCase()
+            } else {
+              return _.get(campaign, `${this.sort.value}`)
+            }
+          }, 'userHasReservation'], [this.sort.order, 'desc'])
         }
       }
 
-      // Sort campaigns
-      if (this.sort) {
-        filteredCampaigns = _.orderBy(filteredCampaigns, [(campaign) => {
-          if (typeof _.get(campaign, `${this.sort.value}`) === 'string') {
-            return _.get(campaign, `${this.sort.value}`).toLowerCase()
-          } else {
-            return _.get(campaign, `${this.sort.value}`)
-          }
-        }, 'userHasReservation'], [this.sort.order, 'desc'])
-      }
       return filteredCampaigns
     },
     paginatedCampaigns () {

@@ -11,6 +11,7 @@ export default {
         // We have no campaigns yet
         state.campaigns = campaigns
       } else {
+        const updatedCampaigns = state.campaigns.map((c) => { return { ...c } })
         for (let i = 0; i < campaigns.length; i++) {
           const index = state.campaigns.findIndex(c => c.id === campaigns[i].id)
           if (index !== -1) {
@@ -18,46 +19,51 @@ export default {
               campaigns[i].info = state.campaigns[index].info
             }
             // Update existing campaign
-            Vue.set(state.campaigns, index, campaigns[i])
+            updatedCampaigns[index] = campaigns[i]
           } else {
             // Insert new campaign
-            state.campaigns.push(campaigns[i])
+            updatedCampaigns.push(campaigns[i])
           }
         }
+        state.campaigns = updatedCampaigns
       }
     },
     UPSERT_BATCHES (state, batches) {
       if (!state.batches) {
         state.batches = batches
       } else {
+        const updatedBatches = state.batches.map((b) => { return { ...b } })
         for (let i = 0; i < batches.length; i++) {
           const index = state.batches.findIndex(c => c.batch_id === batches[i].batch_id)
           if (index !== -1) {
             // Update existing batches
-            Vue.set(state.batches, index, batches[i])
+            updatedBatches[index] = batches[i]
           } else {
             // Insert new batches
-            state.batches.push(batches[i])
+            updatedBatches.push(batches[i])
           }
         }
+        state.batches = updatedBatches
       }
     },
     UPSERT_SUBMISSIONS (state, submissions) {
       if (!state.submissions) {
         state.submissions = submissions
       } else {
+        const updatedSubmissions = state.submissions.map((s) => { return { ...s } })
         for (let i = 0; i < submissions.length; i++) {
           const index = state.submissions.findIndex(s => s.id === submissions[i].id)
           if (index !== -1) {
             if (state.submissions[index].paid !== 1) {
               // Submission was not paid yet, so could be updated.
-              Vue.set(state.submissions, index, submissions[i])
+              updatedSubmissions[index] = submissions[i]
             }
           } else {
             // Insert new submissions
-            state.submissions.push(submissions[i])
+            updatedSubmissions.push(submissions[i])
           }
         }
+        state.submissions = updatedSubmissions
       }
     },
     SET_LOADING (state, loading) {
@@ -145,6 +151,7 @@ export default {
         commit('UPSERT_BATCHES', data.rows)
 
         if (data.more) {
+          console.log('retrieving more batches..')
           await dispatch('getBatches', data.next_key)
         } else {
           // No more campaigns, we are done
@@ -213,11 +220,15 @@ export default {
       }
       commit('SET_LOADING', true)
       try {
-        const data = await this.$blockchain.getCampaigns(nextKey, 250, false)
-        commit('UPSERT_CAMPAIGNS', data.rows)
+        const data = await this.$blockchain.getCampaigns(nextKey, 200, false)
+
+        if (processAllCampaigns && !state.allCampaignsLoaded) {
+          // first time fetching campaigns, already show loading placeholders while we still have to process campaigns
+          commit('UPSERT_CAMPAIGNS', data.rows)
+        }
 
         // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
-        if (processAllCampaigns) {
+        if (processAllCampaigns || 1 + 1 === 2) {
           setTimeout(() => {
             dispatch('processCampaigns', data.rows)
           }, 0)
@@ -293,6 +304,7 @@ export default {
         commit('UPSERT_SUBMISSIONS', submissions)
 
         if (data.more) {
+          console.log('retrieving more submissions..')
           await dispatch('getSubmissions', data.next_key)
         } else {
           // No more campaigns, we are done
