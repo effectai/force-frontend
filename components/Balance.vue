@@ -40,7 +40,7 @@
         </b>
       </div>
     </div>
-    <div class="column">
+    <div class="column has-margin-bottom-mobile">
       <div class="field is-horizontal is-grouped-centered has-text-centered">
             <span class="control">
               <nuxt-link to="/deposit" class="button is-primary ">
