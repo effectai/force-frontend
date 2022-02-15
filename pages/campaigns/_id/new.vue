@@ -54,23 +54,20 @@
                 </thead>
                 <tbody>
                   <tr v-for="(task, index) in tasks" :key="task.id">
-                    <!-- <td>{{index}}: {{task}}</td> -->
                     <td>{{index + 1}}</td>
                     <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
                         {{ task[placeholder] }}
                     </td>
-                    <!-- <td><span class="has-text-danger-dark is-size-5 has-text-weight-bold" @click="tasks.splice(index, 1)">x</span></td> -->
                     <td>
-                      <!-- TODO What the fuck -->
                       <button class="button is-danger is-outlined is-small is-rounded" @click.prevent="tasks.splice(index, 1)">
-                        <!-- <span class="icon">
-                          <i class="fas fa-check"></i>
-                        </span> -->
-                        <span>🗙</span>
+                        <font-awesome-icon icon="fa-solid fa-trash-can" />
+                        <!-- <span>🗙</span> -->
                       </button>
                     </td>
                     <td>
-                      <button class="button is-info is-outlined is-small is-rounded" @click.prevent="previewModal(index)">🔎</button>
+                      <button class="button is-info is-outlined is-small is-rounded" @click.prevent="previewModal(index)">
+                        <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
+                      </button>
                     </td>
                   </tr>
                   <tr>

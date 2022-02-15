@@ -11,7 +11,7 @@
           <div class="column">
             <div class="block">
               <div class="has-text-weight-bold is-size-6">
-                Account Name:
+                Account Name
               </div>
               <a
                 class="is-flex is-clipped"
@@ -26,10 +26,11 @@
                 <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
                 <span v-if="$auth.user.blockchain === 'bsc'">
                   <span>&nbsp;BSC Address</span>
-                  <button v-if="$auth.user.provider === 'burner-wallet'" class="button is-info is-light is-small is-rounded" @click="showPK = !showPK">
-                    🔑
+                  <button v-if="$auth.user.provider === 'burner-wallet'" class="button is-info is-light is-small" @click="showPK = !showPK">
+                    <span class="is-small icon">
+                      <font-awesome-icon :icon="['fas', 'fa-key']" />
+                    </span>
                   </button>
-                  <span>:</span>
                 </span>
               </div>
               <a
@@ -49,7 +50,7 @@
           <div class="column">
             <div class="block">
               <div class="has-text-weight-bold is-size-6">
-                ID:
+                ID
               </div>
               {{ $auth.user.vAccountRows[0].id }}
             </div>
@@ -65,13 +66,13 @@
                 Pending Payout
             </h2>
           <div class="is-pulled-right">
-              <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-secondary" @click.prevent="payout()">
+              <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-primary" @click.prevent="payout()">
                 <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
               </button>
-              <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-secondary is-wide">
+              <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-primary is-wide">
                 <p class="is-size-7">Nothing to cash out</p>
               </button>
-              <button v-else disabled="disabled" class="button is-secondary">
+              <button v-else disabled="disabled" class="button is-primary">
                 <p>... EFX</p>
               </button>
             </div>
@@ -276,5 +277,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+button.button.is-small.is-info {
+  border-radius: 8px;
+}
+
 </style>
