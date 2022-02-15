@@ -25,10 +25,11 @@
               <div class="has-text-weight-bold is-size-6 is-vecentered">
                 <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
                 <span v-if="$auth.user.blockchain === 'bsc'">
-                  <button v-if="$auth.user.provider === 'burner-wallet'" class="button is-info is-light is-small" @click="showPK = !showPK">
-                    <strong>BSC PrivateKey</strong>
+                  <span>&nbsp;BSC Address</span>
+                  <button v-if="$auth.user.provider === 'burner-wallet'" class="button is-info is-light is-small is-rounded" @click="showPK = !showPK">
+                    🔑
                   </button>
-                  <span>&nbsp;BSC Address:</span>
+                  <span>:</span>
                 </span>
               </div>
               <a
