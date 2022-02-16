@@ -228,7 +228,7 @@ export default {
         }
 
         // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
-        if (processAllCampaigns || 1 + 1 === 2) {
+        if (processAllCampaigns) {
           setTimeout(() => {
             dispatch('processCampaigns', data.rows)
           }, 0)
