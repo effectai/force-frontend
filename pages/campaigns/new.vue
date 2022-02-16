@@ -19,14 +19,14 @@
       </div>
       <div class="tabs">
         <ul>
+          <li :class="{'is-active': formGroup === 'tasks'}">
+            <a @click.prevent="formGroup = 'tasks'">Design Tasks</a>
+          </li>
           <li :class="{'is-active': formGroup === 'basic-info'}">
             <a @click.prevent="formGroup = 'basic-info'">Basic Information</a>
           </li>
           <li :class="{'is-active': formGroup === 'instructions'}">
             <a @click.prevent="formGroup = 'instructions'">Instructions</a>
-          </li>
-          <li :class="{'is-active': formGroup === 'tasks'}">
-            <a @click.prevent="formGroup = 'tasks'">Design Tasks</a>
           </li>
         </ul>
       </div>
@@ -120,56 +120,64 @@
           </div>
         </div>
         <div v-show="formGroup === 'tasks'" class="block task-group">
-          <div class="field">
-            <label class="label">Template</label>
-            <div class="control">
-              <textarea v-model="campaignIpfs.template" class="textarea" />
-            </div>
-          </div>
-          <div v-if="Object.keys(campaignIpfs.example_task).length" class="field">
-            <label class="label">Example Task</label>
-          </div>
-          <div v-else>
-            Add placeholders to your template. For example:
-            <pre>${placeholder}</pre>
-          </div>
-          <div>
-            To learn more about templates and placeholders, visit the <a href="https://effectai.github.io/developer-docs/effect_network/template.html" target="_blank">documentation</a>.
-          </div>
-          <div v-for="(placeholder, key) in campaignIpfs.example_task" :key="key" class="field is-horizontal">
-            <div class="field-label is-small">
-              <label class="label">{{ key }}</label>
-            </div>
-            <div class="field-body is-small">
-              <div class="field">
-                <div class="control">
-                  <input v-model="campaignIpfs.example_task[key]" class="input is-small" type="text">
+          <div class="columns is-variable is-2 is-multiline">
+            <div class="column is-6-widescreen is-12">
+              <label class="label">Template <span class="has-text-info"><b>*</b></span></label>
+              <codemirror
+                id="template"
+                ref="template"
+                v-model="campaignIpfs.template"
+                :options="cmOptions"
+                name="template"
+              />
+              <div v-if="Object.keys(campaignIpfs.example_task).length" class="field">
+                <label class="label">Example Task</label>
+              </div>
+              <div v-else>
+                Add placeholders to your template. For example:
+                <pre>${placeholder}</pre>
+              </div>
+              <div>
+                To learn more about templates and placeholders, visit the <a href="https://effectai.github.io/developer-docs/effect_network/template.html" target="_blank">documentation</a>.
+              </div>
+              <div v-for="(placeholder, key) in campaignIpfs.example_task" :key="key" class="field is-horizontal">
+                <div class="field-label is-small">
+                  <label class="label">{{ key }}</label>
+                </div>
+                <div class="field-body is-small">
+                  <div class="field">
+                    <div class="control">
+                      <input v-model="campaignIpfs.example_task[key]" class="input is-small" type="text">
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <h2 class="subtitle mt-5">
-            Task Preview
-          </h2>
-          <template-media
-            :html="renderTemplate(
-              campaignIpfs.template || 'No template found..',
-              campaignIpfs.example_task || {})"
-            @submit="showSubmission"
-          />
-          <div class="mt-5">
-            <h2 class="subtitle">
-              Submission Answer
-            </h2>
-            <pre v-if="answer">{{ answer }}</pre>
-            <p v-else>
-              Make sure your template has a submit button so that users can submit their answers
-            </p>
+            <div class="column is-6-widescreen is-12">
+              <h2 class="subtitle">
+                Task Preview
+              </h2>
+              <template-media
+                :html="renderTemplate(
+                  campaignIpfs.template || 'No template found..',
+                  campaignIpfs.example_task || {})"
+                @submit="showSubmission"
+              />
+              <div class="mt-5">
+                <h2 class="subtitle">
+                  Submission Answer
+                </h2>
+                <pre v-if="answer">{{ answer }}</pre>
+                <p v-else>
+                  Make sure your template has a submit button so that users can submit their answers. Test your template by submitting and view your submission here
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
-          <div class="control">
-            <button class="button is-secondary" @click.prevent="$refs.fileInput.click()">
+          <div class="control has-margin-bottom-mobile">
+            <button class="button is-secondary is-outlined is-small" @click.prevent="$refs.fileInput.click()">
               Import Campaign
             </button>
             <input
@@ -181,7 +189,7 @@
             >
           </div>
           <div class="control">
-            <button class="button is-secondary" @click.prevent="exportCampaign">
+            <button class="button is-secondary is-outlined is-small" @click.prevent="exportCampaign">
               Export Campaign
             </button>
           </div>
@@ -208,9 +216,15 @@
 <script>
 import VueSimplemde from 'vue-simplemde'
 import { Template } from '@effectai/effect-js'
+import { codemirror } from 'vue-codemirror'
 import InstructionsModal from '@/components/InstructionsModal'
 import TemplateMedia from '@/components/Template'
 import SuccessModal from '@/components/SuccessModal'
+// require component
+// require styles
+import 'codemirror/lib/codemirror.css'
+// language js
+import 'codemirror/mode/htmlmixed/htmlmixed'
 
 function getMatches (string, regex, index) {
   index || (index = 1) // default to the first capturing group
@@ -224,6 +238,7 @@ function getMatches (string, regex, index) {
 
 export default {
   components: {
+    codemirror,
     VueSimplemde,
     TemplateMedia,
     InstructionsModal,
@@ -250,6 +265,14 @@ export default {
   middleware: ['auth'],
   data () {
     return {
+      cmOptions: {
+        // codemirror options
+        tabSize: 4,
+        mode: 'htmlmixed',
+        theme: 'default',
+        lineNumbers: true,
+        line: true
+      },
       success: false,
       loading: false,
       preview: false,
@@ -268,7 +291,7 @@ export default {
       campaign: {
         content_hash: null
       },
-      formGroup: 'basic-info',
+      formGroup: 'tasks',
       cachedFormData: null,
       uploadingFile: false,
       selectedFile: null,
@@ -320,6 +343,18 @@ export default {
   },
 
   methods: {
+    async retrieveTemplate (params) {
+      if (params.templateUrl) {
+        this.campaignIpfs.template = 'Retrieving template..'
+        const response = await this.$axios.get(params.templateUrl)
+        this.campaignIpfs.template = response.data
+      } else if (params.template) {
+        this.campaignIpfs.template = decodeURI(params.template)
+      }
+      if (params.placeholders) {
+        this.campaignIpfs.example_task = JSON.parse(params.placeholders)
+      }
+    },
     showSubmission (values) {
       this.answer = values
     },
@@ -384,6 +419,7 @@ export default {
       if (campaignIpfs) {
         this.campaignIpfs = JSON.parse(campaignIpfs)
       }
+      this.retrieveTemplate(this.$route.query)
       this.cachedFormData = this.formDataForComparison()
       window.addEventListener('beforeunload', this.checkClose)
     },
@@ -445,7 +481,15 @@ export default {
   }
 }
 </script>
+<style>
+.CodeMirror {
+  height: 100%;
+}
+</style>
 <style lang="scss" scoped>
+#template {
+  height: 500px;
+}
 div.instructions-group .textarea {
   overflow-y: scroll
 }

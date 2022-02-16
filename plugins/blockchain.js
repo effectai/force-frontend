@@ -68,10 +68,10 @@ export default (context, inject) => {
     },
 
     methods: {
-      async updateForceInfo () {
-        console.log('updating campaigns and batches..')
-        await context.store.dispatch('campaign/getCampaigns', { processAllCampaigns: false })
-        await context.store.dispatch('campaign/getBatches')
+      updateForceInfo () {
+        console.log('updating campaigns and batches and submissions..')
+        context.store.dispatch('campaign/getCampaigns', { processAllCampaigns: false })
+        context.store.dispatch('campaign/getBatches')
         context.store.dispatch('campaign/getSubmissions')
       },
       updateUserInfo () {
@@ -312,6 +312,15 @@ export default (context, inject) => {
           return this.efxPayout
         }
       },
+      async getPendingTx () {
+        const data = await this.sdk.force.getPending(context.$auth.user.vAccountRows[0].id)
+        console.log('getPendingTx', data)
+        if (data) {
+          return data.rows
+        } else {
+          return []
+        }
+      },
       async getBatches (nextKey, limit = 50, processBatch = true) {
         return await this.sdk.force.getBatches(nextKey, limit, processBatch)
       },
@@ -385,6 +394,9 @@ export default (context, inject) => {
       },
       async waitForTransaction (transactionResult) {
         return await this.sdk.force.waitTransaction(transactionResult)
+      },
+      async joinCampaignAndReserveTask (id, batchId, tasksDone, tasks) {
+        return await this.sdk.force.joinCampaignAndReserveTask(id, batchId, tasksDone, tasks)
       },
 
       async recoverPublicKey () {
