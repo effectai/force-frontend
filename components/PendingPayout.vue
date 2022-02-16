@@ -264,7 +264,7 @@ export default {
     async getForceInfo () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
         // on the requester campaign list process all campaigns
-        await this.$store.dispatch('campaign/getCampaigns', { processAllCampaigns: this.loadAllCampaigns ? this.loadAllCampaigns : null })
+        await this.$store.dispatch('campaign/getCampaigns')
       }
       if (!this.allBatchesLoaded) {
         await this.$store.dispatch('campaign/getBatches')
