@@ -213,7 +213,7 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    async getCampaigns ({ dispatch, rootGetters, commit, state }, { nextKey }) {
+    async getCampaigns ({ dispatch, rootGetters, commit, state }, nextKey) {
       if (!nextKey && state.loading) {
         console.log('Already retrieving campaigns somewhere else, aborting..')
         return
@@ -258,7 +258,7 @@ export default {
         if (data.more) {
           console.log('retrieving more campaigns..')
           await sleep(100)
-          await dispatch('getCampaigns', { nextKey: data.next_key })
+          await dispatch('getCampaigns', data.next_key)
         } else {
           // No more campaigns, we are done
           commit('SET_ALL_CAMPAIGNS_LOADED', true)

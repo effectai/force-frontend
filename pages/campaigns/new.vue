@@ -436,7 +436,7 @@ export default {
           this.successTitle = 'Campaign submitted successfully'
           this.successMessage = 'Waiting for transaction to complete before continuing'
           await this.$blockchain.waitForTransaction(result)
-          await this.$store.dispatch('campaign/getCampaigns', { processAllCampaigns: true })
+          await this.$store.dispatch('campaign/getCampaigns')
           createdCampaign = await this.$blockchain.getMyLastCampaign()
 
           this.$store.dispatch('transaction/addTransaction', result)

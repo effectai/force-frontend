@@ -270,7 +270,7 @@ export default {
     getForceInfo () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
         // on the requester campaign list process all campaigns
-        this.$store.dispatch('campaign/getCampaigns', { processAllCampaigns: this.loadAllCampaigns ? this.loadAllCampaigns : false })
+        this.$store.dispatch('campaign/getCampaigns')
       }
       if (!this.allBatchesLoaded) {
         this.$store.dispatch('campaign/getBatches')
