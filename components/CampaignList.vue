@@ -234,7 +234,7 @@ export default {
       const start = (this.page - 1) * this.perPage
       if (this.filteredCampaigns) {
         const pageCampaigns = this.filteredCampaigns.slice(start, start + this.perPage)
-        this.processCampaigns(pageCampaigns)
+        // this.processCampaigns(pageCampaigns)
         return pageCampaigns
       }
       return []
@@ -270,7 +270,7 @@ export default {
     getForceInfo () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
         // on the requester campaign list process all campaigns
-        this.$store.dispatch('campaign/getCampaigns', { processAllCampaigns: this.loadAllCampaigns ? this.loadAllCampaigns : null })
+        this.$store.dispatch('campaign/getCampaigns', { processAllCampaigns: this.loadAllCampaigns ? this.loadAllCampaigns : false })
       }
       if (!this.allBatchesLoaded) {
         this.$store.dispatch('campaign/getBatches')
