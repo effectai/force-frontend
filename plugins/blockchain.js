@@ -22,6 +22,7 @@ export default (context, inject) => {
         efxAvailable: null,
         efxPayout: 0,
         efxPending: 0,
+        pendingPayout: null,
         eos,
         bsc,
         sdk: new effectSdk.EffectClient(process.env.NUXT_ENV_EOS_NETWORK, sdkOptions),
@@ -74,6 +75,7 @@ export default (context, inject) => {
         context.store.dispatch('campaign/getCampaigns')
         context.store.dispatch('campaign/getBatches')
         context.store.dispatch('campaign/getSubmissions')
+        context.store.dispatch('pendingPayout/loadPendingPayouts')
       },
       updateUserInfo () {
         this.getEfxPrice()
@@ -83,6 +85,7 @@ export default (context, inject) => {
           this.getAccountBalance()
           this.getPendingBalance()
           this.getPayoutBalance()
+          this.getPendingPayouts()
         }
       },
       async getEfxPrice (currency = 'usd') {
@@ -313,13 +316,14 @@ export default (context, inject) => {
           return this.efxPayout
         }
       },
-      async getPendingTx () {
-        const data = await this.sdk.force.getPending(context.$auth.user.vAccountRows[0].id)
-        console.log('getPendingTx', data)
+      async getPendingPayouts () {
+        const data = await this.sdk.force.getPendingBalance(context.$auth.user.vAccountRows[0].id)
+        // console.log('getPendingPayout', data)
         if (data) {
-          return data.rows
+          this.pendingPayouts = data.rows
+          return data
         } else {
-          return []
+          return null
         }
       },
       async getBatches (nextKey, limit = 50, processBatch = true) {
