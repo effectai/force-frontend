@@ -458,6 +458,7 @@ export default {
           this.$router.push(`/campaigns/${createdCampaign.id}`)
         }
       } catch (error) {
+        console.error(error)
         this.loading = false
         this.errors.push(error)
       }
