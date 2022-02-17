@@ -11,6 +11,7 @@ export default (context, inject) => {
       const sdkOptions = {
         network: process.env.NUXT_ENV_EOS_NETWORK,
         force_contract: process.env.NUXT_ENV_EOS_FORCE_CONTRACT,
+        force_vaccount_id: process.env.NUXT_ENV_EOS_FORCE_VACCOUNT_ID,
         host: eosHost
       }
       return {
