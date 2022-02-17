@@ -1,7 +1,7 @@
 <template>
-  <div class="columns is-touch is-tablet is-desktop is-vcentered">
+  <div class="columns is-touch is-tablet is-desktop is-vcentered my-auto">
     <div class="column">
-      <div class="box">
+      <div class="box ">
         Total
         <br>
         <span class="">
@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="column">
-      <div class="box">
+      <div class="box ">
         vAccount
         <br>
         <b>
@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="column">
-      <div class="box">
+      <div class="box ">
         Wallet
         <br>
         <b>
@@ -31,7 +31,7 @@
       </div>
     </div>
     <div class="column">
-      <div class="box">
+      <div class="box ">
         Pending
         <br>
         <b>
@@ -45,6 +45,12 @@
             <span class="control">
               <nuxt-link to="/deposit" class="button is-primary ">
                 Deposit
+              </nuxt-link>
+            </span>
+            <span>&nbsp;</span>
+            <span class="control">
+              <nuxt-link to="/vtransfer" class="button is-secondary is-outlined">
+                vTransfer
               </nuxt-link>
             </span>
             <span>&nbsp;</span>
@@ -67,4 +73,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  div.box {
+    background: $balance-box-color;
+    padding: 5%;
+    border-radius: 8px;
+    box-shadow: none;
+  }
 </style>

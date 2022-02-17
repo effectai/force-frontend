@@ -2,33 +2,23 @@
   <section class="section">
     <div class="container mt-5">
       <div class="text-center">
-        <h4 class="title is-spaced has-text-weight-bold is-full-mobile">
+        <h1 class="title is-spaced has-text-weight-bold is-full-mobile">
           <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->
           Effect Account | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
-        </h4>
+        </h1>
         <balance />
-        <div class="columns">
-          <div class="column">
-            <div class="block">
-              <div class="has-text-weight-bold is-size-6">
-                Account Name:
-              </div>
-              <a
-                class="is-flex is-clipped"
-                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
-                target="_blank"
-              >{{ $auth.user.accountName }}</a>
-            </div>
-          </div>
+        <div class="columns my-auto">
           <div class="column">
             <div class="block">
               <div class="has-text-weight-bold is-size-6 is-vecentered">
                 <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
                 <span v-if="$auth.user.blockchain === 'bsc'">
-                  <button class="button is-info is-light is-small" @click="showPK = !showPK">
-                    <strong>BSC PrivateKey</strong>
+                  <span>&nbsp;BSC Address</span>
+                  <button v-if="$auth.user.provider === 'burner-wallet'" class="button is-info is-light is-small" @click="showPK = !showPK">
+                    <span class="is-small icon">
+                      <font-awesome-icon :icon="['fas', 'fa-key']" />
+                    </span>
                   </button>
-                  <span>&nbsp;BSC Address:</span>
                 </span>
               </div>
               <a
@@ -48,36 +38,119 @@
           <div class="column">
             <div class="block">
               <div class="has-text-weight-bold is-size-6">
-                ID:
+                Account Name
+              </div>
+              <a
+                class="is-flex is-clipped"
+                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
+                target="_blank"
+              >{{ $auth.user.accountName }}</a>
+            </div>
+          </div>
+          <div class="column">
+            <div class="block">
+              <div class="has-text-weight-bold is-size-6">
+                ID
               </div>
               {{ $auth.user.vAccountRows[0].id }}
             </div>
           </div>
-          <div class="column">
-            <div class="block" />
+          <div class="column" />
+        </div>
+        <hr>
+
+        <div>
+          <div class="level">
+            <h2 class="title is-4">
+              Pending Payout
+            </h2>
+            <div class="is-pulled-right no-float-mobile ">
+              <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout !== 0" :class="{'is-loading': loading === true}" class="button is-primary" @click.prevent="payout()">
+                <p v-if="!loading">
+                  Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span>
+                </p>
+              </button>
+              <button v-else-if="$blockchain.efxPayout === 0" disabled="disabled" class="button is-primary is-wide">
+                <p class="">
+                  Nothing to cash out
+                </p>
+              </button>
+              <button v-else disabled="disabled" class="button is-primary">
+                <p>... EFX</p>
+              </button>
+            </div>
           </div>
         </div>
-        <!-- <hr>
-        <h2 class="title is-4">
-          Pending Payout
-        </h2> -->
-        <!-- <pending-payout class="mb-6" :owner="$auth.user.accountName"/> -->
+        <div class="is-full-mobile">
+          <div v-if="pendingPayoutsStore" class="table-container">
+            <table class="table" style="width: 100%">
+              <thead>
+                <tr>
+                  <th>Countdown</th>
+                  <th>Pending</th>
+                  <th>ID</th>
+                  <th>BatchCampaignID</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="pendingPayout in pendingPayoutsStore.payouts.rows.filter((el) => parseFloat(el.pending.quantity) > 0)"
+                  :key="pendingPayout.id"
+                >
+                  <td>
+                    <!-- Time for the release of  -->
+                    <vue-countdown
+                      ref="countdown"
+                      :auto-start="true"
+                      :time="calculatePendingTime(pendingPayout.last_submission_time)"
+                    >
+                      <template slot-scope="props">
+                        {{ endTime(props) ? props.minutes : '✅' }}{{ props.minutes > 0 && props.seconds > 0 ? ':' + props.seconds : '' }}
+                      </template>
+                      <!-- <template v-else><font-awesome-icon :icon="['fas', 'fa-check']" /></template> -->
+                    </vue-countdown>
+                  </td>
+                  <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }} EFX</td>
+                  <!-- <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}`}">{{ pendingPayout.id }}</nuxt-link></td> -->
+                  <!-- <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}/${pendingPayout.batch_id}`}">{{ pendingPayout.batch_id }}</nuxt-link></td> -->
+                  <td>{{ pendingPayout.id }}</td>
+                  <td>{{ pendingPayout.batch_id }}</td>
+                  <td>{{ new Date(pendingPayout.last_submission_time).toLocaleDateString() }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Total</th>
+                  <td><strong>{{ parseFloat($blockchain.efxPending).toFixed(2) }} EFX</strong></td>
+                </tr>
+                <tr>
+                  <th>Claimable</th>
+                  <td><strong>{{ parseFloat($blockchain.efxPayout).toFixed(2) }} EFX</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <span v-else>No Pending Payouts</span>
+        </div>
+
         <hr>
+
         <nuxt-link class="button is-primary is-pulled-right has-margin-bottom-mobile no-float-mobile" to="/campaigns/templates">
           <span class="icon">
             +
           </span>
           <span>Create Campaign</span>
         </nuxt-link>
-        <h2 class="title is-4 has-text-weight-bold is-full-mobile">
+        <h2 class="title is-4 is-full-mobile">
           My Campaigns
         </h2>
-
         <campaign-list class="mb-6" :owner="$auth.user.accountName" />
         <hr>
-        <h4 class="title is-4 is-spaced">
+
+        <h2 class="title is-4 is-spaced">
           Transactions
-        </h4>
+        </h2>
         <div v-if="transactions" class="table-container">
           <table class="table" style="width: 100%">
             <thead>
@@ -131,14 +204,14 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import VueCountdown from '@chenfengyuan/vue-countdown/dist/vue-countdown.common'
 import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
 import KeyModal from '@/components/KeyModal.vue'
-// import PendingPayout from '~/components/PendingPayout.vue'
 
 export default {
-  components: { Balance, CampaignList, Pagination, KeyModal /* , PendingPayout */ },
+  components: { Balance, CampaignList, Pagination, KeyModal, VueCountdown },
   filters: {
     hide (value, show) {
       if (show) {
@@ -151,16 +224,19 @@ export default {
   middleware: ['auth'],
   data () {
     return {
+      loading: null,
       page: 1,
       perPage: 10,
       showPK: false,
       pages: [],
-      pending: []
+      pendingPayouts: []
     }
   },
   computed: {
     ...mapGetters({
-      transactionsByUser: 'transaction/transactionsByUser'
+      transactionsByUser: 'transaction/transactionsByUser',
+      getPendingPayouts: 'pendingPayout/getPendingPayouts'
+
     }),
     transactions () {
       return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)
@@ -171,7 +247,14 @@ export default {
         return this.transactions.slice(start, start + this.perPage)
       }
       return []
+    },
+    pendingPayoutsStore () {
+      return this.getPendingPayouts ?? null
     }
+  },
+  mounted () {
+    console.log('mounted')
+    this.$store.dispatch('pendingPayout/loadPendingPayouts')
   },
   methods: {
     async logout () {
@@ -179,9 +262,52 @@ export default {
     },
     setPage (newPage) {
       this.page = newPage
+    },
+    calculatePendingTime (submissionTime) {
+      // Here we take the submission  time, add 1 hour, substract time since.
+      // Retrieve the submission time in UTC and convert to milliseconds
+      const subTimeSec = new Date(`${new Date(submissionTime)}UTC`).getTime()
+      // Release time for payment at the moment is 1 hour, equal to 3600e2 Seconds.
+      // Retrieve delay in milliseconds
+      const delaySec = 3600 * 10e2
+      // const delaySec = this.$blockchain.force.sdk.config.payout_delay_sec
+      // retrieve time now in milliseconds
+      const now = Date.now()
+      const endTime = subTimeSec + delaySec - now
+      // https://github.com/fengyuanchen/vue-countdown/tree/v1#time
+      // The value accepted for the `countdown` componenent, prop `time` can not be less than 0
+      return endTime < 0 ? 0 : endTime
+    },
+    endTime (props) {
+      return props.minutes > 0 && props.seconds > 0
+    },
+    async payout () {
+      this.loading = true
+      try {
+        const result = await this.$blockchain.payout()
+        this.$store.dispatch('transaction/addTransaction', result)
+        this.$store.dispatch('pendingPayout/loadPendingPayouts')
+        this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+        this.successTitle = 'Payout Completed'
+        this.successMessage = 'All your available pending payouts have been completed and are added to your Effect account'
+      } catch (error) {
+        this.loading = false
+      }
+      this.loading = false
     }
   }
 }
 </script>
+
 <style lang="scss" scoped>
+button.button.is-small.is-info {
+  border-radius: 8px;
+}
+
+@media screen and (max-width: 768px) {
+  .is-pulled-right {
+    float: none !important;
+    margin-bottom: 25px;
+  }
+}
 </style>
