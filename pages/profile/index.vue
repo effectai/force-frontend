@@ -55,27 +55,30 @@
               {{ $auth.user.vAccountRows[0].id }}
             </div>
           </div>
-          <div class="column">
-          </div>
+          <div class="column" />
         </div>
         <hr>
 
         <div>
           <div class="level">
-              <h2 class="title is-4">
-                  Pending Payout
-              </h2>
+            <h2 class="title is-4">
+              Pending Payout
+            </h2>
             <div class="is-pulled-right no-float-mobile ">
-                <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-primary" @click.prevent="payout()">
-                  <p v-if="!loading">Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
-                </button>
-                <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-primary is-wide">
-                  <p class="">Nothing to cash out</p>
-                </button>
-                <button v-else disabled="disabled" class="button is-primary">
-                  <p>... EFX</p>
-                </button>
-              </div>
+              <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout !== 0" :class="{'is-loading': loading === true}" class="button is-primary" @click.prevent="payout()">
+                <p v-if="!loading">
+                  Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span>
+                </p>
+              </button>
+              <button v-else-if="$blockchain.efxPayout === 0" disabled="disabled" class="button is-primary is-wide">
+                <p class="">
+                  Nothing to cash out
+                </p>
+              </button>
+              <button v-else disabled="disabled" class="button is-primary">
+                <p>... EFX</p>
+              </button>
+            </div>
           </div>
         </div>
         <div class="is-full-mobile">
@@ -247,6 +250,10 @@ export default {
       return this.getPendingPayouts ?? null
     }
   },
+  mounted () {
+    console.log('mounted')
+    this.$store.dispatch('pendingPayout/loadPendingPayouts')
+  },
   methods: {
     async logout () {
       await this.$auth.logout()
@@ -291,10 +298,6 @@ export default {
       }
       this.loading = false
     }
-  },
-  mounted () {
-    console.log('mounted')
-    this.$store.dispatch('pendingPayout/loadPendingPayouts')
   }
 }
 </script>
