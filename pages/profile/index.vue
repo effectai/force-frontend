@@ -10,18 +10,6 @@
         <div class="columns my-auto">
           <div class="column">
             <div class="block">
-              <div class="has-text-weight-bold is-size-6">
-                Account Name
-              </div>
-              <a
-                class="is-flex is-clipped"
-                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
-                target="_blank"
-              >{{ $auth.user.accountName }}</a>
-            </div>
-          </div>
-          <div class="column">
-            <div class="block">
               <div class="has-text-weight-bold is-size-6 is-vecentered">
                 <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
                 <span v-if="$auth.user.blockchain === 'bsc'">
@@ -45,6 +33,18 @@
                 target="_blank"
                 class="blockchain-address"
               >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
+            </div>
+          </div>
+          <div class="column">
+            <div class="block">
+              <div class="has-text-weight-bold is-size-6">
+                Account Name
+              </div>
+              <a
+                class="is-flex is-clipped"
+                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
+                target="_blank"
+              >{{ $auth.user.accountName }}</a>
             </div>
           </div>
           <div class="column">
