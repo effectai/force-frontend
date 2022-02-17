@@ -92,7 +92,7 @@
                 </thead>
                 <tbody>
                   <tr
-                    v-for="pendingPayout in pendingPayoutsStore.payouts.rows.filter((el) => parseFloat(el.pending.quantity) > 0)"
+                    v-for="pendingPayout in pendingPayoutsStore.payouts.rows"
                     :key="pendingPayout.id"
                   >
                     <td>
@@ -100,8 +100,9 @@
                       <vue-countdown
                         ref="countdown"
                         :auto-start="true"
-                        :time="calculatePendingTime(pendingPayout.last_submission_time)">
-                          <template slot-scope="props">{{endTime(props) ? props.minutes : '✅'}}{{ props.minutes > 0 && props.seconds > 0 ? ':' + props.seconds : '' }}</template>
+                        :time="calculatePendingTime(pendingPayout.last_submission_time)"
+                        :transform="transform">
+                          <template slot-scope="props">{{ props }}</template>
                           <!-- <template v-else><font-awesome-icon :icon="['fas', 'fa-check']" /></template> -->
                       </vue-countdown>
                     </td>
@@ -268,8 +269,13 @@ export default {
       // The value accepted for the `countdown` componenent, prop `time` can not be less than 0
       return endTime < 0 ? 0 : endTime
     },
-    endTime (props) {
-      return props.minutes > 0 && props.seconds > 0
+    transform (props) {
+      Object.entries(props).forEach(([key, value]) => {
+        // Adds leading zero
+        const digits = value < 10 ? `0${value}` : value
+        props[key] = digits
+      })
+      return props.minutes > 0 && props.seconds ? `${props.minutes}:${props.seconds}` : ' ✔' // there is a space before the checkmark
     },
     async payout () {
       this.loading = true
