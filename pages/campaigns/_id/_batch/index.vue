@@ -204,7 +204,7 @@
               <div class="block">
                 <b>Tasks</b>
                 <br>
-                <template v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batch.reservations && !batch.reservations.length">
+                <template v-if="batch && batch.num_tasks - batch.tasks_done === 0">
                   <span>{{ batch.num_tasks }} Tasks done.</span>
                 </template>
                 <template v-if="batch && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
@@ -216,7 +216,7 @@
                   <span>/ {{ batch.num_tasks }} left</span>
                 </template>
                 <span v-else>...</span>
-                <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks && batch.reservations && !batch.reservations.length : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || (batch.reservations && batch.reservations.length): false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
+                <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || (batch.reservations && batch.reservations.length): false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
                   Left
                 </progress>
               </div>
@@ -237,7 +237,7 @@
                 </div>
                 <div class="column is-half">
                   <div class="block">
-                    <b>Requester</b>
+                    Requester
                     <br>
                     <div class="blockchain-address">
                       <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
@@ -247,7 +247,7 @@
                     </div>
                   </div>
                   <div class="block">
-                    <b>IPFS</b>
+                    IPFS
                     <br>
                     <div v-if="batch" class="blockchain-address">
                       <a target="_blank" :href="`${ipfsExplorer}/ipfs/${batch.content.field_1}`">{{ batch.content.field_1 }}</a>
@@ -255,7 +255,7 @@
                     <span v-else>.....</span>
                   </div>
                   <div class="block">
-                    <b>Blockchain</b>
+                    Blockchain
                     <br>
                     <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View in Explorer</a>
                   </div>
