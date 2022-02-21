@@ -113,7 +113,7 @@
             </div>
 
             <!-- Task tabs -->
-            <div v-if="taskTab === 'allTasks'">
+            <div v-if="taskTab === 'allTasks'" style="overflow-x:auto">
               <div v-if="batch && batch.tasks && batch.tasks.length > 0">
                 <table class="table" style="width: 100%">
                   <thead>
@@ -153,7 +153,7 @@
               <span v-else>No tasks found</span>
             </div>
 
-            <div v-if="taskTab === 'submissions'">
+            <div v-if="taskTab === 'submissions'" style="overflow-x:auto">
               <div v-if="submissions && submissions.length > 0">
                 <table class="table" style="width: 100%">
                   <thead>
@@ -197,7 +197,7 @@
               <span v-else>No submissions found</span>
             </div>
 
-            <div v-if="taskTab === 'reservations'">
+            <div v-if="taskTab === 'reservations'" style="overflow-x:auto">
               <div v-if="reservations && reservations.length > 0">
                 <table class="table" style="width: 100%">
                   <thead>

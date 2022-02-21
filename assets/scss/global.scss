@@ -364,7 +364,9 @@ a.box {
     float: none !important;
   }
 }
-
+.campaign-tabs { 
+  overflow-x: hidden;
+} 
 @include mobile {
   .campaign-tabs ul {
     flex-direction: column;
