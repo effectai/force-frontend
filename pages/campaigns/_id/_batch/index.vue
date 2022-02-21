@@ -332,6 +332,7 @@
                   </div>
                 </div>
               </div>
+
               <div class="block is-vcentered">
                 <template v-if="campaign && $auth.user.accountName === campaign.owner[1]">
                   <button v-if="batch && batch.status !== 'Completed'" class="button is-primary is-fullwidth is-light" @click.prevent="handleBatch">
@@ -349,7 +350,7 @@
                 <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
                   Resume Task
                 </button>
-                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations" class="button is-fullwidth is-primary" @click.prevent="reserveTask = true">
+                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations.length > 0" class="button is-fullwidth is-primary" @click.prevent="reserveTask = true">
                   Make Task Reservation
                 </button>
                 <template v-else>
@@ -359,6 +360,7 @@
                   <p>No active tasks currently</p>
                 </template>
               </div>
+
             </div>
           </div>
         </div>

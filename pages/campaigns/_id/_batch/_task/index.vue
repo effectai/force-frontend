@@ -156,22 +156,25 @@ export default {
         this.loading = false
 
         await this.getBatch()
+        if (this.batch.tasks_done === this.batch.num_tasks || this.taskIndex + 1 >= this.batch.num_tasks) {
+          this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '?batchCompleted=1')
+        } else {
+          this.reserveNextTask = true
+          // if there are no more tasks left in this batch, look in other batches
+          if (this.batch.tasks_done === this.batch.num_tasks) {
+            const batch = this.campaignBatches.find((b) => {
+              return b.num_tasks - b.tasks_done > 0
+            })
 
-        // if there are no more tasks left in this batch, look in other batches
-        if (this.batch.tasks_done === this.batch.num_tasks) {
-          const batch = this.campaignBatches.find((b) => {
-            return b.num_tasks - b.tasks_done > 0
-          })
-
-          if (!batch) {
-            console.error('Could not find batch with active tasks')
-            this.$router.push('/campaigns/' + this.batch.campaign_id)
-            return
+            if (!batch) {
+              console.error('Could not find batch with active tasks')
+              this.$router.push('/campaigns/' + this.batch.campaign_id)
+              return
+            }
+            await this.$store.dispatch('campaign/getBatchTasks', batch)
+            this.reserveInBatch = batch
           }
-          await this.$store.dispatch('campaign/getBatchTasks', batch)
-          this.reserveInBatch = batch
         }
-        this.reserveNextTask = true
       } catch (e) {
         throw new Error(e)
       }
