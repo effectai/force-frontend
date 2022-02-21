@@ -53,11 +53,8 @@
               <li :class="{'is-active': body === 'preview'}">
                 <a @click.prevent="body = 'preview'">Preview</a>
               </li>
-              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'reservations'}">
-                <a @click.prevent="body = 'reservations'">Active Reservations</a>
-              </li>
-              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'results'}">
-                <a @click.prevent="body = 'results'">Task Results</a>
+              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'tasks'}">
+                <a @click.prevent="body = 'tasks'">Tasks</a>
               </li>
             </ul>
           </div>
@@ -85,10 +82,83 @@
             />
           </div>
 
-          <!-- Current Task Reservations  -->
-          <div v-if="body === 'reservations'" class="block" style="overflow-x:auto;">
-            <div v-if="campaign && campaign.info" class="content">
-              <div v-if="reservations && reservations.length">
+          <!-- Tasks -->
+          <div v-if="body === 'tasks'">
+            <div class="block columns" style="overflow-x:auto">
+              <div class="column is-one-third task-tab" @click.prevent="taskTab = 'allTasks'">
+                <div v-if="batch && batch.tasks" class="box" :class="{'is-active': taskTab === 'allTasks'}">
+                  Tasks
+                  <br>
+                  <span class="">
+                    <span><b>{{ batch.tasks.length }}</b></span>
+                  </span>
+                </div>
+              </div>
+              <div class="column is-one-third task-tab" @click.prevent="taskTab = 'submissions'">
+                <div v-if="batch" class="box" :class="{'is-active': taskTab === 'submissions'}">
+                  Tasks Completed
+                  <br>
+                  <b v-if="submissions">{{ submissions.length }}</b>
+                  <b v-else>0</b>
+                </div>
+              </div>
+              <div class="column is-one-third task-tab" @click.prevent="taskTab = 'reservations'">
+                <div class="box" :class="{'is-active': taskTab === 'reservations'}">
+                  Active Reservations
+                  <br>
+                  <b v-if="reservations">{{ reservations.length }}</b>
+                  <b v-else>0</b>
+                </div>
+              </div>
+            </div>
+
+            <!-- Task tabs -->
+            <div v-if="taskTab === 'submissions'">
+              <div v-if="submissions && submissions.length > 0">
+                <table class="table" style="width: 100%">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Account ID</th>
+                      <th>Data</th>
+                      <th>Paid</th>
+                      <th />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="sub in paginatedSubmissions"
+                      :key="sub.id"
+                    >
+                      <td>{{ sub.id }}</td>
+                      <td>{{ sub.account_id }}</td>
+                      <td>{{ sub.data }}</td>
+                      <td>{{ sub.paid ? "yes" : "no" }}</td>
+                      <td>
+                        <button class="button" @click.prevent="viewTask(sub)">
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <pagination
+                  v-if="submissions"
+                  :items="submissions.length"
+                  :page="page"
+                  :per-page="perPage"
+                  @setPage="setPage"
+                />
+
+                <button class="button is-primary" @click.prevent="downloadTaskResults()">
+                  Download Results
+                </button>
+              </div>
+              <span v-else>No submissions found</span>
+            </div>
+
+            <div v-if="taskTab === 'reservations'">
+              <div v-if="reservations && reservations.length > 0">
                 <table class="table" style="width: 100%">
                   <thead>
                     <tr>
@@ -127,70 +197,64 @@
               </div>
               <span v-else>No active reservations</span>
             </div>
-          </div>
 
-          <!-- Task results -->
-          <div v-if="body === 'results'" class="block" style="overflow-x:auto">
-            <div v-if="campaign && campaign.info" class="content">
-              <div v-if="submissions.length">
+            <div v-if="taskTab === 'allTasks'">
+              <div v-if="batch && batch.tasks && batch.tasks.length > 0">
                 <table class="table" style="width: 100%">
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>Account ID</th>
-                      <th>Data</th>
-                      <th>Paid</th>
-                      <th />
+                      <th>Placeholders</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr
-                      v-for="sub in paginatedSubmissions"
-                      :key="sub.id"
+                      v-for="task in batch.tasks"
+                      :key="task.id"
                     >
-                      <td>{{ sub.id }}</td>
-                      <td>{{ sub.account_id }}</td>
-                      <td>{{ sub.data }}</td>
-                      <td>{{ sub.paid ? "yes" : "no" }}</td>
+                      <td>{{ task.id }}</td>
                       <td>
-                        <button class="button" @click.prevent="viewTask(sub)">
-                          View
+                        <div v-for="(name, nIndex) in Object.keys(task)" :key="nIndex">
+                          <span v-if="name !== 'id' && name !== 'link_id'">{{name}}: {{ task[name] }}</span><br>
+                        </div>
+                      </td>
+                      <td>
+                        <button class="button is-primary" @click.prevent="viewTaskPreview(task)">
+                          Preview
                         </button>
                       </td>
                     </tr>
                   </tbody>
                 </table>
-
                 <pagination
-                  v-if="submissions"
-                  :items="submissions.length"
-                  :page="page"
+                  v-if="batch.tasks"
+                  :items="batch.tasks.length"
+                  :page="pageT"
                   :per-page="perPage"
                   @setPage="setPage"
                 />
-
-                <button class="button is-primary" @click.prevent="downloadTaskResults()">
-                  Download Results
-                </button>
               </div>
-              <span v-else>No submissions found</span>
-              <div class="modal" :class="{'is-active': viewTaskResult}">
-                <div class="modal-background" @click="viewTaskResult = false" />
-                <div class="modal-content" style="background-color: #fff; padding: 10px;">
-                  <template-media
-                    v-if="campaign && campaign.info && viewTaskResult"
-                    :html="renderTemplate(
-                      campaign.info.template || 'No template found..',
-                      viewTaskResult.placeholders)"
-                    @templateLoaded="postResults(viewTaskResult.results)"
-                  />
-                </div>
-                <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
-              </div>
+              <span v-else>No tasks found</span>
             </div>
           </div>
-          <nuxt-link :to="`/campaigns/${campaignId}`">
-            &lt; Back to all batches of campaign
+
+          <div class="modal" :class="{'is-active': viewTaskResult}">
+            <div class="modal-background" @click="viewTaskResult = false" />
+            <div class="modal-content" style="background-color: #fff; padding: 10px;">
+              <template-media
+                v-if="campaign && campaign.info && viewTaskResult"
+                :html="renderTemplate(
+                  campaign.info.template || 'No template found..',
+                  viewTaskResult.placeholders)"
+                @templateLoaded="postResults(viewTaskResult.results)"
+              />
+            </div>
+            <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
+          </div>
+
+          <nuxt-link :to="`/campaigns/${campaignId}`" class="mt-6 button is-primary is-light">
+            &lt; Back to campaign
           </nuxt-link>
         </div>
         <div class="column is-two-fifths">
@@ -333,9 +397,11 @@ export default {
       submissions: null,
       pageR: 1,
       page: 1,
+      pageT: 1,
       perPage: 30,
       pages: [],
       pagesR: [],
+      pagesT: [],
       viewTaskResult: false,
       successMessage: null,
       successTitle: null,
@@ -343,7 +409,8 @@ export default {
       userReservation: null,
       releasedReservations: null,
       waitingOnTransaction: false,
-      categories: ['translate', 'captions', 'socials', 'dao']
+      categories: ['translate', 'captions', 'socials', 'dao'],
+      taskTab: 'allTasks'
     }
   },
   computed: {
@@ -441,6 +508,13 @@ export default {
       {
         placeholders: this.batch.tasks[taskIndex],
         results: JSON.parse(sub.data)
+      }
+    },
+    viewTaskPreview (task) {
+      this.viewTaskResult =
+      {
+        placeholders: task,
+        results: []
       }
     },
     submitTask (values) {
@@ -576,6 +650,16 @@ export default {
 
   .information-header {
     background: #F7FBFF;
+  }
+}
+.task-tab div.box {
+  background: $balance-box-color;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: none;
+  cursor:pointer;
+  &.is-active {
+    border: 3px solid #1977F3;
   }
 }
 </style>
