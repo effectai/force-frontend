@@ -336,6 +336,7 @@
                   </div>
                 </div>
               </div>
+
               <div class="block is-vcentered">
                 <template v-if="campaign && $auth.user.accountName === campaign.owner[1]">
                   <button v-if="batch && batch.status !== 'Completed'" class="button is-primary is-fullwidth is-light" @click.prevent="handleBatch">
@@ -363,6 +364,7 @@
                   <p>No active tasks currently</p>
                 </template>
               </div>
+
             </div>
           </div>
         </div>

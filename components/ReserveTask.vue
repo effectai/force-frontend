@@ -36,10 +36,14 @@ export default {
       try {
         this.loading = true
         let reservations = await this.$blockchain.getReservations()
-        let rvObj = await this.getReservationForUser(reservations)
 
-        if (rvObj.reservation === null && rvObj.isReleased === false && rvObj.isExpired === false) {
-          const result = await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
+        const taskIndex = reservations.rows.filter((rv) => {
+          return rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.batch.batch_id) === parseInt(rv.batch_id) && (rv.data || rv.data.length > 0)
+        }).length
+
+        let rvObj = await this.getReservationForUser(reservations)
+        if (rvObj.reservation === null && rvObj.isReleased === false) {
+          const result = await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, taskIndex, this.batch.tasks)
           this.$store.dispatch('transaction/addTransaction', result)
 
           // get reservations and see if this user has a reservation
