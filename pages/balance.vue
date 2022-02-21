@@ -118,4 +118,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+// #content > section > div > div.text-center > div.columns.is-touch.is-tablet.is-desktop.is-vcentered > div:nth-child(3) > div
+
+div.box {
+  background: $balance-box-color;
+}
+
 </style>

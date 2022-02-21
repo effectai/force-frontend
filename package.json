@@ -11,9 +11,13 @@
     "lint": "npm run lint:js"
   },
   "dependencies": {
+    "@chenfengyuan/vue-countdown": "^1.1.5",
     "@creativebulma/bulma-badge": "^1.0.1",
     "@creativebulma/bulma-tooltip": "^1.2.0",
-    "@effectai/effect-js": "^0.1.18",
+    "@effectai/effect-js": "^0.1.33",
+    "@fortawesome/fontawesome-svg-core": "^1.3.0",
+    "@fortawesome/free-solid-svg-icons": "^6.0.0",
+    "@fortawesome/vue-fontawesome": "^2.0.6",
     "@nuxtjs/auth-next": "^5.0.0-1624817847.21691f1",
     "@nuxtjs/axios": "^5.13.1",
     "@nuxtjs/markdownit": "^2.0.0",
@@ -37,6 +41,7 @@
     "qs": "^6.10.1",
     "sanitize-html": "^2.5.3",
     "vue-carousel": "^0.18.0",
+    "vue-codemirror": "^4.0.6",
     "vue-simplemde": "^1.1.2",
     "vuex-persist": "^3.1.3",
     "web3": "^1.3.6"

@@ -49,6 +49,7 @@ $socials-color: #06c6c6;
 $pieces-color: #999999;
 $dao-color: #d7ac00;
 $captions-color: #e06375;
+$balance-box-color: #F7FBFF;
 
 $network-color-invert: findColorInvert($network-color);
 $translate-color-invert: findColorInvert($translate-color);
@@ -77,7 +78,7 @@ $captions-color-dark: findDarkColor($captions-color);
 //$box-shadow: 0 0 38px 10px rgba(49,71,168,0.12);
 //$box-link-hover-shadow: 0 0 38px 10px rgba($link,0.12);
 //$box-link-active-shadow:  0 0 38px 10px rgba($link,0.12);
-$box-shadow: 0 5px 10px 0 rgba(31,41,51,0.1);
+$box-shadow: 0px 2px 20px rgba(129, 136, 157, 0.4);
 $box-link-hover-shadow: 0 5px 10px 0 rgba($link,0.1);
 $box-link-active-shadow: 0 5px 10px 0 rgba($link,0.1);
 $card-shadow: 0 0 38px 10px rgba(49,71,168,0.12);
@@ -89,7 +90,7 @@ $drawer-divider: 2px solid $lightblue;
 $drawer-header-height: 63px;
 $drawer-shadow: -5px 0px 12px 0 rgba($primary, 0.10);
 
-$navbar-height: 3.9rem;
+$navbar-height: 5rem;
 
 $control-border-width: 2px;
 
@@ -104,3 +105,5 @@ $effectColors: (
   "network": ($network-color, $network-color-invert, $network-color-light, $network-color-dark)
 );
 $colors: map-merge($colors, $effectColors);
+
+$fullhd: 1440px + (2 * $gap)
