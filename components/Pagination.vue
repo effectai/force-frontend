@@ -1,6 +1,6 @@
 <template>
   <nav
-    v-if="items"
+    v-if="items && items > perPage"
     class="pagination"
     role="navigation"
     aria-label="pagination"
@@ -17,7 +17,7 @@
       :disabled="!maxPage || page === maxPage"
       @click="$emit('setPage', page + 1)"
     >Next page</a>
-    <ul class="pagination-list">
+    <ul class="pagination-list has-margin-top-mobile">
       <li v-if="page > 2">
         <a class="pagination-link" @click="$emit('setPage', 1)">1</a>
       </li>
