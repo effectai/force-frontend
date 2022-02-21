@@ -398,7 +398,7 @@ export default {
       pageR: 1,
       page: 1,
       pageT: 1,
-      perPage: 3,
+      perPage: 20,
       pages: [],
       pagesR: [],
       pagesT: [],
