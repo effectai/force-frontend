@@ -113,6 +113,46 @@
             </div>
 
             <!-- Task tabs -->
+            <div v-if="taskTab === 'allTasks'">
+              <div v-if="batch && batch.tasks && batch.tasks.length > 0">
+                <table class="table" style="width: 100%">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Placeholders</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="task in paginatedTasks"
+                      :key="task.id"
+                    >
+                      <td>{{ task.id }}</td>
+                      <td>
+                        <div v-for="(name, nIndex) in Object.keys(task)" :key="nIndex">
+                          <span v-if="name !== 'id' && name !== 'link_id'">{{name}}: {{ task[name] }}</span><br>
+                        </div>
+                      </td>
+                      <td>
+                        <button class="button" @click.prevent="viewTaskPreview(task)">
+                          Preview
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <pagination
+                  v-if="batch && batch.tasks"
+                  :items="batch.tasks.length"
+                  :page="pageT"
+                  :per-page="perPage"
+                  @setPage="setPageT"
+                />
+              </div>
+              <span v-else>No tasks found</span>
+            </div>
+
             <div v-if="taskTab === 'submissions'">
               <div v-if="submissions && submissions.length > 0">
                 <table class="table" style="width: 100%">
@@ -192,50 +232,10 @@
                   :items="reservations.length"
                   :page="pageR"
                   :per-page="perPage"
-                  @setPage="setPage"
+                  @setPage="setPageR"
                 />
               </div>
               <span v-else>No active reservations</span>
-            </div>
-
-            <div v-if="taskTab === 'allTasks'">
-              <div v-if="batch && batch.tasks && batch.tasks.length > 0">
-                <table class="table" style="width: 100%">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Placeholders</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="task in batch.tasks"
-                      :key="task.id"
-                    >
-                      <td>{{ task.id }}</td>
-                      <td>
-                        <div v-for="(name, nIndex) in Object.keys(task)" :key="nIndex">
-                          <span v-if="name !== 'id' && name !== 'link_id'">{{name}}: {{ task[name] }}</span><br>
-                        </div>
-                      </td>
-                      <td>
-                        <button class="button" @click.prevent="viewTaskPreview(task)">
-                          Preview
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <pagination
-                  v-if="batch.tasks"
-                  :items="batch.tasks.length"
-                  :page="pageT"
-                  :per-page="perPage"
-                  @setPage="setPage"
-                />
-              </div>
-              <span v-else>No tasks found</span>
             </div>
           </div>
 
@@ -398,7 +398,7 @@ export default {
       pageR: 1,
       page: 1,
       pageT: 1,
-      perPage: 30,
+      perPage: 3,
       pages: [],
       pagesR: [],
       pagesT: [],
@@ -431,6 +431,13 @@ export default {
       const start = (this.page - 1) * this.perPage
       if (this.reservations.filter(x => x.account_id)) {
         return this.reservations.filter(x => x.account_id).slice(start, start + this.perPage)
+      }
+      return []
+    },
+    paginatedTasks () {
+      const start = (this.pageT - 1) * this.perPage
+      if (this.batch && this.batch.tasks) {
+        return this.batch.tasks.slice(start, start + this.perPage)
       }
       return []
     }
@@ -610,6 +617,9 @@ export default {
     },
     setPageR (newPage) {
       this.pageR = newPage
+    },
+    setPageT (newPage) {
+      this.pageT = newPage
     }
   }
 }
