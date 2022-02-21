@@ -364,3 +364,13 @@ a.box {
     float: none !important;
   }
 }
+
+@include mobile {
+  .campaign-tabs ul {
+    flex-direction: column;
+
+    li {
+      width: 100%;
+    }
+  }
+}

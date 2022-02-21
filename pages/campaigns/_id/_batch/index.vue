@@ -42,7 +42,7 @@
               <span v-else class="has-text-danger-dark">Could not load campaign info</span>
             </div>
           </div>
-          <div class="tabs">
+          <div class="tabs campaign-tabs">
             <ul>
               <li :class="{'is-active': body === 'description'}">
                 <a @click.prevent="body = 'description'">Description</a>
