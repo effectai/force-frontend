@@ -237,40 +237,6 @@
               </div>
               <span v-else>No active reservations</span>
             </div>
-            <div class="block">
-              <b>Status</b>
-              <br>
-              <span v-if="batch">{{ batch.status }}</span>
-              <span v-else>...</span>
-            </div>
-            <div class="block">
-              <b>Reward</b>
-              <br>
-              <span v-if="campaign">{{ campaign.reward.quantity }}</span>
-              <span v-else>.....</span>
-            </div>
-            <div class="block">
-              <b>Tasks</b>
-              <br>
-              <template v-if="batch && batch.status === 'Completed' && batch.reservations && !batch.reservations.length">
-                <span>{{ batch.num_tasks }} Tasks done.</span>
-              </template>
-              <template v-else-if="batch && batch.status === 'Active' && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
-                <span>{{ batch.num_tasks - (batch.tasks_done - releasedReservations.length) }}</span>
-                <span>/ {{ batch.num_tasks }} left</span>
-              </template>
-              <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations && batch.reservations.length)">
-                <span>{{ batch.num_tasks - batch.tasks_done }}</span>
-                <span>/ {{ batch.num_tasks }} left</span>
-              </template>
-              <template v-else-if="batch && batch.status === 'Paused'">
-                <span>{{ batch.tasks_done}} task<span v-if="batch.tasks_done > 1">s</span> completed</span>
-              </template>
-              <span v-else>...</span>
-              <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks && batch.reservations && !batch.reservations.length : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || (batch.reservations && batch.reservations.length): false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
-                Left
-              </progress>
-          </div>
 
           <div class="modal" :class="{'is-active': viewTaskResult}">
             <div class="modal-background" @click="viewTaskResult = false" />
@@ -326,6 +292,12 @@
                     <br>
                     <span v-if="campaign && campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
                     <span v-else class="tag is-info is-light is-medium">...</span>
+                  </div>
+                  <div class="block">
+                    Status
+                    <br>
+                    <span v-if="batch"><b>{{ batch.status }}</b></span>
+                    <span v-else>...</span>
                   </div>
                   <div class="block">
                     Reward
