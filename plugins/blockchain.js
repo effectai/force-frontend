@@ -10,6 +10,8 @@ export default (context, inject) => {
       const eosHost = process.env.NUXT_ENV_EOS_NETWORK.includes('local') ? `http://${process.env.NUXT_ENV_EOS_NODE_URL}:8888` : `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
       const sdkOptions = {
         network: process.env.NUXT_ENV_EOS_NETWORK,
+        force_contract: process.env.NUXT_ENV_EOS_FORCE_CONTRACT,
+        force_vaccount_id: process.env.NUXT_ENV_EOS_FORCE_VACCOUNT_ID,
         host: eosHost
       }
       return {
@@ -20,7 +22,7 @@ export default (context, inject) => {
         efxAvailable: null,
         efxPayout: 0,
         efxPending: 0,
-        validationPeriod: 259200,
+        pendingPayout: null,
         eos,
         bsc,
         sdk: new effectSdk.EffectClient(process.env.NUXT_ENV_EOS_NETWORK, sdkOptions),
@@ -69,9 +71,11 @@ export default (context, inject) => {
 
     methods: {
       updateForceInfo () {
-        console.log('updating campaigns and batches..')
+        console.log('updating campaigns and batches and submissions..')
         context.store.dispatch('campaign/getCampaigns')
-        // context.store.dispatch('campaign/getBatches')
+        context.store.dispatch('campaign/getBatches')
+        context.store.dispatch('campaign/getSubmissions')
+        context.store.dispatch('pendingPayout/loadPendingPayouts')
       },
       updateUserInfo () {
         this.getEfxPrice()
@@ -81,6 +85,7 @@ export default (context, inject) => {
           this.getAccountBalance()
           this.getPendingBalance()
           this.getPayoutBalance()
+          this.getPendingPayouts()
         }
       },
       async getEfxPrice (currency = 'usd') {
@@ -302,7 +307,7 @@ export default (context, inject) => {
           let pending = 0
           if (data) {
             data.rows.forEach((entry) => {
-              if (((new Date(new Date(entry.last_submission_time) + 'UTC').getTime() / 1000) + this.validationPeriod) < ((Date.now() / 1000))) {
+              if (((new Date(new Date(entry.last_submission_time) + 'UTC').getTime() / 1000) + this.sdk.force.config.payout_delay_sec) < ((Date.now() / 1000))) {
                 pending = pending + parseFloat(entry.pending.quantity)
               }
             })
@@ -311,7 +316,17 @@ export default (context, inject) => {
           return this.efxPayout
         }
       },
-      async getBatches (nextKey, limit = 20, processBatch = true) {
+      async getPendingPayouts () {
+        const data = await this.sdk.force.getPendingBalance(context.$auth.user.vAccountRows[0].id)
+        // console.log('getPendingPayout', data)
+        if (data) {
+          this.pendingPayouts = data.rows
+          return data
+        } else {
+          return null
+        }
+      },
+      async getBatches (nextKey, limit = 50, processBatch = true) {
         return await this.sdk.force.getBatches(nextKey, limit, processBatch)
       },
       async getCampaign (id) {
@@ -320,11 +335,11 @@ export default (context, inject) => {
       async getMyLastCampaign () {
         return await this.sdk.force.getMyLastCampaign()
       },
-      async getCampaigns (nextKey, limit = 20, processCampaign = true) {
+      async getCampaigns (nextKey, limit = 50, processCampaign = true) {
         return await this.sdk.force.getCampaigns(nextKey, limit, processCampaign)
       },
-      getSubmissions (nextKey, limit = 20) {
-        alert('NOT IMPLEMENTED YET')
+      async getSubmissions (nextKey, limit = 50) {
+        return await this.sdk.force.getSubmissions(nextKey, limit)
       },
       async getCampaignJoins (campaignId) {
         return await this.sdk.force.getCampaignJoins(campaignId)
@@ -390,6 +405,9 @@ export default (context, inject) => {
       },
       async waitForTransaction (transactionResult) {
         return await this.sdk.force.waitTransaction(transactionResult)
+      },
+      async joinCampaignAndReserveTask (id, batchId, tasksDone, tasks) {
+        return await this.sdk.force.joinCampaignAndReserveTask(id, batchId, tasksDone, tasks)
       },
 
       async recoverPublicKey () {

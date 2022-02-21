@@ -22,20 +22,27 @@
       </nav>
       <div v-if="loading" class="loader-wrapper is-active">
         <div class="loader is-loading" />
-        <br>Waiting for the transaction to complete...
+        <br><span v-if="waitingOnTransaction">Waiting for the transaction to complete...</span>
       </div>
       <div v-if="!campaign">
         Campaign loading..
       </div>
       <div class="columns">
-        <div class="column is-two-thirds">
-          <div class="title">
-            <span v-if="batch">#{{ campaignId }}.{{ batch.id }}: </span>
-            <span v-if="campaign && campaign.info">{{ campaign.info.title }}</span>
-            <span v-else-if="!campaign || campaign.info !== null">Loading..</span>
-            <span v-else class="has-text-danger-dark">Could not load campaign info</span>
+        <div class="column is-three-fifths">
+          <div class="is-flex is-align-items-center mb-6">
+            <p class="image has-radius mr-4" style="width: 52px; height: 52px" v-if="campaign">
+              <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
+              <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+              <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
+            </p>
+            <div class="title has-text-weight-bold">
+              <span v-if="batch">#{{ campaignId }}.{{ batch.id }}: </span>
+              <span v-if="campaign && campaign.info">{{ campaign.info.title }}</span>
+              <span v-else-if="!campaign || campaign.info !== null">Loading..</span>
+              <span v-else class="has-text-danger-dark">Could not load campaign info</span>
+            </div>
           </div>
-          <div class="tabs">
+          <div class="tabs campaign-tabs">
             <ul>
               <li :class="{'is-active': body === 'description'}">
                 <a @click.prevent="body = 'description'">Description</a>
@@ -43,11 +50,11 @@
               <li :class="{'is-active': body === 'instruction'}">
                 <a @click.prevent="body = 'instruction'">Instructions</a>
               </li>
-              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'reservations'}">
-                <a @click.prevent="body = 'reservations'">Active Reservations</a>
+              <li :class="{'is-active': body === 'preview'}">
+                <a @click.prevent="body = 'preview'">Preview</a>
               </li>
-              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'results'}">
-                <a @click.prevent="body = 'results'">Task Results</a>
+              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'tasks'}">
+                <a @click.prevent="body = 'tasks'">Tasks</a>
               </li>
             </ul>
           </div>
@@ -58,9 +65,14 @@
             <p v-else>
               ...
             </p>
-            <h2 class="subtitle mt-5">
-              Task Preview
-            </h2>
+          </div>
+          <div v-if="body === 'instruction'" class="block">
+            <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
+            <p v-else>
+              ...
+            </p>
+          </div>
+          <div v-if="body === 'preview'" class="block">
             <template-media
               v-if="campaign && campaign.info"
               :html="renderTemplate(
@@ -69,17 +81,124 @@
               @submit="submitTask"
             />
           </div>
-          <div v-if="body === 'instruction'" class="block">
-            <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
-            <p v-else>
-              ...
-            </p>
-          </div>
 
-          <!-- Current Task Reservations  -->
-          <div v-if="body === 'reservations'" class="block">
-            <div v-if="campaign && campaign.info" class="content">
-              <div v-if="reservations && reservations.length">
+          <!-- Tasks -->
+          <div v-if="body === 'tasks'">
+            <div class="block columns" style="overflow-x:auto">
+              <div class="column is-one-third task-tab" @click.prevent="taskTab = 'allTasks'">
+                <div v-if="batch && batch.tasks" class="box" :class="{'is-active': taskTab === 'allTasks'}">
+                  Tasks
+                  <br>
+                  <span class="">
+                    <span><b>{{ batch.tasks.length }}</b></span>
+                  </span>
+                </div>
+              </div>
+              <div class="column is-one-third task-tab" @click.prevent="taskTab = 'submissions'">
+                <div v-if="batch" class="box" :class="{'is-active': taskTab === 'submissions'}">
+                  Tasks Completed
+                  <br>
+                  <b v-if="submissions">{{ submissions.length }}</b>
+                  <b v-else>0</b>
+                </div>
+              </div>
+              <div class="column is-one-third task-tab" @click.prevent="taskTab = 'reservations'">
+                <div class="box" :class="{'is-active': taskTab === 'reservations'}">
+                  Active Reservations
+                  <br>
+                  <b v-if="reservations">{{ reservations.length }}</b>
+                  <b v-else>0</b>
+                </div>
+              </div>
+            </div>
+
+            <!-- Task tabs -->
+            <div v-if="taskTab === 'allTasks'" style="overflow-x:auto">
+              <div v-if="batch && batch.tasks && batch.tasks.length > 0">
+                <table class="table" style="width: 100%">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Placeholders</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="task in paginatedTasks"
+                      :key="task.id"
+                    >
+                      <td>{{ task.id }}</td>
+                      <td>
+                        <div v-for="(name, nIndex) in Object.keys(task)" :key="nIndex">
+                          <span v-if="name !== 'id' && name !== 'link_id'">{{name}}: {{ task[name] }}</span><br>
+                        </div>
+                      </td>
+                      <td>
+                        <button class="button" @click.prevent="viewTaskPreview(task)">
+                          Preview
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <pagination
+                  v-if="batch && batch.tasks"
+                  :items="batch.tasks.length"
+                  :page="pageT"
+                  :per-page="perPage"
+                  @setPage="setPageT"
+                />
+              </div>
+              <span v-else>No tasks found</span>
+            </div>
+
+            <div v-if="taskTab === 'submissions'" style="overflow-x:auto">
+              <div v-if="submissions && submissions.length > 0">
+                <table class="table" style="width: 100%">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Account ID</th>
+                      <th>Data</th>
+                      <th>Paid</th>
+                      <th />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="sub in paginatedSubmissions"
+                      :key="sub.id"
+                    >
+                      <td>{{ sub.id }}</td>
+                      <td>{{ sub.account_id }}</td>
+                      <td>{{ sub.data }}</td>
+                      <td>{{ sub.paid ? "yes" : "no" }}</td>
+                      <td>
+                        <button class="button" @click.prevent="viewTask(sub)">
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <pagination
+                  v-if="submissions"
+                  :items="submissions.length"
+                  :page="page"
+                  :per-page="perPage"
+                  @setPage="setPage"
+                />
+
+                <button class="button is-primary" @click.prevent="downloadTaskResults()">
+                  Download Results
+                </button>
+              </div>
+              <span v-else>No submissions found</span>
+            </div>
+
+            <div v-if="taskTab === 'reservations'" style="overflow-x:auto">
+              <div v-if="reservations && reservations.length > 0">
                 <table class="table" style="width: 100%">
                   <thead>
                     <tr>
@@ -90,7 +209,7 @@
                   </thead>
                   <tbody>
                     <tr
-                      v-for="sub in displayedReservations"
+                      v-for="sub in paginatedReservations"
                       :key="sub.id"
                     >
                       <td>{{ sub.id }}</td>
@@ -108,98 +227,15 @@
                     </tr>
                   </tbody>
                 </table>
-
-                <nav class="pagination" role="navigation" aria-label="pagination">
-                  <a v-if="pageR != 1" class="pagination-previous" @click="pageR--">Previous</a>
-                  <a v-if="pageR < pagesR.length" class="pagination-next" @click="pageR++">Next page</a>
-                  <ul class="pagination-list">
-                    <li v-for="pageNumber in pagesR" :key="pageNumber">
-                      <a class="pagination-link" :class="{'is-current': pageR === pageNumber}" @click="pageR = pageNumber">{{ pageNumber }}</a>
-                    </li>
-                  </ul>
-                </nav>
+                <pagination
+                  v-if="reservations"
+                  :items="reservations.length"
+                  :page="pageR"
+                  :per-page="perPage"
+                  @setPage="setPageR"
+                />
               </div>
               <span v-else>No active reservations</span>
-            </div>
-          </div>
-
-          <!-- Task results -->
-          <div v-if="body === 'results'" class="block">
-            <div v-if="campaign && campaign.info" class="content">
-              <div v-if="submissions.length">
-                <table class="table" style="width: 100%">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Account ID</th>
-                      <th>Data</th>
-                      <th>Paid</th>
-                      <th />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="sub in displayedSubmissions"
-                      :key="sub.id"
-                    >
-                      <td>{{ sub.id }}</td>
-                      <td>{{ sub.account_id }}</td>
-                      <td>{{ sub.data }}</td>
-                      <td>{{ sub.paid ? "yes" : "no" }}</td>
-                      <td>
-                        <button class="button" @click.prevent="viewTask(sub)">
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                <nav class="pagination" role="navigation" aria-label="pagination">
-                  <a v-if="page != 1" class="pagination-previous" @click="page--">Previous</a>
-                  <a v-if="page < pages.length" class="pagination-next" @click="page++">Next page</a>
-                  <ul class="pagination-list">
-                    <li v-for="pageNumber in pages" :key="pageNumber">
-                      <a class="pagination-link" :class="{'is-current': page === pageNumber}" @click="page = pageNumber">{{ pageNumber }}</a>
-                    </li>
-                  </ul>
-                </nav>
-
-                <button class="button is-primary" @click.prevent="downloadTaskResults()">
-                  Download Results
-                </button>
-              </div>
-              <span v-else>No submissions found</span>
-              <div class="modal" :class="{'is-active': viewTaskResult}">
-                <div class="modal-background" @click="viewTaskResult = false" />
-                <div class="modal-content" style="background-color: #fff; padding: 10px;">
-                  <template-media
-                    v-if="campaign && campaign.info && viewTaskResult"
-                    :html="renderTemplate(
-                      campaign.info.template || 'No template found..',
-                      viewTaskResult.placeholders)"
-                    @templateLoaded="postResults(viewTaskResult.results)"
-                  />
-                </div>
-                <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="column is-one-third">
-          <div class="box">
-            <h4 class="box-title is-size-4">
-              <b>Information</b>
-            </h4>
-            <div class="block">
-              <b>Requester</b>
-              <br>
-              <div class="blockchain-address">
-                <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
-                  {{ campaign.owner[1] }}
-                </nuxt-link>
-                <span v-else>.....</span>
-              </div>
             </div>
             <div class="block">
               <b>Status</b>
@@ -234,56 +270,126 @@
               <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks && batch.reservations && !batch.reservations.length : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || (batch.reservations && batch.reservations.length): false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
                 Left
               </progress>
-            </div>
-            <div class="block">
-              <b>Category</b>
-              <br>
-              <span v-if="campaign && campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
-              <span v-else class="tag is-info is-light is-medium">...</span>
-            </div>
-            <div class="block">
-              <b>IPFS</b>
-              <br>
-              <div v-if="batch" class="blockchain-address">
-                <a target="_blank" :href="`${ipfsExplorer}/ipfs/${batch.content.field_1}`">{{ batch.content.field_1 }}</a>
-              </div>
-              <span v-else>.....</span>
-            </div>
+          </div>
 
-            <div class="block">
-              <b>Blockchain</b>
-              <br>
-              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
+          <div class="modal" :class="{'is-active': viewTaskResult}">
+            <div class="modal-background" @click="viewTaskResult = false" />
+            <div class="modal-content" style="background-color: #fff; padding: 10px;">
+              <template-media
+                v-if="campaign && campaign.info && viewTaskResult"
+                :html="renderTemplate(
+                  campaign.info.template || 'No template found..',
+                  viewTaskResult.placeholders)"
+                @templateLoaded="postResults(viewTaskResult.results)"
+              />
             </div>
-            <div class="block">
-              <template v-if="campaign && $auth.user.accountName === campaign.owner[1]">
-                <button v-if="batch && batch.status !== 'Completed'" class="button is-primary is-light" @click.prevent="handleBatch">
-                  <span v-if="batch.status === 'Active'">Pause Batch</span>
-                  <span v-else-if="batch.status === 'Paused'">Resume Batch</span>
+            <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
+          </div>
+
+          <nuxt-link :to="`/campaigns/${campaignId}`" class="mt-6 button is-primary is-light">
+            &lt; Back to campaign
+          </nuxt-link>
+          </div>
+        </div>
+
+        <div class="column is-two-fifths">
+          <div class="information-block">
+            <div class="information-header has-text-centered">
+              <h4 class="p-5 is-size-4">
+                <b>Information</b>
+              </h4>
+            </div>
+            <div class="p-5">
+              <div class="block">
+                <b>Tasks</b>
+                <br>
+                <template v-if="batch && batch.num_tasks - batch.tasks_done === 0">
+                  <span>{{ batch.num_tasks }} Tasks done.</span>
+                </template>
+                <template v-if="batch && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
+                  <span>{{ batch.num_tasks - (batch.tasks_done - releasedReservations.length) }}</span>
+                  <span>/ {{ batch.num_tasks }} left</span>
+                </template>
+                <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations && batch.reservations.length)">
+                  <span>{{ batch.num_tasks - batch.tasks_done }}</span>
+                  <span>/ {{ batch.num_tasks }} left</span>
+                </template>
+                <span v-else>...</span>
+                <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || (batch.reservations && batch.reservations.length): false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
+                  Left
+                </progress>
+              </div>
+
+              <div class="columns">
+                <div class="column is-half">
+                  <div class="block">
+                    <br>
+                    <span v-if="campaign && campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
+                    <span v-else class="tag is-info is-light is-medium">...</span>
+                  </div>
+                  <div class="block">
+                    Reward
+                    <br>
+                    <span v-if="campaign"><b>{{ campaign.reward.quantity }}</b></span>
+                    <span v-else>.....</span>
+                  </div>
+                </div>
+                <div class="column is-half">
+                  <div class="block">
+                    Requester
+                    <br>
+                    <div class="blockchain-address">
+                      <nuxt-link v-if="campaign" :to="'/profile/' + campaign.owner[1]">
+                        {{ campaign.owner[1] }}
+                      </nuxt-link>
+                      <span v-else>.....</span>
+                    </div>
+                  </div>
+                  <div class="block">
+                    IPFS
+                    <br>
+                    <div v-if="batch" class="blockchain-address">
+                      <a target="_blank" :href="`${ipfsExplorer}/ipfs/${batch.content.field_1}`">{{ batch.content.field_1 }}</a>
+                    </div>
+                    <span v-else>.....</span>
+                  </div>
+                  <div class="block">
+                    Blockchain
+                    <br>
+                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
+                  </div>
+                </div>
+              </div>
+              <div class="block is-vcentered">
+                <template v-if="campaign && $auth.user.accountName === campaign.owner[1]">
+                  <button v-if="batch && batch.status !== 'Completed'" class="button is-primary is-fullwidth is-light" @click.prevent="handleBatch">
+                    <span v-if="batch.status === 'Active'">Pause Batch</span>
+                    <span v-else-if="batch.status === 'Paused'">Resume Batch</span>
+                  </button>
+                  <br>
+                </template>
+                <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
+                  Loading
                 </button>
-              </template>
-              <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-primary is-loading">
-                Loading
-              </button>
-              <button v-else-if="!userJoined" class="button is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
-                Join Campaign
-              </button>
-              <button v-else-if="userReservation && batch.status === 'Active'" class="button is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
-                Resume Task
-              </button>
-              <button v-else-if="batch.status === 'Active' && !userReservation || batch.status === 'Active' && releasedReservations" class="button is-primary" @click.prevent="reserveTask = true">
-                Make Task Reservation
-              </button>
-              <template v-else>
-                <button v-if="userJoined" class="button is-primary" :disabled="true">
-                  Joined Campaign
+                <button v-else-if="!userJoined" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
+                  Join Campaign
                 </button>
-                <p class="pt-3">No active tasks currently</p>
-              </template>
+                <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
+                  Resume Task
+                </button>
+                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations" class="button is-fullwidth is-primary" @click.prevent="reserveTask = true">
+                  Make Task Reservation
+                </button>
+                <template v-else>
+                  <button v-if="userJoined" class="button is-fullwidth is-primary" :disabled="true">
+                    Joined Campaign
+                  </button>
+                  <p>No active tasks currently</p>
+                </template>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
       <!-- SuccessModal -->
       <success-modal v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
@@ -294,6 +400,7 @@
       <!-- Instructions modal -->
       <instructions-modal v-if="campaign && campaign.info" :campaign="campaign" :info="campaign.info" :show="joinCampaignPopup" @clicked="campaignModalChange" />
     </div>
+    </div>
   </section>
 </template>
 <script>
@@ -303,6 +410,7 @@ import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
 import SuccessModal from '@/components/SuccessModal'
+import Pagination from '@/components/Pagination'
 const jsonexport = require('jsonexport/dist')
 
 export default {
@@ -310,7 +418,8 @@ export default {
     TemplateMedia,
     ReserveTask,
     InstructionsModal,
-    SuccessModal
+    SuccessModal,
+    Pagination
   },
   middleware: ['auth'],
   data () {
@@ -328,17 +437,22 @@ export default {
       joinCampaignPopup: false,
       reserveTask: false,
       submissions: null,
-      page: 1,
       pageR: 1,
-      perPage: 10,
+      page: 1,
+      pageT: 1,
+      perPage: 20,
       pages: [],
       pagesR: [],
+      pagesT: [],
       viewTaskResult: false,
       successMessage: null,
       successTitle: null,
       reservations: null,
       userReservation: null,
-      releasedReservations: null
+      releasedReservations: null,
+      waitingOnTransaction: false,
+      categories: ['translate', 'captions', 'socials', 'dao'],
+      taskTab: 'allTasks'
     }
   },
   computed: {
@@ -348,19 +462,26 @@ export default {
       campaignLoading: state => state.campaign.loading && !state.campaign.allCampaignsLoaded,
       batchLoading: state => state.campaign.loadingBatch
     }),
-    displayedSubmissions () {
-      return this.paginate(this.submissions)
+    paginatedSubmissions () {
+      const start = (this.page - 1) * this.perPage
+      if (this.submissions) {
+        return this.submissions.slice(start, start + this.perPage)
+      }
+      return []
     },
-    displayedReservations () {
-      return this.paginate(this.reservations.filter(x => x.account_id))
-    }
-  },
-  watch: {
-    submissions () {
-      this.setPages()
+    paginatedReservations () {
+      const start = (this.page - 1) * this.perPage
+      if (this.reservations.filter(x => x.account_id)) {
+        return this.reservations.filter(x => x.account_id).slice(start, start + this.perPage)
+      }
+      return []
     },
-    reservations () {
-      this.setPagesR()
+    paginatedTasks () {
+      const start = (this.pageT - 1) * this.perPage
+      if (this.batch && this.batch.tasks) {
+        return this.batch.tasks.slice(start, start + this.perPage)
+      }
+      return []
     }
   },
   mounted () {
@@ -373,7 +494,6 @@ export default {
     this.checkUserCampaign()
     this.getBatch()
     this.getCampaign()
-    this.setPages()
   },
   methods: {
     campaignModalChange (val) {
@@ -401,10 +521,13 @@ export default {
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
-        const data = await this.$blockchain.joinCampaign(this.campaignId)
+        this.loading = true
+        this.joinCampaignPopup = false
+        const data = await this.$blockchain.joinCampaignAndReserveTask(this.campaignId, this.batch.id, this.batch.tasks_done, this.batch.tasks)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
+          this.waitingOnTransaction = true
           this.joinCampaignPopup = false
           await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
@@ -412,6 +535,7 @@ export default {
             this.reserveTask = true
           }
         }
+        this.waitingOnTransaction = false
         this.joinCampaignPopup = false
       } catch (e) {
         this.$blockchain.handleError(e)
@@ -452,6 +576,13 @@ export default {
       {
         placeholders: this.batch.tasks[taskIndex],
         results: JSON.parse(sub.data)
+      }
+    },
+    viewTaskPreview (task) {
+      this.viewTaskResult =
+      {
+        placeholders: task,
+        results: []
       }
     },
     submitTask (values) {
@@ -542,28 +673,14 @@ export default {
         console.error(error)
       }
     },
-    setPages () {
-      if (!this.submissions) { return }
-      const numberOfPages = Math.ceil(this.submissions.length / this.perPage)
-      for (let index = 1; index <= numberOfPages; index++) {
-        if (this.pages.length < index) {
-          this.pages.push(index)
-        }
-      }
+    setPage (newPage) {
+      this.page = newPage
     },
-    setPagesR () {
-      if (!this.reservations) { return }
-      const numberOfPages = Math.ceil(this.reservations.length / this.perPage)
-      for (let index = 1; index <= numberOfPages; index++) {
-        if (this.pagesR.length < index) {
-          this.pagesR.push(index)
-        }
-      }
+    setPageR (newPage) {
+      this.pageR = newPage
     },
-    paginate (submissions) {
-      const from = (this.page * this.perPage) - this.perPage
-      const to = (this.page * this.perPage)
-      return submissions.slice(from, to)
+    setPageT (newPage) {
+      this.pageT = newPage
     }
   }
 }
@@ -577,5 +694,43 @@ export default {
 }
 .progress::-webkit-progress-value {
   transition: width 0.5s ease;
+}
+.tabs {
+  li {
+    font-weight: 500;
+    a {
+      padding-left: 35px;
+      padding-right: 35px;
+    }
+    &.is-active {
+      a {
+        border-bottom-width: 2px;
+        border-bottom-color: #1977F3;
+        color: #151A1F;
+        font-weight: 600;
+      }
+    }
+  }
+}
+.information-block {
+  border: 1px solid #E8EEFF;
+  border-radius: 8px;
+  .block {
+    margin-bottom: 10px
+  }
+
+  .information-header {
+    background: #F7FBFF;
+  }
+}
+.task-tab div.box {
+  background: $balance-box-color;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: none;
+  cursor:pointer;
+  &.is-active {
+    border: 3px solid #1977F3;
+  }
 }
 </style>
