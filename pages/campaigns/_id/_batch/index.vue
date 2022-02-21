@@ -237,7 +237,6 @@
               </div>
               <span v-else>No active reservations</span>
             </div>
-          </div>
 
           <div class="modal" :class="{'is-active': viewTaskResult}">
             <div class="modal-background" @click="viewTaskResult = false" />
@@ -256,7 +255,9 @@
           <nuxt-link :to="`/campaigns/${campaignId}`" class="mt-6 button is-primary is-light">
             &lt; Back to campaign
           </nuxt-link>
+          </div>
         </div>
+
         <div class="column is-two-fifths">
           <div class="information-block">
             <div class="information-header has-text-centered">
@@ -293,6 +294,12 @@
                     <span v-else class="tag is-info is-light is-medium">...</span>
                   </div>
                   <div class="block">
+                    Status
+                    <br>
+                    <span v-if="batch"><b>{{ batch.status }}</b></span>
+                    <span v-else>...</span>
+                  </div>
+                  <div class="block">
                     Reward
                     <br>
                     <span v-if="campaign"><b>{{ campaign.reward.quantity }}</b></span>
@@ -321,21 +328,28 @@
                   <div class="block">
                     Blockchain
                     <br>
-                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View in Explorer</a>
+                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
                   </div>
                 </div>
               </div>
               <div class="block is-vcentered">
-                <button v-if="loading || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
+                <template v-if="campaign && $auth.user.accountName === campaign.owner[1]">
+                  <button v-if="batch && batch.status !== 'Completed'" class="button is-primary is-fullwidth is-light" @click.prevent="handleBatch">
+                    <span v-if="batch.status === 'Active'">Pause Batch</span>
+                    <span v-else-if="batch.status === 'Paused'">Resume Batch</span>
+                  </button>
+                  <br>
+                </template>
+                <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
                   Loading
                 </button>
                 <button v-else-if="!userJoined" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                   Join Campaign
                 </button>
-                <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
+                <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
                   Resume Task
                 </button>
-                <button v-else-if="batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations" class="button is-fullwidth is-primary" @click.prevent="reserveTask = true">
+                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations" class="button is-fullwidth is-primary" @click.prevent="reserveTask = true">
                   Make Task Reservation
                 </button>
                 <template v-else>
@@ -348,7 +362,6 @@
             </div>
           </div>
         </div>
-      </div>
 
       <!-- SuccessModal -->
       <success-modal v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
@@ -358,6 +371,7 @@
 
       <!-- Instructions modal -->
       <instructions-modal v-if="campaign && campaign.info" :campaign="campaign" :info="campaign.info" :show="joinCampaignPopup" @clicked="campaignModalChange" />
+    </div>
     </div>
   </section>
 </template>
@@ -456,6 +470,25 @@ export default {
   methods: {
     campaignModalChange (val) {
       this.joinCampaignPopup = val
+    },
+    async handleBatch () {
+      let data
+      try {
+        if (this.batch.status === 'Active') {
+          data = await this.$blockchain.pauseBatch(this.batch)
+        } else if (this.batch.status === 'Paused') {
+          data = await this.$blockchain.resumeBatch(this.batch)
+        }
+        this.$store.dispatch('transaction/addTransaction', data)
+        if (data) {
+          this.loading = true
+          this.joinCampaignPopup = false
+          await this.$blockchain.waitForTransaction(data)
+          this.$router.push(`/campaigns/${this.campaign.id}`)
+        }
+      } catch (e) {
+        this.$blockchain.handleError(e)
+      }
     },
     async joinCampaign () {
       try {

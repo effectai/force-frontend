@@ -365,6 +365,12 @@ export default (context, inject) => {
       async createBatch (campaignId, content, repetitions) {
         return await this.sdk.force.createBatch(campaignId, content, repetitions)
       },
+      async pauseBatch (batch) {
+        return await this.sdk.force.pauseBatch(batch)
+      },
+      async resumeBatch (batch) {
+        return await this.sdk.force.resumeBatch(batch)
+      },
       async editCampaign (id, hash, reward) {
         return await this.sdk.force.editCampaign(id, hash, reward)
       },

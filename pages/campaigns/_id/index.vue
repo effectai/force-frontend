@@ -94,11 +94,22 @@
                       </h2>
                     </div>
                     <div class="column">
+                      <p class="has-text-grey is-size-7">
+                        Status
+                      </p>
+                      <h2 v-if="batch" class="subtitle is-6 has-text-weight-semibold mb-0">
+                        {{ batch.status }}
+                      </h2>
+                    </div>
+                    <div class="column">
                       <p v-if="batch.num_tasks - batch.tasks_done === 0" class="has-text-grey is-size-7">
                         Tasks <small>(<b class="has-text-success">Done</b>)</small>
                       </p>
-                      <p v-else class="has-text-grey is-size-7">
+                      <p v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done > 0" class="has-text-grey is-size-7">
                         Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
+                      </p>
+                      <p v-else-if="batch.status === 'Paused'" class="has-text-grey is-size-7">
+                        {{ batch.tasks_done }} Task <span v-if="batch.tasks_done > 1">s</span><small><b>completed</b></small>
                       </p>
                       <progress class="progress is-small mt-2" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false }" :value="batch.tasks_done" :max="batch.num_tasks" />
                     </div>
