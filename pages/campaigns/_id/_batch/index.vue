@@ -349,7 +349,7 @@
                 <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
                   Resume Task
                 </button>
-                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations" class="button is-fullwidth is-primary" @click.prevent="reserveTask = true">
+                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations.length > 0" class="button is-fullwidth is-primary" @click.prevent="reserveTask = true">
                   Make Task Reservation
                 </button>
                 <template v-else>

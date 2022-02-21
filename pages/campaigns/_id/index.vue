@@ -176,11 +176,7 @@
                     Join Campaign
                   </button>
                   <button
-                    v-else-if="campaignBatches.reduce(function(a,b){
-                      return a + b.num_tasks
-                    },0) - campaignBatches.reduce(function(a,b){
-                      return a + b.tasks_done
-                    },0) > 0 && !userReservation"
+                    v-else-if="campaignBatches.reduce((a,b) => a + b.num_tasks,0) - campaignBatches.reduce((a,b) => a + b.tasks_done,0) > 0 && !userReservation"
                     class="button is-fullwidth is-primary"
                     @click.prevent="reserveTask"
                   >
