@@ -220,7 +220,7 @@
                         </div>
                       </td>
                       <td>
-                        <button class="button is-primary" @click.prevent="viewTaskPreview(task)">
+                        <button class="button" @click.prevent="viewTaskPreview(task)">
                           Preview
                         </button>
                       </td>
