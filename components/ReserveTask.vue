@@ -99,7 +99,7 @@ export default {
         }
 
         // get task form reservation and go to task page
-        if (rvObj.reservation && rvObj.isReleased === false && rvObj.isExpired === false) {
+        if (rvObj.reservation && rvObj.isExpired === false) {
           const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, rvObj.reservation.leaf_hash, this.batch.tasks)
           // TODO: temp for demo, pass reservation/reservation.id in a different way
           this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '/' + taskIndex + '?submissionId=' + rvObj.reservation.id)
