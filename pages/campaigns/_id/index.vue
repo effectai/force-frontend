@@ -166,9 +166,12 @@
                   <b><span>{{ campaign.reward.quantity }}</span></b>
                 </div>
                 <div class="block">
-                  <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
-                    Edit Campaign
-                  </nuxt-link>
+                  <div v-if="$auth.user.accountName === campaign.owner[1]">
+                    <nuxt-link :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
+                      Edit Campaign
+                    </nuxt-link>
+                    <br>
+                  </div>
                   <button v-if="loading || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
                     Loading
                   </button>

@@ -12,6 +12,7 @@
       class="box p-4"
       :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
     >
+    <div v-if="toggleGridList">
       <div class="columns is-vcentered is-multiline is-mobile">
         <div class="column is-narrow is-mobile-1">
           <p class="image has-radius" style="width: 52px; height: 52px">
@@ -94,6 +95,10 @@
           </button>
         </div>
       </div>
+    </div>
+    <div v-else>
+      hi!
+    </div>
     </nuxt-link>
     <pagination
       v-if="filteredCampaigns"
@@ -131,7 +136,8 @@ export default {
     SortFilters,
     Pagination
   },
-  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns'],
+  // props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns'],
+  props: ['toggleGridList', 'active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns'],
   data () {
     return {
       filter: null,
