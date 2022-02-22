@@ -19,7 +19,7 @@
             <div v-else-if="!templates">
               Could not retrieve default templates
             </div>
-            <div v-else-if="!templates.length">
+            <div v-else-if="Object.keys(templates).length === 0">
               No default templates found
             </div>
             <a v-for="template in templates" :key="template.url" class="panel-block" :class="{'is-active': selectedTemplate === template}" @click="selectedTemplate = template">
@@ -54,6 +54,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 
@@ -71,6 +72,11 @@ export default {
       previewTemplate: null,
       templates: null
     }
+  },
+  computed: {
+    ...mapGetters({
+      savedTemplates: 'template/getTemplates'
+    })
   },
   watch: {
     async selectedTemplate (template) {
@@ -102,22 +108,11 @@ export default {
     async retrieveTemplates () {
       this.loading = true
       try {
-        const response = await fetch('https://api.github.com/repos/effectai/effect-force-templates/git/trees/master')
-        const templatesTree = (await response.json()).tree.find(t => t.path === 'templates')
-        if (templatesTree) {
-          const response2 = await fetch(templatesTree.url)
-          const templatesTrees = (await response2.json()).tree
-          const templates = []
-          templatesTrees.forEach((template) => {
-            templates.push({
-              name: template.path,
-              url: `https://raw.githubusercontent.com/effectai/effect-force-templates/master/templates/${template.path}/template.html`,
-              placeholders: `https://raw.githubusercontent.com/effectai/effect-force-templates/master/templates/${template.path}/example_task.json`
-            })
-          })
-          this.templates = templates
-          this.selectedTemplate = this.templates[0]
+        if (!this.savedTemplates || Object.keys(this.savedTemplates).length === 0) {
+          await this.$store.dispatch('template/getTemplates')
         }
+        this.templates = this.savedTemplates
+        this.selectedTemplate = this.templates[Object.keys(this.templates)[0]]
       } catch (e) {
         console.error(e)
       }
