@@ -5,14 +5,14 @@
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
       <hr>
     </client-only>
-    <nuxt-link
-      v-for="campaign in paginatedCampaigns"
-      :key="campaign.id"
-      :to="'/campaigns/'+campaign.id"
-      class="box p-4"
-      :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
-    >
     <div v-if="toggleGridList">
+      <nuxt-link
+        v-for="campaign in paginatedCampaigns"
+        :key="campaign.id"
+        :to="'/campaigns/'+campaign.id"
+        class="box p-4"
+        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
+      >
       <div class="columns is-vcentered is-multiline is-mobile">
         <div class="column is-narrow is-mobile-1">
           <p class="image has-radius" style="width: 52px; height: 52px">
@@ -95,11 +95,88 @@
           </button>
         </div>
       </div>
+    </nuxt-link>
     </div>
     <div v-else>
-      hi!
+      <span>
+        <div class="columns is-6">
+        <nuxt-link
+        v-for="campaign in paginatedCampaigns"
+        :key="campaign.id"
+        :to="'/campaigns/'+campaign.id"
+        class="box p-4"
+        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
+        >
+          <div class="column">
+            <div class="card is-mobile">
+              <!-- <div class="card-image">
+                <figure>
+                  <p class="image has-radius">
+                    <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
+                    <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+                    <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
+                  </p>
+                </figure>
+              </div> -->
+              <div class="card-content">
+                <div class="media">
+                  <div class="media-left">
+                    <p class="image has-radius" style="width: 52px; height: 52px">
+                      <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
+                      <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+                      <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
+                    </p>
+                  </div>
+                  <div class="media-content">
+                    <p class="title is-4">
+                      {{ campaign.info.title }}
+                    </p>
+                    <p class="subtitle is-6">
+                      {{ campaign.info.description }}
+                    </p>
+                  </div>
+                </div>
+                  <div class="content">
+                        <p class="has-text-grey is-size-7">
+                          Requester:
+                        </p>
+                        <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                          <nuxt-link :to="'/profile/' + campaign.owner[1]">
+                            <span class="is-ellipsis">{{ campaign.owner[1] }}</span>
+                          </nuxt-link>
+                        </h2>
+                        <p class="has-text-grey is-size-7">
+                          Reward:
+                        </p>
+                        <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                          {{ campaign.reward.quantity }}
+                        </h2>
+                        <p class="has-text-grey is-size-7">
+                          Tasks:
+                        </p>
+                        <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                          <span v-if="batchByCampaignId(campaign.id) === null">
+                            Loading..
+                          </span>
+                          <span v-else>
+                            {{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                              return a + b.num_tasks
+                            },0) - batchByCampaignId(campaign.id).reduce(function(a,b){
+                              return a + b.tasks_done
+                            },0) }}/{{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                              return a + b.num_tasks
+                            },0) }} left
+                            <br>
+                          </span>
+                        </h2>
+                  </div>
+              </div>
+            </div>
+          </div>
+          </nuxt-link>
+        </div>
+      </span>
     </div>
-    </nuxt-link>
     <pagination
       v-if="filteredCampaigns"
       :items="filteredCampaigns.length"
