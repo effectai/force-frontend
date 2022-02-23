@@ -143,12 +143,8 @@
         <h2 class="title is-4 is-full-mobile">
           My Campaigns
         </h2>
-        <div class="field">
-          <input type="checkbox" class="switch" name="gridToggle" id="gridToggle" v-model="listGridSwitch">
-          <label for="gridToggle">ListGrid</label>
-        </div>
 
-        <campaign-list class="mb-6" :owner="$auth.user.accountName" :toggleGridList="listGridSwitch"/>
+        <campaign-list class="mb-6" :owner="$auth.user.accountName" />
         <hr>
 
         <h2 class="title is-4 is-spaced">
@@ -231,7 +227,6 @@ export default {
       page: 1,
       perPage: 10,
       showPK: false,
-      listGridSwitch: true,
       pages: [],
       pendingPayouts: []
     }
