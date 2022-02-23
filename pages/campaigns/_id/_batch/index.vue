@@ -204,6 +204,7 @@
                     <tr>
                       <th>Reservation ID</th>
                       <th>Account ID</th>
+                      <th>Submitted on</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -218,6 +219,9 @@
                           {{ sub.account_id }}
                         </p>
                         <p v-else />
+                      </td>
+                      <td>
+                        <p>{{ sub.submitted_on }}</p>
                       </td>
                       <td>
                         <button v-if="sub.account_id !== null" class="button is-primary" @click.prevent="releaseTask(sub.id)">
@@ -272,7 +276,7 @@
                 <template v-if="batch && batch.num_tasks - batch.tasks_done === 0">
                   <span>{{ batch.num_tasks }} Tasks done.</span>
                 </template>
-                <template v-if="batch && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
+                <template v-else-if="batch && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
                   <span>{{ batch.num_tasks - (batch.tasks_done - releasedReservations.length) }}</span>
                   <span>/ {{ batch.num_tasks }} left</span>
                 </template>
@@ -332,6 +336,7 @@
                   </div>
                 </div>
               </div>
+
               <div class="block is-vcentered">
                 <template v-if="campaign && $auth.user.accountName === campaign.owner[1]">
                   <button v-if="batch && batch.status !== 'Completed'" class="button is-primary is-fullwidth is-light" @click.prevent="handleBatch">
@@ -359,19 +364,20 @@
                   <p>No active tasks currently</p>
                 </template>
               </div>
+
             </div>
           </div>
         </div>
 
-      <!-- SuccessModal -->
-      <success-modal v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
+        <!-- SuccessModal -->
+        <success-modal v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
 
-      <!-- Reserve task -->
-      <reserve-task v-if="reserveTask" :batch="batch" />
+        <!-- Reserve task -->
+        <reserve-task v-if="reserveTask" :batch="batch" />
 
-      <!-- Instructions modal -->
-      <instructions-modal v-if="campaign && campaign.info" :campaign="campaign" :info="campaign.info" :show="joinCampaignPopup" @clicked="campaignModalChange" />
-    </div>
+        <!-- Instructions modal -->
+        <instructions-modal v-if="campaign && campaign.info" :campaign="campaign" :info="campaign.info" :show="joinCampaignPopup" @clicked="campaignModalChange" />
+      </div>
     </div>
   </section>
 </template>
@@ -521,6 +527,7 @@ export default {
       this.reservations = allReservations.filter(function (sub) {
         return sub.account_id
       })
+      this.getBatch()
     },
     async checkUserCampaign () {
       this.loading = true
@@ -573,7 +580,9 @@ export default {
       this.reservations = allSubmissions.filter(function (sub) {
         return !sub.data && sub.account_id
       })
-      this.releasedReservations = this.reservations.filter(r => r.account_id === null)
+      this.releasedReservations = allSubmissions.filter(function (sub) {
+        return !sub.data && !sub.account_id
+      })
       this.userReservation = this.reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id)
     },
     async getCampaign () {
