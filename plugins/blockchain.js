@@ -31,7 +31,8 @@ export default (context, inject) => {
         waitForSignature: 0,
         efxPrice: null,
         userRefreshInterval: null,
-        forceRefreshInterval: null
+        forceRefreshInterval: null,
+        templateRefreshInterval: null
       }
     },
     computed: {
@@ -62,11 +63,15 @@ export default (context, inject) => {
       if (!this.forceRefreshInterval) {
         this.forceRefreshInterval = setInterval(this.updateForceInfo, parseInt(process.env.NUXT_ENV_FORCE_UPDATE_RATE, 10))
       }
+      if (!this.templateRefreshInterval) {
+        this.templateRefreshInterval = setInterval(this.updateTemplates, parseInt(process.env.NUXT_ENV_TEMPLATE_UPDATE_RATE, 10))
+      }
     },
 
     beforeDestroy () {
       clearInterval(this.userRefreshInterval)
       clearInterval(this.forceRefreshInterval)
+      clearInterval(this.templateRefreshInterval)
     },
 
     methods: {
@@ -76,6 +81,10 @@ export default (context, inject) => {
         context.store.dispatch('campaign/getBatches')
         context.store.dispatch('campaign/getSubmissions')
         context.store.dispatch('pendingPayout/loadPendingPayouts')
+      },
+      updateTemplates () {
+        console.log('updating campaign templates..')
+        context.store.dispatch('template/getTemplates')
       },
       updateUserInfo () {
         this.getEfxPrice()
