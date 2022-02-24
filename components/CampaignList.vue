@@ -1,17 +1,22 @@
 <template>
   <div>
     <client-only>
+      <div class="field">
+        <input type="checkbox" class="switch" name="gridToggle" id="gridToggle" v-model="listGridSwitch">
+        <label for="gridToggle">Grid / List</label>
+      </div>
       <category-filters v-if="categoryFilter" @clicked="onFilter" />
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
       <hr>
     </client-only>
-    <nuxt-link
-      v-for="campaign in paginatedCampaigns"
-      :key="campaign.id"
-      :to="'/campaigns/'+campaign.id"
-      class="box p-4"
-      :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
-    >
+    <div v-if="listGridSwitch">
+      <nuxt-link
+        v-for="campaign in paginatedCampaigns"
+        :key="campaign.id"
+        :to="'/campaigns/'+campaign.id"
+        class="box p-4"
+        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
+      >
       <div class="columns is-vcentered is-multiline is-mobile">
         <div class="column is-narrow is-mobile-1">
           <p class="image has-radius" style="width: 52px; height: 52px">
@@ -95,6 +100,94 @@
         </div>
       </div>
     </nuxt-link>
+    </div>
+    <div v-else>
+      <span>
+        <div class="columns is-multiline">
+          <div
+          class="column is-one-third"
+          v-for="campaign in paginatedCampaigns"
+          :key="campaign.id"
+          >
+            <div class="card is-shadowless">
+            <nuxt-link
+            :to="'/campaigns/'+campaign.id"
+            class="box p-4"
+            :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
+            >
+              <div class="card-image">
+                <figure>
+                  <p class="image has-radius is-3by1 is-vcentered">
+                    <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
+                    <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+                    <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
+                  </p>
+                </figure>
+              </div>
+              <div class="card-content has-text-centered">
+                <div class="media">
+                  <section class="title-section">
+                    <div class="media-content">
+                      <p class="title is-4">
+                        <span v-if="campaign.info">
+                          <span v-if="campaign.info.title">{{ campaign.info.title.length > 12 ? `${campaign.info.title.slice(0, 12)}...` : campaign.info.title }}</span>
+                          <i v-else>- Untitled -</i>
+                        </span>
+                      </p>
+                      <p class="subtitle is-6 is-flex is-clipped is-inline">
+                        <span v-if="campaign.info">
+                          <span v-if="campaign.info.description.length > 0">
+                            {{ campaign.info.description.length > 50 ? `${campaign.info.description.slice(0, 37)}...` : campaign.info.description  }}
+                          </span>
+                          <span v-else>
+                            <i>- No Description... -</i>
+                          </span>
+                        </span>
+                      </p>
+                    </div>
+                  </section>
+                </div>
+                <hr>
+                  <div class="content">
+                        <div class="has-text-grey is-size-7">
+                          Requester:
+                        </div>
+                        <div class="subtitle is-6 has-text-weight-semibold mb-0">
+                          <nuxt-link :to="'/profile/' + campaign.owner[1]">
+                            <span class="is-ellipsis">{{ campaign.owner[1] }}</span>
+                          </nuxt-link>
+                        </div>
+                        <br>
+                        <div class="has-text-grey is-size-7">
+                          Reward:
+                        </div>
+                        <div class="subtitle is-6 has-text-weight-semibold mb-0">
+                          {{ campaign.reward.quantity }}
+                        </div>
+                        <br>
+                        <div class="has-text-grey is-size-7">
+                          Tasks:
+                        </div>
+                        <div class="subtitle is-6 has-text-weight-semibold mb-0">
+                          <span v-if="batchByCampaignId(campaign.id) === null">
+                            Loading..
+                          </span>
+                          <span v-else>
+                            {{ batchByCampaignId(campaign.id).reduce((a,b) => a + b.num_tasks, 0) -
+                            batchByCampaignId(campaign.id).reduce((a,b) => a + b.tasks_done, 0) }}/{{
+                              batchByCampaignId(campaign.id).reduce((a,b) => a + b.num_tasks, 0) }} left
+                            <br>
+                          </span>
+                        </div>
+                  </div>
+                <button class="button is-primary is-fullwidth">View</button>
+                </div>
+                </nuxt-link>
+              </div>
+          </div>
+        </div>
+      </span>
+    </div>
     <pagination
       v-if="filteredCampaigns"
       :items="filteredCampaigns.length"
@@ -131,6 +224,7 @@ export default {
     SortFilters,
     Pagination
   },
+  // props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns'],
   props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns'],
   data () {
     return {
@@ -140,6 +234,7 @@ export default {
       perPage: 30,
       search: null,
       status: null,
+      listGridSwitch: true,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       categories: ['translate', 'captions', 'socials', 'dao']
     }
@@ -285,6 +380,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.title-section {
+  height: 100%;
+}
+
+.column {
+  // display: inline-flex;
+  // display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
 .box {
   &.is-disabled {
     .column:not(:last-child) {
