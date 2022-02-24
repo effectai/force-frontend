@@ -128,6 +128,22 @@
                   <div class="media">
                     <section class="title-section">
                       <div class="media-content">
+                        <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                          <div>
+                            <span
+                              v-if="campaign.info && campaign.info.category"
+                              class="tag is-light mb-2"
+                              :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
+                            >{{ campaign.info.category }}</span>
+                          </div>
+
+                          <span v-if="campaign.info">
+                            <span v-if="campaign.info.title">{{ campaign.info.title }}</span>
+                            <i v-else>- Untitled -</i>
+                          </span>
+                          <span v-else-if="campaign.info !== null">Loading..</span>
+                          <span v-else class="has-text-danger-dark">Could not load campaign info</span>
+                        </h2>
                         <h3 class="title is-4">
                           <span v-if="campaign.info">
                             <span v-if="campaign.info.title">{{ campaign.info.title.length > 12 ? `${campaign.info.title.slice(0, 12)}...` : campaign.info.title }}</span>
