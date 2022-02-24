@@ -80,19 +80,20 @@ export default {
   },
   watch: {
     async selectedTemplate (template) {
+      const sTemplate = { ...template }
       this.loading = true
       try {
-        const response = await this.$axios.get(template.url)
-        if (typeof template.placeholders === 'string') {
+        const response = await this.$axios.get(sTemplate.url)
+        if (typeof sTemplate.placeholders === 'string') {
           try {
-            const response2 = await this.$axios.get(template.placeholders)
-            template.placeholders = response2.data
+            const response2 = await this.$axios.get(sTemplate.placeholders)
+            sTemplate.placeholders = response2.data
           } catch (e) {
-            template.placeholders = {}
+            sTemplate.placeholders = {}
             console.error('could not retrieve example task', e)
           }
         }
-        this.previewTemplate = this.renderTemplate(response.data, template.placeholders)
+        this.previewTemplate = this.renderTemplate(response.data, sTemplate.placeholders)
       } catch (e) {
         console.error(e)
       }
@@ -111,7 +112,7 @@ export default {
         if (!this.savedTemplates || Object.keys(this.savedTemplates).length === 0) {
           await this.$store.dispatch('template/getTemplates')
         }
-        this.templates = this.savedTemplates
+        this.templates = { ...this.savedTemplates }
         this.selectedTemplate = this.templates[Object.keys(this.templates)[0]]
       } catch (e) {
         console.error(e)
