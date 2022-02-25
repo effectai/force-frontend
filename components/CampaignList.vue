@@ -1,13 +1,13 @@
 <template>
   <div>
     <client-only>
-      <div class="field">
-        <input type="checkbox" class="switch" name="gridToggle" id="gridToggle" v-model="listGridSwitch">
-        <label for="gridToggle">Grid / List</label>
-      </div>
       <category-filters v-if="categoryFilter" @clicked="onFilter" />
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
-      <hr>
+      <div class="field is-flex is-justify-content-flex-end">
+        <input type="checkbox" class="switch is-pulled-right" name="gridToggle" id="gridToggle" v-model="listGridSwitch">
+        <label for="gridToggle">Grid / List</label>
+      </div>
+      <hr class="mt-1">
     </client-only>
     <div v-if="listGridSwitch">
       <nuxt-link
@@ -105,7 +105,7 @@
       <span>
         <div class="columns is-multiline">
           <div
-            class="column is-2"
+            class="column is-one-fifth-desktop is-one-third-tablet is-full-mobile"
             v-for="campaign in paginatedCampaigns"
             :key="campaign.id"
           >
@@ -115,67 +115,50 @@
                 class="box p-0"
                 :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
               >
-                <div class="card-image p-3">
+                <div class="card-image p-2 mb-3">
                   <figure>
-                    <p class="image has-radius is-3by1 is-vcentered">
+                    <p class="image has-radius is-vcentered">
                       <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
-                      <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+                      <img class="p-2" v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
                       <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
                     </p>
                   </figure>
                 </div>
-                <div class="card-content p-3 has-text-centered">
-                  <div class="media">
-                    <section class="title-section">
-                      <div class="media-content">
-                        <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                          <div>
-                            <span
-                              v-if="campaign.info && campaign.info.category"
-                              class="tag is-light mb-2"
-                              :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
-                            >{{ campaign.info.category }}</span>
-                          </div>
-
-                          <span v-if="campaign.info">
-                            <span v-if="campaign.info.title">{{ campaign.info.title }}</span>
-                            <i v-else>- Untitled -</i>
+                <div class="card-content p-2 has-text-centered">
+                  <section class="title-section">
+                    <div class="media-content">
+                      <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                        <span v-if="campaign.info">
+                          <span v-if="campaign.info.title">{{ campaign.info.title }}</span>
+                          <i v-else>- Untitled -</i>
+                        </span>
+                        <span v-else-if="campaign.info !== null">Loading..</span>
+                        <span v-else class="has-text-danger-dark">Could not load campaign info</span>
+                      </h2>
+                      <p class="has-text-grey is-size-7 is-flex is-clipped is-inline">
+                        <span v-if="campaign.info">
+                          <span v-if="campaign.info.description.length > 0">
+                            {{ campaign.info.description.length > 50 ? `${campaign.info.description.slice(0, 30)}...` : campaign.info.description }}
                           </span>
-                          <span v-else-if="campaign.info !== null">Loading..</span>
-                          <span v-else class="has-text-danger-dark">Could not load campaign info</span>
-                        </h2>
-                        <h3 class="title is-4">
-                          <span v-if="campaign.info">
-                            <span v-if="campaign.info.title">{{ campaign.info.title.length > 12 ? `${campaign.info.title.slice(0, 12)}...` : campaign.info.title }}</span>
-                            <i v-else>- Untitled -</i>
+                          <span v-else>
+                            <i>- No Description... -</i>
                           </span>
-                        </h3>
-                        <p class="subtitle is-6 is-flex is-clipped is-inline">
-                          <span v-if="campaign.info">
-                            <span v-if="campaign.info.description.length > 0">
-                              {{ campaign.info.description.length > 50 ? `${campaign.info.description.slice(0, 37)}...` : campaign.info.description }}
-                            </span>
-                            <span v-else>
-                              <i>- No Description... -</i>
-                            </span>
-                          </span>
-                        </p>
-                      </div>
-                    </section>
-                  </div>
+                        </span>
+                      </p>
+                    </div>
+                  </section>
                 </div>
-                <hr>
-                <div class="card-content has-text-centered">
+                <hr class="mb-2 mt-0">
+                <div class="card-content p-2 has-text-centered">
                   <div class="content">
                     <div class="has-text-grey is-size-7">
                       Requester:
                     </div>
-                    <div class="subtitle is-6 has-text-weight-semibold mb-0">
+                    <div class="subtitle is-6 has-text-weight-semibold mb-2">
                       <nuxt-link :to="'/profile/' + campaign.owner[1]">
                         <span class="is-ellipsis">{{ campaign.owner[1] }}</span>
                       </nuxt-link>
                     </div>
-                    <br>
                     <div class="has-text-grey is-size-7">
                       Reward:
                     </div>
@@ -413,7 +396,7 @@ export default {
   .card-image {
     height: 75px !important;
     figure, p, img {
-      height: 100%;
+      height: 75px !important;
     }
     img {
       width: 100%;
@@ -422,7 +405,6 @@ export default {
     }
   }
   .card-content {
-    padding: 0 !important
   }
 }
 </style>

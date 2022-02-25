@@ -10,9 +10,9 @@
       <nuxt-link v-if="hasCampaigns" class="button is-ghost is-pulled-right no-float-mobile has-margin-bottom-mobile is-paddingless-mobile" to="/campaigns">
         <span>My Campaigns</span>
       </nuxt-link>
-      <h2 class="title mb-6 has-text-weight-bold is-full-mobile">
+      <h1 class="title mb-6 has-text-weight-bold is-full-mobile">
         Active Tasks
-      </h2>
+      </h1>
       <campaign-list :category-filter="true" :active="true" />
     </div>
   </section>
