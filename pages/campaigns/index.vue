@@ -10,9 +10,9 @@
       <nuxt-link class="button is-ghost is-pulled-right is-paddingless-mobile" to="/">
         <span>Active Campaigns</span>
       </nuxt-link>
-      <h2 class="title has-text-weight-bold is-full-mobile">
+      <h1 class="title has-text-weight-bold is-full-mobile">
         <span v-if="myCampaigns">My</span><span v-else>All</span> Campaigns
-      </h2>
+      </h1>
       <label class="checkbox">
         <input v-model="myCampaigns" type="checkbox">
         Show only my campaigns
