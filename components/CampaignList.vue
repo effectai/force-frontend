@@ -28,11 +28,12 @@
           <div class="column is-4-desktop is-4-widescreen is-12-touch">
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
               <div>
-                <span
+                <nuxt-link
+                  :to="'/?category=' + campaign.info.category"
                   v-if="campaign.info && campaign.info.category"
                   class="tag is-light mb-2"
                   :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
-                >{{ campaign.info.category }}</span>
+                >{{ campaign.info.category }}</nuxt-link>
               </div>
 
               <span v-if="campaign.info">
@@ -242,7 +243,7 @@ export default {
       return this.reservationsByAccountId(this.$auth.user.vAccountRows[0].id)
     },
     filteredCampaigns () {
-      const campaigns = this.campaignsByCategory(this.filter)
+      const campaigns = this.campaignsByCategory(this.$route.query.category ? this.$route.query.category : this.filter)
       let filteredCampaigns
       if (campaigns) {
         filteredCampaigns = campaigns.map((c) => { return { ...c } })
@@ -337,6 +338,9 @@ export default {
       this.page = newPage
     },
     onFilter (category) {
+      if (this.$route.query.category) {
+        this.$router.replace('/')
+      }
       this.filter = category
     },
     onStatusFilter (status) {
