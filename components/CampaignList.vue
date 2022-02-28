@@ -7,6 +7,9 @@
         <input type="checkbox" class="switch is-pulled-right" name="gridToggle" id="gridToggle" v-model="listGridSwitch">
         <label for="gridToggle">Grid / List</label>
       </div>
+      <span v-if="$route.query.category">
+        Filtering on category: {{ $route.query.category }}
+      </span>
       <hr class="mt-1">
     </client-only>
     <div v-if="listGridSwitch">
@@ -211,7 +214,6 @@ export default {
     SortFilters,
     Pagination
   },
-  // props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns'],
   props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns'],
   data () {
     return {

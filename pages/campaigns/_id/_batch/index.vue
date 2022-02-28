@@ -294,7 +294,7 @@
                 <div class="column is-half">
                   <div class="block">
                     <br>
-                    <span v-if="campaign && campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</span>
+                    <nuxt-link :to="'/?category=' + campaign.info.category" v-if="campaign && campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</nuxt-link>
                     <span v-else class="tag is-info is-light is-medium">...</span>
                   </div>
                   <div class="block">

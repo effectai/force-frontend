@@ -153,11 +153,12 @@
             <div class="columns p-5">
               <div class="column is-half">
                 <div v-if="campaign.info" class="block">
-                  <span
+                  <nuxt-link
+                    :to="'/?category=' + campaign.info.category"
                     v-if="campaign.info && campaign.info.category"
                     class="tag is-light is-medium mb-5"
                     :class="{'is-secondary': campaign.info.category === 'translation', 'is-info': campaign.info.category === 'image_classification', 'is-warning': campaign.info.category === 'text_classification', 'is-danger': campaign.info.category === 'video_classification'}"
-                  >{{ campaign.info.category }}</span>
+                  >{{ campaign.info.category }}</nuxt-link>
                   <span v-else class="tag is-info is-light is-medium">...</span>
                 </div>
                 <div class="block mb-6">
