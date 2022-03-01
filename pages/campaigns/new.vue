@@ -121,7 +121,7 @@
         </div>
         <div v-show="formGroup === 'tasks'" class="block task-group">
           <div class="columns is-variable is-2 is-multiline">
-            <splitpanes class="default-theme">
+            <splitpanes class="default-theme" :horizontal="windowWidth < 767">
               <pane class="column is-6-widescreen is-12">
                 <label class="label">Template <span class="has-text-info"><b>*</b></span></label>
                 <codemirror
@@ -306,7 +306,8 @@ export default {
       errors: [],
       successMessage: null,
       successTitle: null,
-      answer: null
+      answer: null,
+      windowWidth: 0
     }
   },
   computed: {
@@ -343,6 +344,12 @@ export default {
 
   created () {
     this.cacheFormData()
+    // eslint-disable-next-line nuxt/no-globals-in-created
+    window.addEventListener('resize', this.handleResize)
+    this.handleResize()
+  },
+  destroyed () {
+    window.removeEventListener('resize', this.handleResize)
   },
 
   beforeDestroy () {
@@ -350,6 +357,9 @@ export default {
   },
 
   methods: {
+    handleResize () {
+      this.windowWidth = window.innerWidth
+    },
     async retrieveTemplate (params) {
       if (params.templateUrl) {
         this.campaignIpfs.template = 'Retrieving template..'
@@ -501,7 +511,15 @@ export default {
 div.instructions-group .textarea {
   overflow-y: scroll
 }
-.splitpanes.default-theme .splitpanes__pane {
-  background: transparent !important;
+.splitpanes.default-theme {
+  @media screen and (max-width: $tablet) {
+    display: block !important;
+  }
+  .splitpanes__pane {
+    background: transparent !important;
+    @media screen and (max-width: $tablet) {
+      width: 100% !important;
+    }
+  }
 }
 </style>
