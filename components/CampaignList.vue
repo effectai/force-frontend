@@ -109,7 +109,7 @@
       <span>
         <div class="columns is-multiline">
           <div
-            class="column is-one-fifth-desktop is-one-third-tablet is-full-mobile"
+            class="column is-one-fifth-desktop is-one-third-tablet is-full-mobile columnGrid"
             v-for="campaign in paginatedCampaigns"
             :key="campaign.id"
           >
@@ -128,7 +128,7 @@
                     </p>
                   </figure>
                 </div>
-                <div class="card-content p-2 has-text-centered">
+                <div class="card-content p-2 has-text-centered gridContent">
                   <section class="title-section">
                     <div class="media-content">
                       <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
@@ -373,9 +373,13 @@ export default {
 
 <style lang="scss" scoped>
 
-// #gridToggle {
-//   display: none;
-// }
+.columnGrid {
+  height: 100%;
+}
+
+.gridContent {
+  height: 100%;
+}
 
 #gridToggle + label:after {
   background: url('@/assets/img/icons/border-all.svg') CENTER CENTER NO-REPEAT;
