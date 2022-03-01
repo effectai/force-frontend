@@ -1,13 +1,13 @@
 <template>
   <div>
     <client-only>
-      <category-filters v-if="categoryFilter" @clicked="onFilter" />
+      <category-filters v-if="categoryFilter" :url-filter="filter" @clicked="onFilter" />
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
       <div class="field is-flex is-justify-content-flex-end">
         <input type="checkbox" class="switch is-pulled-right" name="gridToggle" id="gridToggle" v-model="listGridSwitch">
         <label for="gridToggle">Grid / List</label>
       </div>
-      <span v-if="$route.query.category">
+      <span v-if="$route.query.category && !categories.includes($route.query.category)">
         Filtering on category: {{ $route.query.category }}
       </span>
       <hr class="mt-1">
@@ -322,6 +322,14 @@ export default {
         return pageCampaigns
       }
       return []
+    }
+  },
+  watch: {
+    filteredCampaigns: {
+      deep: true,
+      handler () {
+        this.filter = this.$route.query.category ? this.$route.query.category : this.filter
+      }
     }
   },
   created () {

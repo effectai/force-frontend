@@ -4,14 +4,14 @@
       <slide v-for="(dapp, index) in effect_dapps" :key="dapp.value" class="column">
         <a
           href="#"
-          :class="['dapp-' + index, filter === dapp.value ? 'is-active' : null]"
+          :class="['dapp-' + index, filter === dapp.value || urlFilter === dapp.value ? 'is-active' : null]"
           class="box pt-1 pb-0"
           @mouseover="dapp.hover = true"
           @mouseleave="dapp.hover = false"
           @click.prevent="onClick(dapp.value)"
         >
           <div class="card-image has-text-centered">
-            <img class="dapp-logo block" :src="dapp.hover || filter === dapp.value ? dapp.whiteUrl : dapp.normalUrl" alt="Image">
+            <img class="dapp-logo block" :src="dapp.hover || filter === dapp.value || urlFilter === dapp.value ? dapp.whiteUrl : dapp.normalUrl" alt="Image">
           </div>
         </a>
       </slide>
@@ -34,6 +34,7 @@ export default {
     Carousel,
     Slide
   },
+  props: ['urlFilter'],
   data () {
     return {
       filter: null,
