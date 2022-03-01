@@ -4,8 +4,8 @@
       <category-filters v-if="categoryFilter" @clicked="onFilter" />
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
       <div class="field is-flex is-justify-content-flex-end">
-        <input type="checkbox" class="switch is-pulled-right" name="gridToggle" id="gridToggle" v-model="listGridSwitch">
-        <label for="gridToggle">Grid / List</label>
+        <input type="checkbox" class="switch is-pulled-right is-outlined is-info is-large" name="gridToggle" id="gridToggle" v-model="listGridSwitch">
+        <label for="gridToggle" class=""></label>
       </div>
       <span v-if="$route.query.category">
         Filtering on category: {{ $route.query.category }}
@@ -373,6 +373,26 @@ export default {
 
 <style lang="scss" scoped>
 
+// #gridToggle {
+//   display: none;
+// }
+
+#gridToggle + label:after {
+  background: url('@/assets/img/icons/border-all.svg') CENTER CENTER NO-REPEAT;
+  background-color: #ffffff;
+  /* 16x16 transparent pixels */
+  width: 28px;
+  height: 28px;
+}
+
+#gridToggle:checked + label:after {
+  background: url('@/assets/img/icons/list-ul.svg') CENTER CENTER NO-REPEAT;
+  background-color: #ffffff;
+  /* 21x21 transparent pixels */
+  width: 28px;
+  height: 28px;
+}
+
 .title-section {
   height: 100%;
 }
@@ -390,7 +410,7 @@ export default {
     }
     background-color: rgba(#DEE0E6, 0.5);
   }
-  // not sure about this styling
+  // not sure about this stylingx`
   &.has-reservation {
     box-shadow: 0px 0px 14px 5px rgba(17,72,235,0.3);
   }
