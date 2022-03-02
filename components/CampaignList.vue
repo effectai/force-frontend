@@ -230,7 +230,6 @@ export default {
       perPage: 30,
       search: null,
       status: null,
-      // listGridSwitch: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       categories: ['translate', 'captions', 'socials', 'dao']
     }

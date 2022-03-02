@@ -429,6 +429,18 @@ export default (context, inject) => {
         return addresses
       },
 
+      splitCompositeKey (compositeKey) {
+        const keys = effectSdk.splitCompositeKey(compositeKey)
+        return {
+          batch: keys[0],
+          campaign: keys[1]
+        }
+      },
+
+      getPayoutDelay () {
+        return this.sdk.force.config.payout_delay_sec
+      },
+
       handleError (error) {
         console.error(error) // eslint-disable-line no-console
         if (error.response && error.response.data) {
