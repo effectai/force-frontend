@@ -2,35 +2,27 @@ export default {
   namespaced: true,
   modules: {},
   mutations: {
-    ADD_TRANSACTION (state, transaction) {
-      if (state.transactions === null) { state.transactions = {} }
-      if (transaction && transaction.processed) {
-        if (state.transactions[this.$auth.user.vAccountRows[0].id]) {
-          state.transactions[this.$auth.user.vAccountRows[0].id].push(transaction)
-        } else {
-          state.transactions[this.$auth.user.vAccountRows[0].id] = [transaction]
-        }
+    TOGGLE_GRID_LIST_STATE (state) {
+      if (state.gridListToggle == null) {
+        state.gridListToggle = true
+      } else {
+        state.gridListToggle = !state.gridListToggle
       }
     }
   },
   getters: {
-    transactionById (state) {
-      return id => state.transactions ? state.transactions.find(c => c.id === id) : null
-    },
-    transactionsByUser (state) {
-      return userId => state.transactions ? state.transactions[userId] : null
+    getGridListState (state) {
+      return state.gridListToggle
     }
   },
   actions: {
-    addGridState ({ commit }, toggleState) {
-      if (toggleStage) {
-        commit('ADD_TR', transaction)
-      }
+    toggleGridListState ({ commit }) {
+      commit('TOGGLE_GRID_LIST_STATE')
     }
   },
   state: () => {
     return {
-      listGridToggle: {}
+      gridListToggle: null
     }
   }
 }
