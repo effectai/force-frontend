@@ -10,7 +10,7 @@
         <div class="columns my-auto">
           <div class="column">
             <div class="block">
-              <div class="has-text-weight-bold is-size-6 is-vecentered">
+              <div class="has-text-weight-bold is-size-6 is-vecentered" style="min-height: 32px;">
                 <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
                 <span v-if="$auth.user.blockchain === 'bsc'">
                   <span>&nbsp;BSC Address</span>
@@ -37,7 +37,7 @@
           </div>
           <div class="column">
             <div class="block">
-              <div class="has-text-weight-bold is-size-6">
+              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
                 Account Name
               </div>
               <a
@@ -49,7 +49,7 @@
           </div>
           <div class="column">
             <div class="block">
-              <div class="has-text-weight-bold is-size-6">
+              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
                 ID
               </div>
               {{ $auth.user.vAccountRows[0].id }}
