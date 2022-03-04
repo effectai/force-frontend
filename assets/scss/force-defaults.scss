@@ -1,0 +1,118 @@
+@import '../../node_modules/bulma';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+$primary: #101D56;
+$secondary: #1148EB;
+/* ------------ hello this is test ------------*/
+* {
+  font-family: $family-sans-serif;
+  color: $text;
+}
+
+button {
+  @extend .button;
+  @extend .is-primary;
+  font-weight: 600;
+  height: 2.6em;
+  border-radius: 8px;
+  &.is-small {
+    border-radius: 8px !important;
+  }
+  &.is-wide {
+    min-width: 140px;
+  }
+  &.is-wider {
+    min-width: 200px;
+  }
+  &.is-outlined {
+    border-width: 3px;
+  }
+}
+
+.is-secondary {
+  @extend .is-secondary;
+}
+
+.is-primary {
+  @extend .is-primary;
+}
+
+.has-text-centered {
+  @extend .has-text-centered
+}
+
+input {
+  @extend .input;
+  &.is-primary {
+    &.is-outlined {
+      border: 1px solid $primary;
+      color: $primary;
+      background: none;
+
+    }
+  }
+  &.is-white {
+    &.is-outlined {
+      border: 1px solid #fff;
+      color: #fff;
+      background: none;
+      &::placeholder {
+        color: white;
+        opacity: 0.5;
+      }
+    }
+  }
+}
+
+input[type="submit"] {
+  @extend .button;
+  @extend .is-primary;
+}
+
+textarea {
+  @extend .textarea;
+}
+
+select {
+  @extend .select;
+}
+
+a {
+  color: #1148EB;
+}
+
+h1 {
+  @extend .title;
+  @extend .has-text-weight-bold;
+}
+
+h2 {
+  @extend .is-4;
+}
+
+h3 {
+  @extend .is-5;
+}
+
+h4,h5,h6 {
+  @extend .is-6;
+}
+
+h2,h3,h4,h5,h6 {
+  @extend .subtitle;
+}
+
+.has-radius {
+  border-radius: 7px;
+}
+
+.has-shadow {
+  box-shadow: $box-shadow;
+}
+
+.tag {
+  padding: 3px 13px;
+  padding-top: 4px;
+  border-radius: 6px;
+  border: 1px solid;
+  text-transform: capitalize;
+}
