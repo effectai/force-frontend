@@ -1,6 +1,6 @@
 <template>
-  <div class="columns is-touch is-tablet is-desktop is-vcentered my-auto">
-    <div class="column">
+  <div class="columns is-mobile is-centered is-multiline">
+    <div class="column is-half-mobile">
       <div class="box ">
         Total
         <br>
@@ -10,7 +10,7 @@
         </span>
       </div>
     </div>
-    <div class="column">
+    <div class="column is-half-mobile">
       <div class="box ">
         vAccount
         <br>
@@ -20,7 +20,7 @@
         </b>
       </div>
     </div>
-    <div class="column">
+    <div class="column is-half-mobile">
       <div class="box ">
         Wallet
         <br>
@@ -30,7 +30,7 @@
         </b>
       </div>
     </div>
-    <div class="column">
+    <div class="column is-half-mobile">
       <div class="box ">
         Pending
         <br>
@@ -40,22 +40,22 @@
         </b>
       </div>
     </div>
-    <div class="column has-margin-bottom-mobile">
+    <div class="column has-margin-bottom-mobile is-v-centered my-auto">
       <div class="field is-horizontal is-grouped-centered has-text-centered">
             <span class="control">
-              <nuxt-link to="/deposit" class="button is-primary ">
+              <nuxt-link to="/deposit" class="button is-fullwidth-mobile is-responsive is-primary ">
                 Deposit
               </nuxt-link>
             </span>
             <span>&nbsp;</span>
             <span class="control">
-              <nuxt-link to="/vtransfer" class="button is-secondary is-outlined">
+              <nuxt-link to="/vtransfer" class="button is-fullwidth-mobile is-responsive is-secondary is-outlined">
                 vTransfer
               </nuxt-link>
             </span>
             <span>&nbsp;</span>
             <span class="control">
-              <nuxt-link to="/withdraw" class="button is-primary is-outlined">
+              <nuxt-link to="/withdraw" class="button is-fullwidth-mobile is-responsive is-primary is-outlined">
                 Withdraw
               </nuxt-link>
             </span>

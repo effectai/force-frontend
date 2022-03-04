@@ -10,7 +10,7 @@
         <div class="columns my-auto">
           <div class="column">
             <div class="block">
-              <div class="has-text-weight-bold is-size-6 is-vecentered">
+              <div class="has-text-weight-bold is-size-6 is-vecentered" style="min-height: 32px;">
                 <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
                 <span v-if="$auth.user.blockchain === 'bsc'">
                   <span>&nbsp;BSC Address</span>
@@ -37,7 +37,7 @@
           </div>
           <div class="column">
             <div class="block">
-              <div class="has-text-weight-bold is-size-6">
+              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
                 Account Name
               </div>
               <a
@@ -49,33 +49,32 @@
           </div>
           <div class="column">
             <div class="block">
-              <div class="has-text-weight-bold is-size-6">
+              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
                 ID
               </div>
               {{ $auth.user.vAccountRows[0].id }}
             </div>
           </div>
-          <div class="column" />
         </div>
         <hr>
-        <div v-if="$blockchain.efxPayout !== 0">
+        <div v-if="$blockchain.efxPending !== 0">
           <div>
             <div class="level">
               <h2 class="title is-4">
                 Pending Payout
               </h2>
               <div class="is-pulled-right no-float-mobile ">
-                <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout !== 0" :class="{'is-loading': loading === true}" class="button is-primary" @click.prevent="payout()">
+                <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout !== 0" :class="{'is-loading': loading === true}" class="button is-fullwidth-mobile is-primary" @click.prevent="payout()">
                   <p v-if="!loading">
                     Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span>
                   </p>
                 </button>
-                <button v-else-if="$blockchain.efxPayout === 0" disabled="disabled" class="button is-primary is-wide">
+                <button v-else-if="$blockchain.efxPayout === 0" disabled="disabled" class="button is-fullwidth-mobile is-primary is-wide">
                   <p class="">
                     Nothing to cash out
                   </p>
                 </button>
-                <button v-else disabled="disabled" class="button is-primary">
+                <button v-else disabled="disabled" class="button is-fullwidth-mobile is-primary">
                   <p>... EFX</p>
                 </button>
               </div>
@@ -88,8 +87,8 @@
                     <tr>
                       <th>Countdown</th>
                       <th>Pending</th>
-                      <th>ID</th>
-                      <th>BatchCampaignID</th>
+                      <th>Campaign</th>
+                      <th>Batch</th>
                       <th>Date</th>
                     </tr>
                   </thead>
@@ -106,14 +105,11 @@
                           :time="calculatePendingTime(pendingPayout.last_submission_time)"
                           :transform="transform">
                             <template slot-scope="props">{{ props }}</template>
-                            <!-- <template v-else><font-awesome-icon :icon="['fas', 'fa-check']" /></template> -->
                         </vue-countdown>
                       </td>
                       <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }} EFX</td>
-                      <!-- <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}`}">{{ pendingPayout.id }}</nuxt-link></td> -->
-                      <!-- <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}/${pendingPayout.batch_id}`}">{{ pendingPayout.batch_id }}</nuxt-link></td> -->
-                      <td>{{ pendingPayout.id }}</td>
-                      <td>{{ pendingPayout.batch_id }}</td>
+                      <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).campaign }}</nuxt-link></td>
+                      <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}/${pendingPayout.batch_id}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).batch }}</nuxt-link></td>
                       <td>{{ new Date(pendingPayout.last_submission_time).toLocaleDateString() }}</td>
                     </tr>
                   </tbody>
@@ -135,15 +131,15 @@
           <hr>
         </div>
 
-        <nuxt-link class="button is-primary is-pulled-right has-margin-bottom-mobile no-float-mobile" to="/campaigns/templates">
+        <h2 class="title is-4 is-full-mobile">
+          My Campaigns
+        </h2>
+        <nuxt-link class="button is-primary is-pulled-right has-margin-bottom-mobile no-float-mobile is-fullwidth-mobile" to="/campaigns/templates">
           <span class="icon">
             +
           </span>
           <span>Create Campaign</span>
         </nuxt-link>
-        <h2 class="title is-4 is-full-mobile">
-          My Campaigns
-        </h2>
 
         <campaign-list class="mb-6" :owner="$auth.user.accountName" />
         <hr>
@@ -267,10 +263,8 @@ export default {
       // Here we take the submission  time, add 1 hour, substract time since.
       // Retrieve the submission time in UTC and convert to milliseconds
       const subTimeSec = new Date(`${new Date(submissionTime)}UTC`).getTime()
-      // Release time for payment at the moment is 1 hour, equal to 3600e2 Seconds.
-      // Retrieve delay in milliseconds
-      const delaySec = 3600 * 10e2
-      // const delaySec = this.$blockchain.force.sdk.config.payout_delay_sec
+      // Retrieve delay and convert to milliseconds, payout_delay_sec = 3600 seconds
+      const delaySec = this.$blockchain.getPayoutDelay() * 1e3
       // retrieve time now in milliseconds
       const now = Date.now()
       const endTime = subTimeSec + delaySec - now
@@ -280,8 +274,7 @@ export default {
     },
     transform (props) {
       Object.entries(props).forEach(([key, value]) => {
-        // Adds leading zero
-        const digits = value < 10 ? `0${value}` : value
+        const digits = value < 10 ? `0${value}` : value // Add leading zero
         props[key] = digits
       })
       return props.minutes > 0 && props.seconds ? `${props.minutes}:${props.seconds}` : ' ✔' // there is a space before the checkmark
@@ -292,6 +285,7 @@ export default {
         const result = await this.$blockchain.payout()
         this.$store.dispatch('transaction/addTransaction', result)
         this.$store.dispatch('pendingPayout/loadPendingPayouts')
+        this.$blockchain.updateUserInfo()
         this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
         this.successTitle = 'Payout Completed'
         this.successMessage = 'All your available pending payouts have been completed and are added to your Effect account'
@@ -309,7 +303,7 @@ button.button.is-small.is-info {
   border-radius: 8px;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: $tablet) {
   .is-pulled-right {
     float: none !important;
     margin-bottom: 25px;

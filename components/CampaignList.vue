@@ -3,16 +3,23 @@
     <client-only>
       <category-filters v-if="categoryFilter" :url-filter="filter" @clicked="onFilter" />
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
-      <div class="field is-flex is-justify-content-flex-end">
-        <input type="checkbox" class="switch is-pulled-right" name="gridToggle" id="gridToggle" v-model="listGridSwitch">
-        <label for="gridToggle">Grid / List</label>
+      <div class="field is-flex is-justify-content-flex-begin is-unselectable">
+        <input
+          type="checkbox"
+          class="switch is-pulled-left is-outlined is-info is-large is-unselectable"
+          name="gridToggle"
+          id="gridToggle"
+          v-model="gridListState"
+          @click="toggleGridList()"
+        >
+        <label for="gridToggle" class="is-unselectable"></label>
       </div>
       <span v-if="$route.query.category && !categories.includes($route.query.category)">
         Filtering on category: {{ $route.query.category }}
       </span>
       <hr class="mt-1">
     </client-only>
-    <div v-if="listGridSwitch">
+    <div v-if="gridListState">
       <nuxt-link
         v-for="campaign in paginatedCampaigns"
         :key="campaign.id"
@@ -109,7 +116,7 @@
       <span>
         <div class="columns is-multiline">
           <div
-            class="column is-one-fifth-desktop is-one-third-tablet is-full-mobile"
+            class="column is-one-fifth-desktop is-one-third-tablet is-full-mobile columnGrid"
             v-for="campaign in paginatedCampaigns"
             :key="campaign.id"
           >
@@ -128,7 +135,7 @@
                     </p>
                   </figure>
                 </div>
-                <div class="card-content p-2 has-text-centered">
+                <div class="card-content p-2 has-text-centered gridContent">
                   <section class="title-section">
                     <div class="media-content">
                       <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
@@ -142,7 +149,7 @@
                       <p class="has-text-grey is-size-7 is-flex is-clipped is-inline">
                         <span v-if="campaign.info">
                           <span v-if="campaign.info.description.length > 0">
-                            {{ campaign.info.description.length > 50 ? `${campaign.info.description.slice(0, 30)}...` : campaign.info.description }}
+                            {{ campaign.info.description.length > 50 ? `${campaign.info.description.slice(0, 50)}...` : campaign.info.description }}
                           </span>
                           <span v-else>
                             <i>- No Description... -</i>
@@ -223,7 +230,6 @@ export default {
       perPage: 30,
       search: null,
       status: null,
-      listGridSwitch: true,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
       categories: ['translate', 'captions', 'socials', 'dao']
     }
@@ -232,15 +238,25 @@ export default {
     ...mapGetters({
       batchByCampaignId: 'campaign/batchByCampaignId',
       campaignsByCategory: 'campaign/campaignsByCategory',
-      reservationsByAccountId: 'campaign/reservationsByAccountId'
+      reservationsByAccountId: 'campaign/reservationsByAccountId',
+      getGridListState: 'view/getGridListState'
     }),
     ...mapState({
       campaigns: state => state.campaign.campaigns,
       campaignsLoading: state => state.campaign.loading,
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
       allBatchesLoaded: state => state.campaign.allBatchesLoaded,
-      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded
+      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded,
+      gridListToggle: state => state.gridListToggle
     }),
+    gridListState: {
+      get () {
+        return this.getGridListState
+      },
+      set (toggleState) {
+        return toggleState
+      }
+    },
     reservations () {
       return this.reservationsByAccountId(this.$auth.user.vAccountRows[0].id)
     },
@@ -373,6 +389,9 @@ export default {
       if (!this.allSubmissionsLoaded) {
         this.$store.dispatch('campaign/getSubmissions')
       }
+    },
+    toggleGridList () {
+      this.$store.dispatch('view/toggleGridListState')
     }
   }
 
@@ -380,6 +399,41 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.columnGrid {
+  height: 100%;
+}
+
+.gridContent {
+  height: 100%;
+}
+
+#gridToggle {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    cursor:not-allowed; /*makes it even more obvious*/
+}
+
+#gridToggle + label:after {
+  background: url('@/assets/img/icons/border-all.svg') CENTER CENTER NO-REPEAT;
+  background-color: #ffffff;
+  /* 16x16 transparent pixels */
+  width: 28px;
+  height: 28px;
+}
+
+#gridToggle:checked + label:after {
+  background: url('@/assets/img/icons/list-ul.svg') CENTER CENTER NO-REPEAT;
+  background-color: #ffffff;
+  /* 21x21 transparent pixels */
+  width: 28px;
+  height: 28px;
+}
 
 .title-section {
   height: 100%;
@@ -398,7 +452,7 @@ export default {
     }
     background-color: rgba(#DEE0E6, 0.5);
   }
-  // not sure about this styling
+  // not sure about this stylingx`
   &.has-reservation {
     box-shadow: 0px 0px 14px 5px rgba(17,72,235,0.3);
   }
