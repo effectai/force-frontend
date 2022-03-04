@@ -3,10 +3,10 @@
     <client-only>
       <category-filters v-if="categoryFilter" :url-filter="filter" @clicked="onFilter" />
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
-      <div class="field is-flex is-justify-content-flex-end is-unselectable">
+      <div class="field is-flex is-justify-content-flex-begin is-unselectable">
         <input
           type="checkbox"
-          class="switch is-pulled-right is-outlined is-info is-large is-unselectable"
+          class="switch is-pulled-left is-outlined is-info is-large is-unselectable"
           name="gridToggle"
           id="gridToggle"
           v-model="gridListState"
@@ -149,7 +149,7 @@
                       <p class="has-text-grey is-size-7 is-flex is-clipped is-inline">
                         <span v-if="campaign.info">
                           <span v-if="campaign.info.description.length > 0">
-                            {{ campaign.info.description.length > 50 ? `${campaign.info.description.slice(0, 30)}...` : campaign.info.description }}
+                            {{ campaign.info.description.length > 50 ? `${campaign.info.description.slice(0, 50)}...` : campaign.info.description }}
                           </span>
                           <span v-else>
                             <i>- No Description... -</i>

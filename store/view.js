@@ -3,11 +3,7 @@ export default {
   modules: {},
   mutations: {
     TOGGLE_GRID_LIST_STATE (state) {
-      if (state.gridListToggle == null) {
-        state.gridListToggle = true
-      } else {
-        state.gridListToggle = !state.gridListToggle
-      }
+      state.gridListToggle = !state.gridListToggle
     }
   },
   getters: {
@@ -22,7 +18,7 @@ export default {
   },
   state: () => {
     return {
-      gridListToggle: null
+      gridListToggle: true
     }
   }
 }
