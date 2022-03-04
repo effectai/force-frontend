@@ -98,4 +98,4 @@ OneSignalSDK*
 .projectile
 
 # Default force stylesheet
-./static/force-default.css
+static/force-defaults.css
