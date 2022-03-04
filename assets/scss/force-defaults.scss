@@ -1,8 +1,7 @@
 @import '../../node_modules/bulma';
+@import 'variables.scss';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-$primary: #101D56;
-$secondary: #1148EB;
-/* ------------ hello this is test ------------*/
+
 * {
   font-family: $family-sans-serif;
   color: $text;
