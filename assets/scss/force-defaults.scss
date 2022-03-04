@@ -114,3 +114,22 @@ h2,h3,h4,h5,h6 {
   border: 1px solid;
   text-transform: capitalize;
 }
+
+.box {
+  border: 1px solid transparent;
+  box-shadow: 2px 2px 9px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+a.box {
+  &:hover, &:focus {
+    border: 1px solid $link-hover;
+  }
+}
+
+.blockchain-address {
+  font-family: monospace;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
