@@ -56,7 +56,7 @@ export default {
   background: $yellow;
   font-weight: bold;
   text-align: center;
-  @media screen and (max-width: 768px), print {
+  @media screen and (max-width: $tablet), print {
     padding: 0.5rem;
   }
 }

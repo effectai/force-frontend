@@ -136,7 +136,7 @@ a.card {
     border-width: 3px;
   }
 }
-@media screen and (max-width: 768px), print {
+@media screen and (max-width: $tablet), print {
   .button {
     &.is-fullwidth-mobile {
       display: flex;
@@ -295,7 +295,7 @@ a.box {
 }
 
 /* Mobile margins */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: $tablet) {
   .has-margin-mobile {
     margin: 1rem !important;
   }

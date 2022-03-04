@@ -303,7 +303,7 @@ button.button.is-small.is-info {
   border-radius: 8px;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: $tablet) {
   .is-pulled-right {
     float: none !important;
     margin-bottom: 25px;

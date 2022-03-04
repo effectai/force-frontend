@@ -121,58 +121,60 @@
         </div>
         <div v-show="formGroup === 'tasks'" class="block task-group">
           <div class="columns is-variable is-2 is-multiline">
-            <div class="column is-6-widescreen is-12">
-              <label class="label">Template <span class="has-text-info"><b>*</b></span></label>
-              <codemirror
-                id="template"
-                ref="template"
-                v-model="campaignIpfs.template"
-                :options="cmOptions"
-                name="template"
-              />
-              <div v-if="Object.keys(campaignIpfs.example_task).length" class="field">
-                <label class="label">Example Task</label>
-              </div>
-              <div v-else>
-                Add placeholders to your template. For example:
-                <pre>${placeholder}</pre>
-              </div>
-              <div>
-                To learn more about templates and placeholders, visit the <a href="https://effectai.github.io/developer-docs/effect_network/template.html" target="_blank">documentation</a>.
-              </div>
-              <div v-for="(placeholder, key) in campaignIpfs.example_task" :key="key" class="field is-horizontal">
-                <div class="field-label is-small">
-                  <label class="label">{{ key }}</label>
+            <splitpanes class="default-theme" :horizontal="windowWidth < 767">
+              <pane class="column is-6-widescreen is-12">
+                <label class="label">Template <span class="has-text-info"><b>*</b></span></label>
+                <codemirror
+                  id="template"
+                  ref="template"
+                  v-model="campaignIpfs.template"
+                  :options="cmOptions"
+                  name="template"
+                />
+                <div v-if="Object.keys(campaignIpfs.example_task).length" class="field">
+                  <label class="label">Example Task</label>
                 </div>
-                <div class="field-body is-small">
-                  <div class="field">
-                    <div class="control">
-                      <input v-model="campaignIpfs.example_task[key]" class="input is-small" type="text">
+                <div v-else>
+                  Add placeholders to your template. For example:
+                  <pre>${placeholder}</pre>
+                </div>
+                <div>
+                  To learn more about templates and placeholders, visit the <a href="https://effectai.github.io/developer-docs/effect_network/template.html" target="_blank">documentation</a>.
+                </div>
+                <div v-for="(placeholder, key) in campaignIpfs.example_task" :key="key" class="field is-horizontal">
+                  <div class="field-label is-small">
+                    <label class="label">{{ key }}</label>
+                  </div>
+                  <div class="field-body is-small">
+                    <div class="field">
+                      <div class="control">
+                        <input v-model="campaignIpfs.example_task[key]" class="input is-small" type="text">
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div class="column is-6-widescreen is-12">
-              <h2 class="subtitle">
-                Task Preview
-              </h2>
-              <template-media
-                :html="renderTemplate(
-                  campaignIpfs.template || 'No template found..',
-                  campaignIpfs.example_task || {})"
-                @submit="showSubmission"
-              />
-              <div class="mt-5">
+              </pane>
+              <pane class="column is-6-widescreen is-12">
                 <h2 class="subtitle">
-                  Submission Answer
+                  Task Preview
                 </h2>
-                <pre v-if="answer">{{ answer }}</pre>
-                <p v-else>
-                  Make sure your template has a submit button so that users can submit their answers. Test your template by submitting and view your submission here
-                </p>
-              </div>
-            </div>
+                <template-media
+                  :html="renderTemplate(
+                    campaignIpfs.template || 'No template found..',
+                    campaignIpfs.example_task || {})"
+                  @submit="showSubmission"
+                />
+                <div class="mt-5">
+                  <h2 class="subtitle">
+                    Submission Answer
+                  </h2>
+                  <pre v-if="answer">{{ answer }}</pre>
+                  <p v-else>
+                    Make sure your template has a submit button so that users can submit their answers. Test your template by submitting and view your submission here
+                  </p>
+                </div>
+              </pane>
+            </splitpanes>
           </div>
         </div>
         <div class="field is-grouped is-grouped-right mt-4">
@@ -217,9 +219,12 @@
 import VueSimplemde from 'vue-simplemde'
 import { Template } from '@effectai/effect-js'
 import { codemirror } from 'vue-codemirror'
+import { Splitpanes, Pane } from 'splitpanes'
 import InstructionsModal from '@/components/InstructionsModal'
 import TemplateMedia from '@/components/Template'
 import SuccessModal from '@/components/SuccessModal'
+import 'splitpanes/dist/splitpanes.css'
+
 // require component
 // require styles
 import 'codemirror/lib/codemirror.css'
@@ -242,7 +247,9 @@ export default {
     VueSimplemde,
     TemplateMedia,
     InstructionsModal,
-    SuccessModal
+    SuccessModal,
+    Splitpanes,
+    Pane
   },
 
   filters: {
@@ -299,7 +306,8 @@ export default {
       errors: [],
       successMessage: null,
       successTitle: null,
-      answer: null
+      answer: null,
+      windowWidth: 0
     }
   },
   computed: {
@@ -336,6 +344,12 @@ export default {
 
   created () {
     this.cacheFormData()
+    // eslint-disable-next-line nuxt/no-globals-in-created
+    window.addEventListener('resize', this.handleResize)
+    this.handleResize()
+  },
+  destroyed () {
+    window.removeEventListener('resize', this.handleResize)
   },
 
   beforeDestroy () {
@@ -343,6 +357,9 @@ export default {
   },
 
   methods: {
+    handleResize () {
+      this.windowWidth = window.innerWidth
+    },
     async retrieveTemplate (params) {
       if (params.templateUrl) {
         this.campaignIpfs.template = 'Retrieving template..'
@@ -493,5 +510,16 @@ export default {
 }
 div.instructions-group .textarea {
   overflow-y: scroll
+}
+.splitpanes.default-theme {
+  @media screen and (max-width: $tablet) {
+    display: block !important;
+  }
+  .splitpanes__pane {
+    background: transparent !important;
+    @media screen and (max-width: $tablet) {
+      width: 100% !important;
+    }
+  }
 }
 </style>

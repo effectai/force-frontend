@@ -42,7 +42,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@media screen and (max-width: 768px) {
+@media screen and (max-width: $tablet) {
   .is-pulled-right {
     float: none !important;
     margin-bottom: 25px;
