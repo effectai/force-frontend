@@ -58,7 +58,7 @@
           <div class="column" />
         </div>
         <hr>
-        <div v-if="$blockchain.efxPayout !== 0">
+        <div v-if="$blockchain.efxPending !== 0">
           <div>
             <div class="level">
               <h2 class="title is-4">
@@ -88,8 +88,8 @@
                     <tr>
                       <th>Countdown</th>
                       <th>Pending</th>
-                      <th>ID</th>
-                      <th>BatchCampaignID</th>
+                      <th>Campaign</th>
+                      <th>Batch</th>
                       <th>Date</th>
                     </tr>
                   </thead>
@@ -106,14 +106,11 @@
                           :time="calculatePendingTime(pendingPayout.last_submission_time)"
                           :transform="transform">
                             <template slot-scope="props">{{ props }}</template>
-                            <!-- <template v-else><font-awesome-icon :icon="['fas', 'fa-check']" /></template> -->
                         </vue-countdown>
                       </td>
                       <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }} EFX</td>
-                      <!-- <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}`}">{{ pendingPayout.id }}</nuxt-link></td> -->
-                      <!-- <td><nuxt-link :to="{ path: `/campaigns/${pendingPayout.id}/${pendingPayout.batch_id}`}">{{ pendingPayout.batch_id }}</nuxt-link></td> -->
-                      <td>{{ pendingPayout.id }}</td>
-                      <td>{{ pendingPayout.batch_id }}</td>
+                      <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).campaign }}</nuxt-link></td>
+                      <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}/${pendingPayout.batch_id}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).batch }}</nuxt-link></td>
                       <td>{{ new Date(pendingPayout.last_submission_time).toLocaleDateString() }}</td>
                     </tr>
                   </tbody>
@@ -267,10 +264,8 @@ export default {
       // Here we take the submission  time, add 1 hour, substract time since.
       // Retrieve the submission time in UTC and convert to milliseconds
       const subTimeSec = new Date(`${new Date(submissionTime)}UTC`).getTime()
-      // Release time for payment at the moment is 1 hour, equal to 3600e2 Seconds.
-      // Retrieve delay in milliseconds
-      const delaySec = 3600 * 10e2
-      // const delaySec = this.$blockchain.force.sdk.config.payout_delay_sec
+      // Retrieve delay and convert to milliseconds, payout_delay_sec = 3600 seconds
+      const delaySec = this.$blockchain.getPayoutDelay() * 1e3
       // retrieve time now in milliseconds
       const now = Date.now()
       const endTime = subTimeSec + delaySec - now
@@ -280,8 +275,7 @@ export default {
     },
     transform (props) {
       Object.entries(props).forEach(([key, value]) => {
-        // Adds leading zero
-        const digits = value < 10 ? `0${value}` : value
+        const digits = value < 10 ? `0${value}` : value // Add leading zero
         props[key] = digits
       })
       return props.minutes > 0 && props.seconds ? `${props.minutes}:${props.seconds}` : ' ✔' // there is a space before the checkmark
