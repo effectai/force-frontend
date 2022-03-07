@@ -29,95 +29,105 @@
       </div> -->
       <!-- <div v-else> -->
       <div>
-        <div class="title">
-          Tasks
-        </div>
         <div>
-        </div>
-        <form>
-          <div class="field">
-            <div>
-              <table class="table mx-auto">
-                <thead>
-                  <tr>
-                    <th v-if="tasks.length">Index</th>
-                    <th v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
-                      <!-- <input v-model="newTask[placeholder]" type="text" class="input"> -->
-                      {{ placeholder }}
-                    </th>
-                    <th v-if="tasks.length">Remove</th>
-                    <th v-if="tasks.length">Preview</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(task, index) in tasks" :key="task.id">
-                    <td>{{index + 1}}</td>
-                    <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
-                        {{ task[placeholder] }}
-                    </td>
-                    <td>
-                      <button class="button is-danger is-outlined is-small is-rounded" @click.prevent="tasks.splice(index, 1)">
-                        <font-awesome-icon icon="fa-solid fa-trash-can" />
-                      </button>
-                    </td>
-                    <td>
-                      <button class="button is-info is-outlined is-small is-rounded" @click.prevent="previewModal(index)">
-                        <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td v-if="tasks.length"></td>
-                    <td v-for="(placeholder, placeindex) in placeholders" :key="placeholder" class="task-placeholder-value">
-                      <input
-                      v-model="newTask[placeholder]"
-                      type="text"
-                      class="input is-info task-placeholder-value"
-                      placeholder="..."
-                      :ref="`placeholder-${placeindex}`"
-                      @keydown.enter.prevent="createTask"
-                      >
-                    </td>
-                    <td v-if="tasks.length"></td>
-                  </tr>
-                </tbody>
-                <tfoot>
-                </tfoot>
-              </table>
-              <div v-if="!tasks.length" class="has-text-centered">
-                <h1>
-                  No tasks...
-                </h1>
-              </div>
-              <div class="control has-text-centered">
-                <button class="button is-primary" @click.prevent="createTask">
-                  Create Task
-                </button>
-                <br>
-                <br>
-                <nuxt-link to="/deposit" class="button is-primary">Deposit</nuxt-link>
+          <div v-if="campaign && campaign.info" class="columns">
+            <div class="column is-half">
+              <div class="title has-text-weight-bold">
+                Tasks
               </div>
             </div>
-
-            <hr>
-            <div v-if="tasks.length">
-              <div class="columns">
-                <div class="column">
+            <div class="column is-half columns">
+              <div class="column is-one-third">
+                <div class="box">
                   <h2>Batch Cost</h2>
                   <strong>{{ campaign.info.reward * tasks.length }} EFX</strong>
                 </div>
-                <div class="column">
+              </div>
+              <div class="column is-one-third">
+                <div class="box">
                   <h2>Available Balance</h2>
                   <strong>{{ efxAvailable }}</strong>
                 </div>
-                <div class="column">
-                  <h2>Batch Tasks possible</h2>
+              </div>
+              <div class="column is-one-third">
+                <div class="box">
+                  <h2>Batch Tasks Possible</h2>
                   <strong>{{ maxAmountTask }}</strong>
                 </div>
               </div>
             </div>
-            <br>
-
+          </div>
+        </div>
+        <div class="tabs campaign-tabs">
+          <ul>
+            <li class="is-active">
+              <a href="#">Batches</a>
+            </li>
+          </ul>
+        </div>
+        <form>
+          <div class="field">
+            <div class="box">
+              <div v-if="!tasks.length" class="has-text-centered mb-4">
+                <h1>
+                  No tasks in batch yet
+                </h1>
+              </div>
+              <div style="background: #fff; border-radius: 8px" class="p-2">
+                <table class="table mx-auto">
+                  <thead>
+                    <tr>
+                      <th v-if="tasks.length">Index</th>
+                      <th v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
+                        <!-- <input v-model="newTask[placeholder]" type="text" class="input"> -->
+                        {{ placeholder }}
+                      </th>
+                      <th v-if="tasks.length">Preview</th>
+                      <th v-if="tasks.length">Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(task, index) in tasks" :key="task.id">
+                      <td>{{index + 1}}</td>
+                      <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
+                        {{ task[placeholder] }}
+                      </td>
+                      <td>
+                        <button class="button is-info is-outlined is-small is-rounded" @click.prevent="previewModal(index)">
+                          <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
+                        </button>
+                      </td>
+                      <td>
+                        <button class="button is-danger is-outlined is-small is-rounded" @click.prevent="tasks.splice(index, 1)">
+                          <font-awesome-icon icon="fa-solid fa-trash-can" />
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td v-if="tasks.length"></td>
+                      <td v-for="(placeholder, placeindex) in placeholders" :key="placeholder" class="task-placeholder-value">
+                        <input
+                          v-model="newTask[placeholder]"
+                          type="text"
+                          class="input is-info task-placeholder-value"
+                          placeholder="Type here"
+                          :ref="`placeholder-${placeindex}`"
+                          @keydown.enter.prevent="createTask"
+                        >
+                      </td>
+                      <td v-if="tasks.length"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="control has-text-centered mt-5">
+                <button class="button is-primary is-wide" @click.prevent="createTask">
+                  Create Task
+                </button>
+                <!-- <nuxt-link to="/deposit" class="button is-outlined is-primary is-wide">Deposit</nuxt-link> -->
+              </div>
+            </div>
+            <hr>
             <h2 class="subtitle is-5 mb-3">
               Import tasks
             </h2>
@@ -152,12 +162,10 @@
           </div>
           <div class="field is-grouped">
             <div class="control">
-              <button type="submit" class="button is-link" :disabled="!tasks.length || tasks.length >= maxAmountTask">
+              <button type="submit" class="button button is-primary is-wide mr-4" :disabled="!tasks.length || tasks.length >= maxAmountTask">
                 Submit
               </button>
-            </div>
-            <div class="control">
-              <button class="button is-link is-light" @click.prevent="cancel">
+              <button class="button is-outlined is-primary is-wide" @click.prevent="cancel">
                 Cancel
               </button>
             </div>
@@ -371,4 +379,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+table {
+  background: transparent;
+  border-spacing: 10px;
+  width: 100%;
+  text-align: center;
+  border-radius: 8px;
+  td {
+    border-top: 1px solid #E8EEFF;
+  }
+  th {
+    border: none;
+  }
+}
+div.box {
+  background: $balance-box-color;
+  padding: 5%;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.button.is-wide {
+  min-width: 220px;
+}
 </style>
