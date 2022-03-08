@@ -127,30 +127,30 @@
                 <!-- <nuxt-link to="/deposit" class="button is-outlined is-primary is-wide">Deposit</nuxt-link> -->
               </div>
             </div>
-            <hr>
-            <h2 class="subtitle is-5 mb-3">
+            <h2 class="subtitle mt-6 is-6 has-text-weight-bold mb-3">
               Import tasks
             </h2>
-            <div class="file has-name">
+            <div>
+              <a ref="csvfiledownload" href="" :download="'tasks_example'+campaignId+'.csv'">Download example CSV</a>
+            </div>
+            <div class="file is-boxed">
               <label class="file-label">
                 <input class="file-input" type="file" name="csvtasks" @change="uploadFile">
-                <span class="file-cta">
+                <span class="file-cta" @dragover="dragover" @dragleave="dragleave" @drop="drop">
                   <span class="file-label">
-                    Choose a .csv file…
+                    Drag and drop or browse to choose a CSV file
                   </span>
-                </span>
-                <span v-if="file && file.name" class="file-name">
-                  {{ file.name }}
+                  <img src="~assets/img/icons/upload.svg" alt="Upload">
                 </span>
               </label>
             </div>
+            <p v-if="file.name" class="has-text-success mt-2">
+              Imported file: {{ file.name }}
+            </p>
             <p v-if="error" class="has-text-danger">
               {{ error }}
             </p>
             <br>
-            <div>
-              <a id="downloadlink" ref="csvfiledownload" href="" :download="'tasks_example'+campaignId+'.csv'">download example csv</a>
-            </div>
           </div>
         </form>
         <form @submit.prevent="uploadBatch">
@@ -160,7 +160,7 @@
               <input v-model="repetitions" class="input" type="number" min="0" required>
             </div>
           </div>
-          <div class="field is-grouped">
+          <div class="field is-grouped is-justify-content-center mt-6">
             <div class="control">
               <button type="submit" class="button button is-primary is-wide mr-4" :disabled="!tasks.length || tasks.length >= maxAmountTask">
                 Submit
@@ -248,6 +248,21 @@ export default {
     this.getCampaign()
   },
   methods: {
+    dragover (event) {
+      event.preventDefault()
+      event.currentTarget.classList.add('dragover')
+    },
+    dragleave (event) {
+      event.currentTarget.classList.remove('dragover')
+    },
+    onChange () {
+      this.filelist = [...this.$refs.file.files]
+    },
+    drop (event) {
+      event.preventDefault()
+      this.uploadFile(event.dataTransfer.files ? event.dataTransfer.files : null, true)
+      event.currentTarget.classList.remove('dragover')
+    },
     generateCsvData (placeholders) {
       const link = this.$refs.csvfiledownload
       let csvContent = 'data:text/csv;charset=utf-8,'
@@ -325,15 +340,15 @@ export default {
     cancel () {
       this.$router.push('/campaigns/' + this.campaignId)
     },
-    uploadFile (event) {
+    uploadFile (event, drop) {
       this.file = {
         name: null,
         content: null
       }
       this.error = null
-      console.log(event)
-      if (event.target.files[0]) {
-        this.file.name = event.target.files[0].name
+      const file = drop ? event[0] : event.target.files[0]
+      if (file) {
+        this.file.name = file.name
         const reader = new FileReader()
         reader.onload = (e) => {
           this.file.content = this.csvToJson(e.target.result)
@@ -351,7 +366,7 @@ export default {
             }
           })
         }
-        reader.readAsText(event.target.files[0])
+        reader.readAsText(file)
       } else {
         this.error = 'Could not find file'
         this.file = null
@@ -379,6 +394,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.is-boxed {
+  .file-cta {
+    background: $balance-box-color;
+    border: none;
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='%23A9B1BD' stroke-width='4' stroke-dasharray='6%2c14' stroke-dashoffset='10' stroke-linecap='square'/%3e%3c/svg%3e");
+  }
+}
+.dragover {
+  background-color: #e7f3ff !important;
+}
 table {
   background: transparent;
   border-spacing: 10px;
