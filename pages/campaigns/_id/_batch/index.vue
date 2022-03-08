@@ -131,13 +131,16 @@
                       <td>{{ task.id }}</td>
                       <td>
                         <div v-for="(name, nIndex) in Object.keys(task)" :key="nIndex">
-                          <span v-if="name !== 'id' && name !== 'link_id'">{{name}}: {{ task[name] }}</span><br>
+                          <span v-if="name !== 'id' && name !== 'link_id'">
+                            <span>{{name}}: {{ task[name] }}</span>
+                            <br>
+                          </span>
                         </div>
                       </td>
                       <td>
-                        <button class="button" @click.prevent="viewTaskPreview(task)">
-                          Preview
-                        </button>
+                        <div @click.prevent="viewTaskPreview(task)">
+                          <img src="@/assets/img/icons/eye.svg">
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -162,7 +165,7 @@
                       <th>Account ID</th>
                       <th>Data</th>
                       <th>Paid</th>
-                      <th />
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -175,9 +178,9 @@
                       <td>{{ sub.data }}</td>
                       <td>{{ sub.paid ? "yes" : "no" }}</td>
                       <td>
-                        <button class="button" @click.prevent="viewTask(sub)">
-                          View
-                        </button>
+                        <div @click.prevent="viewTask(sub)" style="width: 30px">
+                          <img src="@/assets/img/icons/eye.svg">
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -705,13 +708,15 @@ export default {
   }
 }
 .task-tab div.box {
-  background: $balance-box-color;
+  // background: $balance-box-color;
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: none;
   cursor:pointer;
+  &:hover {
+    background: $balance-box-color;
+  }
   &.is-active {
-    border: 3px solid #1977F3;
+    border: 2px solid #1977F3;
   }
 }
 </style>
