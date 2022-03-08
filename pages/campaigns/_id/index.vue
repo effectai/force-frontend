@@ -66,16 +66,18 @@
               ...
             </p>
             <div class="mt-5">
-              <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" :to="`/campaigns/${id}/new`">
-                <span class="icon">
-                  +
-                </span>
-                <span>Create Batch</span>
-              </nuxt-link>
-              <h4 class="is-size-6 mb-0 has-text-weight-bold">
-                Batches
-                <hr class="mt-2 mb-5">
-              </h4>
+              <div class="is-flex is-justify-content-space-between is-align-items-center">
+                <h4 class="is-size-6 mb-0 has-text-weight-bold">
+                  Batches
+                </h4>
+                <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" :to="`/campaigns/${id}/new`">
+                  <span class="icon">
+                    +
+                  </span>
+                  <span>Create Batch</span>
+                </nuxt-link>
+              </div>
+              <hr class="mt-2 mb-5">
               <div class="block mt-5">
                 <nuxt-link
                   v-for="batch in campaignBatches"
