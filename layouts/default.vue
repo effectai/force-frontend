@@ -7,12 +7,12 @@
       “⚠️ Effect Network is still in beta and undergoing security audits. Use at your own risk! ⚠️”
     </div>
     <nav-bar />
-    <div v-if="provider === 'burner-wallet'" class="burnerWalletBanner">
+    <!-- <div v-if="provider === 'burner-wallet'" class="burnerWalletBanner">
       Connected with a burner wallet.
       <nuxt-link to="/profile">
         Show private key
       </nuxt-link>
-    </div>
+    </div> -->
     <div id="content">
       <Nuxt />
     </div>
