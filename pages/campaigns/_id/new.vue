@@ -40,7 +40,8 @@
               <div class="column is-one-third">
                 <div class="box">
                   <h2>Batch Cost</h2>
-                  <strong>{{ campaign.info.reward * tasks.length }} EFX</strong>
+                  <strong class="has-text-danger" v-if="(campaign.info.reward * tasks.length * repetitions) > efxAvailable">{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
+                  <strong v-else>{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
                 </div>
               </div>
               <div class="column is-one-third">
@@ -52,7 +53,7 @@
               <div class="column is-one-third">
                 <div class="box">
                   <h2>Batch Tasks Possible</h2>
-                  <strong>{{ maxAmountTask }}</strong>
+                  <strong>{{ maxAmountTask > efxAvailable ? efxAvailable : maxAmountTask }}</strong>
                 </div>
               </div>
             </div>
@@ -162,7 +163,7 @@
           </div>
           <div class="field is-grouped is-justify-content-center mt-6">
             <div class="control">
-              <button type="submit" class="button button is-primary is-wide mr-4" :disabled="!tasks.length || tasks.length >= maxAmountTask">
+              <button type="submit" class="button button is-primary is-wide mr-4" :disabled="!tasks.length || tasks.length > maxAmountTask">
                 Submit
               </button>
               <button class="button is-outlined is-primary is-wide" @click.prevent="cancel">
@@ -241,7 +242,7 @@ export default {
       return this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable
     },
     maxAmountTask () {
-      return Math.floor((this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable) / this.campaign.info.reward)
+      return Math.floor(((this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable) / this.campaign.info.reward) / this.repetitions)
     }
   },
   mounted () {
