@@ -80,7 +80,7 @@
               <hr class="mt-2 mb-5">
               <div class="block mt-5">
                 <nuxt-link
-                  v-for="batch in campaignBatches.reverse()"
+                  v-for="batch in campaignBatches.slice().reverse()"
                   :key="batch.id"
                   :to="`/campaigns/${batch.campaign_id}/${batch.batch_id}`"
                   class="box p-4"
