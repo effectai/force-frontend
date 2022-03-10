@@ -714,6 +714,7 @@ export default {
   cursor:pointer;
   &:hover {
     background: $balance-box-color;
+    border: 1px solid $link-hover;
   }
   &.is-active {
     border: 2px solid #1977F3;
