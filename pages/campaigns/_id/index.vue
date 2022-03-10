@@ -105,7 +105,7 @@
                     </div>
                     <div class="column">
                       <p v-if="batch.num_tasks - batch.tasks_done === 0" class="has-text-grey is-size-7">
-                        Tasks <small>(<b class="has-text-success">Done</b>)</small>
+                        {{ batch.tasks_done }} Task<span v-if="batch.tasks_done > 1">s</span> <small>(<b class="has-text-success">Done</b>)</small>
                       </p>
                       <p v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done > 0" class="has-text-grey is-size-7">
                         Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
