@@ -5,14 +5,14 @@
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
       <div class="field is-flex is-justify-content-flex-begin is-unselectable">
         <input
+          id="gridToggle"
+          v-model="gridListState"
           type="checkbox"
           class="switch is-pulled-left is-outlined is-info is-large is-unselectable"
           name="gridToggle"
-          id="gridToggle"
-          v-model="gridListState"
           @click="toggleGridList()"
         >
-        <label for="gridToggle" class="is-unselectable"></label>
+        <label for="gridToggle" class="is-unselectable" />
       </div>
       <span v-if="$route.query.category && !categories.includes($route.query.category)">
         Filtering on category: {{ $route.query.category }}
@@ -39,11 +39,13 @@
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
               <div>
                 <nuxt-link
-                  :to="'/?category=' + campaign.info.category"
                   v-if="campaign.info && campaign.info.category"
+                  :to="'/?category=' + campaign.info.category"
                   class="tag is-light mb-2"
                   :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
-                >{{ campaign.info.category }}</nuxt-link>
+                >
+                  {{ campaign.info.category }}
+                </nuxt-link>
               </div>
 
               <span v-if="campaign.info">
@@ -116,9 +118,9 @@
       <span>
         <div class="columns is-multiline">
           <div
-            class="column is-one-fifth-desktop is-one-third-tablet is-full-mobile columnGrid"
             v-for="campaign in paginatedCampaigns"
             :key="campaign.id"
+            class="column is-one-fifth-desktop is-one-third-tablet is-full-mobile columnGrid"
           >
             <div class="card is-shadowless">
               <nuxt-link
@@ -130,7 +132,7 @@
                   <figure>
                     <p class="image has-radius is-vcentered">
                       <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
-                      <img class="p-2" v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+                      <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" class="p-2" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
                       <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
                     </p>
                   </figure>
@@ -221,7 +223,7 @@ export default {
     SortFilters,
     Pagination
   },
-  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns'],
+  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns', 'approvedCampaigns'],
   data () {
     return {
       filter: null,
@@ -265,6 +267,9 @@ export default {
       let filteredCampaigns
       if (campaigns) {
         filteredCampaigns = campaigns.map((c) => { return { ...c } })
+        if (this.approvedCampaigns) {
+          filteredCampaigns = filteredCampaigns.filter(c => this.approvedCampaigns.includes(c.id))
+        }
         for (const i in filteredCampaigns) {
           const batches = this.batchByCampaignId(filteredCampaigns[i].id)
           // get the reservations of the user for this campaign
