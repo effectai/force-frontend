@@ -357,18 +357,17 @@ export default {
     font-weight: 500;
     display: flex;
     border-bottom: 1px solid #F1F5FA;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    display: block;
+    width: 100%;
     cursor: pointer;
     span {
       margin-right: 10px;
     }
     a, &.logout {
-      padding: 10px 20px;
+      padding: 16px 20px;
     }
     &:last-child {
-      padding-top: 16px;
-      padding-bottom: 16px;
+      display: flex;
       border-bottom: none;
     }
     &:hover {
