@@ -159,7 +159,7 @@
                     v-if="campaign.info && campaign.info.category"
                     :to="'/?category=' + campaign.info.category"
                     class="tag is-light is-medium mb-5"
-                    :class="{'is-secondary': campaign.info.category === 'translation', 'is-info': campaign.info.category === 'image_classification', 'is-warning': campaign.info.category === 'text_classification', 'is-danger': campaign.info.category === 'video_classification'}"
+                    :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
                   >
                     {{ campaign.info.category }}
                   </nuxt-link>

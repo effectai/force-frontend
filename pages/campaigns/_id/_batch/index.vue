@@ -297,7 +297,12 @@
                 <div class="column is-half">
                   <div class="block">
                     <br>
-                    <nuxt-link v-if="campaign && campaign.info" :to="'/?category=' + campaign.info.category" class="tag is-info is-light is-medium">
+                    <nuxt-link
+                      v-if="campaign && campaign.info"
+                      :to="'/?category=' + campaign.info.category"
+                      class="tag is-info is-light is-medium"
+                      :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
+                    >
                       {{ campaign.info.category }}
                     </nuxt-link>
                     <span v-else class="tag is-info is-light is-medium">...</span>
