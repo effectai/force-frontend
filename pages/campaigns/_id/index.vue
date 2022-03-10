@@ -32,7 +32,7 @@
       <div v-else class="columns">
         <div class="column is-three-fifths">
           <div class="is-flex is-align-items-center mb-6">
-            <p class="image has-radius mr-4" style="width: 52px; height: 52px" v-if="campaign">
+            <p v-if="campaign" class="image has-radius mr-4" style="width: 52px; height: 52px">
               <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
               <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
               <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
@@ -80,7 +80,7 @@
               <hr class="mt-2 mb-5">
               <div class="block mt-5">
                 <nuxt-link
-                  v-for="batch in campaignBatches"
+                  v-for="batch in campaignBatches.slice().reverse()"
                   :key="batch.id"
                   :to="`/campaigns/${batch.campaign_id}/${batch.batch_id}`"
                   class="box p-4"
@@ -105,7 +105,7 @@
                     </div>
                     <div class="column">
                       <p v-if="batch.num_tasks - batch.tasks_done === 0" class="has-text-grey is-size-7">
-                        Tasks <small>(<b class="has-text-success">Done</b>)</small>
+                        {{ batch.tasks_done }} Task<span v-if="batch.tasks_done > 1">s</span> <small>(<b class="has-text-success">Done</b>)</small>
                       </p>
                       <p v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done > 0" class="has-text-grey is-size-7">
                         Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
@@ -156,11 +156,13 @@
               <div class="column is-half">
                 <div v-if="campaign.info" class="block">
                   <nuxt-link
-                    :to="'/?category=' + campaign.info.category"
                     v-if="campaign.info && campaign.info.category"
+                    :to="'/?category=' + campaign.info.category"
                     class="tag is-light is-medium mb-5"
                     :class="{'is-secondary': campaign.info.category === 'translation', 'is-info': campaign.info.category === 'image_classification', 'is-warning': campaign.info.category === 'text_classification', 'is-danger': campaign.info.category === 'video_classification'}"
-                  >{{ campaign.info.category }}</nuxt-link>
+                  >
+                    {{ campaign.info.category }}
+                  </nuxt-link>
                   <span v-else class="tag is-info is-light is-medium">...</span>
                 </div>
                 <div class="block mb-6">

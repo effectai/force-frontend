@@ -85,7 +85,7 @@
                       </span>
                       Settings
                     </li> -->
-                    <li @click="logout" class="logout">
+                    <li class="logout" @click="logout">
                       <span class="icon">
                         <img src="~assets/img/icons/logout.svg" style="height: 22px">
                       </span>
