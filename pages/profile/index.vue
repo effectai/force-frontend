@@ -83,49 +83,49 @@
           <div class="is-full-mobile">
             <div v-if="pendingPayoutsStore" class="table-container">
               <table class="table" style="width: 100%">
-                  <thead>
-                    <tr>
-                      <th>Countdown</th>
-                      <th>Pending</th>
-                      <th>Campaign</th>
-                      <th>Batch</th>
-                      <th>Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="pendingPayout in pendingPayoutsStore.payouts.rows"
-                      :key="pendingPayout.id"
-                    >
-                      <td>
-                        <!-- Time for the release of  -->
-                        <vue-countdown
-                          ref="countdown"
-                          :auto-start="true"
-                          :time="calculatePendingTime(pendingPayout.last_submission_time)"
-                          :transform="transform">
-                            <template slot-scope="props">{{ props }}</template>
-                        </vue-countdown>
-                      </td>
-                      <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }} EFX</td>
-                      <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).campaign }}</nuxt-link></td>
-                      <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}/${pendingPayout.batch_id}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).batch }}</nuxt-link></td>
-                      <td>{{ new Date(pendingPayout.last_submission_time).toLocaleDateString() }}</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <th>Total</th>
-                      <td><strong>{{ parseFloat($blockchain.efxPending).toFixed(2) }} EFX</strong></td>
-                    </tr>
-                    <tr>
-                      <th>Claimable</th>
-                      <td><strong>{{ parseFloat($blockchain.efxPayout).toFixed(2) }} EFX</strong></td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-              <span v-else>No Pending Payouts</span>
+                <thead>
+                  <tr>
+                    <th>Countdown</th>
+                    <th>Pending</th>
+                    <th>Campaign</th>
+                    <th>Batch</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="pendingPayout in pendingPayoutsStore.payouts.rows"
+                    :key="pendingPayout.id"
+                  >
+                    <td>
+                      <!-- Time for the release of  -->
+                      <vue-countdown
+                        ref="countdown"
+                        :auto-start="true"
+                        :time="calculatePendingTime(pendingPayout.last_submission_time)"
+                        :transform="transform">
+                        <template slot-scope="props">{{ props }}</template>
+                      </vue-countdown>
+                    </td>
+                    <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }} EFX</td>
+                    <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).campaign }}</nuxt-link></td>
+                    <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}/${pendingPayout.batch_id}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).batch }}</nuxt-link></td>
+                    <td>{{ new Date(pendingPayout.last_submission_time).toLocaleDateString() }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th>Total</th>
+                    <td><strong>{{ parseFloat($blockchain.efxPending).toFixed(2) }} EFX</strong></td>
+                  </tr>
+                  <tr>
+                    <th>Claimable</th>
+                    <td><strong>{{ parseFloat($blockchain.efxPayout).toFixed(2) }} EFX</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <span v-else>No Pending Payouts</span>
           </div>
 
           <hr>
@@ -194,6 +194,8 @@
         <br><br>
       </div>
       <key-modal v-if="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" @close="showPK = !showPK" />
+      <!-- SuccessModal -->
+      <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
     </div>
   </section>
 </template>
@@ -205,9 +207,10 @@ import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
 import KeyModal from '@/components/KeyModal.vue'
+import SuccessModal from '@/components/SuccessModal'
 
 export default {
-  components: { Balance, CampaignList, Pagination, KeyModal, VueCountdown },
+  components: { Balance, CampaignList, Pagination, KeyModal, VueCountdown, SuccessModal },
   filters: {
     hide (value, show) {
       if (show) {
