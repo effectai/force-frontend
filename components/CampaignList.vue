@@ -3,7 +3,7 @@
     <client-only>
       <category-filters v-if="categoryFilter" :url-filter="filter" @clicked="onFilter" />
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
-      <div class="field is-flex is-justify-content-flex-begin is-unselectable">
+      <div v-if="gridToggle != false" class="field is-flex is-justify-content-flex-begin is-unselectable">
         <input
           id="gridToggle"
           v-model="gridListState"
@@ -19,7 +19,7 @@
       </span>
       <hr class="mt-1">
     </client-only>
-    <div v-if="gridListState">
+    <div v-if="gridListState || gridToggle === false">
       <nuxt-link
         v-for="campaign in paginatedCampaigns"
         :key="campaign.id"
@@ -223,7 +223,7 @@ export default {
     SortFilters,
     Pagination
   },
-  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns', 'approvedCampaigns'],
+  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns', 'approvedCampaigns', 'gridToggle'],
   data () {
     return {
       filter: null,
