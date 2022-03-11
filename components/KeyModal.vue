@@ -7,7 +7,7 @@
 
       <div class="field has-addons has-addons-centered is-centered">
         <div class="control is-expanded">
-          <input :type="input_type" class="input" :value="messageContent">
+          <input :type="input_type" class="input" :value="messageContent" readonly>
         </div>
         <div class="control">
           <button class="button" @click="toggleInputType">
