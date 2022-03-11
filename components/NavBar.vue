@@ -85,7 +85,7 @@
                       </span>
                       Settings
                     </li> -->
-                    <li @click="logout">
+                    <li class="logout" @click="logout">
                       <span class="icon">
                         <img src="~assets/img/icons/logout.svg" style="height: 22px">
                       </span>
@@ -355,15 +355,23 @@ export default {
     color: #6C7786;
     font-size: 15px;
     font-weight: 500;
-    padding: 10px 0;
     display: flex;
     border-bottom: 1px solid #F1F5FA;
+    display: block;
+    width: 100%;
     cursor: pointer;
     span {
       margin-right: 10px;
     }
+    a, &.logout {
+      padding: 16px 20px;
+    }
     &:last-child {
+      display: flex;
       border-bottom: none;
+    }
+    &:hover {
+      background-color: rgba(129, 136, 157, 0.1);
     }
   }
   .modal-card {
@@ -379,7 +387,7 @@ export default {
 
     .modal-card-body {
       box-shadow: 0px 10px 32px 7px rgb(129 136 157 / 20%);
-      padding: 8px 20px;
+      padding: 0px 0;
     }
   }
 }

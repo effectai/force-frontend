@@ -30,7 +30,7 @@
       <div class="columns">
         <div class="column is-three-fifths">
           <div class="is-flex is-align-items-center mb-6">
-            <p class="image has-radius mr-4" style="width: 52px; height: 52px" v-if="campaign">
+            <p v-if="campaign" class="image has-radius mr-4" style="width: 52px; height: 52px">
               <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
               <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
               <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
@@ -131,13 +131,16 @@
                       <td>{{ task.id }}</td>
                       <td>
                         <div v-for="(name, nIndex) in Object.keys(task)" :key="nIndex">
-                          <span v-if="name !== 'id' && name !== 'link_id'">{{name}}: {{ task[name] }}</span><br>
+                          <span v-if="name !== 'id' && name !== 'link_id'">
+                            <span>{{ name }}: {{ task[name] }}</span>
+                            <br>
+                          </span>
                         </div>
                       </td>
                       <td>
-                        <button class="button" @click.prevent="viewTaskPreview(task)">
-                          Preview
-                        </button>
+                        <div @click.prevent="viewTaskPreview(task)">
+                          <img src="@/assets/img/icons/eye.svg">
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -162,7 +165,7 @@
                       <th>Account ID</th>
                       <th>Data</th>
                       <th>Paid</th>
-                      <th />
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -175,9 +178,9 @@
                       <td>{{ sub.data }}</td>
                       <td>{{ sub.paid ? "yes" : "no" }}</td>
                       <td>
-                        <button class="button" @click.prevent="viewTask(sub)">
-                          View
-                        </button>
+                        <div style="width: 30px" @click.prevent="viewTask(sub)">
+                          <img src="@/assets/img/icons/eye.svg">
+                        </div>
                       </td>
                     </tr>
                   </tbody>
@@ -242,23 +245,23 @@
               <span v-else>No active reservations</span>
             </div>
 
-          <div class="modal" :class="{'is-active': viewTaskResult}">
-            <div class="modal-background" @click="viewTaskResult = false" />
-            <div class="modal-content" style="background-color: #fff; padding: 10px;">
-              <template-media
-                v-if="campaign && campaign.info && viewTaskResult"
-                :html="renderTemplate(
-                  campaign.info.template || 'No template found..',
-                  viewTaskResult.placeholders)"
-                @templateLoaded="postResults(viewTaskResult.results)"
-              />
+            <div class="modal" :class="{'is-active': viewTaskResult}">
+              <div class="modal-background" @click="viewTaskResult = false" />
+              <div class="modal-content" style="background-color: #fff; padding: 10px;">
+                <template-media
+                  v-if="campaign && campaign.info && viewTaskResult"
+                  :html="renderTemplate(
+                    campaign.info.template || 'No template found..',
+                    viewTaskResult.placeholders)"
+                  @templateLoaded="postResults(viewTaskResult.results)"
+                />
+              </div>
+              <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
             </div>
-            <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
-          </div>
 
-          <nuxt-link :to="`/campaigns/${campaignId}`" class="mt-6 button is-primary is-light">
-            &lt; Back to campaign
-          </nuxt-link>
+            <nuxt-link :to="`/campaigns/${campaignId}`" class="mt-6 button is-primary is-light">
+              &lt; Back to campaign
+            </nuxt-link>
           </div>
         </div>
 
@@ -294,7 +297,14 @@
                 <div class="column is-half">
                   <div class="block">
                     <br>
-                    <nuxt-link :to="'/?category=' + campaign.info.category" v-if="campaign && campaign.info" class="tag is-info is-light is-medium">{{ campaign.info.category }}</nuxt-link>
+                    <nuxt-link
+                      v-if="campaign && campaign.info"
+                      :to="'/?category=' + campaign.info.category"
+                      class="tag is-info is-light is-medium"
+                      :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
+                    >
+                      {{ campaign.info.category }}
+                    </nuxt-link>
                     <span v-else class="tag is-info is-light is-medium">...</span>
                   </div>
                   <div class="block">
@@ -364,7 +374,6 @@
                   <p>No active tasks currently</p>
                 </template>
               </div>
-
             </div>
           </div>
         </div>
@@ -705,13 +714,16 @@ export default {
   }
 }
 .task-tab div.box {
-  background: $balance-box-color;
+  // background: $balance-box-color;
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: none;
   cursor:pointer;
+  &:hover {
+    background: $balance-box-color;
+    border: 1px solid $link-hover;
+  }
   &.is-active {
-    border: 3px solid #1977F3;
+    border: 2px solid #1977F3;
   }
 }
 </style>

@@ -3,23 +3,22 @@
     <client-only>
       <category-filters v-if="categoryFilter" :url-filter="filter" @clicked="onFilter" />
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
-      <div class="field is-flex is-justify-content-flex-begin is-unselectable">
-        <input
-          type="checkbox"
-          class="switch is-pulled-left is-outlined is-info is-large is-unselectable"
-          name="gridToggle"
-          id="gridToggle"
-          v-model="gridListState"
-          @click="toggleGridList()"
-        >
-        <label for="gridToggle" class="is-unselectable"></label>
+      <div class="is-flex is-justify-content-space-between">
+        <div>
+          <span v-if="$route.query.category && !categories.includes($route.query.category)">
+            Filtering on category: {{ $route.query.category }}
+          </span>
+        </div>
+        <div v-if="gridToggle != false">
+          <div class="switch-button mb-1">
+            <input class="switch-button-checkbox" type="checkbox" v-model="gridListState" @click="toggleGridList()"/>
+            <label class="switch-button-label" for=""><span class="switch-button-label-span"><img height="28px" src="@/assets/img/icons/border-all.svg"></span></label>
+          </div>
+        </div>
       </div>
-      <span v-if="$route.query.category && !categories.includes($route.query.category)">
-        Filtering on category: {{ $route.query.category }}
-      </span>
       <hr class="mt-1">
     </client-only>
-    <div v-if="gridListState">
+    <div v-if="gridListState || gridToggle === false">
       <nuxt-link
         v-for="campaign in paginatedCampaigns"
         :key="campaign.id"
@@ -39,11 +38,13 @@
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
               <div>
                 <nuxt-link
-                  :to="'/?category=' + campaign.info.category"
                   v-if="campaign.info && campaign.info.category"
+                  :to="'/?category=' + campaign.info.category"
                   class="tag is-light mb-2"
                   :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
-                >{{ campaign.info.category }}</nuxt-link>
+                >
+                  {{ campaign.info.category }}
+                </nuxt-link>
               </div>
 
               <span v-if="campaign.info">
@@ -116,9 +117,9 @@
       <span>
         <div class="columns is-multiline">
           <div
-            class="column is-one-fifth-desktop is-one-third-tablet is-full-mobile columnGrid"
             v-for="campaign in paginatedCampaigns"
             :key="campaign.id"
+            class="column is-one-fifth-desktop is-one-third-tablet is-full-mobile columnGrid"
           >
             <div class="card is-shadowless">
               <nuxt-link
@@ -130,7 +131,7 @@
                   <figure>
                     <p class="image has-radius is-vcentered">
                       <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
-                      <img class="p-2" v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+                      <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" class="p-2" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
                       <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
                     </p>
                   </figure>
@@ -221,7 +222,7 @@ export default {
     SortFilters,
     Pagination
   },
-  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns'],
+  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns', 'approvedCampaigns', 'gridToggle'],
   data () {
     return {
       filter: null,
@@ -265,6 +266,9 @@ export default {
       let filteredCampaigns
       if (campaigns) {
         filteredCampaigns = campaigns.map((c) => { return { ...c } })
+        if (this.approvedCampaigns) {
+          filteredCampaigns = filteredCampaigns.filter(c => this.approvedCampaigns.includes(c.id))
+        }
         for (const i in filteredCampaigns) {
           const batches = this.batchByCampaignId(filteredCampaigns[i].id)
           // get the reservations of the user for this campaign
@@ -399,42 +403,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-.columnGrid {
-  height: 100%;
-}
-
-.gridContent {
-  height: 100%;
-}
-
-#gridToggle {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-    cursor:not-allowed; /*makes it even more obvious*/
-}
-
-#gridToggle + label:after {
-  background: url('@/assets/img/icons/border-all.svg') CENTER CENTER NO-REPEAT;
-  background-color: #ffffff;
-  /* 16x16 transparent pixels */
-  width: 28px;
-  height: 28px;
-}
-
-#gridToggle:checked + label:after {
-  background: url('@/assets/img/icons/list-ul.svg') CENTER CENTER NO-REPEAT;
-  background-color: #ffffff;
-  /* 21x21 transparent pixels */
-  width: 28px;
-  height: 28px;
-}
-
 .title-section {
   height: 100%;
 }
@@ -472,7 +440,76 @@ export default {
       border-radius: 6px !important;
     }
   }
-  .card-content {
+}
+
+.switch-button {
+  background: #D7DCEE;
+  border-radius: 6px;
+  overflow: hidden;
+  width: 80px;
+  text-align: center;
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: #155FFF;
+  position: relative;
+  padding: 4px 40px 4px 4px;
+  position: relative;
+
+  &:before {
+    content: url('@/assets/img/icons/list-ul.svg');
+    position: absolute;
+    top: 9px;
+    bottom: 0;
+    right: 1px;
+    width: 40px;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  &-checkbox {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 2;
+
+    &:checked + .switch-button-label:before {
+      transform: translateX(36px);
+      transition: transform 300ms linear;
+    }
+
+    & + .switch-button-label {
+      position: relative;
+      padding: 1px 0;
+      display: block;
+      user-select: none;
+      pointer-events: none;
+
+      &:before {
+        content: "";
+        padding: 1px 0;
+        background: #F6F7FF;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        border-radius: 6px;
+        transform: translateX(0);
+        transition: transform 300ms;
+      }
+
+      .switch-button-label-span {
+        position: relative;
+        top: 5px
+      }
+    }
   }
 }
 </style>

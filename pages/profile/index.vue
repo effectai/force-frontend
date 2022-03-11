@@ -57,133 +57,137 @@
           </div>
         </div>
         <hr>
-        <div v-if="$blockchain.efxPending !== 0">
+        <div v-if="$blockchain.efxPending !== 0" class="py-4">
           <div>
-            <div class="level">
-              <h2 class="title is-4">
-                Pending Payout
-              </h2>
-              <div class="is-pulled-right no-float-mobile ">
-                <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout !== 0" :class="{'is-loading': loading === true}" class="button is-fullwidth-mobile is-primary" @click.prevent="payout()">
-                  <p v-if="!loading">
-                    Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span>
-                  </p>
-                </button>
-                <button v-else-if="$blockchain.efxPayout === 0" disabled="disabled" class="button is-fullwidth-mobile is-primary is-wide">
-                  <p class="">
-                    Nothing to cash out
-                  </p>
-                </button>
-                <button v-else disabled="disabled" class="button is-fullwidth-mobile is-primary">
-                  <p>... EFX</p>
-                </button>
-              </div>
+            <h2 class="title is-4">
+              Pending Payout
+            </h2>
+            <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout !== 0" :class="{'is-loading': loading === true}" class="button is-fullwidth-mobile is-primary" @click.prevent="payout()">
+              <p v-if="!loading">
+                Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span>
+              </p>
+            </button>
+            <button v-else-if="$blockchain.efxPayout === 0" disabled="disabled" class="button is-fullwidth-mobile is-primary is-wide">
+              <p class="">
+                Nothing to cash out
+              </p>
+            </button>
+            <button v-else disabled="disabled" class="button is-fullwidth-mobile is-primary">
+              <p>... EFX</p>
+            </button>
+            <div @click="showPayoutDetails = !showPayoutDetails" class="payout-detail mt-3">
+              <span>
+                View Details
+                <font-awesome-icon class="pl-1" v-if="!showPayoutDetails" icon="fa-solid fa-chevron-down" />
+                <font-awesome-icon v-else class="pl-1" icon="fa-solid fa-chevron-up" />
+              </span>
             </div>
           </div>
-          <div class="is-full-mobile">
+          <div class="is-full-mobile mt-5 payout-table" v-if="showPayoutDetails">
             <div v-if="pendingPayoutsStore" class="table-container">
               <table class="table" style="width: 100%">
-                  <thead>
-                    <tr>
-                      <th>Countdown</th>
-                      <th>Pending</th>
-                      <th>Campaign</th>
-                      <th>Batch</th>
-                      <th>Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="pendingPayout in pendingPayoutsStore.payouts.rows"
-                      :key="pendingPayout.id"
-                    >
-                      <td>
-                        <!-- Time for the release of  -->
-                        <vue-countdown
-                          ref="countdown"
-                          :auto-start="true"
-                          :time="calculatePendingTime(pendingPayout.last_submission_time)"
-                          :transform="transform">
-                            <template slot-scope="props">{{ props }}</template>
-                        </vue-countdown>
-                      </td>
-                      <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }} EFX</td>
-                      <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).campaign }}</nuxt-link></td>
-                      <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}/${pendingPayout.batch_id}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).batch }}</nuxt-link></td>
-                      <td>{{ new Date(pendingPayout.last_submission_time).toLocaleDateString() }}</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <th>Total</th>
-                      <td><strong>{{ parseFloat($blockchain.efxPending).toFixed(2) }} EFX</strong></td>
-                    </tr>
-                    <tr>
-                      <th>Claimable</th>
-                      <td><strong>{{ parseFloat($blockchain.efxPayout).toFixed(2) }} EFX</strong></td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-              <span v-else>No Pending Payouts</span>
+                <thead>
+                  <tr>
+                    <th>Countdown</th>
+                    <th>Pending</th>
+                    <th>Campaign</th>
+                    <th>Batch</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="pendingPayout in pendingPayoutsStore.payouts.rows"
+                    :key="pendingPayout.id"
+                  >
+                    <td>
+                      <!-- Time for the release of  -->
+                      <vue-countdown
+                        ref="countdown"
+                        :auto-start="true"
+                        :time="calculatePendingTime(pendingPayout.last_submission_time)"
+                        :transform="transform">
+                        <template slot-scope="props">{{ props }}</template>
+                      </vue-countdown>
+                    </td>
+                    <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }} EFX</td>
+                    <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).campaign }}</nuxt-link></td>
+                    <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}/${pendingPayout.batch_id}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).batch }}</nuxt-link></td>
+                    <td>{{ new Date(pendingPayout.last_submission_time).toLocaleDateString() }}</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th>Total</th>
+                    <td><strong>{{ parseFloat($blockchain.efxPending).toFixed(2) }} EFX</strong></td>
+                  </tr>
+                  <tr>
+                    <th>Claimable</th>
+                    <td><strong>{{ parseFloat($blockchain.efxPayout).toFixed(2) }} EFX</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <span v-else>No Pending Payouts</span>
           </div>
-
-          <hr>
         </div>
 
-        <h2 class="title is-4 is-full-mobile">
-          My Campaigns
-        </h2>
-        <nuxt-link class="button is-primary is-pulled-right has-margin-bottom-mobile no-float-mobile is-fullwidth-mobile" to="/campaigns/templates">
-          <span class="icon">
-            +
-          </span>
-          <span>Create Campaign</span>
-        </nuxt-link>
-
-        <campaign-list class="mb-6" :owner="$auth.user.accountName" />
-        <hr>
-
-        <h2 class="title is-4 is-spaced">
-          Transactions
-        </h2>
-        <div v-if="transactions" class="table-container">
-          <table class="table" style="width: 100%">
-            <thead>
-              <tr>
-                <th>Transaction ID</th>
-                <th>Type</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="transaction in paginatedTransactions"
-                :key="transaction.transaction_id"
-              >
-                <td>
-                  <a
-                    :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
-                    target="_blank"
-                  >{{ transaction.transaction_id.substr(0, 30) }}&hellip;</a>
-                </td>
-                <td><span v-if="transaction.processed && transaction.processed.action_traces">{{ transaction.processed.action_traces[0].act.name }}</span></td>
-                <td><span v-if="transaction.processed">{{ new Date(transaction.processed.block_time).toLocaleString() }}</span></td>
-                <td><span v-if="transaction.processed && transaction.processed.receipt">{{ transaction.processed.receipt.status }}</span></td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
+          <h2 class="title is-4 is-full-mobile">
+            My Campaigns
+          </h2>
+          <nuxt-link class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" to="/campaigns/templates">
+            <span class="icon">
+              +
+            </span>
+            <span>Create Campaign</span>
+          </nuxt-link>
         </div>
-        <span v-else>No transactions found</span>
-        <pagination
-          v-if="transactions"
-          :items="transactions.length"
-          :page="page"
-          :per-page="perPage"
-          @setPage="setPage"
-        />
+
+        <campaign-list class="mb-5" :grid-toggle="false" :owner="$auth.user.accountName" />
+
+        <div style="display:block; overflow:hidden;" class="mb-6">
+          <h2 class="title is-4 mt-6 is-spaced">
+            Transactions
+          </h2>
+          <div v-if="transactions" class="table-container">
+            <table class="table" style="width: 100%">
+              <thead>
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="transaction in paginatedTransactions"
+                  :key="transaction.transaction_id"
+                >
+                  <td>
+                    <a
+                      :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
+                      target="_blank"
+                    >{{ transaction.transaction_id.substr(0, 30) }}&hellip;</a>
+                  </td>
+                  <td><span v-if="transaction.processed && transaction.processed.action_traces">{{ transaction.processed.action_traces[0].act.name }}</span></td>
+                  <td><span v-if="transaction.processed">{{ new Date(transaction.processed.block_time).toLocaleString() }}</span></td>
+                  <td><span v-if="transaction.processed && transaction.processed.receipt">{{ transaction.processed.receipt.status }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <span v-else>No transactions found</span>
+          <pagination
+            v-if="transactions"
+            :items="transactions.length"
+            :page="page"
+            :per-page="perPage"
+            @setPage="setPage"
+          />
+        </div>
         <hr>
         <button class="button is-white" exact-active-class="is-active" @click="logout">
           <span class="icon">
@@ -194,6 +198,8 @@
         <br><br>
       </div>
       <key-modal v-if="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" @close="showPK = !showPK" />
+      <!-- SuccessModal -->
+      <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
     </div>
   </section>
 </template>
@@ -205,9 +211,10 @@ import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
 import KeyModal from '@/components/KeyModal.vue'
+import SuccessModal from '@/components/SuccessModal'
 
 export default {
-  components: { Balance, CampaignList, Pagination, KeyModal, VueCountdown },
+  components: { Balance, CampaignList, Pagination, KeyModal, VueCountdown, SuccessModal },
   filters: {
     hide (value, show) {
       if (show) {
@@ -225,7 +232,10 @@ export default {
       perPage: 10,
       showPK: false,
       pages: [],
-      pendingPayouts: []
+      pendingPayouts: [],
+      showPayoutDetails: false,
+      successMessage: null,
+      successTitle: null
     }
   },
   computed: {
@@ -301,6 +311,19 @@ export default {
 <style lang="scss" scoped>
 button.button.is-small.is-info {
   border-radius: 8px;
+}
+.payout-detail {
+  cursor: pointer;
+  span {
+    color: $link;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.payout-table {
+  transition: all .5s ease-in-out;
 }
 
 @media screen and (max-width: $tablet) {
