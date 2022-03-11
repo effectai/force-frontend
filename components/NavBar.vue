@@ -6,13 +6,22 @@
           <a class="navbar-item navbar-item navbar-title" @click="onLogo">
             <img src="@/assets/img/logo.svg" class="logo" @click="mobileMenu = false">
           </a>
-          <div class="navbar-item is-hidden-desktop" style="margin-left: auto" @click="mobileMenu = false">
+          <div v-if="$auth && $auth.loggedIn" class="navbar-item is-hidden-desktop" style="margin-left: auto" @click="mobileMenu = false">
             <div class="mt-1 is-flex notification-icon" style="position: relative" @click="showNotifications = true">
               <span v-if="newNotifications" title="Badge top right" class="badge is-danger">{{ newNotifications }}</span>
               <img src="~assets/img/icons/notification.svg" style="height: 26px">
             </div>
           </div>
+          <div v-else class="navbar-item is-hidden-desktop" style="margin-left: auto" @click="mobileMenu = false">
+            <nuxt-link to="/profile" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
+              <span class="icon">
+                <img src="~assets/img/icons/user.svg" style="height: 24px">
+              </span>
+              <span v-if="mobileMenu">Profile</span>
+            </nuxt-link>
+          </div>
           <a
+            v-if="$auth && $auth.loggedIn"
             role="button"
             class="navbar-burger burger ml-0"
             aria-label="menu"
@@ -36,7 +45,7 @@
             </div>
           </div>
           <div class="navbar-end">
-            <div class="navbar-item is-hidden-touch" @click="mobileMenu = false">
+            <div v-if="$auth && $auth.loggedIn" class="navbar-item is-hidden-touch" @click="mobileMenu = false">
               <div class="mt-1 is-flex notification-icon" style="position: relative" @click="showNotifications = true">
                 <span v-if="newNotifications" title="Badge top right" class="badge is-danger">{{ newNotifications }}</span>
                 <img src="~assets/img/icons/notification.svg" style="height: 26px">
@@ -70,7 +79,7 @@
               <div class="modal-card">
                 <div class="arrow-up" />
                 <section class="modal-card-body has-shadow">
-                  <ul>
+                  <ul v-if="$auth && $auth.loggedIn">
                     <li>
                       <nuxt-link to="/profile">
                         <span class="icon">
@@ -90,6 +99,16 @@
                         <img src="~assets/img/icons/logout.svg" style="height: 22px">
                       </span>
                       Logout
+                    </li>
+                  </ul>
+                  <ul v-else>
+                    <li>
+                      <nuxt-link to="/login">
+                        <span class="icon">
+                          <img src="~assets/img/icons/user.svg" style="height: 20px">
+                        </span>
+                        Login
+                      </nuxt-link>
                     </li>
                   </ul>
                 </section>

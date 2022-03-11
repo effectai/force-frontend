@@ -1,6 +1,6 @@
 <template>
   <div>
-    <carousel :pagination-enabled="false" :per-page-custom="[[768, 3], [1024, 5]]" class="columns mb-6">
+    <carousel :pagination-enabled="false" :per-page-custom="[[768, 3], [1024, 5]]" class="columns mb-5">
       <slide v-for="(dapp, index) in effect_dapps" :key="dapp.value" class="column">
         <a
           href="#"

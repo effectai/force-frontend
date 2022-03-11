@@ -1,22 +1,34 @@
 <template>
   <section class="section">
     <div class="container">
-      <nuxt-link class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" to="/campaigns/templates">
-        <span class="icon">
-          +
-        </span>
-        <span>Create Campaign</span>
-      </nuxt-link>
-      <nuxt-link v-if="hasCampaigns" class="button is-ghost is-pulled-right no-float-mobile has-margin-bottom-mobile is-paddingless-mobile" to="/campaigns">
-        <span>My Campaigns</span>
-      </nuxt-link>
-      <h1 class="title has-text-weight-bold is-full-mobile has-text-danger mb-0">
-        Unmoderated Tasks
-      </h1>
-      <div class="mb-4">
-        <nuxt-link to="/" class="has-text-success">
-          Approved tasks
-        </nuxt-link>
+      <div class="level">
+        <div class="level-left">
+          <div class="level-item">
+            <h1 class="title has-text-weight-bold is-full-mobile has-text-danger">
+              Unmoderated Tasks
+            </h1>
+          </div>
+        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <nuxt-link to="/" class="button is-success is-small is-light">
+              View approved tasks
+            </nuxt-link>
+          </div>
+          <div class="level-item">
+            <nuxt-link v-if="hasCampaigns" class="button is-small is-ghost " to="/campaigns">
+              <span>My Campaigns</span>
+            </nuxt-link>
+          </div>
+          <div class="level-item">
+            <nuxt-link class="button is-primary" to="/campaigns/templates">
+              <span class="icon">
+                +
+              </span>
+              <span>Create Campaign</span>
+            </nuxt-link>
+          </div>
+        </div>
       </div>
       <campaign-list :category-filter="true" :active="true" />
     </div>
