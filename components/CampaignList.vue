@@ -3,20 +3,19 @@
     <client-only>
       <category-filters v-if="categoryFilter" :url-filter="filter" @clicked="onFilter" />
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
-      <div v-if="gridToggle != false" class="field is-flex is-justify-content-flex-begin is-unselectable">
-        <input
-          id="gridToggle"
-          v-model="gridListState"
-          type="checkbox"
-          class="switch is-pulled-left is-outlined is-info is-large is-unselectable"
-          name="gridToggle"
-          @click="toggleGridList()"
-        >
-        <label for="gridToggle" class="is-unselectable" />
+      <div class="is-flex is-justify-content-space-between">
+        <div>
+          <span v-if="$route.query.category && !categories.includes($route.query.category)">
+            Filtering on category: {{ $route.query.category }}
+          </span>
+        </div>
+        <div v-if="gridToggle != false">
+          <div class="switch-button mb-1">
+            <input class="switch-button-checkbox" type="checkbox" v-model="gridListState" @click="toggleGridList()"/>
+            <label class="switch-button-label" for=""><span class="switch-button-label-span"><img height="28px" src="@/assets/img/icons/border-all.svg"></span></label>
+          </div>
+        </div>
       </div>
-      <span v-if="$route.query.category && !categories.includes($route.query.category)">
-        Filtering on category: {{ $route.query.category }}
-      </span>
       <hr class="mt-1">
     </client-only>
     <div v-if="gridListState || gridToggle === false">
@@ -404,42 +403,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-.columnGrid {
-  height: 100%;
-}
-
-.gridContent {
-  height: 100%;
-}
-
-#gridToggle {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-    cursor:not-allowed; /*makes it even more obvious*/
-}
-
-#gridToggle + label:after {
-  background: url('@/assets/img/icons/border-all.svg') CENTER CENTER NO-REPEAT;
-  background-color: #ffffff;
-  /* 16x16 transparent pixels */
-  width: 28px;
-  height: 28px;
-}
-
-#gridToggle:checked + label:after {
-  background: url('@/assets/img/icons/list-ul.svg') CENTER CENTER NO-REPEAT;
-  background-color: #ffffff;
-  /* 21x21 transparent pixels */
-  width: 28px;
-  height: 28px;
-}
-
 .title-section {
   height: 100%;
 }
@@ -477,7 +440,76 @@ export default {
       border-radius: 6px !important;
     }
   }
-  .card-content {
+}
+
+.switch-button {
+  background: #D7DCEE;
+  border-radius: 6px;
+  overflow: hidden;
+  width: 80px;
+  text-align: center;
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: #155FFF;
+  position: relative;
+  padding: 4px 40px 4px 4px;
+  position: relative;
+
+  &:before {
+    content: url('@/assets/img/icons/list-ul.svg');
+    position: absolute;
+    top: 9px;
+    bottom: 0;
+    right: 1px;
+    width: 40px;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  &-checkbox {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 2;
+
+    &:checked + .switch-button-label:before {
+      transform: translateX(36px);
+      transition: transform 300ms linear;
+    }
+
+    & + .switch-button-label {
+      position: relative;
+      padding: 1px 0;
+      display: block;
+      user-select: none;
+      pointer-events: none;
+
+      &:before {
+        content: "";
+        padding: 1px 0;
+        background: #F6F7FF;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        border-radius: 6px;
+        transform: translateX(0);
+        transition: transform 300ms;
+      }
+
+      .switch-button-label-span {
+        position: relative;
+        top: 5px
+      }
+    }
   }
 }
 </style>
