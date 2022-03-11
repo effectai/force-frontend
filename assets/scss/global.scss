@@ -44,6 +44,7 @@ h2.title {
 }
 
 .card {
+  height: 100%;
   //transition: box-shadow 0.2s;
   display: block;
   &.is-flat {
@@ -113,6 +114,8 @@ a.card {
 }
 
 .card-content {
+  flex-grow: 1;
+  height: 100%;
   position: relative;
 }
 .modal-card {
@@ -148,6 +151,9 @@ a.card {
   border: 1px solid transparent;
   box-shadow: 2px 2px 9px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
 }
 a.box {
   &:hover, &:focus {
