@@ -32,28 +32,33 @@
         <div class="title">
           Tasks
         </div>
-        <div>
-        </div>
+        <div />
         <form>
           <div class="field">
             <div>
               <table class="table mx-auto">
                 <thead>
                   <tr>
-                    <th v-if="tasks.length">Index</th>
+                    <th v-if="tasks.length">
+                      Index
+                    </th>
                     <th v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
                       <!-- <input v-model="newTask[placeholder]" type="text" class="input"> -->
                       {{ placeholder }}
                     </th>
-                    <th v-if="tasks.length">Remove</th>
-                    <th v-if="tasks.length">Preview</th>
+                    <th v-if="tasks.length">
+                      Remove
+                    </th>
+                    <th v-if="tasks.length">
+                      Preview
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(task, index) in tasks" :key="task.id">
-                    <td>{{index + 1}}</td>
+                    <td>{{ index + 1 }}</td>
                     <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
-                        {{ task[placeholder] }}
+                      {{ task[placeholder] }}
                     </td>
                     <td>
                       <button class="button is-danger is-outlined is-small is-rounded" @click.prevent="tasks.splice(index, 1)">
@@ -67,22 +72,21 @@
                     </td>
                   </tr>
                   <tr>
-                    <td v-if="tasks.length"></td>
+                    <td v-if="tasks.length" />
                     <td v-for="(placeholder, placeindex) in placeholders" :key="placeholder" class="task-placeholder-value">
                       <input
-                      v-model="newTask[placeholder]"
-                      type="text"
-                      class="input is-info task-placeholder-value"
-                      placeholder="..."
-                      :ref="`placeholder-${placeindex}`"
-                      @keydown.enter.prevent="createTask"
+                        :ref="`placeholder-${placeindex}`"
+                        v-model="newTask[placeholder]"
+                        type="text"
+                        class="input is-info task-placeholder-value"
+                        placeholder="..."
+                        @keydown.enter.prevent="createTask"
                       >
                     </td>
-                    <td v-if="tasks.length"></td>
+                    <td v-if="tasks.length" />
                   </tr>
                 </tbody>
-                <tfoot>
-                </tfoot>
+                <tfoot />
               </table>
               <div v-if="!tasks.length" class="has-text-centered">
                 <h1>
@@ -95,7 +99,9 @@
                 </button>
                 <br>
                 <br>
-                <nuxt-link to="/deposit" class="button is-primary">Deposit</nuxt-link>
+                <nuxt-link to="/deposit" class="button is-primary">
+                  Deposit
+                </nuxt-link>
               </div>
             </div>
 
@@ -198,11 +204,11 @@ function getMatches (string, regex, index) {
 }
 
 export default {
-  middleware: ['auth'],
   components: {
     // templatePreviewModal
     TemplateMedia
   },
+  middleware: ['auth'],
   data () {
     return {
       campaignId: parseInt(this.$route.params.id),
