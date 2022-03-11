@@ -20,38 +20,104 @@
           </li>
         </ul>
       </nav>
-      <div v-if="campaignLoading">
+      <!-- This campaignLoading div is refreshing the page every time the info is updated -->
+      <!-- <div v-if="campaignLoading">
         Campaign loading..
       </div>
       <div v-else-if="!campaign">
         Could not retrieve campaign
-      </div>
-      <div v-else>
+      </div> -->
+      <!-- <div v-else> -->
+      <div>
         <div class="title">
           Tasks
         </div>
         <div>
-          <div v-for="(task,index) in tasks" :key="index">
-            #{{ index }}: {{ task }} <span class="has-text-danger-dark is-size-5 has-text-weight-bold" @click="tasks.splice(index, 1)">x</span>
-          </div>
-          <div v-if="!tasks.length">
-            No tasks..
-          </div>
         </div>
-        <form @submit.prevent="createTask">
+        <form>
           <div class="field">
-            <div v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
-              <label class="label">{{ placeholder }}</label>
-              <div class="control">
-                <input v-model="newTask[placeholder]" type="text" class="input">
+            <div>
+              <table class="table mx-auto">
+                <thead>
+                  <tr>
+                    <th v-if="tasks.length">Index</th>
+                    <th v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
+                      <!-- <input v-model="newTask[placeholder]" type="text" class="input"> -->
+                      {{ placeholder }}
+                    </th>
+                    <th v-if="tasks.length">Remove</th>
+                    <th v-if="tasks.length">Preview</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(task, index) in tasks" :key="task.id">
+                    <td>{{index + 1}}</td>
+                    <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
+                        {{ task[placeholder] }}
+                    </td>
+                    <td>
+                      <button class="button is-danger is-outlined is-small is-rounded" @click.prevent="tasks.splice(index, 1)">
+                        <font-awesome-icon icon="fa-solid fa-trash-can" />
+                      </button>
+                    </td>
+                    <td>
+                      <button class="button is-info is-outlined is-small is-rounded" @click.prevent="previewModal(index)">
+                        <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td v-if="tasks.length"></td>
+                    <td v-for="(placeholder, placeindex) in placeholders" :key="placeholder" class="task-placeholder-value">
+                      <input
+                      v-model="newTask[placeholder]"
+                      type="text"
+                      class="input is-info task-placeholder-value"
+                      placeholder="..."
+                      :ref="`placeholder-${placeindex}`"
+                      @keydown.enter.prevent="createTask"
+                      >
+                    </td>
+                    <td v-if="tasks.length"></td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                </tfoot>
+              </table>
+              <div v-if="!tasks.length" class="has-text-centered">
+                <h1>
+                  No tasks...
+                </h1>
+              </div>
+              <div class="control has-text-centered">
+                <button class="button is-primary" @click.prevent="createTask">
+                  Create Task
+                </button>
+                <br>
+                <br>
+                <nuxt-link to="/deposit" class="button is-primary">Deposit</nuxt-link>
               </div>
             </div>
-            <div class="control">
-              <button type="submit" class="button">
-                Create Task
-              </button>
+
+            <hr>
+            <div v-if="tasks.length">
+              <div class="columns">
+                <div class="column">
+                  <h2>Batch Cost</h2>
+                  <strong>{{ campaign.info.reward * tasks.length }} EFX</strong>
+                </div>
+                <div class="column">
+                  <h2>Available Balance</h2>
+                  <strong>{{ efxAvailable }}</strong>
+                </div>
+                <div class="column">
+                  <h2>Batch Tasks possible</h2>
+                  <strong>{{ maxAmountTask }}</strong>
+                </div>
+              </div>
             </div>
             <br>
+
             <h2 class="subtitle is-5 mb-3">
               Import tasks
             </h2>
@@ -78,15 +144,15 @@
           </div>
         </form>
         <form @submit.prevent="uploadBatch">
-          <!-- <div class="field">
+          <div class="field">
             <label class="label">Repetitions</label>
             <div class="control">
               <input v-model="repetitions" class="input" type="number" min="0" required>
             </div>
-          </div> -->
+          </div>
           <div class="field is-grouped">
             <div class="control">
-              <button type="submit" class="button is-link" :disabled="!tasks.length">
+              <button type="submit" class="button is-link" :disabled="!tasks.length || tasks.length >= maxAmountTask">
                 Submit
               </button>
             </div>
@@ -98,12 +164,28 @@
           </div>
         </form>
       </div>
+      <div class="modal" :class="{'is-active': previewTask}">
+        <div class="modal-background" @click="previewTask = false" />
+        <div class="modal-content" style="background-color: #fff; padding: 10px;">
+          <template-media
+            v-if="campaign && campaign.info && previewTask"
+            :html="renderTemplate(
+              campaign.info.template || 'No template found..',
+              previewTask)"
+            @templateLoaded="postResults(previewTask.results)"
+          />
+        </div>
+        <button class="modal-close is-large" aria-label="close" @click="previewTask = false" />
+      </div>
     </div>
   </section>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import { Template } from '@effectai/effect-js'
+import TemplateMedia from '@/components/Template'
+// import templatePreviewModal from '~/components/templatePreviewModal.vue'
 
 function getMatches (string, regex, index) {
   index || (index = 1) // default to the first capturing group
@@ -117,12 +199,19 @@ function getMatches (string, regex, index) {
 
 export default {
   middleware: ['auth'],
+  components: {
+    // templatePreviewModal
+    TemplateMedia
+  },
   data () {
     return {
       campaignId: parseInt(this.$route.params.id),
       repetitions: 1,
       newTask: {},
       tasks: [],
+      tempCounter: 0,
+      taskModal: false,
+      previewTask: false,
       placeholders: null,
       campaign: null,
       file: {
@@ -139,7 +228,13 @@ export default {
     }),
     ...mapGetters({
       batchByCampaignId: 'campaign/batchByCampaignId'
-    })
+    }),
+    efxAvailable () {
+      return this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable
+    },
+    maxAmountTask () {
+      return Math.floor((this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable) / this.campaign.info.reward)
+    }
   },
   mounted () {
     this.getCampaign()
@@ -159,8 +254,29 @@ export default {
       link.href = encodeURI(csvContent)
     },
     createTask () {
+      // An temp id is needed for :key=task.id
+      this.newTask.id = this.tempCounter++
       this.tasks.push(this.newTask)
       this.newTask = this.getEmptyTask(this.placeholders)
+      this.$nextTick(() => {
+        this.$refs['placeholder-0'][0].focus()
+      })
+    },
+    previewModal (index) {
+      this.previewTask = true
+      this.previewTask = this.tasks[index]
+    },
+    renderTemplate (template, placeholders = {}, options = {}) {
+      return new Template(template, placeholders, options).render()
+    },
+    postResults (results) {
+      const frame = document.getElementById('mediaFrame')
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { task: 'results', value: results },
+          '*'
+        )
+      }
     },
     getEmptyTask (placeholders) {
       const emptyTask = {}

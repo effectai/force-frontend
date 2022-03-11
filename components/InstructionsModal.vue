@@ -1,5 +1,5 @@
 <template>
-  <div v-if="campaign && info" class="modal" :class="{'is-active': showModal}" :style="{position: !functional ? 'relative' : 'fixed', padding: !functional ? '10px' : 'initial'}">
+  <div v-if="campaign && info" class="modal" :class="{'is-active': showModal}" :style="{position: !functional ? 'relative' : 'fixed', padding: !functional ? '10px' : 'initial', zIndex: !functional ? '1' : '40'}">
     <div class="modal-background" />
     <div class="modal-card">
       <header class="modal-card-head">
