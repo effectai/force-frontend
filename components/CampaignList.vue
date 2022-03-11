@@ -11,7 +11,7 @@
         </div>
         <div v-if="gridToggle != false">
           <div class="switch-button mb-1">
-            <input class="switch-button-checkbox" type="checkbox" v-model="gridListState" @click="toggleGridList()"/>
+            <input v-model="gridListState" class="switch-button-checkbox" type="checkbox" @click="toggleGridList()">
             <label class="switch-button-label" for=""><span class="switch-button-label-span"><img height="28px" src="@/assets/img/icons/border-all.svg"></span></label>
           </div>
         </div>
@@ -129,9 +129,10 @@
               >
                 <div class="card-image p-2 mb-3">
                   <figure>
-                    <p class="image has-radius is-vcentered">
-                      <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
-                      <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" class="p-2" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+                    <p v-if="campaign.info && campaign.info.image" class="image has-radius is-vcentered has-background-image" :style="{backgroundImage: 'url(' + (campaign.info && campaign.info.image && campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image) + ')'}" />
+                    <p v-else class="image has-radius is-vcentered has-background-image">
+                      <!-- <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image"> -->
+                      <img v-if="campaign.info && !campaign.info.image && campaign.info.category && categories.includes(campaign.info.category)" class="p-2" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
                       <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
                     </p>
                   </figure>

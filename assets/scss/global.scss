@@ -43,6 +43,12 @@ h2.title {
   text-shadow: 2px 2px 4px #000000;
 }
 
+.has-background-image {
+  background-size: cover;
+  background-position: top center;
+  background-repeat: no-repeat;
+}
+
 .card {
   height: 100%;
   //transition: box-shadow 0.2s;
