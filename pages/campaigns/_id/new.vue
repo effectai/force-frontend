@@ -40,7 +40,7 @@
               <div class="column is-one-third">
                 <div class="box">
                   <h2>Batch Cost</h2>
-                  <strong class="has-text-danger" v-if="(campaign.info.reward * tasks.length * repetitions) > efxAvailable">{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
+                  <strong v-if="(campaign.info.reward * tasks.length * repetitions) > efxAvailable" class="has-text-danger">{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
                   <strong v-else>{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
                 </div>
               </div>
@@ -78,18 +78,24 @@
                 <table class="table mx-auto">
                   <thead>
                     <tr>
-                      <th v-if="tasks.length">Index</th>
+                      <th v-if="tasks.length">
+                        Index
+                      </th>
                       <th v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
                         <!-- <input v-model="newTask[placeholder]" type="text" class="input"> -->
                         {{ placeholder }}
                       </th>
-                      <th v-if="tasks.length">Preview</th>
-                      <th v-if="tasks.length">Remove</th>
+                      <th v-if="tasks.length">
+                        Preview
+                      </th>
+                      <th v-if="tasks.length">
+                        Remove
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(task, index) in tasks" :key="task.id">
-                      <td>{{index + 1}}</td>
+                      <td>{{ index + 1 }}</td>
                       <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
                         {{ task[placeholder] }}
                       </td>
@@ -105,18 +111,18 @@
                       </td>
                     </tr>
                     <tr>
-                      <td v-if="tasks.length"></td>
+                      <td v-if="tasks.length" />
                       <td v-for="(placeholder, placeindex) in placeholders" :key="placeholder" class="task-placeholder-value">
                         <input
+                          :ref="`placeholder-${placeindex}`"
                           v-model="newTask[placeholder]"
                           type="text"
                           class="input is-info task-placeholder-value"
                           placeholder="Type here"
-                          :ref="`placeholder-${placeindex}`"
                           @keydown.enter.prevent="createTask"
                         >
                       </td>
-                      <td v-if="tasks.length"></td>
+                      <td v-if="tasks.length" />
                     </tr>
                   </tbody>
                 </table>
@@ -207,11 +213,11 @@ function getMatches (string, regex, index) {
 }
 
 export default {
-  middleware: ['auth'],
   components: {
     // templatePreviewModal
     TemplateMedia
   },
+  middleware: ['auth'],
   data () {
     return {
       campaignId: parseInt(this.$route.params.id),

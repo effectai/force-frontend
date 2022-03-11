@@ -44,13 +44,15 @@ export default (context, inject) => {
       },
       vefxAvailable () {
         let balance = 0
-        const vAccountRows = context.$auth.user.vAccountRows
-        if (vAccountRows) {
-          vAccountRows.forEach((row) => {
-            if (row.balance.contract === process.env.NUXT_ENV_EOS_TOKEN_CONTRACT) {
-              balance = parseFloat(row.balance.quantity.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
-            }
-          })
+        if (context.$auth && context.$auth.loggedIn) {
+          const vAccountRows = context.$auth.user.vAccountRows
+          if (vAccountRows) {
+            vAccountRows.forEach((row) => {
+              if (row.balance.contract === process.env.NUXT_ENV_EOS_TOKEN_CONTRACT) {
+                balance = parseFloat(row.balance.quantity.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+              }
+            })
+          }
         }
         return balance
       }
@@ -326,8 +328,11 @@ export default (context, inject) => {
         }
       },
       async getPendingPayouts () {
-        const data = await this.sdk.force.getPendingBalance(context.$auth.user.vAccountRows[0].id)
+        let data
+        if (context.$auth && context.$auth.loggedIn) {
+          data = await this.sdk.force.getPendingBalance(context.$auth.user.vAccountRows[0].id)
         // console.log('getPendingPayout', data)
+        }
         if (data) {
           this.pendingPayouts = data.rows
           return data

@@ -32,7 +32,11 @@ export default {
   components: {
     CampaignList
   },
-  middleware: ['auth'],
+  data () {
+    return {
+      approvedCampaigns
+    }
+  },
   computed: {
     ...mapState({
       campaigns: state => state.campaign.campaigns
@@ -41,7 +45,7 @@ export default {
       let hasCampaigns = false
       if (this.campaigns) {
         this.campaigns.forEach((c) => {
-          if (c.owner[1] === this.$auth.user.accountName) {
+          if (this.$auth && this.$auth.user && c.owner[1] === this.$auth.user.accountName) {
             hasCampaigns = true
           }
         })
@@ -49,12 +53,10 @@ export default {
       return hasCampaigns
     }
   },
-  data () {
-    return {
-      approvedCampaigns
-    }
-  },
   created () {
+    if (!this.$auth || !this.$auth.loggedIn) {
+      this.$router.push('/welcome')
+    }
   },
   methods: {
   }
