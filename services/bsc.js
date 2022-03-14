@@ -219,6 +219,14 @@ const bsc = {
   },
 
   /**
+   * getBlockHeight
+   * @returns the current blockheight of the chain
+   */
+  getBlockHeight: async () => {
+    return await bsc.web3.eth.getBlockNumber().catch(console.error)
+  },
+
+  /**
    * Assign provider to currentProvider, instantiate web3, and register eventlisteners.
    */
   registerProvider: async (provider, privateKey) => {
