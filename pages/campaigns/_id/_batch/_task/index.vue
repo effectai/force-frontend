@@ -44,8 +44,8 @@
           <div class="loader is-loading" />
           <br>Waiting for the transaction to complete...
         </div>
-        <div v-if="!campaign || !campaign.info || !task">
-          Loading..
+        <div v-if="!campaign || !campaign.info || !task" class="text-loading">
+          Loading
         </div>
         <template-media
           v-else

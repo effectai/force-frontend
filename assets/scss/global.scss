@@ -184,7 +184,8 @@ a.box {
   left: 0;
   height: 100%;
   width: 100%;
-  background: #fff;
+  backdrop-filter: blur(2px);
+  background: rgba(white, 0.8);
   opacity: 0;
   z-index: -1;
   transition: opacity .3s;
@@ -193,7 +194,6 @@ a.box {
   align-items: center;
   border-radius: 6px;
   flex-direction: column;
-
   .loader {
     height: 80px;
     width: 80px;

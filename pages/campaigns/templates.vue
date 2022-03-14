@@ -13,8 +13,8 @@
             <p class="panel-heading">
               Templates
             </p>
-            <div v-if="loading">
-              Loading..
+            <div v-if="loading" class="subtitle text-loading">
+              Loading
             </div>
             <div v-else-if="!templates">
               Could not retrieve default templates

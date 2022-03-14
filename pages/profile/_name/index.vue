@@ -5,8 +5,8 @@
         <h4 class="title is-spaced">
           Effect Account
         </h4>
-        <div v-if="loading">
-          Loading..
+        <div v-if="loading" class="text-loading">
+          Loading
         </div>
         <div v-else-if="account">
           <div class="block">

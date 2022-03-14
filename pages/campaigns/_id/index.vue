@@ -12,19 +12,19 @@
         <ul>
           <li>
             <nuxt-link to="/">
-              Campaigns
+              Tasks
             </nuxt-link>
           </li>
           <li class="is-active">
             <nuxt-link :to="'/campaigns/' + id" aria-current="page">
-              Campaign {{ id }}
+              Task {{ id }}
             </nuxt-link>
           </li>
         </ul>
       </nav>
       <div v-if="loading" class="loader-wrapper is-active">
-        <div class="loader is-loading" />
-        <br><span v-if="waitingOnTransaction">Waiting for the transaction to complete...</span>
+        <img src="~assets/img/loading.svg">
+        <br><span v-if="waitingOnTransaction" class="loading-text subtitle">Waiting for the transaction to complete</span>
       </div>
       <div v-if="!campaign" class="loading-text">
         Task loading
@@ -40,14 +40,14 @@
             <div class="title has-text-weight-bold">
               <span>#{{ id }} </span>
               <span v-if="campaign.info">{{ campaign.info.title }}</span>
-              <span v-else-if="campaign.info !== null">Loading..</span>
+              <span v-else-if="campaign.info !== null" class="text-loading">Loading</span>
               <span v-else class="has-text-danger-dark">Could not load campaign info</span>
             </div>
           </div>
           <div class="tabs campaign-tabs">
             <ul>
               <li :class="{'is-active': body === 'description'}">
-                <a @click.prevent="body = 'description'">Batches</a>
+                <a @click.prevent="body = 'description'">Tasks</a>
               </li>
               <li :class="{'is-active': body === 'instruction'}">
                 <a @click.prevent="body = 'instruction'">Instructions</a>
@@ -175,7 +175,7 @@
                 <div class="block">
                   <div v-if="$auth.user.accountName === campaign.owner[1]">
                     <nuxt-link :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
-                      Edit Campaign
+                      Edit Task
                     </nuxt-link>
                     <br>
                   </div>
@@ -192,18 +192,16 @@
                   >
                     Make Task Reservation
                   </button>
-                  <button
-                    v-else-if="userReservation"
-                    class="button is-fullwidth is-accent has-text-weight-semibold"
-                    @click.prevent="goToTask"
-                  >
+                  <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="goToTask">
                     Go To Task
                   </button>
                   <template v-else>
                     <button v-if="userJoined" class="button is-fullwidth is-primary" :disabled="true">
                       Qualified for Task
                     </button>
-                    <p>No active tasks currently</p>
+                    <div class="has-text-centered">
+                      <i>No active tasks currently</i>
+                    </div>
                   </template>
                 </div>
               </div>
@@ -232,8 +230,8 @@
                 <div class="block">
                   Tasks
                   <br>
-                  <span v-if="batchByCampaignId(campaign.id) === null">
-                    Loading..
+                  <span v-if="batchByCampaignId(campaign.id) === null" class="text-loading">
+                    Loading
                   </span>
                   <span v-else>
                     {{ batchByCampaignId(campaign.id).reduce(function(a,b){

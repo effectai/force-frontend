@@ -5,12 +5,12 @@
         <ul>
           <li>
             <nuxt-link to="/">
-              Campaigns
+              Tasks
             </nuxt-link>
           </li>
           <li>
             <nuxt-link :to="`/campaigns/${campaignId}`">
-              Campaign {{ campaignId }}
+              Task {{ campaignId }}
             </nuxt-link>
           </li>
           <li class="is-active">
@@ -21,11 +21,11 @@
         </ul>
       </nav>
       <div v-if="loading" class="loader-wrapper is-active">
-        <div class="loader is-loading" />
-        <br><span v-if="waitingOnTransaction">Waiting for the transaction to complete...</span>
+        <img src="~assets/img/loading.svg">
+        <br><span v-if="waitingOnTransaction" class="loading-text subtitle">Waiting for the transaction to complete</span>
       </div>
-      <div v-if="!campaign">
-        Campaign loading..
+      <div v-if="!campaign" class="loading-text">
+        Task loading
       </div>
       <div class="columns">
         <div class="column is-three-fifths">
@@ -38,7 +38,7 @@
             <div class="title has-text-weight-bold">
               <span v-if="batch">#{{ campaignId }}.{{ batch.id }}: </span>
               <span v-if="campaign && campaign.info">{{ campaign.info.title }}</span>
-              <span v-else-if="!campaign || campaign.info !== null">Loading..</span>
+              <span v-else-if="!campaign || campaign.info !== null" class="text-loading">Loading</span>
               <span v-else class="has-text-danger-dark">Could not load campaign info</span>
             </div>
           </div>
@@ -359,7 +359,7 @@
                   Loading
                 </button>
                 <button v-else-if="!userJoined" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
-                  Join Campaign
+                  Qualify
                 </button>
                 <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
                   Resume Task
@@ -369,9 +369,11 @@
                 </button>
                 <template v-else>
                   <button v-if="userJoined" class="button is-fullwidth is-primary" :disabled="true">
-                    Joined Campaign
+                    Qualified for Task
                   </button>
-                  <p>No active tasks currently</p>
+                  <div class="has-text-centered">
+                    <i>No active tasks currently</i>
+                  </div>
                 </template>
               </div>
             </div>

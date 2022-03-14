@@ -5,12 +5,12 @@
         <ul>
           <li>
             <nuxt-link to="/">
-              All Campaigns
+              All Tasks
             </nuxt-link>
           </li>
           <li>
             <nuxt-link :to="`/campaigns/${campaignId}`">
-              Campaign {{ campaignId }}
+              Task {{ campaignId }}
             </nuxt-link>
           </li>
           <li class="is-active">
@@ -20,14 +20,6 @@
           </li>
         </ul>
       </nav>
-      <!-- This campaignLoading div is refreshing the page every time the info is updated -->
-      <!-- <div v-if="campaignLoading">
-        Campaign loading..
-      </div>
-      <div v-else-if="!campaign">
-        Could not retrieve campaign
-      </div> -->
-      <!-- <div v-else> -->
       <div>
         <div>
           <div class="columns">
@@ -50,7 +42,7 @@
             <div class="box">
               <div v-if="!tasks.length" class="has-text-centered mb-4">
                 <h1>
-                  No tasks in batch yet
+                  No tasks added in batch yet
                 </h1>
               </div>
               <div style="background: #fff; border-radius: 8px" class="p-2">
@@ -108,7 +100,7 @@
               </div>
               <div class="control has-text-centered mt-5">
                 <button class="button is-primary is-wide" @click.prevent="createTask">
-                  Create Task
+                  Add Task
                 </button>
                 <!-- <nuxt-link to="/deposit" class="button is-outlined is-primary is-wide">Deposit</nuxt-link> -->
               </div>
@@ -117,7 +109,7 @@
               <div class="columns">
                 <div class="column is-3 has-text-centered py-0">
                   <h2 class="subtitle is-6 has-text-weight-bold mb-3">
-                    Import tasks
+                    Upload tasks
                   </h2>
                   <div class="file is-boxed mt-3">
                     <label class="file-label">
@@ -133,7 +125,7 @@
                     </label>
                   </div>
                   <div>
-                    <a class="is-size-7" ref="csvfiledownload" href="" :download="'tasks_example'+campaignId+'.csv'">Download example CSV</a>
+                    <a ref="csvfiledownload" class="is-size-7" href="" :download="'tasks_example'+campaignId+'.csv'">Download example CSV</a>
                   </div>
                   <p v-if="file.name" class="has-text-success mt-2">
                     Imported file: {{ file.name }}
@@ -155,7 +147,7 @@
                 <div v-if="campaign && campaign.info" class="column is-6 py-0 columns batch-info">
                   <div class="column is-one-third">
                     <div class="box">
-                      <h2>Batch Cost</h2>
+                      <h2>Total Cost</h2>
                       <strong v-if="(campaign.info.reward * tasks.length * repetitions) > efxAvailable" class="has-text-danger">{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
                       <strong v-else>{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
                     </div>
@@ -168,7 +160,7 @@
                   </div>
                   <div class="column is-one-third">
                     <div class="box">
-                      <h2>Batch Tasks Possible</h2>
+                      <h2>Max Tasks Possible</h2>
                       <strong>{{ maxAmountTask > efxAvailable ? efxAvailable : maxAmountTask }}</strong>
                     </div>
                   </div>
@@ -181,7 +173,7 @@
           <div class="field is-grouped is-justify-content-center mt-6">
             <div class="control">
               <button type="submit" class="button button is-primary is-wide mr-4" :disabled="!tasks.length || tasks.length > maxAmountTask">
-                Submit
+                Add Tasks
               </button>
               <button class="button is-outlined is-primary is-wide" @click.prevent="cancel">
                 Cancel

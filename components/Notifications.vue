@@ -62,8 +62,8 @@
         </div>
       </div>
     </div>
-    <div v-if="loading" class="p-2 has-text-centered">
-      Loading..
+    <div v-if="loading" class="p-2 has-text-centered text-loading">
+      Loading
     </div>
     <div v-else-if="!notifications" class="p-2 has-text-centered">
       Could not retrieve notifications
