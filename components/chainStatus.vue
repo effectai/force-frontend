@@ -1,6 +1,9 @@
 <template>
   <div class="columns is-centered is-multiline">
-    <div class="column">
+    <div class="column is-third">
+      <div class="subtitle">BlockHeight</div>
+    </div>
+    <div class="column is-third">
         <span>
           <strong>BSC:</strong>
         </span>
@@ -15,7 +18,7 @@
           <span v-else>...</span>
         </span>
     </div>
-    <div class="column">
+    <div class="column is-third">
         <span>
           <strong>EOS:</strong>
         </span>
