@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <div class="container mt-5">
+    <div class="container">
       <div class="text-center">
         <h1 class="title is-spaced has-text-weight-bold is-full-mobile">
           <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->

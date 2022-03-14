@@ -168,16 +168,15 @@
     font-weight: 900;
     left: calc(50% - 45px);
     width: 90px;
-height: 70px;
-padding-top: 12px;
-text-align: center;
-font-size: 25px;
-
-background: #FAFDFF;
-border: 1px solid #BFCDF5;
-box-sizing: border-box;
-box-shadow: 0px 4px 20px rgba(16, 29, 86, 0.2);
-border-radius: 20px;
+    height: 70px;
+    padding-top: 12px;
+    text-align: center;
+    font-size: 25px;
+    background: #FAFDFF;
+    border: 1px solid #BFCDF5;
+    box-sizing: border-box;
+    box-shadow: 0px 4px 20px rgba(16, 29, 86, 0.2);
+    border-radius: 20px;
   }
   @include desktop {
     .bg-hover:hover {
