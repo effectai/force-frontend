@@ -102,7 +102,6 @@
                 <button class="button is-primary is-wide" @click.prevent="createTask">
                   Add Task
                 </button>
-                <!-- <nuxt-link to="/deposit" class="button is-outlined is-primary is-wide">Deposit</nuxt-link> -->
               </div>
             </div>
             <div class="box">
@@ -148,14 +147,18 @@
                   <div class="column is-one-third">
                     <div class="box">
                       <h2>Total Cost</h2>
-                      <strong v-if="(campaign.info.reward * tasks.length * repetitions) > efxAvailable" class="has-text-danger">{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
-                      <strong v-else>{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
+                      <strong :class="{'has-text-danger': (campaign.info.reward * tasks.length * repetitions) > efxAvailable}">{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
                     </div>
                   </div>
                   <div class="column is-one-third">
                     <div class="box">
                       <h2>Available Balance</h2>
-                      <strong>{{ efxAvailable }}</strong>
+                      <p>
+                        <strong>{{ efxAvailable }} | </strong>
+                        <nuxt-link to="/deposit">
+                          Deposit EFX
+                        </nuxt-link>
+                      </p>
                     </div>
                   </div>
                   <div class="column is-one-third">
