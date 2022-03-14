@@ -6,11 +6,11 @@
         </span>
         <span>
           <a
-            v-if="$blockchain.bscBlockHeight !== null"
-            :href="`https://bscscan.com/block/${$blockchain.bscBlockHeight - 5}`"
+            v-if="bscBlockHeight !== null"
+            :href="`${$blockchain.bsc.explorer}/block/${bscBlockHeight - 5}`"
             target="_blank"
             rel="noopener noreferrer">
-            {{ $blockchain.bscBlockHeight }}
+            {{ bscBlockHeight }}
           </a>
           <span v-else>...</span>
         </span>
@@ -21,11 +21,11 @@
         </span>
         <span>
           <a
-            v-if="$blockchain.eosBlockHeight !== null"
-            :href="`${$blockchain.eos.explorer}/block/${$blockchain.eosBlockHeight}`"
+            v-if="eosBlockHeight !== null"
+            :href="`${$blockchain.eos.explorer}/block/${eosBlockHeight}`"
             target="_blank"
             rel="noopener noreferrer">
-            {{ $blockchain.eosBlockHeight }}
+            {{ eosBlockHeight }}
           </a>
           <span v-else>...</span>
         </span>
@@ -46,9 +46,9 @@ export default {
     }
   },
   created () {
-    // if (!this.updateChainInterval) {
-    //   this.updateChainInterval = setInterval(this.updateChainHeight(), 500)
-    // }
+    if (!this.updateChainInterval) {
+      this.updateChainInterval = setInterval(() => this.updateChainHeight(), 1000)
+    }
   },
   beforeDestroy () {
     clearInterval(this.updateChainInterval)
@@ -57,7 +57,8 @@ export default {
   },
   methods: {
     async updateChainHeight () {
-      const height = await this.$blockchain.getBlockHeight().catch(console.error)
+      const height = await this.$blockchain.getBlockHeight().catch(error => console.log('Error chainstatus', error))
+      console.log(height)
       this.eosBlockHeight = height.eos
       this.bscBlockHeight = height.bsc
     }
