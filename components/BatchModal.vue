@@ -4,13 +4,13 @@
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">
-          Create a batch.
+          Add first tasks
         </p>
         <button class="delete" aria-label="close" @click.prevent="onCancel()" />
       </header>
       <section class="modal-card-body">
         <div class="content">
-          It looks like you haven't created any batches yet... Let's create one!
+          It looks like you haven't added any tasks yet... Let's add some!
         </div>
       </section>
       <footer class="modal-card-foot">
@@ -19,7 +19,7 @@
             <span class="icon">
               +
             </span>
-            <span>Create Batch</span>
+            <span>Add Tasks</span>
           </nuxt-link>
           <button class="button" @click.prevent="onCancel()">
             Cancel

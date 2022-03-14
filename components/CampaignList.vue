@@ -45,13 +45,16 @@
                 >
                   {{ campaign.info.category }}
                 </nuxt-link>
+                <span v-else-if="campaign.info !== null" class="tag is-light mb-2">
+                  <span class="loading-text">Loading</span>
+                </span>
               </div>
 
               <span v-if="campaign.info">
                 <span v-if="campaign.info.title">{{ campaign.info.title }}</span>
                 <i v-else>- Untitled -</i>
               </span>
-              <span v-else-if="campaign.info !== null">Loading..</span>
+              <span v-else-if="campaign.info !== null" class="loading-text">Loading</span>
               <span v-else class="has-text-danger-dark">Could not load campaign info</span>
             </h2>
             <div class="has-text-grey is-size-7">
@@ -89,8 +92,8 @@
               Tasks:
             </p>
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-              <span v-if="batchByCampaignId(campaign.id) === null">
-                Loading..
+              <span v-if="batchByCampaignId(campaign.id) === null" class="loading-text">
+                Loading
               </span>
               <span v-else>
                 {{ batchByCampaignId(campaign.id).reduce(function(a,b){
@@ -145,7 +148,7 @@
                           <span v-if="campaign.info.title">{{ campaign.info.title }}</span>
                           <i v-else>- Untitled -</i>
                         </span>
-                        <span v-else-if="campaign.info !== null">Loading..</span>
+                        <span v-else-if="campaign.info !== null" class="loading-text">Loading</span>
                         <span v-else class="has-text-danger-dark">Could not load campaign info</span>
                       </h2>
                       <p class="has-text-grey is-size-7 is-flex is-clipped is-inline">
@@ -194,11 +197,11 @@
       :per-page="perPage"
       @setPage="setPage"
     />
-    <div v-if="campaignsLoading" class="subtitle">
-      Campaigns loading..
+    <div v-if="campaignsLoading" class="subtitle loading-text">
+      Campaigns loading
     </div>
-    <div v-else-if="!allBatchesLoaded">
-      Batches loading..
+    <div v-else-if="!allBatchesLoaded" class="loading-text">
+      Batches loading
     </div>
     <div v-else-if="filteredCampaigns && !filteredCampaigns.length" class="subtitle">
       No <span v-if="active">active</span> campaigns

@@ -26,8 +26,8 @@
         <div class="loader is-loading" />
         <br><span v-if="waitingOnTransaction">Waiting for the transaction to complete...</span>
       </div>
-      <div v-if="!campaign">
-        Campaign loading..
+      <div v-if="!campaign" class="loading-text">
+        Task loading
       </div>
       <div v-else class="columns">
         <div class="column is-three-fifths">
@@ -68,60 +68,62 @@
             <div class="mt-5">
               <div class="is-flex is-justify-content-space-between is-align-items-center">
                 <h4 class="is-size-6 mb-0 has-text-weight-bold">
-                  Batches
+                  Tasks
                 </h4>
                 <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" :to="`/campaigns/${id}/new`">
                   <span class="icon">
                     +
                   </span>
-                  <span>Create Batch</span>
+                  <span>Add Tasks</span>
                 </nuxt-link>
               </div>
               <hr class="mt-2 mb-5">
               <div class="block mt-5">
-                <nuxt-link
-                  v-for="batch in campaignBatches.slice().reverse()"
-                  :key="batch.id"
-                  :to="`/campaigns/${batch.campaign_id}/${batch.batch_id}`"
-                  class="box p-4"
-                  :class="{'is-disabled': false}"
-                >
-                  <div class="columns is-vcentered is-multiline is-mobile">
-                    <div class="column">
-                      <p class="has-text-grey is-size-7">
-                        Batch
-                      </p>
-                      <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                        #<span v-if="campaign">{{ campaign.id }}.</span>{{ batch.id }}
-                      </h2>
+                <div v-if="campaignBatches">
+                  <nuxt-link
+                    v-for="batch in campaignBatches.slice().reverse()"
+                    :key="batch.id"
+                    :to="`/campaigns/${batch.campaign_id}/${batch.batch_id}`"
+                    class="box p-4"
+                    :class="{'is-disabled': false}"
+                  >
+                    <div class="columns is-vcentered is-multiline is-mobile">
+                      <div class="column">
+                        <p class="has-text-grey is-size-7">
+                          Batch
+                        </p>
+                        <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                          #<span v-if="campaign">{{ campaign.id }}.</span>{{ batch.id }}
+                        </h2>
+                      </div>
+                      <div class="column">
+                        <p class="has-text-grey is-size-7">
+                          Status
+                        </p>
+                        <h2 v-if="batch" class="subtitle is-6 has-text-weight-semibold mb-0">
+                          {{ batch.status }}
+                        </h2>
+                      </div>
+                      <div class="column">
+                        <p v-if="batch.num_tasks - batch.tasks_done === 0" class="has-text-grey is-size-7">
+                          {{ batch.tasks_done }} Task<span v-if="batch.tasks_done > 1">s</span> <small>(<b class="has-text-success">Done</b>)</small>
+                        </p>
+                        <p v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done > 0" class="has-text-grey is-size-7">
+                          Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
+                        </p>
+                        <p v-else-if="batch.status === 'Paused'" class="has-text-grey is-size-7">
+                          {{ batch.tasks_done }} Task <span v-if="batch.tasks_done > 1">s</span><small><b>completed</b></small>
+                        </p>
+                        <progress class="progress is-small mt-2" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false }" :value="batch.tasks_done" :max="batch.num_tasks" />
+                      </div>
                     </div>
-                    <div class="column">
-                      <p class="has-text-grey is-size-7">
-                        Status
-                      </p>
-                      <h2 v-if="batch" class="subtitle is-6 has-text-weight-semibold mb-0">
-                        {{ batch.status }}
-                      </h2>
-                    </div>
-                    <div class="column">
-                      <p v-if="batch.num_tasks - batch.tasks_done === 0" class="has-text-grey is-size-7">
-                        {{ batch.tasks_done }} Task<span v-if="batch.tasks_done > 1">s</span> <small>(<b class="has-text-success">Done</b>)</small>
-                      </p>
-                      <p v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done > 0" class="has-text-grey is-size-7">
-                        Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
-                      </p>
-                      <p v-else-if="batch.status === 'Paused'" class="has-text-grey is-size-7">
-                        {{ batch.tasks_done }} Task <span v-if="batch.tasks_done > 1">s</span><small><b>completed</b></small>
-                      </p>
-                      <progress class="progress is-small mt-2" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false }" :value="batch.tasks_done" :max="batch.num_tasks" />
-                    </div>
-                  </div>
-                </nuxt-link>
-                <div v-if="batchesLoading">
-                  Batches loading..
+                  </nuxt-link>
+                </div>
+                <div v-if="batchesLoading" class="loading-text">
+                  Tasks loading
                 </div>
                 <div v-else-if="campaignBatches && !campaignBatches.length">
-                  No batches
+                  No tasks
                 </div>
                 <div v-else-if="!campaignBatches">
                   Could not retrieve batches
@@ -181,7 +183,7 @@
                     Loading
                   </button>
                   <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="joinCampaignPopup = true">
-                    Join Campaign
+                    Qualify
                   </button>
                   <button
                     v-else-if="campaignBatches.reduce((a,b) => a + b.num_tasks, 0) - campaignBatches.reduce((a,b) => a + b.tasks_done, 0) > 0 && !userReservation"
@@ -199,7 +201,7 @@
                   </button>
                   <template v-else>
                     <button v-if="userJoined" class="button is-fullwidth is-primary" :disabled="true">
-                      Joined Campaign
+                      Qualified for Task
                     </button>
                     <p>No active tasks currently</p>
                   </template>

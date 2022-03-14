@@ -16,7 +16,7 @@
         <label class="checkbox">
           <input v-if="readonly" checked type="checkbox" disabled>
           <input v-else v-model="tac" type="checkbox">
-          I agree to the <a href="#">terms and conditions</a>
+          I agree to the <a href="/download/tac.pdf" target="_blank">terms and conditions</a>
         </label>
       </section>
       <footer class="modal-card-foot">
@@ -24,8 +24,8 @@
           OK
         </button>
         <template v-else>
-          <button class="button is-primary" :disabled="!tac || !campaign || !info || !functional" @click.prevent="onClick()">
-            Join Campaign
+          <button class="button is-primary has-tooltip has-tooltip-arrow" :data-tooltip="!tac ? 'agree to the terms and\nconditions to qualify' : 'No additional\nqualifications needed'" :disabled="!tac || !campaign || !info || !functional" @click.prevent="onClick()">
+            Qualify
           </button>
           <button class="button" :disabled="!functional" @click.prevent="onCancel()">
             Cancel
