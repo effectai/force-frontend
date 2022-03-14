@@ -49,6 +49,7 @@ export default {
   computed: {
   },
   created () {
+    this.updateChainHeight()
     if (!this.updateChainInterval) {
       this.updateChainInterval = setInterval(() => this.updateChainHeight(), 60000)
     }
