@@ -25,7 +25,7 @@ $custom-colors: (
   "accent":($accent, $accent-invert),
 );
 
-$text: #363636;
+$text: #2B2F3B;
 // $body-background-color: #FFFDF7;
 
 $link: $secondary;
@@ -34,7 +34,7 @@ $link-focus: lighten($secondary, 20%);
 $link-active: lighten($secondary, 20%);
 
 $title-weight: 400;
-$title-color: $primary;
+$title-color: $text;
 //$subtitle-color: $secondary;
 $title-family: $family-secondary;
 $subtitle-family: $family-sans-serif;
