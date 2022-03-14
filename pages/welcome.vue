@@ -6,7 +6,7 @@
           <div class="column is-6 bg-hover bg-hover-left">
             <div class="columns">
               <div class="column is-8-widescreen is-10-desktop is-11-tablet">
-                <img src="~assets/img/icons/coins.gif" style="height: 90px" class="show-on-hover">
+                <img src="~assets/img/icons/coins_white.gif" style="height: 90px" class="show-on-hover">
                 <img src="~assets/img/icons/coins.png" style="height: 90px" class="hide-on-hover">
                 <h1 class="title is-1">
                   Earn Crypto
@@ -30,7 +30,7 @@
             <div class="columns">
               <div class="column is-4-widescreen is-2-desktop is-1-tablet" />
               <div class="column is-8-widescreen is-10-desktop is-11-tablet">
-                <img src="~assets/img/icons/create.gif" style="height: 90px" class="show-on-hover">
+                <img src="~assets/img/icons/create_white.gif" style="height: 90px" class="show-on-hover">
                 <img src="~assets/img/icons/create.png" style="height: 90px" class="hide-on-hover">
                 <h1 class="title is-1">
                   Create Task
