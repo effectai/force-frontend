@@ -1,11 +1,8 @@
 <template>
   <div class="columns is-centered is-multiline">
     <div class="column is-third">
-      <div class="subtitle">BlockHeight</div>
-    </div>
-    <div class="column is-third">
         <span>
-          <strong>BSC:</strong>
+          <strong>BSC-Block:</strong>
         </span>
         <span>
           <a
@@ -20,7 +17,7 @@
     </div>
     <div class="column is-third">
         <span>
-          <strong>EOS:</strong>
+          <strong>EOS-Block:</strong>
         </span>
         <span>
           <a
@@ -61,7 +58,6 @@ export default {
   methods: {
     async updateChainHeight () {
       const height = await this.$blockchain.getBlockHeight().catch(error => console.log('Error chainstatus', error))
-      console.log(height)
       this.eosBlockHeight = height.eos
       this.bscBlockHeight = height.bsc
     }
