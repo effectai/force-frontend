@@ -33,8 +33,7 @@ export default (context, inject) => {
         userRefreshInterval: null,
         forceRefreshInterval: null,
         templateRefreshInterval: null,
-        eosBlockHeight: null,
-        bscBlockHeight: null
+        eosInfo: null
       }
     },
     computed: {
@@ -92,7 +91,7 @@ export default (context, inject) => {
       },
       updateUserInfo () {
         this.getEfxPrice()
-        this.getBlockHeight()
+        this.getBlockchainInfo()
         if (context.$auth.loggedIn) {
           // console.log('updating user and balance..')
           context.$auth.fetchUser()
@@ -113,15 +112,14 @@ export default (context, inject) => {
             }
           })
       },
-      async getBlockHeight () {
-        const eosBlockHeight = await this.eos.getEosInfo()
-        const bscBlockHeight = await this.bsc.getBlockHeight()
-        this.eosBlockHeight = eosBlockHeight.head_block_num
-        this.bscBlockHeight = bscBlockHeight
-        return {
-          eos: eosBlockHeight.head_block_num,
-          bsc: bscBlockHeight
+      async getBlockchainInfo () {
+        let eosInfo
+        try {
+          eosInfo = await this.eos.getEosInfo()
+        } catch (e) {
+          console.error(e)
         }
+        this.eosInfo = eosInfo
       },
       async rememberLogin () {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')

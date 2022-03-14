@@ -181,7 +181,6 @@ export default {
     font-size: 25px;
     background: #FAFDFF;
     border: 1px solid #BFCDF5;
-    box-sizing: border-box;
     box-shadow: 0px 4px 20px rgba(16, 29, 86, 0.2);
     border-radius: 20px;
   }

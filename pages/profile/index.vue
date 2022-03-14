@@ -58,8 +58,6 @@
           </div>
         </div>
         <hr>
-        <chain-status/>
-        <hr>
         <div v-if="$blockchain.efxPending !== 0" class="py-4">
           <div>
             <h2 class="title is-4">
@@ -226,10 +224,9 @@ import Balance from '@/components/Balance'
 import CampaignList from '@/components/CampaignList'
 import KeyModal from '@/components/KeyModal.vue'
 import SuccessModal from '@/components/SuccessModal'
-import ChainStatus from '~/components/chainStatus.vue'
 
 export default {
-  components: { Balance, CampaignList, Pagination, KeyModal, VueCountdown, SuccessModal, ChainStatus },
+  components: { Balance, CampaignList, Pagination, KeyModal, VueCountdown, SuccessModal },
   filters: {
     hide (value, show) {
       if (show) {

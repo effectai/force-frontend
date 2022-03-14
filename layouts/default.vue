@@ -3,6 +3,7 @@
     <bsc-wallet />
     <eos-wallet />
     <error-modal />
+    <chain-status v-if="$auth && $auth.loggedIn" />
     <div class="burnerWalletBanner">
       “⚠️ Effect Network is still in beta and undergoing security audits. Use at your own risk! ⚠️”
     </div>
@@ -24,12 +25,15 @@ import BscWallet from '@/components/BscWallet'
 import EosWallet from '@/components/EosWallet'
 import NavBar from '@/components/NavBar'
 import ErrorModal from '@/components/ErrorModal'
+import ChainStatus from '~/components/chainStatus.vue'
+
 export default {
   components: {
     ErrorModal,
     BscWallet,
     EosWallet,
-    NavBar
+    NavBar,
+    ChainStatus
   },
   data () {
     return {

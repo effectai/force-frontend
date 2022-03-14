@@ -187,10 +187,6 @@
               </div>
             </div>
           </div>
-          <hr>
-          <chain-status/>
-        </section>
-        <section class="modal-card-footer">
         </section>
       </div>
     </div>
@@ -210,14 +206,12 @@
 </template>
 
 <script>
-import ChainStatus from '@/components/chainStatus'
 import Notifications from '@/components/Notifications'
 import SuccessModal from '@/components/SuccessModal'
 export default {
   components: {
     Notifications,
-    SuccessModal,
-    ChainStatus
+    SuccessModal
   },
 
   data () {
