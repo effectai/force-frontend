@@ -158,6 +158,14 @@ export default {
       return Boolean(this.$blockchain.bsc.binance != null)
     }
   },
+  watch: {
+    '$blockchain.triggerGenerate' (trigger) {
+      if (trigger) {
+        this.burnerWallet = true
+        this.createKeypair()
+      }
+    }
+  },
   methods: {
     copyToClipboard (content) {
       navigator.clipboard.writeText(content).then(() => {
@@ -165,6 +173,7 @@ export default {
       })
     },
     createKeypair () {
+      this.$blockchain.triggerGenerate = false
       this.showKeypairDetails = true
       const { address, privateKey } = createAccount()
       this.keypair = { address, privateKey }

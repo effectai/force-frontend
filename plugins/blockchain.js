@@ -33,7 +33,8 @@ export default (context, inject) => {
         userRefreshInterval: null,
         forceRefreshInterval: null,
         templateRefreshInterval: null,
-        eosInfo: null
+        eosInfo: null,
+        triggerGenerate: false
       }
     },
     computed: {
