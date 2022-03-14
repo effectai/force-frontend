@@ -1,6 +1,5 @@
 <template>
   <div>
-    <chain-status />
     <div class="columns is-mobile is-centered is-multiline">
       <div class="column is-half-mobile">
         <div class="box ">
@@ -68,11 +67,9 @@
 </template>
 
 <script>
-import ChainStatus from './chainStatus.vue'
 export default {
   name: 'Balances',
-  computed: {},
-  components: { ChainStatus }
+  computed: {}
 }
 </script>
 
