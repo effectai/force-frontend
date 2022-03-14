@@ -30,31 +30,10 @@
       <!-- <div v-else> -->
       <div>
         <div>
-          <div v-if="campaign && campaign.info" class="columns">
+          <div class="columns">
             <div class="column is-half">
               <div class="title has-text-weight-bold">
                 Tasks
-              </div>
-            </div>
-            <div class="column is-half columns">
-              <div class="column is-one-third">
-                <div class="box">
-                  <h2>Batch Cost</h2>
-                  <strong v-if="(campaign.info.reward * tasks.length * repetitions) > efxAvailable" class="has-text-danger">{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
-                  <strong v-else>{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
-                </div>
-              </div>
-              <div class="column is-one-third">
-                <div class="box">
-                  <h2>Available Balance</h2>
-                  <strong>{{ efxAvailable }}</strong>
-                </div>
-              </div>
-              <div class="column is-one-third">
-                <div class="box">
-                  <h2>Batch Tasks Possible</h2>
-                  <strong>{{ maxAmountTask > efxAvailable ? efxAvailable : maxAmountTask }}</strong>
-                </div>
               </div>
             </div>
           </div>
@@ -134,39 +113,71 @@
                 <!-- <nuxt-link to="/deposit" class="button is-outlined is-primary is-wide">Deposit</nuxt-link> -->
               </div>
             </div>
-            <h2 class="subtitle mt-6 is-6 has-text-weight-bold mb-3">
-              Import tasks
-            </h2>
-            <div>
-              <a ref="csvfiledownload" href="" :download="'tasks_example'+campaignId+'.csv'">Download example CSV</a>
+            <div class="box">
+              <div class="columns">
+                <div class="column is-3 has-text-centered py-0">
+                  <h2 class="subtitle is-6 has-text-weight-bold mb-3">
+                    Import tasks
+                  </h2>
+                  <div class="file is-boxed mt-3">
+                    <label class="file-label">
+                      <input class="file-input" type="file" name="csvtasks" @change="uploadFile">
+                      <span class="file-cta" @dragover="dragover" @dragleave="dragleave" @drop="drop">
+                        <span class="file-label has-text-grey is-size-7">
+                          Drag and drop or browse to choose a CSV file
+                        </span>
+                        <button class="button is-light mt-2 ">
+                          Choose a .csv file
+                        </button>
+                      </span>
+                    </label>
+                  </div>
+                  <div>
+                    <a class="is-size-7" ref="csvfiledownload" href="" :download="'tasks_example'+campaignId+'.csv'">Download example CSV</a>
+                  </div>
+                  <p v-if="file.name" class="has-text-success mt-2">
+                    Imported file: {{ file.name }}
+                  </p>
+                  <p v-if="error" class="has-text-danger">
+                    {{ error }}
+                  </p>
+                </div>
+
+                <div class="column is-3 py-0">
+                  <div class="field">
+                    <label class="label">Repetitions</label>
+                    <div class="control">
+                      <input v-model="repetitions" class="input" type="number" min="0" required>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="campaign && campaign.info" class="column is-6 py-0 columns batch-info">
+                  <div class="column is-one-third">
+                    <div class="box">
+                      <h2>Batch Cost</h2>
+                      <strong v-if="(campaign.info.reward * tasks.length * repetitions) > efxAvailable" class="has-text-danger">{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
+                      <strong v-else>{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
+                    </div>
+                  </div>
+                  <div class="column is-one-third">
+                    <div class="box">
+                      <h2>Available Balance</h2>
+                      <strong>{{ efxAvailable }}</strong>
+                    </div>
+                  </div>
+                  <div class="column is-one-third">
+                    <div class="box">
+                      <h2>Batch Tasks Possible</h2>
+                      <strong>{{ maxAmountTask > efxAvailable ? efxAvailable : maxAmountTask }}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="file is-boxed">
-              <label class="file-label">
-                <input class="file-input" type="file" name="csvtasks" @change="uploadFile">
-                <span class="file-cta" @dragover="dragover" @dragleave="dragleave" @drop="drop">
-                  <span class="file-label">
-                    Drag and drop or browse to choose a CSV file
-                  </span>
-                  <img src="~assets/img/icons/upload.svg" alt="Upload">
-                </span>
-              </label>
-            </div>
-            <p v-if="file.name" class="has-text-success mt-2">
-              Imported file: {{ file.name }}
-            </p>
-            <p v-if="error" class="has-text-danger">
-              {{ error }}
-            </p>
-            <br>
           </div>
         </form>
         <form @submit.prevent="uploadBatch">
-          <div class="field">
-            <label class="label">Repetitions</label>
-            <div class="control">
-              <input v-model="repetitions" class="input" type="number" min="0" required>
-            </div>
-          </div>
           <div class="field is-grouped is-justify-content-center mt-6">
             <div class="control">
               <button type="submit" class="button button is-primary is-wide mr-4" :disabled="!tasks.length || tasks.length > maxAmountTask">
@@ -403,7 +414,7 @@ export default {
 <style lang="scss" scoped>
 .is-boxed {
   .file-cta {
-    background: $balance-box-color;
+    background: #fff;
     border: none;
     background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='%23A9B1BD' stroke-width='4' stroke-dasharray='6%2c14' stroke-dashoffset='10' stroke-linecap='square'/%3e%3c/svg%3e");
   }
@@ -425,13 +436,26 @@ table {
   }
 }
 div.box {
-  background: $balance-box-color;
-  padding: 5%;
+  background: #F7F9FB;
+  padding: 2rem;
   border-radius: 8px;
   box-shadow: none;
 }
 
 .button.is-wide {
   min-width: 220px;
+}
+
+.batch-info {
+  padding-right: 0;
+  .box {
+    width: 100%;
+    height: auto;
+    padding: 1rem;
+    background: #fff;
+    button {
+      font-size: .9rem;
+    }
+  }
 }
 </style>
