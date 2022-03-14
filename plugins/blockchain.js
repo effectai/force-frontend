@@ -32,7 +32,9 @@ export default (context, inject) => {
         efxPrice: null,
         userRefreshInterval: null,
         forceRefreshInterval: null,
-        templateRefreshInterval: null
+        templateRefreshInterval: null,
+        eosBlockHeight: null,
+        bscBlockHeight: null
       }
     },
     computed: {
@@ -78,20 +80,21 @@ export default (context, inject) => {
 
     methods: {
       updateForceInfo () {
-        console.log('updating campaigns and batches and submissions..')
+        // console.log('updating campaigns and batches and submissions..')
         context.store.dispatch('campaign/getCampaigns')
         context.store.dispatch('campaign/getBatches')
         context.store.dispatch('campaign/getSubmissions')
         context.store.dispatch('pendingPayout/loadPendingPayouts')
       },
       updateTemplates () {
-        console.log('updating campaign templates..')
+        // console.log('updating campaign templates..')
         context.store.dispatch('template/getTemplates')
       },
       updateUserInfo () {
         this.getEfxPrice()
+        this.getBlockHeight()
         if (context.$auth.loggedIn) {
-          console.log('updating user and balance..')
+          // console.log('updating user and balance..')
           context.$auth.fetchUser()
           this.getAccountBalance()
           this.getPendingBalance()
@@ -109,6 +112,16 @@ export default (context, inject) => {
               return data.tickers[0].converted_last[currency]
             }
           })
+      },
+      async getBlockHeight () {
+        const eosBlockHeight = await this.eos.getEosInfo()
+        const bscBlockHeight = await this.bsc.getBlockHeight()
+        this.eosBlockHeight = eosBlockHeight.head_block_num
+        this.bscBlockHeight = bscBlockHeight
+        return {
+          eos: eosBlockHeight.head_block_num,
+          bsc: bscBlockHeight
+        }
       },
       async rememberLogin () {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
