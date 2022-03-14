@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <div class="container mt-5">
+    <div class="container">
       <div class="text-center">
         <h1 class="title is-spaced has-text-weight-bold is-full-mobile">
           <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->
@@ -75,15 +75,15 @@
             <button v-else disabled="disabled" class="button is-fullwidth-mobile is-primary">
               <p>... EFX</p>
             </button>
-            <div @click="showPayoutDetails = !showPayoutDetails" class="payout-detail mt-3">
+            <div class="payout-detail mt-3" @click="showPayoutDetails = !showPayoutDetails">
               <span>
                 View Details
-                <font-awesome-icon class="pl-1" v-if="!showPayoutDetails" icon="fa-solid fa-chevron-down" />
+                <font-awesome-icon v-if="!showPayoutDetails" class="pl-1" icon="fa-solid fa-chevron-down" />
                 <font-awesome-icon v-else class="pl-1" icon="fa-solid fa-chevron-up" />
               </span>
             </div>
           </div>
-          <div class="is-full-mobile mt-5 payout-table" v-if="showPayoutDetails">
+          <div v-if="showPayoutDetails" class="is-full-mobile mt-5 payout-table">
             <div v-if="pendingPayoutsStore" class="table-container">
               <table class="table" style="width: 100%">
                 <thead>
@@ -106,13 +106,24 @@
                         ref="countdown"
                         :auto-start="true"
                         :time="calculatePendingTime(pendingPayout.last_submission_time)"
-                        :transform="transform">
-                        <template slot-scope="props">{{ props }}</template>
+                        :transform="transform"
+                      >
+                        <template slot-scope="props">
+                          {{ props }}
+                        </template>
                       </vue-countdown>
                     </td>
                     <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }} EFX</td>
-                    <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).campaign }}</nuxt-link></td>
-                    <td><nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}/${pendingPayout.batch_id}`}">{{ $blockchain.splitCompositeKey(pendingPayout.batch_id).batch }}</nuxt-link></td>
+                    <td>
+                      <nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">
+                        {{ $blockchain.splitCompositeKey(pendingPayout.batch_id).campaign }}
+                      </nuxt-link>
+                    </td>
+                    <td>
+                      <nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}/${pendingPayout.batch_id}`}">
+                        {{ $blockchain.splitCompositeKey(pendingPayout.batch_id).batch }}
+                      </nuxt-link>
+                    </td>
                     <td>{{ new Date(pendingPayout.last_submission_time).toLocaleDateString() }}</td>
                   </tr>
                 </tbody>
@@ -134,13 +145,13 @@
 
         <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
           <h2 class="title is-4 is-full-mobile">
-            My Campaigns
+            My Tasks
           </h2>
           <nuxt-link class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" to="/campaigns/templates">
             <span class="icon">
               +
             </span>
-            <span>Create Campaign</span>
+            <span>Create Task</span>
           </nuxt-link>
         </div>
 

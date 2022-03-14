@@ -5,17 +5,17 @@
         <span class="icon">
           +
         </span>
-        <span>Create Campaign</span>
+        <span>Create Task</span>
       </nuxt-link>
       <nuxt-link class="button is-ghost is-pulled-right is-paddingless-mobile" to="/">
-        <span>Active Campaigns</span>
+        <span>Active Tasks</span>
       </nuxt-link>
       <h1 class="title has-text-weight-bold is-full-mobile">
-        <span v-if="myCampaigns">My</span><span v-else>All</span> Campaigns
+        <span v-if="myCampaigns">My</span><span v-else>All</span> Tasks
       </h1>
       <label class="checkbox">
         <input v-model="myCampaigns" type="checkbox">
-        Show only my campaigns
+        Show only my tasks
       </label>
       <campaign-list :owner="myCampaigns ? $auth.user.accountName : null" :filters="false" :sort-campaigns="true" :load-all-campaigns="true" />
     </div>
