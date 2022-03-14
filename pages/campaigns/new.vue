@@ -10,7 +10,7 @@
         <i> is required</i>
       </p>
       <h1 class="title mt-5">
-        New Campaign
+        New Task
       </h1>
       <div v-if="errors.length">
         <div v-for="error in errors" :key="toString(error)" class="notification is-danger is-light">
@@ -180,7 +180,7 @@
         <div class="field is-grouped is-grouped-right mt-4">
           <div class="control has-margin-bottom-mobile">
             <button class="button is-secondary is-outlined is-small" @click.prevent="$refs.fileInput.click()">
-              Import Campaign
+              Import
             </button>
             <input
               ref="fileInput"
@@ -192,7 +192,7 @@
           </div>
           <div class="control">
             <button class="button is-secondary is-outlined is-small" @click.prevent="exportCampaign">
-              Export Campaign
+              Export
             </button>
           </div>
         </div>
@@ -204,7 +204,7 @@
           </div>
           <div class="control" :class="{'has-tooltip-arrow': !answer}" :data-tooltip="!answer ? 'submit your template in the task\npreview to test your template' : null">
             <button type="submit" :class="{'is-loading': loading}" :disabled="!answer" class="button is-primary is-wide">
-              Save Campaign
+              Create Task
             </button>
           </div>
         </div>
