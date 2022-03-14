@@ -226,7 +226,7 @@ export default {
     SortFilters,
     Pagination
   },
-  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns', 'approvedCampaigns', 'gridToggle'],
+  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns', 'approvedCampaigns', 'hideCampaigns', 'gridToggle'],
   data () {
     return {
       filter: null,
@@ -277,6 +277,10 @@ export default {
         filteredCampaigns = campaigns.map((c) => { return { ...c } })
         if (this.approvedCampaigns) {
           filteredCampaigns = filteredCampaigns.filter(c => this.approvedCampaigns.includes(c.id))
+        }
+        console.log(this.hideCampaigns)
+        if (this.hideCampaigns) {
+          filteredCampaigns = filteredCampaigns.filter(c => !this.hideCampaigns.includes(c.id))
         }
         for (const i in filteredCampaigns) {
           const batches = this.batchByCampaignId(filteredCampaigns[i].id)

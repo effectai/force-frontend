@@ -39,7 +39,6 @@ export default {
     chainName () {
       let chainName
       if (this.$blockchain && this.$blockchain.eosInfo) {
-        console.log(this.$blockchain.eosInfo)
         switch (this.$blockchain.eosInfo.chain_id) {
           case '2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840':
             chainName = 'JungleNet'

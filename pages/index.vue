@@ -4,16 +4,22 @@
       <div class="level">
         <div class="level-left">
           <div class="level-item">
-            <h1 class="title has-text-weight-bold is-full-mobile">
-              Approved Tasks
+            <h1 v-if="approved" class="title has-text-weight-bold is-full-mobile">
+              Active Tasks
+            </h1>
+            <h1 v-else class="title has-text-weight-bold is-full-mobile has-text-danger">
+              Unmoderated Tasks
             </h1>
           </div>
         </div>
         <div class="level-right">
           <div class="level-item">
-            <nuxt-link to="/unmoderated" class="button is-danger is-small is-light">
+            <a v-if="approved" class="button is-danger is-small is-light" @click="approved = false">
               View unmoderated tasks
-            </nuxt-link>
+            </a>
+            <a v-else class="button is-success is-small is-light" @click="approved = true">
+              View approved tasks
+            </a>
           </div>
           <div class="level-item">
             <nuxt-link v-if="hasCampaigns" class="button is-small is-ghost " to="/campaigns">
@@ -30,7 +36,7 @@
           </div>
         </div>
       </div>
-      <campaign-list :approved-campaigns="approvedCampaigns" :category-filter="true" :active="true" />
+      <campaign-list :hide-campaigns="!approved ? approvedCampaigns : null" :approved-campaigns="approved ? approvedCampaigns : null" :category-filter="true" :active="true" />
     </div>
   </section>
 </template>
@@ -46,7 +52,8 @@ export default {
   },
   data () {
     return {
-      approvedCampaigns
+      approvedCampaigns,
+      approved: true
     }
   },
   computed: {
