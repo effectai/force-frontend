@@ -23,6 +23,7 @@
       <div v-if="loading" class="loader-wrapper is-active">
         <img src="~assets/img/loading.svg">
         <br><span v-if="waitingOnTransaction" class="loading-text subtitle">Waiting for the transaction to complete</span>
+        <span v-else class="loading-text subtitle">Please sign the transaction</span>
       </div>
       <div v-if="!campaign" class="loading-text">
         Task loading

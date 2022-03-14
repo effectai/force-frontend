@@ -63,7 +63,7 @@
     </section>
     <section class="py-3 has-background-light">
       <div class="container has-text-centered">
-        <button class="button is-danger" @click.prevent="releaseTask(submissionId)">
+        <button class="button is-danger is-small" @click.prevent="releaseTask(submissionId)">
           Stop Task
         </button>
       </div>
@@ -139,9 +139,13 @@ export default {
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
     },
     async releaseTask (id) {
-      const data = await this.$blockchain.releaseTask(id)
-      this.$store.dispatch('transaction/addTransaction', data)
-      this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id)
+      try {
+        const data = await this.$blockchain.releaseTask(id)
+        this.$store.dispatch('transaction/addTransaction', data)
+        this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id)
+      } catch (e) {
+        console.error(e)
+      }
     },
     async submitTask (values) {
       try {
@@ -184,7 +188,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .wrapper {
-  min-height: calc(100vh - 66px);
+  min-height: calc(100vh - 110px);
   display: flex;
   flex-direction: column;
 
