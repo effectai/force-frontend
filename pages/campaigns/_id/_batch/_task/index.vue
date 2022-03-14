@@ -42,9 +42,9 @@
       <div class="container">
         <div v-if="loading" class="loader-wrapper is-active">
           <img src="~assets/img/loading.svg">
-          <br><span class="text-loading">Waiting for the transaction to complete</span>
+          <br><span class="loading-text">Waiting for the transaction to complete</span>
         </div>
-        <div v-if="!campaign || !campaign.info || !task" class="text-loading">
+        <div v-if="!campaign || !campaign.info || !task" class="loading-text">
           Loading
         </div>
         <template-media

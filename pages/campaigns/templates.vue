@@ -13,7 +13,7 @@
             <p class="panel-heading">
               Templates
             </p>
-            <div v-if="loading" class="subtitle text-loading">
+            <div v-if="loading" class="subtitle loading-text">
               Loading
             </div>
             <div v-else-if="!templates">

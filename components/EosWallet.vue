@@ -16,6 +16,7 @@
         <section class="modal-card-body">
           <div v-if="loading" class="loader-wrapper is-active">
             <img src="~assets/img/loading.svg">
+            <div class="loading-text subtitle">Waiting for wallet</div>
           </div>
           <div class="columns is-multiline">
             <div class="column is-half">

@@ -3,7 +3,9 @@
     <section class="section">
       <div class="container">
         <div class="columns is-vcentered">
-          <div class="column is-6 bg-hover bg-hover-left">
+          <div class="column is-6 bg-hover bg-hover-left py-6">
+            <img src="@/assets/img/logo.svg" class="logo hide-on-hover">
+            <img src="@/assets/img/dapps/effect-force_white_h100.png" class="logo show-on-hover">
             <div class="columns">
               <div class="column is-8-widescreen is-10-desktop is-11-tablet">
                 <img src="~assets/img/icons/coins_white.gif" style="height: 90px" class="show-on-hover">
@@ -25,8 +27,7 @@
               </div>
             </div>
           </div>
-          <div class="bg-left" />
-          <div class="column is-6 bg-hover bg-hover-right">
+          <div class="column is-6 bg-hover bg-hover-right py-6">
             <div class="columns">
               <div class="column is-4-widescreen is-2-desktop is-1-tablet" />
               <div class="column is-8-widescreen is-10-desktop is-11-tablet">
@@ -49,7 +50,6 @@
               </div>
             </div>
           </div>
-          <div class="bg-right" />
         </div>
       </div>
       <div class="or">
@@ -62,48 +62,24 @@
 <script>
 export default {
   components: {
-  }
+  },
+  layout: 'empty'
 }
 </script>
 
 <style lang="scss" scoped>
+.logo {
+  position: absolute; z-index: 2; top: 17px; height: 45px
+}
 .container {
   position: unset;
   > .columns {
-    height: calc(100vh - 350px);
+    min-height: calc(100vh - 150px);
   }
 }
 
 @import "bulma/sass/utilities/mixins";
 
-.bg-left, .bg-right {
-   position: absolute;
-    background: #FAFDFF;
-    height: 100vh;
-    width: 50%;
-    left: 0;
-    top:0;
-    z-index:0;
-    &:hover {
-      &:after {
-        height: 100vh;
-        background: $primary;
-      }
-    }
-
-    &:after {
-      content: "";
-      display: block;
-      position: absolute;
-      background: transparent;
-      height: 0;
-      width: 100%;
-      left: 0;
-      top:0;
-      transition: 0.3s;
-      z-index:0;
-    }
-}
 .bg-hover {
     z-index: 1;
     &:before {
@@ -111,20 +87,38 @@ export default {
       display: block;
       background: transparent;
       position: absolute;
-      left: 0;
       top: 0;
-      width: 50%;
+      width: 100%;
       height: 100vh;
+    }
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      background: transparent;
+      height: 0;
+      width: 100%;
+      top:0;
+      transition: 0.3s;
+      z-index:-1;
     }
     .button {
       transition: 0.3s;
     }
 }
-.bg-left, .bg-hover-left:before {
-  left: 0;
+.bg-hover-left:after, .bg-hover-left:before {
+  right: 50%;
 }
-.bg-right, .bg-hover-right:before {
+.bg-hover-right:after, .bg-hover-right:before {
   left: 50%
+}
+.bg-hover-right:hover:after {
+  height: 100vh;
+  background: $primary;
+}
+.bg-hover-left:hover:after {
+  height: 100vh;
+  background: $primary;
 }
 .hide-on-hover {
   display: block;
@@ -132,43 +126,8 @@ export default {
 .show-on-hover {
   display: none;
 }
-.bg-left:hover {
-      ~ .bg-hover-left {
-      color: white;
-      .title, .subtitle {
-        color: white;
-      }
-      .show-on-hover {
-        display: block;
-      }
-      .hide-on-hover {
-        display: none;
-      }
-      .button {
-        border-color: $accent !important;
-        background: $accent !important;
-        color: black !important;
-      }
-    }
-}
-.bg-hover-right {
-    &:hover {
-      + .bg-right:after {
-        height: 100vh;
-        background: $primary;
-      }
-  }
-}
-.bg-hover-left {
-    &:hover {
-      + .bg-left:after {
-        height: 100vh;
-        background: $primary;
-      }
-  }
-}
-
   .or {
+    z-index: 1;
     position: absolute;
     top: calc(50% - 35px);
     font-size: 35px;
@@ -204,7 +163,7 @@ export default {
     }
   }
   @include touch {
-    .bg-left, .bg-right, .or {
+    .bg-hover:before, .bg-hover:after, .or {
       display: none;
     }
   }

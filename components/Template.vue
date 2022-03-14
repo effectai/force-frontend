@@ -1,6 +1,6 @@
 <template>
   <div class="template-wrapper">
-    <div v-if="loading" class="text-loading subtitle">
+    <div v-if="loading" class="loading-text subtitle">
       Loading
     </div>
     <!-- TODO: add polyfill for srcdoc or move to different URL and use src -->

@@ -38,7 +38,7 @@
             <div class="title has-text-weight-bold">
               <span v-if="batch">#{{ campaignId }}.{{ batch.id }}: </span>
               <span v-if="campaign && campaign.info">{{ campaign.info.title }}</span>
-              <span v-else-if="!campaign || campaign.info !== null" class="text-loading">Loading</span>
+              <span v-else-if="!campaign || campaign.info !== null" class="loading-text">Loading</span>
               <span v-else class="has-text-danger-dark">Could not load campaign info</span>
             </div>
           </div>

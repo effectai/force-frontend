@@ -20,7 +20,7 @@
           </li>
         </ul>
       </nav>
-      <div v-if="campaignLoading" class="text-loading">
+      <div v-if="campaignLoading" class="loading-text">
         Task loading
       </div>
       <div v-else-if="!campaign">

@@ -2,7 +2,7 @@
   <span>
     <div v-if="loading" class="loader-wrapper is-active">
       <img src="~assets/img/loading.svg">
-      <br><span class="text-loading">Making reservation</span>
+      <br><span class="loading-text">Making reservation</span>
     </div>
   </span>
 </template>

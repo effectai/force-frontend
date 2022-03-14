@@ -40,7 +40,7 @@
             <div class="title has-text-weight-bold">
               <span>#{{ id }} </span>
               <span v-if="campaign.info">{{ campaign.info.title }}</span>
-              <span v-else-if="campaign.info !== null" class="text-loading">Loading</span>
+              <span v-else-if="campaign.info !== null" class="loading-text">Loading</span>
               <span v-else class="has-text-danger-dark">Could not load campaign info</span>
             </div>
           </div>
@@ -230,7 +230,7 @@
                 <div class="block">
                   Tasks
                   <br>
-                  <span v-if="batchByCampaignId(campaign.id) === null" class="text-loading">
+                  <span v-if="batchByCampaignId(campaign.id) === null" class="loading-text">
                     Loading
                   </span>
                   <span v-else>

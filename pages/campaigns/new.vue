@@ -3,7 +3,7 @@
     <div class="container">
       <div v-if="loading" class="loader-wrapper is-active">
         <img src="~assets/img/loading.svg">
-        <br><span class="text-loading">Waiting for the transaction to complete</span>
+        <br><span class="loading-text">Waiting for the transaction to complete</span>
       </div>
       <p class="is-pulled-right">
         <span class="has-text-info"><b>*</b></span>

@@ -6,7 +6,7 @@
       <span v-else>Login to your Effect Account</span>
     </h2>
     <div v-if="loading" class="container">
-      <span class="text-loading">Loading</span>
+      <span class="loading-text">Loading</span>
     </div>
     <div v-else class="container">
       <div v-if="$blockchain.account">
