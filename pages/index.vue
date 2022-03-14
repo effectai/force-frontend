@@ -17,7 +17,7 @@
           </div>
           <div class="level-item">
             <nuxt-link v-if="hasCampaigns" class="button is-small is-ghost " to="/campaigns">
-              <span>My Campaigns</span>
+              <span>My Tasks</span>
             </nuxt-link>
           </div>
           <div class="level-item">
@@ -25,7 +25,7 @@
               <span class="icon">
                 +
               </span>
-              <span>Create Campaign</span>
+              <span>Create Task</span>
             </nuxt-link>
           </div>
         </div>
