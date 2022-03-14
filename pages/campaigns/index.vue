@@ -1,18 +1,18 @@
 <template>
   <section class="section">
     <div class="container">
-      <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/templates">
+      <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/new">
         <span class="icon">
           +
         </span>
         <span>Create Campaign</span>
       </nuxt-link>
-      <nuxt-link class="button is-ghost is-pulled-right is-paddingless-mobile" to="/">
+      <nuxt-link class="button is-ghost is-pulled-right" to="/">
         <span>Active Campaigns</span>
       </nuxt-link>
-      <h1 class="title has-text-weight-bold is-full-mobile">
+      <h2 class="title">
         <span v-if="myCampaigns">My</span><span v-else>All</span> Campaigns
-      </h1>
+      </h2>
       <label class="checkbox">
         <input v-model="myCampaigns" type="checkbox">
         Show only my campaigns
@@ -41,11 +41,5 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-@media screen and (max-width: $tablet) {
-  .is-pulled-right {
-    float: none !important;
-    margin-bottom: 25px;
-  }
-}
+<style>
 </style>

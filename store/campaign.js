@@ -1,7 +1,7 @@
 import Vue from 'vue'
-function sleep (ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
+// function sleep (ms) {
+//   return new Promise(resolve => setTimeout(resolve, ms))
+// }
 export default {
   namespaced: true,
   modules: {},
@@ -11,7 +11,6 @@ export default {
         // We have no campaigns yet
         state.campaigns = campaigns
       } else {
-        const updatedCampaigns = state.campaigns.map((c) => { return { ...c } })
         for (let i = 0; i < campaigns.length; i++) {
           const index = state.campaigns.findIndex(c => c.id === campaigns[i].id)
           if (index !== -1) {
@@ -19,51 +18,46 @@ export default {
               campaigns[i].info = state.campaigns[index].info
             }
             // Update existing campaign
-            updatedCampaigns[index] = campaigns[i]
+            Vue.set(state.campaigns, index, campaigns[i])
           } else {
             // Insert new campaign
-            updatedCampaigns.push(campaigns[i])
+            state.campaigns.push(campaigns[i])
           }
         }
-        state.campaigns = updatedCampaigns
       }
     },
     UPSERT_BATCHES (state, batches) {
       if (!state.batches) {
         state.batches = batches
       } else {
-        const updatedBatches = state.batches.map((b) => { return { ...b } })
         for (let i = 0; i < batches.length; i++) {
           const index = state.batches.findIndex(c => c.batch_id === batches[i].batch_id)
           if (index !== -1) {
             // Update existing batches
-            updatedBatches[index] = batches[i]
+            Vue.set(state.batches, index, batches[i])
           } else {
             // Insert new batches
-            updatedBatches.push(batches[i])
+            state.batches.push(batches[i])
           }
         }
-        state.batches = updatedBatches
       }
     },
     UPSERT_SUBMISSIONS (state, submissions) {
       if (!state.submissions) {
         state.submissions = submissions
       } else {
-        const updatedSubmissions = state.submissions.map((s) => { return { ...s } })
         for (let i = 0; i < submissions.length; i++) {
           const index = state.submissions.findIndex(s => s.id === submissions[i].id)
           if (index !== -1) {
             if (state.submissions[index].paid !== 1) {
               // Submission was not paid yet, so could be updated.
-              updatedSubmissions[index] = submissions[i]
+              Vue.set(state.submissions, index, submissions[i])
             }
           } else {
             // Insert new submissions
-            updatedSubmissions.push(submissions[i])
+            state.submissions.push(submissions[i])
           }
         }
-        state.submissions = updatedSubmissions
       }
     },
     SET_LOADING (state, loading) {
@@ -151,7 +145,6 @@ export default {
         commit('UPSERT_BATCHES', data.rows)
 
         if (data.more) {
-          console.log('retrieving more batches..')
           await dispatch('getBatches', data.next_key)
         } else {
           // No more campaigns, we are done
@@ -213,51 +206,30 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    async getCampaigns ({ dispatch, rootGetters, commit, state }, nextKey) {
+    async getCampaigns ({ dispatch, commit, state }, { processAllCampaigns = false, nextKey }) {
       if (!nextKey && state.loading) {
         console.log('Already retrieving campaigns somewhere else, aborting..')
         return
       }
       commit('SET_LOADING', true)
       try {
-        const data = await this.$blockchain.getCampaigns(nextKey, 200, false)
+        const data = await this.$blockchain.getCampaigns(nextKey, 500, false)
+        commit('UPSERT_CAMPAIGNS', data.rows)
 
-        if (!state.allCampaignsLoaded) {
-          // first time fetching campaigns, already show loading placeholders while we still have to process campaigns
-          commit('UPSERT_CAMPAIGNS', data.rows)
-        }
-        const campaigns = data.rows
         // Process campaigns asynchronously from retrieving campaigns, but synchronously for multi-campaign processing
-        setTimeout(async () => {
-          // field_0 represents the content type where:
-          // 0: IPFS
-          for (const campaign of campaigns) {
-            try {
-              if (campaign.content.field_0 === 0) {
-                // field_1 represents the IPFS hash
-                // Save IPFS content it in the store if its not there yet
-                await dispatch('ipfs/getIpfsContent', campaign.content.field_1, { root: true })
-                const info = rootGetters['ipfs/ipfsContentByHash'](campaign.content.field_1)
-                campaign.info = info
-              }
-            } catch (e) {
-              campaign.info = null
+        if (processAllCampaigns) {
+          ;(async () => {
+            // reverse campaigns array so newer campaigns are processed first
+            for (const campaign of data.rows.slice().reverse()) {
+              // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
+              // a short sleep helps for some reason to make interface less laggy
+              // await sleep(0)
+              await dispatch('processCampaign', campaign)
             }
-          }
-          commit('UPSERT_CAMPAIGNS', campaigns)
-        }, 0)
-        // ;(async () => {
-        //   for (const campaign of data.rows) {
-        //   // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
-        //   // a short sleep helps for some reason to make interface less laggy
-        //   // await sleep(0)
-        //     dispatch('processCampaign', campaign)
-        //   }
-        // })()
+          })()
+        }
 
         if (data.more) {
-          console.log('retrieving more campaigns..')
-          await sleep(100)
           await dispatch('getCampaigns', data.next_key)
         } else {
           // No more campaigns, we are done
@@ -299,7 +271,6 @@ export default {
         commit('UPSERT_SUBMISSIONS', submissions)
 
         if (data.more) {
-          console.log('retrieving more submissions..')
           await dispatch('getSubmissions', data.next_key)
         } else {
           // No more campaigns, we are done

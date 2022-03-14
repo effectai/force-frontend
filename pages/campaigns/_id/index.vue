@@ -30,21 +30,14 @@
         Campaign loading..
       </div>
       <div v-else class="columns">
-        <div class="column is-three-fifths">
-          <div class="is-flex is-align-items-center mb-6">
-            <p v-if="campaign" class="image has-radius mr-4" style="width: 52px; height: 52px">
-              <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
-              <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
-              <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
-            </p>
-            <div class="title has-text-weight-bold">
-              <span>#{{ id }} </span>
-              <span v-if="campaign.info">{{ campaign.info.title }}</span>
-              <span v-else-if="campaign.info !== null">Loading..</span>
-              <span v-else class="has-text-danger-dark">Could not load campaign info</span>
-            </div>
+        <div class="column is-two-thirds">
+          <div class="title">
+            <span>#{{ id }}: </span>
+            <span v-if="campaign.info">{{ campaign.info.title }}</span>
+            <span v-else-if="campaign.info !== null">Loading..</span>
+            <span v-else class="has-text-danger-dark">Could not load campaign info</span>
           </div>
-          <div class="tabs campaign-tabs">
+          <div class="tabs">
             <ul>
               <li :class="{'is-active': body === 'description'}">
                 <a @click.prevent="body = 'description'">Batches</a>
@@ -66,21 +59,18 @@
               ...
             </p>
             <div class="mt-5">
-              <div class="is-flex is-justify-content-space-between is-align-items-center">
-                <h4 class="is-size-6 mb-0 has-text-weight-bold">
-                  Batches
-                </h4>
-                <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" :to="`/campaigns/${id}/new`">
-                  <span class="icon">
-                    +
-                  </span>
-                  <span>Create Batch</span>
-                </nuxt-link>
-              </div>
-              <hr class="mt-2 mb-5">
+              <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" class="button is-primary is-pulled-right" :to="`/campaigns/${id}/new`">
+                <span class="icon">
+                  +
+                </span>
+                <span>Create Batch</span>
+              </nuxt-link>
+              <h4 class="is-size-4">
+                <b>Batches</b>
+              </h4>
               <div class="block mt-5">
                 <nuxt-link
-                  v-for="batch in campaignBatches.slice().reverse()"
+                  v-for="batch in campaignBatches"
                   :key="batch.id"
                   :to="`/campaigns/${batch.campaign_id}/${batch.batch_id}`"
                   class="box p-4"
@@ -96,22 +86,11 @@
                       </h2>
                     </div>
                     <div class="column">
-                      <p class="has-text-grey is-size-7">
-                        Status
-                      </p>
-                      <h2 v-if="batch" class="subtitle is-6 has-text-weight-semibold mb-0">
-                        {{ batch.status }}
-                      </h2>
-                    </div>
-                    <div class="column">
                       <p v-if="batch.num_tasks - batch.tasks_done === 0" class="has-text-grey is-size-7">
-                        {{ batch.tasks_done }} Task<span v-if="batch.tasks_done > 1">s</span> <small>(<b class="has-text-success">Done</b>)</small>
+                        Tasks <small>(<b class="has-text-success">Done</b>)</small>
                       </p>
-                      <p v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done > 0" class="has-text-grey is-size-7">
+                      <p v-else class="has-text-grey is-size-7">
                         Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
-                      </p>
-                      <p v-else-if="batch.status === 'Paused'" class="has-text-grey is-size-7">
-                        {{ batch.tasks_done }} Task <span v-if="batch.tasks_done > 1">s</span><small><b>completed</b></small>
                       </p>
                       <progress class="progress is-small mt-2" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false }" :value="batch.tasks_done" :max="batch.num_tasks" />
                     </div>
@@ -145,106 +124,88 @@
             />
           </div>
         </div>
-        <div class="column is-two-fifths">
-          <div class="information-block">
-            <div class="information-header has-text-centered">
-              <h4 class="p-5 is-size-4">
-                <b>Information</b>
-              </h4>
+        <div class="column is-one-third">
+          <div class="box">
+            <h4 class="box-title is-size-4">
+              <b>Information</b>
+            </h4>
+
+            <div class="block">
+              <b>Requester</b>
+              <br>
+              <div class="blockchain-address">
+                <nuxt-link :to="'/profile/' + campaign.owner[1]">
+                  {{ campaign.owner[1] }}
+                </nuxt-link>
+              </div>
             </div>
-            <div class="columns p-5">
-              <div class="column is-half">
-                <div v-if="campaign.info" class="block">
-                  <nuxt-link
-                    v-if="campaign.info && campaign.info.category"
-                    :to="'/?category=' + campaign.info.category"
-                    class="tag is-light is-medium mb-5"
-                    :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
-                  >
-                    {{ campaign.info.category }}
-                  </nuxt-link>
-                  <span v-else class="tag is-info is-light is-medium">...</span>
-                </div>
-                <div class="block mb-6">
-                  Reward
-                  <br>
-                  <b><span>{{ campaign.reward.quantity }}</span></b>
-                </div>
-                <div class="block">
-                  <div v-if="$auth.user.accountName === campaign.owner[1]">
-                    <nuxt-link :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
-                      Edit Campaign
-                    </nuxt-link>
-                    <br>
-                  </div>
-                  <button v-if="loading || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
-                    Loading
-                  </button>
-                  <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="joinCampaignPopup = true">
-                    Join Campaign
-                  </button>
-                  <button
-                    v-else-if="campaignBatches.reduce((a,b) => a + b.num_tasks, 0) - campaignBatches.reduce((a,b) => a + b.tasks_done, 0) > 0 && !userReservation"
-                    class="button is-fullwidth is-primary"
-                    @click.prevent="reserveTask"
-                  >
-                    Make Task Reservation
-                  </button>
-                  <button
-                    v-else-if="userReservation"
-                    class="button is-fullwidth is-accent has-text-weight-semibold"
-                    @click.prevent="goToTask"
-                  >
-                    Go To Task
-                  </button>
-                  <template v-else>
-                    <button v-if="userJoined" class="button is-fullwidth is-primary" :disabled="true">
-                      Joined Campaign
-                    </button>
-                    <p>No active tasks currently</p>
-                  </template>
-                </div>
+            <div class="block">
+              <b>Reward</b>
+              <br>
+              <span>{{ campaign.reward.quantity }}</span>
+            </div>
+            <div class="block">
+              <b>Batches</b>
+              <br>
+              <span v-if="campaignBatches === null">Loading..</span>
+              <span v-else>{{ campaignBatches.length }}</span>
+            </div>
+            <div v-if="campaign.info" class="block">
+              <b>Category</b>
+              <br>
+              <span
+                v-if="campaign.info && campaign.info.category"
+                class="tag is-light is-medium"
+                :class="{'is-secondary': campaign.info.category === 'translation', 'is-info': campaign.info.category === 'image_classification', 'is-warning': campaign.info.category === 'text_classification', 'is-danger': campaign.info.category === 'video_classification'}"
+              >{{ campaign.info.category }}</span>
+              <span v-else class="tag is-info is-light is-medium">...</span>
+            </div>
+            <div class="block">
+              <b>IPFS</b>
+              <br>
+              <div class="blockchain-address">
+                <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
               </div>
-              <div class="column is-half">
-                <div class="block">
-                  Requester
-                  <br>
-                  <div class="blockchain-address">
-                    <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                      {{ campaign.owner[1] }}
-                    </nuxt-link>
-                  </div>
-                </div>
-                <div class="block">
-                  IPFS
-                  <br>
-                  <div class="blockchain-address">
-                    <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
-                  </div>
-                </div>
-                <div class="block">
-                  Blockchain
-                  <br>
-                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
-                </div>
-                <div class="block">
-                  Tasks
-                  <br>
-                  <span v-if="batchByCampaignId(campaign.id) === null">
-                    Loading..
-                  </span>
-                  <span v-else>
-                    {{ batchByCampaignId(campaign.id).reduce(function(a,b){
-                      return a + b.num_tasks
-                    },0) - batchByCampaignId(campaign.id).reduce(function(a,b){
-                      return a + b.tasks_done
-                    },0) }}/{{ batchByCampaignId(campaign.id).reduce(function(a,b){
-                      return a + b.num_tasks
-                    },0) }} left
-                    <br>
-                  </span>
-                </div>
-              </div>
+            </div>
+            <div class="block">
+              <b>Blockchain</b>
+              <br>
+              <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View Campaign on Explorer</a>
+            </div>
+            <div class="block">
+              <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" :to="`/campaigns/${id}/edit`" class="button is-primary is-light">
+                Edit Campaign
+              </nuxt-link>
+              <button v-if="loading || userReservation === null || campaignBatches === null" class="button is-primary is-loading">
+                Loading
+              </button>
+              <button v-else-if="userJoined === false" class="button is-primary" @click.prevent="joinCampaignPopup = true">
+                Join Campaign
+              </button>
+              <button
+                v-else-if="campaignBatches.reduce(function(a,b){
+                  return a + b.num_tasks
+                },0) - campaignBatches.reduce(function(a,b){
+                  return a + b.tasks_done
+                },0) > 0 && !userReservation"
+                class="button is-primary"
+                @click.prevent="reserveTask"
+              >
+                Make Task Reservation
+              </button>
+              <button
+                v-else-if="userReservation"
+                class="button is-accent has-text-weight-semibold"
+                @click.prevent="goToTask"
+              >
+                Go To Task
+              </button>
+              <template v-else>
+                <button v-if="userJoined" class="button is-primary" :disabled="true">
+                  Joined Campaign
+                </button>
+                <p>No active tasks currently</p>
+              </template>
             </div>
           </div>
         </div>
@@ -282,8 +243,7 @@ export default {
       userReservation: null,
       cancelledBatchesPopup: false,
       showBatchesPopup: false,
-      waitingOnTransaction: false,
-      categories: ['translate', 'captions', 'socials', 'dao']
+      waitingOnTransaction: false
     }
   },
   computed: {
@@ -314,10 +274,6 @@ export default {
   },
   methods: {
     async reserveTask () {
-      await this.prepareReserveTask()
-      this.showReserveTask = true
-    },
-    async prepareReserveTask () {
       const batch = this.campaignBatches.find((b) => {
         return b.num_tasks - b.tasks_done > 0
       })
@@ -328,6 +284,7 @@ export default {
       }
       await this.$store.dispatch('campaign/getBatchTasks', batch)
       this.reserveInBatch = batch
+      this.showReserveTask = true
     },
     async goToTask () {
       const batch = this.campaignBatches.find((b) => {
@@ -350,13 +307,11 @@ export default {
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
-        this.loading = true
-        await this.prepareReserveTask()
-        this.joinCampaignPopup = false
-        const data = await this.$blockchain.joinCampaignAndReserveTask(this.id, this.reserveInBatch.id, this.reserveInBatch.tasks_done, this.reserveInBatch.tasks)
+        const data = await this.$blockchain.joinCampaign(this.id)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
+          this.joinCampaignPopup = false
           this.waitingOnTransaction = true
           await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
@@ -364,7 +319,6 @@ export default {
             this.reserveTask()
           }
         }
-        this.loading = false
         this.waitingOnTransaction = false
         this.joinCampaignPopup = false
       } catch (e) {
@@ -420,33 +374,5 @@ export default {
 }
 .progress::-webkit-progress-value {
   transition: width 0.5s ease;
-}
-.tabs {
-  li {
-    font-weight: 500;
-    a {
-      padding-left: 35px;
-      padding-right: 35px;
-    }
-    &.is-active {
-      a {
-        border-bottom-width: 2px;
-        border-bottom-color: #1977F3;
-        color: #151A1F;
-        font-weight: 600;
-      }
-    }
-  }
-}
-.information-block {
-  border: 1px solid #E8EEFF;
-  border-radius: 8px;
-  .block {
-    margin-bottom: 10px
-  }
-
-  .information-header {
-    background: #F7FBFF;
-  }
 }
 </style>

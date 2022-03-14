@@ -14,17 +14,15 @@
         </div>
       </section>
       <footer class="modal-card-foot">
-        <div class="buttons is-centered mx-auto">
-          <nuxt-link class="button is-primary" :to="`/campaigns/${id}/new`">
-            <span class="icon">
-              +
-            </span>
-            <span>Create Batch</span>
-          </nuxt-link>
-          <button class="button" @click.prevent="onCancel()">
-            Cancel
-          </button>
-        </div>
+        <nuxt-link class="button is-primary is-pulled-right" :to="`/campaigns/${id}/new`">
+          <span class="icon">
+            +
+          </span>
+          <span>Create Batch</span>
+        </nuxt-link>
+        <button class="button" @click.prevent="onCancel()">
+          Cancel
+        </button>
       </footer>
     </div>
   </div>

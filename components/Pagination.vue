@@ -17,7 +17,7 @@
       :disabled="!maxPage || page === maxPage"
       @click="$emit('setPage', page + 1)"
     >Next page</a>
-    <ul class="pagination-list has-margin-top-mobile">
+    <ul class="pagination-list">
       <li v-if="page > 2">
         <a class="pagination-link" @click="$emit('setPage', 1)">1</a>
       </li>

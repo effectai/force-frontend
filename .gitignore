@@ -96,6 +96,3 @@ android/
 OneSignalSDK*
 
 .projectile
-
-# Default force stylesheet
-static/force-defaults.css

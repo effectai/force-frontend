@@ -195,8 +195,8 @@
             </p>
           </div>
         </div>
-        <div class="field is-grouped is-grouped-right has-margin-bottom-mobile import-export mt-4">
-          <div class="control has-margin-bottom-mobile">
+        <div class="field is-grouped is-grouped-right mt-4">
+          <div class="control">
             <button class="button is-secondary" @click.prevent="$refs.fileInput.click()">
               Import Campaign
             </button>
@@ -214,7 +214,7 @@
             </button>
           </div>
         </div>
-        <div class="field is-grouped is-grouped-right has-margin-top-mobile">
+        <div class="field is-grouped is-grouped-right">
           <div class="control">
             <nuxt-link class="button is-light" to="/campaigns">
               Cancel
@@ -431,10 +431,5 @@ export default {
 <style lang="scss" scoped>
 div.instructions-group .textarea {
   overflow-y: scroll
-}
-@media screen and (max-width: $tablet) {
-  .import-export.is-grouped-right {
-    display: block !important;
-  }
 }
 </style>

@@ -58,7 +58,7 @@
         <!-- SuccessModal -->
         <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
         <!-- Reserve task -->
-        <reserve-task v-if="reserveNextTask" :batch="reserveInBatch ? reserveInBatch : batch" />
+        <reserve-task v-if="reserveNextTask" :batch="batch" />
       </div>
     </section>
     <section class="py-3 has-background-light">
@@ -71,7 +71,7 @@
   </div>
 </template>
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
@@ -100,8 +100,7 @@ export default {
       loading: false,
       successMessage: null,
       successTitle: null,
-      showInstructionsModal: false,
-      reserveInBatch: null
+      showInstructionsModal: false
     }
   },
   computed: {
@@ -110,13 +109,7 @@ export default {
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading,
       batchLoading: state => state.campaign.loadingBatch
-    }),
-    ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId'
-    }),
-    campaignBatches () {
-      return this.batchByCampaignId(this.campaignId)
-    }
+    })
   },
   created () {
     this.getBatch()
@@ -156,24 +149,10 @@ export default {
         this.loading = false
 
         await this.getBatch()
-        if (this.batch.tasks_done === this.batch.num_tasks || this.taskIndex + 1 >= this.batch.num_tasks) {
+        if (this.batch.tasks_done === this.batch.num_tasks) {
           this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '?batchCompleted=1')
         } else {
           this.reserveNextTask = true
-          // if there are no more tasks left in this batch, look in other batches
-          if (this.batch.tasks_done === this.batch.num_tasks) {
-            const batch = this.campaignBatches.find((b) => {
-              return b.num_tasks - b.tasks_done > 0
-            })
-
-            if (!batch) {
-              console.error('Could not find batch with active tasks')
-              this.$router.push('/campaigns/' + this.batch.campaign_id)
-              return
-            }
-            await this.$store.dispatch('campaign/getBatchTasks', batch)
-            this.reserveInBatch = batch
-          }
         }
       } catch (e) {
         throw new Error(e)
