@@ -41,8 +41,8 @@
     <section class="section template-section">
       <div class="container">
         <div v-if="loading" class="loader-wrapper is-active">
-          <div class="loader is-loading" />
-          <br>Waiting for the transaction to complete...
+          <img src="~assets/img/loading.svg">
+          <br><span class="text-loading">Waiting for the transaction to complete</span>
         </div>
         <div v-if="!campaign || !campaign.info || !task" class="text-loading">
           Loading

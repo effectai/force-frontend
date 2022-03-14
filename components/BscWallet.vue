@@ -15,7 +15,7 @@
         </header>
         <section class="modal-card-body">
           <div v-if="loading" class="loader-wrapper is-active">
-            <div class="loader is-loading" />
+            <img src="~assets/img/loading.svg">
           </div>
           <div v-if="burnerWallet == true && showKeypairDetails == false">
             <div>

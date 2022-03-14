@@ -1,8 +1,8 @@
 <template>
   <span>
     <div v-if="loading" class="loader-wrapper is-active">
-      <div class="loader is-loading" />
-      <br>Making reservation...
+      <img src="~assets/img/loading.svg">
+      <br><span class="text-loading">Making reservation</span>
     </div>
   </span>
 </template>
