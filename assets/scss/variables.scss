@@ -12,6 +12,7 @@ $family-secondary: 'Inter', sans-serif; // 'p22-mackinac-pro',serif;
 $primary: #101D56;
 $secondary: #1148EB;
 $secondary-alt: #5158fa;
+$danger: #ca0f0f;
 
 $secondary-invert: findColorInvert($secondary) !default;
 $secondary-alt-invert: findColorInvert($secondary-alt) !default;
