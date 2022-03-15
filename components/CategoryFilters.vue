@@ -60,7 +60,7 @@ export default {
         },
         captions: {
           hover: false,
-          value: 'Image labeling',
+          value: 'captions',
           normalUrl: 'https://effect.network/_nuxt/img/effect-captions_h100.2b22d0c.png',
           whiteUrl: 'https://effect.network/_nuxt/img/effect-captions_white_h100.d746459.png'
         }
