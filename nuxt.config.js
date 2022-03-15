@@ -15,7 +15,32 @@ export default {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' }
+      { hid: 'description', name: 'description', content: 'The first Blockchain-based framework for the Future-of-Work. Access a global, on-demand, 24x7 scalable WorkForce.' },
+      {
+        hid: 'og:url',
+        property: 'og:url',
+        content: 'https://app.effect.network/'
+      },
+      {
+        hid: 'og:type',
+        property: 'og:type',
+        content: 'website'
+      },
+      {
+        hid: 'og:title',
+        property: 'og:title',
+        content: 'Effect Force'
+      },
+      {
+        hid: 'og:description',
+        property: 'og:description',
+        content: 'The first Blockchain-based framework for the Future-of-Work. Access a global, on-demand, 24x7 scalable WorkForce.'
+      },
+      {
+        hid: 'og:image',
+        property: 'og:image',
+        content: 'https://app.effect.network/img/screenshot.png'
+      }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
