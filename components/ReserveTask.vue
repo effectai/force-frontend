@@ -37,6 +37,7 @@ export default {
         this.loading = true
         let reservations = await this.$blockchain.getReservations()
         let rvObj = await this.getReservationForUser(reservations)
+        console.log(rvObj)
         if (rvObj.reservation === null && rvObj.isReleased === false) {
           const result = await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
           this.$store.dispatch('transaction/addTransaction', result)
@@ -116,7 +117,7 @@ export default {
           isReleased = true
           isExpired = false
           break
-        } else if (rv.account_id !== null && parseInt(new Date(rv.submitted_on).getTime() / 1000 + this.$blockchain.sdk.force.config.release_task_delay_sec).toFixed(0) < this.now && parseInt(this.batch.batch_id) === parseInt(rv.batch_id) && (!rv.data || !rv.data.length)) {
+        } else if (rv.account_id !== null && parseInt(new Date(new Date(rv.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.release_task_delay_sec.toFixed(0)) < this.now && parseInt(this.batch.batch_id) === parseInt(rv.batch_id) && (!rv.data || !rv.data.length)) {
           reservation = rv
           isReleased = false
           isExpired = true
