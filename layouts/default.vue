@@ -3,13 +3,17 @@
     <bsc-wallet />
     <eos-wallet />
     <error-modal />
+    <chain-status v-if="$auth && $auth.loggedIn" />
+    <div class="burnerWalletBanner">
+      “⚠️ Effect Network is still in beta and undergoing security audits. Use at your own risk! ⚠️”
+    </div>
     <nav-bar />
-    <div v-if="provider === 'burner-wallet'" class="burnerWalletBanner">
+    <!-- <div v-if="provider === 'burner-wallet'" class="burnerWalletBanner">
       Connected with a burner wallet.
       <nuxt-link to="/profile">
         Show private key
       </nuxt-link>
-    </div>
+    </div> -->
     <div id="content">
       <Nuxt />
     </div>
@@ -21,12 +25,15 @@ import BscWallet from '@/components/BscWallet'
 import EosWallet from '@/components/EosWallet'
 import NavBar from '@/components/NavBar'
 import ErrorModal from '@/components/ErrorModal'
+import ChainStatus from '~/components/chainStatus.vue'
+
 export default {
   components: {
     ErrorModal,
     BscWallet,
     EosWallet,
-    NavBar
+    NavBar,
+    ChainStatus
   },
   data () {
     return {
@@ -53,6 +60,9 @@ export default {
   background: $yellow;
   font-weight: bold;
   text-align: center;
+  @media screen and (max-width: $tablet), print {
+    padding: 0.5rem;
+  }
 }
 
 </style>

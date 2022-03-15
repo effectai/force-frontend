@@ -1,21 +1,21 @@
 <template>
   <section class="section">
     <div class="container">
-      <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/new">
+      <nuxt-link class="button is-primary is-pulled-right" to="/campaigns/templates">
         <span class="icon">
           +
         </span>
-        <span>Create Campaign</span>
+        <span>Create Task</span>
       </nuxt-link>
-      <nuxt-link class="button is-ghost is-pulled-right" to="/">
-        <span>Active Campaigns</span>
+      <nuxt-link class="button is-ghost is-pulled-right is-paddingless-mobile" to="/">
+        <span>Active Tasks</span>
       </nuxt-link>
-      <h2 class="title">
-        <span v-if="myCampaigns">My</span><span v-else>All</span> Campaigns
-      </h2>
+      <h1 class="title has-text-weight-bold is-full-mobile">
+        <span v-if="myCampaigns">My</span><span v-else>All</span> Tasks
+      </h1>
       <label class="checkbox">
         <input v-model="myCampaigns" type="checkbox">
-        Show only my campaigns
+        Show only my tasks
       </label>
       <campaign-list :owner="myCampaigns ? $auth.user.accountName : null" :filters="false" :sort-campaigns="true" :load-all-campaigns="true" />
     </div>
@@ -41,5 +41,11 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@media screen and (max-width: $tablet) {
+  .is-pulled-right {
+    float: none !important;
+    margin-bottom: 25px;
+  }
+}
 </style>

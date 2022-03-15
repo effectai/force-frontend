@@ -3,13 +3,40 @@
 @import '../../node_modules/@creativebulma/bulma-badge';
 @import '../../node_modules/@creativebulma/bulma-tooltip';
 @import './drawer';
+@import '../../node_modules/bulma-switch/dist/css/bulma-switch.min.css';
 
 a {
   outline: 0;
 }
 
+hr {
+  height: 1px;
+  background-color: #E8EEFF;
+}
+
+.title {
+  font-family: $title-family;
+  color: $title-color;
+}
+
+h1.title {
+  font-weight: $title-weight;
+  font-style: normal;
+  font-weight: bold;
+  line-height: 130%;
+}
+
+h2.title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
 .has-limited-width {
   width: 670px;
+  max-width: 100%;
+}
+.has-limited-width-small {
+  width: 500px;
   max-width: 100%;
 }
 .is-horizontal-centered {
@@ -19,7 +46,15 @@ a {
 .has-text-shadow {
   text-shadow: 2px 2px 4px #000000;
 }
+
+.has-background-image {
+  background-size: cover;
+  background-position: top center;
+  background-repeat: no-repeat;
+}
+
 .card {
+  height: 100%;
   //transition: box-shadow 0.2s;
   display: block;
   &.is-flat {
@@ -89,6 +124,8 @@ a.card {
 }
 
 .card-content {
+  flex-grow: 1;
+  height: 100%;
   position: relative;
 }
 .modal-card {
@@ -96,14 +133,23 @@ a.card {
 }
 
 .button {
+  font-weight: 600;
+  height: 2.6em;
+  border-radius: 8px;
+  &.is-small {
+    border-radius: 8px !important;
+  }
   &.is-wide {
-    min-width: 150px;
+    min-width: 140px;
   }
   &.is-wider {
     min-width: 200px;
   }
+  &.is-outlined {
+    border-width: 3px;
+  }
 }
-@media screen and (max-width: 768px), print {
+@media screen and (max-width: $tablet), print {
   .button {
     &.is-fullwidth-mobile {
       display: flex;
@@ -113,6 +159,11 @@ a.card {
 }
 .box {
   border: 1px solid transparent;
+  box-shadow: 2px 2px 9px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
 }
 a.box {
   &:hover, &:focus {
@@ -133,7 +184,8 @@ a.box {
   left: 0;
   height: 100%;
   width: 100%;
-  background: #fff;
+  backdrop-filter: blur(2px);
+  background: rgba(white, 0.8);
   opacity: 0;
   z-index: -1;
   transition: opacity .3s;
@@ -142,7 +194,6 @@ a.box {
   align-items: center;
   border-radius: 6px;
   flex-direction: column;
-
   .loader {
     height: 80px;
     width: 80px;
@@ -240,7 +291,7 @@ a.box {
 
 .page-enter-active,
 .page-leave-active {
-  transition: opacity 0.5s;
+  transition: opacity 0.3s;
 }
 .page-enter,
 .page-leave-to {
@@ -250,3 +301,121 @@ a.box {
 .pagination-previous[disabled], .pagination-next[disabled], .pagination-link[disabled] {
   pointer-events: none;
 }
+
+.tag {
+  padding: 3px 13px;
+  padding-top: 4px;
+  border-radius: 6px;
+  border: 1px solid;
+  text-transform: capitalize;
+}
+
+/* Mobile margins */
+@media screen and (max-width: $tablet) {
+  .has-margin-mobile {
+    margin: 1rem !important;
+  }
+
+  .has-margin-vertical-mobile {
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .has-margin-horizontal-mobile {
+    margin-left: 1rem !important;
+    margin-right: 1rem !important;
+  }
+
+  .has-margin-top-mobile {
+    margin-top: 1rem !important;
+  }
+
+  .has-margin-right-mobile {
+    margin-right: 1rem !important;
+  }
+
+  .has-margin-bottom-mobile {
+    margin-bottom: 1rem !important;
+  }
+
+  .has-margin-left-mobile {
+    margin-left : 1rem !important;
+  }
+
+  .is-marginless-mobile {
+    margin: 0 !important;
+  }
+
+  .is-paddingless-mobile {
+    padding: 0 !important;
+  }
+
+  .is-marginless-vertical-mobile {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .is-marginless-horizontal-mobile {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .is-marginless-top-mobile {
+    margin-top: 0 !important;
+  }
+
+  .is-marginless-right-mobile {
+    margin-right: 0 !important;
+  }
+
+  .is-marginless-bottom-mobile {
+    margin-bottom: 0 !important;
+  }
+
+  .is-marginless-left-mobile {
+    margin-left : 0 !important;
+  }
+  .no-float-mobile {
+    float: none !important;
+  }
+}
+.campaign-tabs {
+  overflow-x: hidden;
+}
+@include mobile {
+  .campaign-tabs ul {
+    flex-direction: column;
+
+    li {
+      width: 100%;
+    }
+  }
+}
+
+  .loading-text {
+    padding-right: 0.5em;
+      &:after {
+      content: '.';
+      animation: dots 1.2s steps(5, end) infinite;
+      }
+  }
+
+@keyframes dots {
+  0%, 20% {
+    color: rgba(0,0,0,0);
+    text-shadow:
+      .25em 0 0 rgba(0,0,0,0),
+      .5em 0 0 rgba(0,0,0,0);}
+  40% {
+    color: $text;
+    text-shadow:
+      .25em 0 0 rgba(0,0,0,0),
+      .5em 0 0 rgba(0,0,0,0);}
+  60% {
+    text-shadow:
+      .25em 0 0 $text,
+      .5em 0 0 rgba(0,0,0,0);}
+  80%, 100% {
+    text-shadow:
+      .25em 0 0 $text,
+      .5em 0 0 $text;}}

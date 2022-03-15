@@ -15,14 +15,15 @@
         </header>
         <section class="modal-card-body">
           <div v-if="loading" class="loader-wrapper is-active">
-            <div class="loader is-loading" />
+            <img src="~assets/img/loading.svg">
+            <div class="loading-text subtitle">Waiting for wallet</div>
           </div>
           <div v-if="burnerWallet == true && showKeypairDetails == false">
             <div>
               <a href="#" class="has-text-danger-dark" @click.prevent="burnerWallet = false">Back</a>
             </div>
             <div class="mb-4">
-              <input v-model="privateKey" class="input is-primary is-medium" type="text" placeholder="Private Key...">
+              <input v-model="privateKey" class="input is-primary is-medium" type="text" placeholder="Private Key..." readonly>
             </div>
             <div class="">
               <button class="button is-primary is-fullwidth" :disabled="!privateKey" @click.prevent="importPrivateKey">
@@ -37,16 +38,20 @@
                 <label class="label">Public key</label>
                 <div class="control has-icons-right">
                   <input class="input blockchain-address" type="text" :value="keypair.address" readonly>
-                  <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade" :data-tooltip="copy_message" @click.prevent="copyToClipboard(keypair.address)" @mouseout="copy_message = 'Copy to clipboard'">
+                  <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="copy_message" @click.prevent="copyToClipboard(keypair.address)" @mouseout="copy_message = 'Copy to clipboard'">
                     <img src="~assets/img/icons/copy.svg" alt="Copy">
                   </span>
                 </div>
               </div>
               <div class="">
                 <label class="label">Private key</label>
-                <div class="control has-icons-right">
-                  <input class="input blockchain-address" type="text" :value="keypair.privateKey" readonly>
-                  <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade" :data-tooltip="copy_message" @click.prevent="copyToClipboard(keypair.privateKey)" @mouseout="copy_message = 'Copy to clipboard'">
+                <div class="control has-icons-right has-icons-left">
+                  <input class="input blockchain-address" :type="password_hidden ? 'password' : 'text'" :value="keypair.privateKey" readonly>
+                  <span class="p-2 icon is-small is-left is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="visibility_message" @click.prevent="togglePasswordVisibility()" @mouseout="visibility_message = 'Toggle visibility'">
+                    <font-awesome-icon v-if="password_hidden" icon="fa-solid fa-eye" />
+                    <font-awesome-icon v-else icon="fa-solid fa-eye-slash" />
+                  </span>
+                  <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="copy_message" @click.prevent="copyToClipboard(keypair.privateKey)" @mouseout="copy_message = 'Copy to clipboard'">
                     <img src="~assets/img/icons/copy.svg" alt="Copy">
                   </span>
                 </div>
@@ -139,6 +144,7 @@ export default {
       burnerWallet: false,
       showKeypairDetails: false,
       copy_message: 'Copy to clipboard',
+      password_hidden: true,
       keypair: {
         address: '',
         privateKey: ''
@@ -157,13 +163,25 @@ export default {
       return Boolean(this.$blockchain.bsc.binance != null)
     }
   },
+  watch: {
+    '$blockchain.triggerGenerate' (trigger) {
+      if (trigger) {
+        this.burnerWallet = true
+        this.createKeypair()
+      }
+    }
+  },
   methods: {
+    togglePasswordVisibility () {
+      this.password_hidden = !this.password_hidden
+    },
     copyToClipboard (content) {
       navigator.clipboard.writeText(content).then(() => {
         this.copy_message = 'Copied!'
       })
     },
     createKeypair () {
+      this.$blockchain.triggerGenerate = false
       this.showKeypairDetails = true
       const { address, privateKey } = createAccount()
       this.keypair = { address, privateKey }

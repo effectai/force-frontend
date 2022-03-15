@@ -5,12 +5,12 @@
         <ul>
           <li>
             <nuxt-link to="/campaigns">
-              All Campaigns
+              All Tasks
             </nuxt-link>
           </li>
           <li>
             <nuxt-link :to="'/campaigns/' + id" aria-current="page">
-              Campaign {{ id }}
+              Task {{ id }}
             </nuxt-link>
           </li>
           <li class="is-active">
@@ -20,8 +20,8 @@
           </li>
         </ul>
       </nav>
-      <div v-if="campaignLoading">
-        Campaign loading..
+      <div v-if="campaignLoading" class="loading-text">
+        Task loading
       </div>
       <div v-else-if="!campaign">
         Could not retrieve campaign
@@ -31,7 +31,7 @@
         <i> is required</i>
       </p>
       <h1 class="title mt-5">
-        Edit Campaign
+        Edit Task
       </h1>
       <div v-if="errors.length">
         <div v-for="error in errors" :key="toString(error)" class="notification is-danger is-light">
@@ -195,10 +195,10 @@
             </p>
           </div>
         </div>
-        <div class="field is-grouped is-grouped-right mt-4">
-          <div class="control">
-            <button class="button is-secondary" @click.prevent="$refs.fileInput.click()">
-              Import Campaign
+        <div class="field is-grouped is-grouped-right has-margin-bottom-mobile import-export mt-4">
+          <div class="control has-margin-bottom-mobile">
+            <button class="button is-secondary is-small" @click.prevent="$refs.fileInput.click()">
+              Import
             </button>
             <input
               ref="fileInput"
@@ -209,12 +209,12 @@
             >
           </div>
           <div class="control">
-            <button class="button is-secondary" @click.prevent="exportCampaign">
-              Export Campaign
+            <button class="button is-secondary is-small" @click.prevent="exportCampaign">
+              Export
             </button>
           </div>
         </div>
-        <div class="field is-grouped is-grouped-right">
+        <div class="field is-grouped is-grouped-right has-margin-top-mobile">
           <div class="control">
             <nuxt-link class="button is-light" to="/campaigns">
               Cancel
@@ -222,7 +222,7 @@
           </div>
           <div class="control">
             <button type="submit" class="button is-primary is-wide" :class="{'is-loading': loading}">
-              Save Campaign
+              Save
             </button>
           </div>
         </div>
@@ -431,5 +431,10 @@ export default {
 <style lang="scss" scoped>
 div.instructions-group .textarea {
   overflow-y: scroll
+}
+@media screen and (max-width: $tablet) {
+  .import-export.is-grouped-right {
+    display: block !important;
+  }
 }
 </style>

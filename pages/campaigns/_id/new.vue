@@ -5,12 +5,12 @@
         <ul>
           <li>
             <nuxt-link to="/">
-              All Campaigns
+              All Tasks
             </nuxt-link>
           </li>
           <li>
             <nuxt-link :to="`/campaigns/${campaignId}`">
-              Campaign {{ campaignId }}
+              Task {{ campaignId }}
             </nuxt-link>
           </li>
           <li class="is-active">
@@ -20,83 +20,183 @@
           </li>
         </ul>
       </nav>
-      <div v-if="campaignLoading">
-        Campaign loading..
-      </div>
-      <div v-else-if="!campaign">
-        Could not retrieve campaign
-      </div>
-      <div v-else>
-        <div class="title">
-          Tasks
-        </div>
+      <div>
         <div>
-          <div v-for="(task,index) in tasks" :key="index">
-            #{{ index }}: {{ task }} <span class="has-text-danger-dark is-size-5 has-text-weight-bold" @click="tasks.splice(index, 1)">x</span>
-          </div>
-          <div v-if="!tasks.length">
-            No tasks..
-          </div>
-        </div>
-        <form @submit.prevent="createTask">
-          <div class="field">
-            <div v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
-              <label class="label">{{ placeholder }}</label>
-              <div class="control">
-                <input v-model="newTask[placeholder]" type="text" class="input">
+          <div class="columns">
+            <div class="column is-half">
+              <div class="title has-text-weight-bold">
+                Tasks
               </div>
             </div>
-            <div class="control">
-              <button type="submit" class="button">
-                Create Task
-              </button>
+          </div>
+        </div>
+        <div class="tabs campaign-tabs">
+          <ul>
+            <li class="is-active">
+              <a href="#">Batches</a>
+            </li>
+          </ul>
+        </div>
+        <form>
+          <div class="field">
+            <div class="box">
+              <div v-if="!tasks.length" class="has-text-centered mb-4">
+                <h1>
+                  No tasks added in batch yet
+                </h1>
+              </div>
+              <div style="background: #fff; border-radius: 8px" class="p-2">
+                <table class="table mx-auto">
+                  <thead>
+                    <tr>
+                      <th v-if="tasks.length">
+                        Index
+                      </th>
+                      <th v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
+                        <!-- <input v-model="newTask[placeholder]" type="text" class="input"> -->
+                        {{ placeholder }}
+                      </th>
+                      <th v-if="tasks.length">
+                        Preview
+                      </th>
+                      <th v-if="tasks.length">
+                        Remove
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(task, index) in tasks" :key="task.id">
+                      <td>{{ index + 1 }}</td>
+                      <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
+                        {{ task[placeholder] }}
+                      </td>
+                      <td>
+                        <button class="button is-info is-outlined is-small is-rounded" @click.prevent="previewModal(index)">
+                          <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
+                        </button>
+                      </td>
+                      <td>
+                        <button class="button is-danger is-outlined is-small is-rounded" @click.prevent="tasks.splice(index, 1)">
+                          <font-awesome-icon icon="fa-solid fa-trash-can" />
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td v-if="tasks.length" />
+                      <td v-for="(placeholder, placeindex) in placeholders" :key="placeholder" class="task-placeholder-value">
+                        <input
+                          :ref="`placeholder-${placeindex}`"
+                          v-model="newTask[placeholder]"
+                          type="text"
+                          class="input is-info task-placeholder-value"
+                          placeholder="Type here"
+                          @keydown.enter.prevent="createTask"
+                        >
+                      </td>
+                      <td v-if="tasks.length" />
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="control has-text-centered mt-5">
+                <button class="button is-primary is-wide" @click.prevent="createTask">
+                  Add Task
+                </button>
+              </div>
             </div>
-            <br>
-            <h2 class="subtitle is-5 mb-3">
-              Import tasks
-            </h2>
-            <div class="file has-name">
-              <label class="file-label">
-                <input class="file-input" type="file" name="csvtasks" @change="uploadFile">
-                <span class="file-cta">
-                  <span class="file-label">
-                    Choose a .csv file…
-                  </span>
-                </span>
-                <span v-if="file && file.name" class="file-name">
-                  {{ file.name }}
-                </span>
-              </label>
-            </div>
-            <p v-if="error" class="has-text-danger">
-              {{ error }}
-            </p>
-            <br>
-            <div>
-              <a id="downloadlink" ref="csvfiledownload" href="" :download="'tasks_example'+campaignId+'.csv'">download example csv</a>
+            <div class="box">
+              <div class="columns">
+                <div class="column is-3 has-text-centered py-0">
+                  <h2 class="subtitle is-6 has-text-weight-bold mb-3">
+                    Upload tasks
+                  </h2>
+                  <div class="file is-boxed mt-3">
+                    <label class="file-label">
+                      <input class="file-input" type="file" name="csvtasks" @change="uploadFile">
+                      <span class="file-cta" @dragover="dragover" @dragleave="dragleave" @drop="drop">
+                        <span class="file-label has-text-grey is-size-7">
+                          Drag and drop or browse to choose a CSV file
+                        </span>
+                        <button class="button is-light mt-2 ">
+                          Choose a .csv file
+                        </button>
+                      </span>
+                    </label>
+                  </div>
+                  <div>
+                    <a ref="csvfiledownload" class="is-size-7" href="" :download="'tasks_example'+campaignId+'.csv'">Download example CSV</a>
+                  </div>
+                  <p v-if="file.name" class="has-text-success mt-2">
+                    Imported file: {{ file.name }}
+                  </p>
+                  <p v-if="error" class="has-text-danger">
+                    {{ error }}
+                  </p>
+                </div>
+
+                <div class="column is-3 py-0">
+                  <div class="field">
+                    <label class="label">Repetitions</label>
+                    <div class="control">
+                      <input v-model="repetitions" class="input" type="number" min="0" required>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="campaign && campaign.info" class="column is-6 py-0 columns batch-info">
+                  <div class="column is-one-third">
+                    <div class="box">
+                      <h2>Total Cost</h2>
+                      <strong :class="{'has-text-danger': (campaign.info.reward * tasks.length * repetitions) > efxAvailable}">{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
+                    </div>
+                  </div>
+                  <div class="column is-one-third">
+                    <div class="box">
+                      <h2>Available Balance</h2>
+                      <p>
+                        <strong>{{ efxAvailable }} | </strong>
+                        <nuxt-link to="/deposit">
+                          Deposit EFX
+                        </nuxt-link>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="column is-one-third">
+                    <div class="box">
+                      <h2>Max Tasks Possible</h2>
+                      <strong>{{ maxAmountTask > efxAvailable ? efxAvailable : maxAmountTask }}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </form>
         <form @submit.prevent="uploadBatch">
-          <!-- <div class="field">
-            <label class="label">Repetitions</label>
+          <div class="field is-grouped is-justify-content-center mt-6">
             <div class="control">
-              <input v-model="repetitions" class="input" type="number" min="0" required>
-            </div>
-          </div> -->
-          <div class="field is-grouped">
-            <div class="control">
-              <button type="submit" class="button is-link" :disabled="!tasks.length">
-                Submit
+              <button type="submit" class="button button is-primary is-wide mr-4" :disabled="!tasks.length || tasks.length > maxAmountTask">
+                Add Tasks
               </button>
-            </div>
-            <div class="control">
-              <button class="button is-link is-light" @click.prevent="cancel">
+              <button class="button is-outlined is-primary is-wide" @click.prevent="cancel">
                 Cancel
               </button>
             </div>
           </div>
         </form>
+      </div>
+      <div class="modal" :class="{'is-active': previewTask}">
+        <div class="modal-background" @click="previewTask = false" />
+        <div class="modal-content" style="background-color: #fff; padding: 10px;">
+          <template-media
+            v-if="campaign && campaign.info && previewTask"
+            :html="renderTemplate(
+              campaign.info.template || 'No template found..',
+              previewTask)"
+            @templateLoaded="postResults(previewTask.results)"
+          />
+        </div>
+        <button class="modal-close is-large" aria-label="close" @click="previewTask = false" />
       </div>
     </div>
   </section>
@@ -104,6 +204,9 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import { Template } from '@effectai/effect-js'
+import TemplateMedia from '@/components/Template'
+// import templatePreviewModal from '~/components/templatePreviewModal.vue'
 
 function getMatches (string, regex, index) {
   index || (index = 1) // default to the first capturing group
@@ -116,6 +219,10 @@ function getMatches (string, regex, index) {
 }
 
 export default {
+  components: {
+    // templatePreviewModal
+    TemplateMedia
+  },
   middleware: ['auth'],
   data () {
     return {
@@ -123,6 +230,9 @@ export default {
       repetitions: 1,
       newTask: {},
       tasks: [],
+      tempCounter: 0,
+      taskModal: false,
+      previewTask: false,
       placeholders: null,
       campaign: null,
       file: {
@@ -139,12 +249,33 @@ export default {
     }),
     ...mapGetters({
       batchByCampaignId: 'campaign/batchByCampaignId'
-    })
+    }),
+    efxAvailable () {
+      return this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable
+    },
+    maxAmountTask () {
+      return Math.floor(((this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable) / this.campaign.info.reward) / this.repetitions)
+    }
   },
   mounted () {
     this.getCampaign()
   },
   methods: {
+    dragover (event) {
+      event.preventDefault()
+      event.currentTarget.classList.add('dragover')
+    },
+    dragleave (event) {
+      event.currentTarget.classList.remove('dragover')
+    },
+    onChange () {
+      this.filelist = [...this.$refs.file.files]
+    },
+    drop (event) {
+      event.preventDefault()
+      this.uploadFile(event.dataTransfer.files ? event.dataTransfer.files : null, true)
+      event.currentTarget.classList.remove('dragover')
+    },
     generateCsvData (placeholders) {
       const link = this.$refs.csvfiledownload
       let csvContent = 'data:text/csv;charset=utf-8,'
@@ -159,8 +290,29 @@ export default {
       link.href = encodeURI(csvContent)
     },
     createTask () {
+      // An temp id is needed for :key=task.id
+      this.newTask.id = this.tempCounter++
       this.tasks.push(this.newTask)
       this.newTask = this.getEmptyTask(this.placeholders)
+      this.$nextTick(() => {
+        this.$refs['placeholder-0'][0].focus()
+      })
+    },
+    previewModal (index) {
+      this.previewTask = true
+      this.previewTask = this.tasks[index]
+    },
+    renderTemplate (template, placeholders = {}, options = {}) {
+      return new Template(template, placeholders, options).render()
+    },
+    postResults (results) {
+      const frame = document.getElementById('mediaFrame')
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { task: 'results', value: results },
+          '*'
+        )
+      }
     },
     getEmptyTask (placeholders) {
       const emptyTask = {}
@@ -201,15 +353,15 @@ export default {
     cancel () {
       this.$router.push('/campaigns/' + this.campaignId)
     },
-    uploadFile (event) {
+    uploadFile (event, drop) {
       this.file = {
         name: null,
         content: null
       }
       this.error = null
-      console.log(event)
-      if (event.target.files[0]) {
-        this.file.name = event.target.files[0].name
+      const file = drop ? event[0] : event.target.files[0]
+      if (file) {
+        this.file.name = file.name
         const reader = new FileReader()
         reader.onload = (e) => {
           this.file.content = this.csvToJson(e.target.result)
@@ -227,7 +379,7 @@ export default {
             }
           })
         }
-        reader.readAsText(event.target.files[0])
+        reader.readAsText(file)
       } else {
         this.error = 'Could not find file'
         this.file = null
@@ -255,4 +407,50 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.is-boxed {
+  .file-cta {
+    background: #fff;
+    border: none;
+    background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='%23A9B1BD' stroke-width='4' stroke-dasharray='6%2c14' stroke-dashoffset='10' stroke-linecap='square'/%3e%3c/svg%3e");
+  }
+}
+.dragover {
+  background-color: #e7f3ff !important;
+}
+table {
+  background: transparent;
+  border-spacing: 10px;
+  width: 100%;
+  text-align: center;
+  border-radius: 8px;
+  td {
+    border-top: 1px solid #E8EEFF;
+  }
+  th {
+    border: none;
+  }
+}
+div.box {
+  background: #F7F9FB;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.button.is-wide {
+  min-width: 220px;
+}
+
+.batch-info {
+  padding-right: 0;
+  .box {
+    width: 100%;
+    height: auto;
+    padding: 1rem;
+    background: #fff;
+    button {
+      font-size: .9rem;
+    }
+  }
+}
 </style>

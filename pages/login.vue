@@ -6,7 +6,7 @@
       <span v-else>Login to your Effect Account</span>
     </h2>
     <div v-if="loading" class="container">
-      Loading..
+      <span class="loading-text">Loading</span>
     </div>
     <div v-else class="container">
       <div v-if="$blockchain.account">
@@ -77,7 +77,7 @@
         </div>
         <div class="column is-8">
           <a v-if="$blockchain.account" class="is-size-6  has-text-danger-dark" @click="$blockchain.logout();">switch wallet</a>
-          <!-- <span v-else>No wallet? <a target="_blank" class="is-size-6" href="" @click.prevent="$blockchain.loginModal = 'bsc'">Create a wallet</a></span> -->
+          <span v-else>No wallet? <a target="_blank" class="is-size-6" href="" @click.prevent="$blockchain.loginModal = 'bsc';$blockchain.triggerGenerate = true">Create a keypair</a></span>
         </div>
       </div>
     </div>
