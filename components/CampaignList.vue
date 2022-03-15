@@ -263,7 +263,7 @@ export default {
       }
     },
     reservations () {
-      if (!this.$auth || this.$auth.user) { return }
+      if (!this.$auth || !this.$auth.user || !this.$auth.user.vAccountRows) { return }
       let userReservations = this.reservationsByAccountId(this.$auth.user.vAccountRows[0].id)
       if (userReservations) {
         userReservations = userReservations.filter(r => parseInt(new Date(new Date(r.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.release_task_delay_sec.toFixed(0)) > parseInt((Date.now() / 1000).toFixed(0)))
