@@ -79,8 +79,8 @@
             <div class="payout-detail mt-3" @click="showPayoutDetails = !showPayoutDetails">
               <span>
                 View Details
-                <font-awesome-icon v-if="!showPayoutDetails" class="pl-1" icon="fa-solid fa-chevron-down" style="width: 10px;" />
-                <font-awesome-icon v-else class="pl-1" icon="fa-solid fa-chevron-up" style="width: 10px;" />
+                <font-awesome-icon v-if="!showPayoutDetails" class="ml-1" icon="fa-solid fa-chevron-down" style="width: 10px;" />
+                <font-awesome-icon v-else class="ml-1" icon="fa-solid fa-chevron-up" style="width: 10px;" />
               </span>
             </div>
           </div>
