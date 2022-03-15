@@ -37,9 +37,43 @@ export default {
         this.loading = true
         let reservations = await this.$blockchain.getReservations()
         let rvObj = await this.getReservationForUser(reservations)
-
         if (rvObj.reservation === null && rvObj.isReleased === false) {
           const result = await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
+          this.$store.dispatch('transaction/addTransaction', result)
+          // get reservations and see if this user has a reservation
+          await retry(async () => {
+            reservations = await this.$blockchain.getReservations()
+            rvObj = await this.getReservationForUser(reservations)
+            if (!rvObj.reservation) {
+              throw new Error('Reservation not found')
+            }
+          }, {
+            retries: 5,
+            onRetry: (error, number) => {
+              console.log('attempt', number, error)
+            }
+          })
+        }
+
+        if (rvObj.reservation && rvObj.isReleased === false && rvObj.isExpired === true) {
+          const result = await this.$blockchain.claimExpiredTask(rvObj.reservation.id)
+          this.$store.dispatch('transaction/addTransaction', result)
+          // get reservations and see if this user has a reservation
+          await retry(async () => {
+            reservations = await this.$blockchain.getReservations()
+            rvObj = await this.getReservationForUser(reservations)
+            if (!rvObj.reservation) {
+              throw new Error('Reservation not found')
+            }
+          }, {
+            retries: 5,
+            onRetry: (error, number) => {
+              console.log('attempt', number, error)
+            }
+          })
+        }
+        if (rvObj.reservation && rvObj.isReleased === true && rvObj.isExpired === false) {
+          const result = await this.$blockchain.reclaimTask(rvObj.reservation.id)
           this.$store.dispatch('transaction/addTransaction', result)
           // get reservations and see if this user has a reservation
           await retry(async () => {
