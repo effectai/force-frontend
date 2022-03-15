@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - mainnet-config
 
 jobs:
   deploy:
