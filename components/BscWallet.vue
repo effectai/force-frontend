@@ -23,7 +23,7 @@
               <a href="#" class="has-text-danger-dark" @click.prevent="burnerWallet = false">Back</a>
             </div>
             <div class="mb-4">
-              <input v-model="privateKey" class="input is-primary is-medium" type="text" placeholder="Private Key..." readonly>
+              <input v-model="privateKey" class="input is-primary is-medium" type="text" placeholder="Private Key...">
             </div>
             <div class="">
               <button class="button is-primary is-fullwidth" :disabled="!privateKey" @click.prevent="importPrivateKey">
