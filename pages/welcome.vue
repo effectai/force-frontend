@@ -82,6 +82,10 @@ export default {
 
 .bg-hover {
     z-index: 1;
+    transition: 0.3s;
+    .title, .subtitle {
+      transition: 0.3s;
+    }
     &:before {
       content: "";
       display: block;
@@ -96,8 +100,9 @@ export default {
       display: block;
       position: absolute;
       background: transparent;
-      height: 0;
-      width: 100%;
+      height: 100vh;
+      background: $primary;
+      width: 0;
       top:0;
       transition: 0.3s;
       z-index:-1;
@@ -113,11 +118,11 @@ export default {
   left: 50%
 }
 .bg-hover-right:hover:after {
-  height: 100vh;
+  width: 50vw;
   background: $primary;
 }
 .bg-hover-left:hover:after {
-  height: 100vh;
+  width: 50vw;
   background: $primary;
 }
 .hide-on-hover {
