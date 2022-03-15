@@ -39,7 +39,7 @@ export default {
       {
         hid: 'og:image',
         property: 'og:image',
-        content: 'https://effect.network/_nuxt/img/effect-force_h100.de0fbbf.png'
+        content: 'https://app.effect.network/img/screenshot.png'
       }
     ],
     link: [
