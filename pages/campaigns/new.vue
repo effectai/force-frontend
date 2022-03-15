@@ -362,14 +362,15 @@ export default {
     },
     async retrieveTemplate (params) {
       if (params.templateUrl) {
-        this.campaignIpfs.template = 'Retrieving template..'
+        this.campaignIpfs.template = 'Retrieving campaign template..'
         const response = await this.$axios.get(params.templateUrl)
         this.campaignIpfs.template = response.data
       } else if (params.template) {
         this.campaignIpfs.template = decodeURI(params.template)
       }
       if (params.placeholders) {
-        this.campaignIpfs.example_task = JSON.parse(params.placeholders)
+        const response = await this.$axios.get(params.placeholders.replaceAll('"', ''))
+        this.campaignIpfs.example_task = response.data
       }
     },
     showSubmission (values) {
