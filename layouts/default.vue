@@ -4,8 +4,8 @@
     <eos-wallet />
     <error-modal />
     <chain-status v-if="$auth && $auth.loggedIn" />
-    <div class="burnerWalletBanner">
-      “⚠️ Effect Network is still in beta and undergoing security audits. Use at your own risk! ⚠️”
+    <div class="burnerWalletBanner is-size-6">
+      ⚠️ <nuxt-link to="/security">This is a pre-release that's still undergoing security audits - use at your own risk »</nuxt-link>
     </div>
     <nav-bar />
     <!-- <div v-if="provider === 'burner-wallet'" class="burnerWalletBanner">
@@ -58,7 +58,6 @@ export default {
 <style lang="scss">
 .burnerWalletBanner {
   background: $yellow;
-  font-weight: bold;
   text-align: center;
   @media screen and (max-width: $tablet), print {
     padding: 0.5rem;
