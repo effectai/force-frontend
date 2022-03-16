@@ -3,8 +3,7 @@ import scatter from 'eos-transit-scatter-provider'
 import anchor from 'eos-transit-anchorlink-provider'
 import tp from 'eos-transit-tokenpocket-provider'
 import lynx from 'eos-transit-lynx-provider'
-import { Api, JsonRpc } from 'eosjs' // Only to retrieve block height
-const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig') // Only to retrieve block height
+import { JsonRpc } from 'eosjs' // Only to retrieve block height
 
 const networkHost = {
   host: (process.env.NUXT_ENV_EOS_NETWORK.includes('local') ? 'localhost' : process.env.NUXT_ENV_EOS_NODE_URL),
@@ -95,12 +94,8 @@ const eos = {
   },
 
   async getEosInfo () {
-    const defaultPrivateKey = '5JtUScZK2XEp3g9gh7F8bwtPTRAkASmNrrftmx4AxDKD5K4zDnr' // bob
-    const signatureProvider = new JsSignatureProvider([defaultPrivateKey])
     const rpc = new JsonRpc(`${networkHost.protocol}://${networkHost.host}:${networkHost.port}`)
-    const api = new Api({ rpc, signatureProvider })
-
-    return await api.rpc.get_info()
+    return await rpc.get_info()
   }
 }
 
