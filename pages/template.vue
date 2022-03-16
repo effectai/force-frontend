@@ -54,7 +54,6 @@ export default {
     communicateWithIframe (event) {
       // TODO: check if sender of event is template iframe
       const data = event.data
-      console.log('DATA', data)
       switch (data.task) { // postMessage tasks
         case 'template':
           this.html = data.value
@@ -69,6 +68,7 @@ export default {
           // TaskContent handles submit
           parent.postMessage(data, '*')
           break
+        case 'key':
         case 'results':
           // eslint-disable-next-line no-case-declarations
           const mediaFrame = document.getElementById('mediaFrame')
