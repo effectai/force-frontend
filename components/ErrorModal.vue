@@ -15,3 +15,8 @@
     </div>
   </div>
 </template>
+<style scoped language="scss">
+.modal {
+  z-index: 100;
+}
+</style>

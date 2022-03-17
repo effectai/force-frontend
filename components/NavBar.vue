@@ -271,7 +271,7 @@ export default {
         this.successMessage = 'All your available pending payouts have been completed and are added to your Effect account'
       } catch (error) {
         this.loading = false
-        this.errors.push(error)
+        this.$blockchain.handleError(error)
       }
       this.loading = false
     }
