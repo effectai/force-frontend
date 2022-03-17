@@ -17,6 +17,7 @@
     <div id="content">
       <Nuxt />
     </div>
+    <Footer id="footer" />
   </div>
 </template>
 
@@ -24,6 +25,7 @@
 import BscWallet from '@/components/BscWallet'
 import EosWallet from '@/components/EosWallet'
 import NavBar from '@/components/NavBar'
+import Footer from '@/components/Footer.vue'
 import ErrorModal from '@/components/ErrorModal'
 import ChainStatus from '~/components/chainStatus.vue'
 
@@ -33,6 +35,7 @@ export default {
     BscWallet,
     EosWallet,
     NavBar,
+    Footer,
     ChainStatus
   },
   data () {
@@ -56,12 +59,23 @@ export default {
 }
 </script>
 <style lang="scss">
+
 .burnerWalletBanner {
   background: $yellow;
   text-align: center;
   @media screen and (max-width: $tablet), print {
     padding: 0.5rem;
   }
+}
+
+#content {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+#footer {
+  align-self: flex-end;
 }
 
 </style>
