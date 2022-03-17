@@ -289,7 +289,7 @@
                   <span>/ {{ batch.num_tasks }} left</span>
                 </template>
                 <span v-else>...</span>
-                <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || (batch.reservations && batch.reservations.length): false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
+                <progress class="progress" :class="{'is-info': batch ? batch.tasks_done === batch.num_tasks : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || (batch.reservations && batch.reservations.length): false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
                   Left
                 </progress>
               </div>

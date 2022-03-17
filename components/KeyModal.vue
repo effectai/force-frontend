@@ -6,7 +6,7 @@
 
       <div class="field has-addons has-addons-centered is-centered">
         <div class="control has-icons-right has-icons-left is-expanded">
-          <input class="input blockchain-address" :type="password_hidden ? 'password' : 'text'" :value="messageContent" readonly>
+          <input class="input" :type="password_hidden ? 'password' : 'text'" :value="messageContent" readonly>
           <span class="p-2 icon is-small is-left is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="visibility_message" @click.prevent="togglePasswordVisibility()" @mouseout="visibility_message = 'Toggle visibility'">
             <font-awesome-icon v-if="password_hidden" class="unselectable" icon="fa-solid fa-eye" />
             <font-awesome-icon v-else class="unselectable" icon="fa-solid fa-eye-slash" />

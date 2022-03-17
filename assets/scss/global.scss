@@ -289,6 +289,38 @@ a.box {
   }
 }
 
+.progress.is-info {
+  animation: pulse-blue 2s infinite;
+}
+
+.is-pulsing {
+  animation: pulse-default-info 2s infinite;
+}
+
+@keyframes pulse-default-info {
+  0% {
+    box-shadow: 0 0 0 0 rgba(62, 142, 208, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(62, 142, 208, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(62, 142, 208, 0);
+  }
+}
+
+@keyframes pulse-blue {
+  0% {
+    box-shadow: 0 0 0 0 rgba(62, 142, 208, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(62, 142, 208, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(62, 142, 208, 0);
+  }
+}
+
 .page-enter-active,
 .page-leave-active {
   transition: opacity 0.3s;
