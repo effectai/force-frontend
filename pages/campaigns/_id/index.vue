@@ -118,7 +118,7 @@
                         </p>
                         <progress
                           class="progress is-small mt-2"
-                          :class="{'is-info': batch ? batch.tasks_done === batch.num_tasks: false }"
+                          :class="getProgressBatch(batch)"
                           :value="batch.tasks_done"
                           :max="batch.num_tasks"
                         />
@@ -414,6 +414,18 @@ export default {
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.id)
       // this.campaign = this.campaigns.find(c => c.id === this.id)
+    },
+    getProgressBatch (batch) {
+      switch (batch?.status) {
+        case 'Completed':
+          return 'is-success'
+        case 'Active':
+          return 'is-info'
+        case 'Paused':
+          return 'is-warning'
+        default:
+          break
+      }
     }
   }
 }
