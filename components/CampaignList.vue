@@ -1,7 +1,7 @@
 <template>
   <div>
     <client-only>
-      <category-filters v-if="categoryFilter" :url-filter="filter" @clicked="onFilter" />
+      <category-filters v-if="categoryFilter" :url-filter="$route.query.category" @clicked="onFilter" />
       <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
       <div class="is-flex is-justify-content-space-between">
         <div>
@@ -9,7 +9,7 @@
             Filtering on category: {{ $route.query.category }}
           </span>
         </div>
-        <div v-if="gridToggle != false">
+        <div v-if="gridToggle != false" class="is-hidden-tablet-only">
           <div class="switch-button mb-1">
             <input v-model="gridListState" class="switch-button-checkbox" type="checkbox" @click="toggleGridList()">
             <label class="switch-button-label" for=""><span class="switch-button-label-span"><img height="28px" src="@/assets/img/icons/border-all.svg"></span></label>
@@ -18,13 +18,14 @@
       </div>
       <hr class="mt-1">
     </client-only>
-    <div v-if="gridListState || gridToggle === false">
+    {{gridListState}}
+    <div>
       <nuxt-link
         v-for="campaign in paginatedCampaigns"
         :key="campaign.id"
         :to="'/campaigns/'+campaign.id"
         class="box p-4"
-        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}"
+        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation, 'column is-one-fifth-desktop is-one-third-tablet is-full-mobile' : !gridListState}"
       >
         <div class="columns is-vcentered is-multiline is-mobile">
           <div class="column is-narrow is-mobile-1">
@@ -34,7 +35,7 @@
               <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
             </p>
           </div>
-          <div class="column is-4-desktop is-4-widescreen is-12-touch">
+          <div class="column is-4-desktop is-4-widescreen is-12-touch" :class="{'is-12': !gridListState}">
             <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
               <div>
                 <nuxt-link
@@ -87,7 +88,7 @@
               {{ campaign.reward.quantity }}
             </h2>
           </div>
-          <div class="column">
+          <div class="column" v>
             <p class="has-text-grey is-size-7">
               Tasks:
             </p>
@@ -116,7 +117,7 @@
         </div>
       </nuxt-link>
     </div>
-    <div v-else>
+    <!-- <div v-else>
       <span>
         <div class="columns is-multiline">
           <div
@@ -134,7 +135,6 @@
                   <figure>
                     <p v-if="campaign.info && campaign.info.image" class="image has-radius is-vcentered has-background-image" :style="{backgroundImage: 'url(' + (campaign.info && campaign.info.image && campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image) + ')'}" />
                     <p v-else class="image has-radius is-vcentered has-background-image">
-                      <!-- <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image"> -->
                       <img v-if="campaign.info && !campaign.info.image && campaign.info.category && categories.includes(campaign.info.category)" class="p-2" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
                       <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
                     </p>
@@ -189,7 +189,7 @@
           </div>
         </div>
       </span>
-    </div>
+    </div> -->
     <pagination
       v-if="filteredCampaigns"
       :items="filteredCampaigns.length"
