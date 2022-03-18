@@ -70,6 +70,8 @@ export default {
   }
 }
 
+</style>
+<style lang="scss" scoped>
 #app {
   display: flex;
   min-height: calc(100vh - 80px);
@@ -78,5 +80,4 @@ export default {
 #content {
     flex-grow: 1;
 }
-
 </style>
