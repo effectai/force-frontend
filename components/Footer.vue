@@ -1,6 +1,9 @@
 <template>
   <footer class="footer">
     <div class="level">
+      <div class="level-item level-left">
+        <a href="https://github.com/effectai/force-frontend-new/issues/new" target="_blank" rel="noopener noreferrer"><font-awesome-icon class="mx-2" icon="fa-solid fa-code-pull-request" size="2x"/></a>
+      </div>
       <div class="level-item has-text-centered">
         <a href="https://effect.network" target="_blank" rel="noopener noreferrer"><font-awesome-icon class="mx-2" icon="fa-solid fa-house" size="2x"/></a>
         <a href="https://github.com/effectai" target="_blank" rel="noopener noreferrer"><font-awesome-icon class="mx-2" icon="fa-brands fa-github" size="2x"/></a>
@@ -12,6 +15,7 @@
         <!-- <a href="https://medium.com/effect-ai" target="_blank" rel="noopener noreferrer"><font-awesome-icon icon="fa-brands fa-medium" size="2x"/></a> -->
         <!-- <a href="https://www.youtube.com/@effectai" target="_blank" rel="noopener noreferrer"><font-awesome-icon icon="fa-brands fa-youtube" size="2x"/></a> -->
       </div>
+      <div class="level-item level-right"></div>
     </div>
   </footer>
 </template>
