@@ -376,7 +376,7 @@ export default (context, inject) => {
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)
       },
-      async reserveTask (batchId, campaignId, taskIndex, tasks) {
+      async reserveTask (batchId, taskIndex, campaignId, tasks) {
         return await this.sdk.force.reserveTask(batchId, taskIndex, campaignId, tasks)
       },
       async claimExpiredTask (taskId) {
