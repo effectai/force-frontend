@@ -5,7 +5,9 @@
     <error-modal />
     <chain-status v-if="$auth && $auth.loggedIn" />
     <div class="burnerWalletBanner is-size-6">
-      ⚠️ <nuxt-link to="/security">This is a pre-release that's still undergoing security audits - use at your own risk »</nuxt-link>
+      ⚠️ <nuxt-link to="/security">
+        This is a pre-release that's still undergoing security audits - use at your own risk »
+      </nuxt-link>
     </div>
     <nav-bar />
     <!-- <div v-if="provider === 'burner-wallet'" class="burnerWalletBanner">
@@ -17,7 +19,7 @@
     <div id="content">
       <Nuxt />
     </div>
-    <Footer id="footer" />
+    <Foot id="footer" />
   </div>
 </template>
 
@@ -25,7 +27,7 @@
 import BscWallet from '@/components/BscWallet'
 import EosWallet from '@/components/EosWallet'
 import NavBar from '@/components/NavBar'
-import Footer from '@/components/Footer.vue'
+import Foot from '@/components/Footer.vue'
 import ErrorModal from '@/components/ErrorModal'
 import ChainStatus from '~/components/chainStatus.vue'
 
@@ -35,7 +37,7 @@ export default {
     BscWallet,
     EosWallet,
     NavBar,
-    Footer,
+    Foot,
     ChainStatus
   },
   data () {
@@ -68,14 +70,13 @@ export default {
   }
 }
 
-#content {
+#app {
   display: flex;
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
   flex-direction: column;
 }
-
-#footer {
-  align-self: flex-end;
+#content {
+    flex-grow: 1;
 }
 
 </style>
