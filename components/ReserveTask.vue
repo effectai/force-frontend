@@ -35,16 +35,40 @@ export default {
     async makeReservation () {
       try {
         this.loading = true
-        let reservations = await this.$blockchain.getReservations()
+        const rs = await this.$blockchain.getSubmissionsAndReservationsForBatch(this.batch.batch_id)
+        const reservations = rs.filter((r) => {
+          return !r.data || !r.data.length
+        })
+        const submissions = rs.filter((s) => {
+          return s.data || s.data.length
+        })
+
+        // get the user reservation + the status of the reservation
         let rvObj = await this.getReservationForUser(reservations)
-        console.log(rvObj)
+
         if (rvObj.reservation === null && rvObj.isReleased === false) {
-          const result = await this.$blockchain.reserveTask(this.batch.id, this.batch.campaign_id, this.batch.tasks_done, this.batch.tasks)
+          let taskIndex = this.batch.tasks_done
+
+          // Check here in submissions if user already did the task of this.batch.tasks_done
+          for (const sub of submissions) {
+            const indexes = []
+            if (sub.account_id === this.$auth.user.vAccountRows[0].id) {
+              const index = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, sub.leaf_hash, this.batch.tasks)
+              indexes.push(index)
+            }
+
+            // check highest taskindex user has done, and up it
+            if (indexes.length > 0 && Math.max(indexes) >= this.batch.tasks_done) {
+              taskIndex = Math.max(indexes) + 1
+            }
+          }
+
+          const result = await this.$blockchain.reserveTask(this.batch.id, taskIndex, this.batch.campaign_id, this.batch.tasks)
           this.$store.dispatch('transaction/addTransaction', result)
           // get reservations and see if this user has a reservation
           await retry(async () => {
-            reservations = await this.$blockchain.getReservations()
-            rvObj = await this.getReservationForUser(reservations)
+            const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
+            rvObj = await this.getReservationForUser(rvs)
             if (!rvObj.reservation) {
               throw new Error('Reservation not found')
             }
@@ -56,13 +80,14 @@ export default {
           })
         }
 
+        // Reclaim expired task
         if (rvObj.reservation && rvObj.isReleased === false && rvObj.isExpired === true) {
           const result = await this.$blockchain.claimExpiredTask(rvObj.reservation.id)
           this.$store.dispatch('transaction/addTransaction', result)
           // get reservations and see if this user has a reservation
           await retry(async () => {
-            reservations = await this.$blockchain.getReservations()
-            rvObj = await this.getReservationForUser(reservations)
+            const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
+            rvObj = await this.getReservationForUser(rvs)
             if (!rvObj.reservation) {
               throw new Error('Reservation not found')
             }
@@ -73,13 +98,15 @@ export default {
             }
           })
         }
+
+        // Reclaim released task
         if (rvObj.reservation && rvObj.isReleased === true && rvObj.isExpired === false) {
           const result = await this.$blockchain.reclaimTask(rvObj.reservation.id)
           this.$store.dispatch('transaction/addTransaction', result)
           // get reservations and see if this user has a reservation
           await retry(async () => {
-            reservations = await this.$blockchain.getReservations()
-            rvObj = await this.getReservationForUser(reservations)
+            const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
+            rvObj = await this.getReservationForUser(rvs)
             if (!rvObj.reservation) {
               throw new Error('Reservation not found')
             }
@@ -92,11 +119,11 @@ export default {
         }
 
         // get task form reservation and go to task page
-        if (rvObj.reservation && rvObj.isExpired === false) {
+        if (rvObj.reservation && rvObj.isExpired === false && rvObj.isReleased === false) {
           const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, rvObj.reservation.leaf_hash, this.batch.tasks)
           this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '/' + taskIndex + '?submissionId=' + rvObj.reservation.id)
         } else {
-          this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id)
+          this.$router.push('/campaigns/' + this.batch.campaign_id)
         }
         this.loading = false
       } catch (e) {
@@ -106,7 +133,8 @@ export default {
     },
     getReservationForUser (reservations) {
       let reservation, isReleased, isExpired
-      for (const rv of reservations.rows) {
+      for (const rv of reservations) {
+        // TODO: check if this logic is correct
         if (rv.account_id === this.$auth.user.vAccountRows[0].id && parseInt(this.batch.batch_id) === parseInt(rv.batch_id) && (!rv.data || !rv.data.length)) {
           reservation = rv
           isReleased = false
@@ -126,6 +154,12 @@ export default {
           isReleased = false
           isExpired = false
         }
+      }
+
+      if (reservations.length === 0) {
+        reservation = null
+        isReleased = false
+        isExpired = false
       }
       return { reservation, isReleased, isExpired }
     }
