@@ -18,12 +18,13 @@
       </div>
       <hr class="mt-1">
     </client-only>
-    <div :class="{'is-flex-tablet' : !gridListState}">
+    <div :class="{'is-flex-tablet' : !gridListState || windowWidth < gridBreakpoint}">
       <nuxt-link
         v-for="campaign in paginatedCampaigns"
         :key="campaign.id"
         :to="'/campaigns/'+campaign.id"
-        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation, 'column is-one-fifth-desktop is-one-third-tablet is-full-mobile' : !gridListState}"
+        class="campaign-item"
+        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation, 'column is-one-fifth-desktop is-one-third-tablet is-full-mobile' : !gridListState || windowWidth < gridBreakpoint}"
       >
         <div class="box p-4" :class="{'mt-5': gridListState}">
           <div class="columns is-vcentered is-multiline is-mobile">
@@ -36,7 +37,7 @@
             </div>
             <div class="column is-4-desktop is-4-widescreen is-12-touch" :class="{'is-12': !gridListState}">
               <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                <div v-if="gridListState">
+                <div v-if="gridListState" class="is-hidden-touch">
                   <nuxt-link
                     v-if="campaign.info && campaign.info.category"
                     :to="'/?category=' + campaign.info.category"
@@ -87,7 +88,7 @@
                 {{ campaign.reward.quantity }}
               </h2>
             </div>
-            <div class="column" v-if="gridListState">
+            <div class="column is-hidden-touch" v-if="gridListState" >
               <p class="has-text-grey is-size-7">
                 Tasks:
               </p>
@@ -163,7 +164,10 @@ export default {
       search: null,
       status: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
-      categories: ['translate', 'captions', 'socials', 'dao']
+      categories: ['translate', 'captions', 'socials', 'dao'],
+      windowWidth: window.innerWidth,
+      // bulma touch breakpoint
+      gridBreakpoint: 1024
     }
   },
   computed: {
@@ -205,7 +209,6 @@ export default {
         if (this.approvedCampaigns) {
           filteredCampaigns = filteredCampaigns.filter(c => this.approvedCampaigns.includes(c.id))
         }
-        console.log(this.hideCampaigns)
         if (this.hideCampaigns) {
           filteredCampaigns = filteredCampaigns.filter(c => !this.hideCampaigns.includes(c.id))
         }
@@ -295,6 +298,15 @@ export default {
   created () {
     this.getForceInfo()
   },
+  mounted () {
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize)
+    })
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.onResize)
+  },
   methods: {
     async processCampaigns (campaigns) {
       for (const campaign of campaigns) {
@@ -303,6 +315,9 @@ export default {
           await this.$store.dispatch('campaign/processCampaign', campaign)
         }
       }
+    },
+    onResize () {
+      this.windowWidth = window.innerWidth
     },
     setPage (newPage) {
       this.page = newPage
