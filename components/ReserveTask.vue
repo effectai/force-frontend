@@ -63,6 +63,9 @@ export default {
             }
           }
 
+          if (taskIndex > this.batch.num_tasks) {
+            this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '?batchCompleted=1')
+          }
           const result = await this.$blockchain.reserveTask(this.batch.id, taskIndex, this.batch.campaign_id, this.batch.tasks)
           this.$store.dispatch('transaction/addTransaction', result)
           // get reservations and see if this user has a reservation
