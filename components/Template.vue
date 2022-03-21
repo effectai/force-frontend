@@ -7,7 +7,7 @@
     <iframe
       id="mediaFrame"
       ref="mediaFrame"
-      src="http://localhost:3000/template"
+      :src="alternativeFrontendUrl + '/template'"
       name="mediaFrame"
       sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-pointer-lock allow-same-origin"
       allow="geolocation; microphone; camera; autoplay; fullscreen"
@@ -27,6 +27,7 @@ export default {
   },
   data () {
     return {
+      alternativeFrontendUrl: process.env.NUXT_ENV_ALTERNATIVE_FRONTEND,
       loading: true
     }
   },
