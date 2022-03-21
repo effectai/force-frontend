@@ -19,19 +19,18 @@
       <hr class="mt-1">
     </client-only>
     <div :class="{'is-flex-tablet' : !gridListState || windowWidth < gridBreakpoint}">
-      <nuxt-link
+      <div
         v-for="campaign in paginatedCampaigns"
         :key="campaign.id"
-        :to="'/campaigns/'+campaign.id"
         class="campaign-item"
-        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation, 'column is-one-fifth-desktop is-one-third-tablet is-full-mobile' : !gridListState || windowWidth < gridBreakpoint}"
+        :class="{'column is-one-fifth-desktop is-one-third-tablet is-full-mobile' : !gridListState || windowWidth < gridBreakpoint}"
       >
-        <div class="box p-4" :class="{'mt-5': gridListState}">
+        <nuxt-link :to="'/campaigns/'+campaign.id" class="box p-4" :class="{'mt-5': gridListState, 'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}">
           <div class="columns is-vcentered is-multiline is-mobile">
             <div class="column is-narrow is-mobile-1">
               <p class="image has-radius is-vcentered has-background-image" style="width: 52px; height: 52px">
                 <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
-                <img class v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+                <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" class :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
                 <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
               </p>
             </div>
@@ -88,7 +87,7 @@
                 {{ campaign.reward.quantity }}
               </h2>
             </div>
-            <div class="column is-hidden-touch" v-if="gridListState" >
+            <div v-if="gridListState" class="column is-hidden-touch">
               <p class="has-text-grey is-size-7">
                 Tasks:
               </p>
@@ -115,8 +114,8 @@
               </button>
             </div>
           </div>
-        </div>
-      </nuxt-link>
+        </nuxt-link>
+      </div>
     </div>
     <pagination
       v-if="filteredCampaigns"
