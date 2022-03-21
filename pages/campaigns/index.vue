@@ -10,7 +10,7 @@
       <nuxt-link class="button is-ghost is-pulled-right is-paddingless-mobile" to="/">
         <span>Active Tasks</span>
       </nuxt-link>
-      <h1 class="title has-text-weight-bold is-full-mobile">
+      <h1 class="title has-text-weight-bold">
         <span v-if="myCampaigns">My</span><span v-else>All</span> Tasks
       </h1>
       <label class="checkbox">
@@ -47,7 +47,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId',
+      batchesByCampaignId: 'campaign/batchesByCampaignId',
       campaignsByCategory: 'campaign/campaignsByCategory',
       reservationsByAccountId: 'campaign/reservationsByAccountId',
       getGridListState: 'view/getGridListState'
@@ -58,7 +58,7 @@ export default {
       if (campaigns) {
         filteredCampaigns = campaigns.map((c) => { return { ...c } })
         for (const i in filteredCampaigns) {
-          const batches = this.batchByCampaignId(filteredCampaigns[i].id)
+          const batches = this.batchesByCampaignId(filteredCampaigns[i].id)
           if (batches) {
             filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
               return a + b.num_tasks

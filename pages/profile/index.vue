@@ -2,7 +2,7 @@
   <section class="section">
     <div class="container">
       <div class="text-center">
-        <h1 class="title is-spaced has-text-weight-bold is-full-mobile">
+        <h1 class="title is-spaced has-text-weight-bold">
           <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->
           Effect Account | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
         </h1>
@@ -84,7 +84,7 @@
               </span>
             </div>
           </div>
-          <div v-if="showPayoutDetails" class="is-full-mobile mt-5 payout-table">
+          <div v-if="showPayoutDetails" class="mt-5 payout-table">
             <div v-if="pendingPayoutsStore" class="table-container">
               <table class="table" style="width: 100%">
                 <thead>
@@ -147,7 +147,7 @@
         </div>
 
         <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
-          <h2 class="title is-4 is-full-mobile">
+          <h2 class="title is-4">
             My Tasks
           </h2>
           <nuxt-link class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" to="/campaigns/templates">

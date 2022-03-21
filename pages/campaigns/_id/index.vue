@@ -237,15 +237,15 @@
                 <div class="block">
                   Tasks
                   <br>
-                  <span v-if="batchByCampaignId(campaign.id) === null" class="loading-text">
+                  <span v-if="batchesByCampaignId(campaign.id) === null" class="loading-text">
                     Loading
                   </span>
                   <span v-else>
-                    {{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                    {{ batchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.num_tasks
-                    },0) - batchByCampaignId(campaign.id).reduce(function(a,b){
+                    },0) - batchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.tasks_done
-                    },0) }}/{{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                    },0) }}/{{ batchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.num_tasks
                     },0) }} left
                     <br>
@@ -295,15 +295,14 @@ export default {
   },
   computed: {
     ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId'
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     ...mapState({
-      batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
       batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded
     }),
     campaignBatches () {
-      return this.batchByCampaignId(this.id)
+      return this.batchesByCampaignId(this.id)
     },
     campaign () {
       if (this.campaigns) {

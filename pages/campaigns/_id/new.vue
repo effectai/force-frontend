@@ -263,7 +263,7 @@ export default {
       campaignLoading: state => state.campaign.loading
     }),
     ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId'
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     efxAvailable () {
       return this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable

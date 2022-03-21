@@ -87,15 +87,15 @@
                 Tasks:
               </p>
               <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                <span v-if="batchByCampaignId(campaign.id) === null" class="loading-text">
+                <span v-if="batchesByCampaignId(campaign.id) === null" class="loading-text">
                   Loading
                 </span>
                 <span v-else>
-                  {{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                  {{ batchesByCampaignId(campaign.id).reduce(function(a,b){
                     return a + b.num_tasks
-                  },0) - batchByCampaignId(campaign.id).reduce(function(a,b){
+                  },0) - batchesByCampaignId(campaign.id).reduce(function(a,b){
                     return a + b.tasks_done
-                  },0) }}/{{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                  },0) }}/{{ batchesByCampaignId(campaign.id).reduce(function(a,b){
                     return a + b.num_tasks
                   },0) }} left
                   <br>
@@ -155,7 +155,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId'
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     ...mapState({
       campaignsLoading: state => state.campaign.loading,

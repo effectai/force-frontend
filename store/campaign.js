@@ -123,7 +123,7 @@ export default {
     campaignById (state) {
       return id => state.campaigns ? state.campaigns.find(c => c.id === id) : null
     },
-    batchByCampaignId (state) {
+    batchesByCampaignId (state) {
       return id => state.batches ? state.batches.filter(b => b.campaign_id === id) : null
     },
     campaignsByCategory (state) {

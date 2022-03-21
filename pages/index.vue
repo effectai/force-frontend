@@ -4,8 +4,8 @@
       <div class="level">
         <div class="level-left">
           <div class="level-item">
-            <h1 class="title has-text-weight-bold is-full-mobile" :class="{'has-text-danger': !approved}">
-              <span v-if="approved">Active</span><span v-else>Unmoderated</span> Tasks
+            <h1 class="title has-text-weight-bold" :class="{'has-text-danger': !approved}">
+              <span v-if="approved">Active</span><span v-else>Unmoderated</span> <span v-if="categoryFilter" class="is-capitalized">{{ categoryFilter }}</span> Tasks
             </h1>
           </div>
         </div>
@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId',
+      batchesByCampaignId: 'campaign/batchesByCampaignId',
       campaignsByCategory: 'campaign/campaignsByCategory',
       reservationsByAccountId: 'campaign/reservationsByAccountId'
     }),
@@ -73,7 +73,7 @@ export default {
           filteredCampaigns = filteredCampaigns.filter(c => !this.approvedCampaigns.includes(c.id))
         }
         for (const i in filteredCampaigns) {
-          const batches = this.batchByCampaignId(filteredCampaigns[i].id)
+          const batches = this.batchesByCampaignId(filteredCampaigns[i].id)
           // get the reservations of the user for this campaign
           const reservationsOfUser = _.intersectionBy(batches, this.reservations, 'batch_id')
           filteredCampaigns[i].userHasReservation = (reservationsOfUser.length)

@@ -114,10 +114,10 @@ export default {
       batchLoading: state => state.campaign.loadingBatch
     }),
     ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId'
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     campaignBatches () {
-      return this.batchByCampaignId(this.campaignId)
+      return this.batchesByCampaignId(this.campaignId)
     }
   },
   created () {
