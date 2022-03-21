@@ -53,12 +53,13 @@ export default {
       getGridListState: 'view/getGridListState'
     }),
     filteredCampaigns () {
-      const campaigns = this.campaignsByCategory(this.$route.query.category ? this.$route.query.category : this.filter)
+      const campaigns = this.campaignsByCategory(this.filter)
       let filteredCampaigns
       if (campaigns) {
         filteredCampaigns = campaigns.map((c) => { return { ...c } })
         for (const i in filteredCampaigns) {
           const batches = this.batchesByCampaignId(filteredCampaigns[i].id)
+          filteredCampaigns[i].batches = batches
           if (batches) {
             filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
               return a + b.num_tasks

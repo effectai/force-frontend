@@ -246,14 +246,6 @@ export default {
           }
           commit('UPSERT_CAMPAIGNS', campaigns)
         }, 0)
-        // ;(async () => {
-        //   for (const campaign of data.rows) {
-        //   // TODO: only make one thread to process campaigns, now a new thread is started for every call, so as a temporary fix we are increasing the limit to 500 so only one call is being made
-        //   // a short sleep helps for some reason to make interface less laggy
-        //   // await sleep(0)
-        //     dispatch('processCampaign', campaign)
-        //   }
-        // })()
 
         if (data.more) {
           console.log('retrieving more campaigns..')

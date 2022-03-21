@@ -82,23 +82,13 @@
                 {{ campaign.reward.quantity }}
               </h2>
             </div>
-            <div class="column">
+            <div v-if="campaign.num_tasks || campaign.tasks_done" class="column">
               <p class="has-text-grey is-size-7">
                 Tasks:
               </p>
               <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                <span v-if="batchesByCampaignId(campaign.id) === null" class="loading-text">
-                  Loading
-                </span>
-                <span v-else>
-                  {{ batchesByCampaignId(campaign.id).reduce(function(a,b){
-                    return a + b.num_tasks
-                  },0) - batchesByCampaignId(campaign.id).reduce(function(a,b){
-                    return a + b.tasks_done
-                  },0) }}/{{ batchesByCampaignId(campaign.id).reduce(function(a,b){
-                    return a + b.num_tasks
-                  },0) }} left
-                  <br>
+                <span>
+                  {{ campaign.num_tasks - campaign.tasks_done }}/{{ campaign.num_tasks }} left
                 </span>
               </h2>
             </div>

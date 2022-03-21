@@ -57,7 +57,7 @@
   </section>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 import CampaignList from '@/components/CampaignList'
 
@@ -75,9 +75,29 @@ export default {
     ...mapState({
       campaigns: state => state.campaign.campaigns
     }),
+    ...mapGetters({
+      transactionsByUser: 'transaction/transactionsByUser',
+      getPendingPayouts: 'pendingPayout/getPendingPayouts',
+      campaignById: 'campaign/campaignById',
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
+    }),
     myCampaigns () {
       if (!this.campaigns) { return }
-      return this.campaigns.filter(c => c.owner[1] === this.name)
+      const filteredCampaigns = this.campaigns.filter(c => c.owner[1] === this.name).map((c) => { return { ...c } })
+
+      for (const i in filteredCampaigns) {
+        const batches = this.batchesByCampaignId(filteredCampaigns[i].id)
+        filteredCampaigns[i].batches = batches
+        if (batches) {
+          filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
+            return a + b.num_tasks
+          }, 0)
+          filteredCampaigns[i].tasks_done = batches.reduce(function (a, b) {
+            return a + b.tasks_done
+          }, 0)
+        }
+      }
+      return filteredCampaigns
     }
   },
   created () {

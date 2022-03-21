@@ -256,14 +256,29 @@ export default {
     ...mapGetters({
       transactionsByUser: 'transaction/transactionsByUser',
       getPendingPayouts: 'pendingPayout/getPendingPayouts',
-      campaignById: 'campaign/campaignById'
+      campaignById: 'campaign/campaignById',
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     ...mapState({
       campaigns: state => state.campaign.campaigns
     }),
     myCampaigns () {
       if (!this.campaigns) { return }
-      return this.campaigns.filter(c => c.owner[1] === this.$auth.user.accountName)
+      const filteredCampaigns = this.campaigns.filter(c => c.owner[1] === this.$auth.user.accountName).map((c) => { return { ...c } })
+
+      for (const i in filteredCampaigns) {
+        const batches = this.batchesByCampaignId(filteredCampaigns[i].id)
+        filteredCampaigns[i].batches = batches
+        if (batches) {
+          filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
+            return a + b.num_tasks
+          }, 0)
+          filteredCampaigns[i].tasks_done = batches.reduce(function (a, b) {
+            return a + b.tasks_done
+          }, 0)
+        }
+      }
+      return filteredCampaigns
     },
     transactions () {
       return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)

@@ -77,6 +77,7 @@ export default {
           // get the reservations of the user for this campaign
           const reservationsOfUser = _.intersectionBy(batches, this.reservations, 'batch_id')
           filteredCampaigns[i].userHasReservation = (reservationsOfUser.length)
+          filteredCampaigns[i].batches = batches
           if (batches) {
             filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
               return a + b.num_tasks
