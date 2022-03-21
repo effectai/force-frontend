@@ -160,7 +160,7 @@
 
         <campaign-list class="mb-5" :grid-toggle="false" :owner="$auth.user.accountName" />
 
-        <div style="display:block; overflow:hidden;" class="mb-6">
+        <div class="mb-6">
           <h2 class="title is-4 mt-6 is-spaced">
             Transactions
           </h2>
