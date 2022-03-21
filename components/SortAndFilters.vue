@@ -70,7 +70,7 @@ export default {
         },
         captions: {
           value: 'captions',
-          name: 'Captions'
+          name: 'Image Labeling'
         }
       },
       sort_options: {

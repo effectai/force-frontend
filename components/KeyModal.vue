@@ -3,24 +3,24 @@
     <div class="modal-background" @click="$emit('close')" />
     <div class="modal-content p-5 has-background-info-light has-radius">
       <h3 class="subtitle is-5 has-text-centered">{{ messageTitle }}</h3>
-      <!-- <input class="input" :type="input_type" name="key" :value="messageContent" readonly> -->
 
       <div class="field has-addons has-addons-centered is-centered">
-        <div class="control is-expanded">
-          <input :type="input_type" class="input" :value="messageContent" readonly>
-        </div>
-        <div class="control">
-          <button class="button" @click="toggleInputType">
-            <font-awesome-icon v-if="input_type === 'password'" icon="fa-solid fa-eye" />
-            <font-awesome-icon v-else icon="fa-solid fa-eye-slash" />
-          </button>
+        <div class="control has-icons-right has-icons-left is-expanded">
+          <input class="input" :type="password_hidden ? 'password' : 'text'" :value="messageContent" readonly>
+          <span class="p-2 icon is-small is-left is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="visibility_message" @click.prevent="togglePasswordVisibility()" @mouseout="visibility_message = 'Toggle visibility'">
+            <font-awesome-icon v-if="password_hidden" class="unselectable" icon="fa-solid fa-eye" />
+            <font-awesome-icon v-else class="unselectable" icon="fa-solid fa-eye-slash" />
+          </span>
+          <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="copy_message" @click.prevent="copyToClipboard(messageContent)" @mouseout="copy_message = 'Copy to clipboard'">
+            <img src="~assets/img/icons/copy.svg" class="unselectable" alt="Copy">
+          </span>
         </div>
       </div>
 
       <button class="button modal-close is-large" aria-label="close" @click="$emit('close')"/>
       <br>
       <div class="has-text-centered">
-        <button class="button" @click="copyToClipboard(messageContent)">{{ copy_message }}</button>
+        <button class="button" @click="$emit('close')">Close</button>
       </div>
     </div>
   </div>
@@ -42,7 +42,9 @@ export default {
       messageTitle: this.title,
       messageContent: this.message,
       copy_message: 'Copy',
-      input_type: 'password'
+      input_type: 'password',
+      password_hidden: true
+
     }
   },
   methods: {
@@ -53,12 +55,8 @@ export default {
         this.copy_message = 'Copy'
       }, 5e3)
     },
-    toggleInputType () {
-      if (this.input_type === 'password') {
-        this.input_type = 'text'
-      } else {
-        this.input_type = 'password'
-      }
+    togglePasswordVisibility () {
+      this.password_hidden = !this.password_hidden
     }
   }
 }

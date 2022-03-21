@@ -14,14 +14,17 @@
                   Earn Crypto
                 </h1>
                 <h1 class="title is-4">
-                  Complete tasks and earn the EFX cryptocurrency
+                  Complete tasks and earn crypto
                 </h1>
                 <p class="has-text-aligned block">
-                  Effect Force is the decentralized framework for the Future-of-Work. You can now work from anywhere at any time from any device. Simply create an Effect Account and sign into Effect Force to start earning great pay in the cryptocurrency $EFX.
+                  Effect Network is the platform for the Future-of-Work. You can
+                  work from anywhere, at any time, from any device. Simply
+                  create an Effect Account and start completing tasks while
+                  collecting $EFX directly to your wallet.
                 </p>
                 <p class="block">
                   <nuxt-link class="button is-primary is-outlined is-medium" to="/login">
-                    Join the WorkForce
+                    Join the workforce
                   </nuxt-link>
                 </p>
               </div>
@@ -34,13 +37,17 @@
                 <img src="~assets/img/icons/create_white.gif" style="height: 90px" class="show-on-hover">
                 <img src="~assets/img/icons/create.png" style="height: 90px" class="hide-on-hover">
                 <h1 class="title is-1">
-                  Create Task
+                  Create Tasks
                 </h1>
                 <h1 class="title is-4">
-                  Access a global, on-demand, 24x7 scalable WorkForce
+                  Access a global, on-demand, 24x7 scalable workforce
                 </h1>
                 <p class="has-text-aligned block">
-                  Tap into a scalable WorkForce of over 10,000 people to complete tasks for you. Choose one of the default task templates to get started with text analysis, document transcription, image annotations, sentitment analyis and many more!
+                  Tap into a diverse workforce of over 10,000 people that
+                  complete tasks for you. Choose one of the default task
+                  templates to get started with text analysis, document
+                  transcription, image annotations, sentitment analyis and many
+                  more!
                 </p>
                 <p class="block">
                   <nuxt-link class="button is-primary is-outlined is-medium" to="/campaigns/templates">
