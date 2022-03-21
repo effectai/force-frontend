@@ -289,7 +289,11 @@
                   <span>/ {{ batch.num_tasks }} left</span>
                 </template>
                 <span v-else>...</span>
-                <progress class="progress" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks : false, 'is-secondary': batch ? batch.tasks_done < batch.num_tasks || (batch.reservations && batch.reservations.length): false}" :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined" :max="batch ? batch.num_tasks : undefined">
+                <progress
+                  class="progress"
+                  :class="getProgressBatch(batch)"
+                  :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined"
+                  :max="batch ? batch.num_tasks : undefined">
                   Left
                 </progress>
               </div>
@@ -674,6 +678,19 @@ export default {
     },
     setPageT (newPage) {
       this.pageT = newPage
+    },
+    getProgressBatch (batch) {
+      console.log(`%c ${JSON.stringify(batch)}`, 'background: #222; color: #bada55')
+      switch (batch?.status) {
+        case 'Completed':
+          return 'is-success'
+        case 'Active':
+          return 'is-info'
+        case 'Paused':
+          return 'is-warning'
+        default:
+          break
+      }
     }
   }
 }
