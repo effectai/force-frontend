@@ -68,8 +68,8 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(task, index) in tasks" :key="task.id">
-                      <td>{{ index + 1 }}</td>
+                    <tr v-for="(task, index) in paginatedTasks" :key="task.id">
+                      <td>{{ task.id }}</td>
                       <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
                         {{ task[placeholder] }}
                       </td>
@@ -100,6 +100,13 @@
                     </tr>
                   </tbody>
                 </table>
+                <pagination
+                  v-if="tasks"
+                  :items="tasks.length"
+                  :page="page"
+                  :per-page="perPage"
+                  @setPage="setPage"
+                />
               </div>
               <div class="control has-text-centered mt-5">
                 <button class="button is-primary is-wide" @click.prevent="createTask">
@@ -120,7 +127,7 @@
                         <span class="file-label has-text-grey is-size-7">
                           Drag and drop or browse to choose a CSV file
                         </span>
-                        <button class="button is-light mt-2 ">
+                        <button class="button is-light mt-2">
                           Choose a .csv file
                         </button>
                       </span>
@@ -208,6 +215,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import { Template } from '@effectai/effect-js'
+import Pagination from '@/components/Pagination.vue'
 import TemplateMedia from '@/components/Template'
 // import templatePreviewModal from '~/components/templatePreviewModal.vue'
 
@@ -224,6 +232,7 @@ function getMatches (string, regex, index) {
 export default {
   components: {
     // templatePreviewModal
+    Pagination,
     TemplateMedia
   },
   middleware: ['auth'],
@@ -243,7 +252,9 @@ export default {
         content: null
       },
       error: null,
-      loading: false
+      loading: false,
+      page: 1,
+      perPage: 30
     }
   },
   computed: {
@@ -259,12 +270,22 @@ export default {
     },
     maxAmountTask () {
       return Math.floor(((this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable) / this.campaign.info.reward) / this.repetitions)
+    },
+    paginatedTasks () {
+      const start = (this.page - 1) * this.perPage
+      if (this.tasks) {
+        return this.tasks.slice(start, start + this.perPage)
+      }
+      return []
     }
   },
   mounted () {
     this.getCampaign()
   },
   methods: {
+    setPage (newPage) {
+      this.page = newPage
+    },
     dragover (event) {
       event.preventDefault()
       event.currentTarget.classList.add('dragover')
