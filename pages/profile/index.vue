@@ -89,11 +89,11 @@
               <table class="table" style="width: 100%">
                 <thead>
                   <tr>
-                    <th>Countdown</th>
-                    <th>Pending</th>
                     <th>Campaign</th>
                     <th>Batch</th>
                     <th>Date</th>
+                    <th>Countdown</th>
+                    <th>Pending</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -101,6 +101,17 @@
                     v-for="pendingPayout in pendingPayoutsStore.payouts.rows"
                     :key="pendingPayout.id"
                   >
+                    <td>
+                      <nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">
+                        {{ campaignById($blockchain.splitCompositeKey(pendingPayout.batch_id).campaign).info.title }}
+                      </nuxt-link>
+                    </td>
+                    <td>
+                      <nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}/${pendingPayout.batch_id}`}">
+                        {{ $blockchain.splitCompositeKey(pendingPayout.batch_id).batch }}
+                      </nuxt-link>
+                    </td>
+                    <td>{{ new Date(pendingPayout.last_submission_time).toLocaleDateString() }}</td>
                     <td>
                       <!-- Time for the release of  -->
                       <vue-countdown
@@ -115,27 +126,18 @@
                       </vue-countdown>
                     </td>
                     <td>{{ parseFloat(pendingPayout.pending.quantity).toFixed(2) }} EFX</td>
-                    <td>
-                      <nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">
-                        {{ $blockchain.splitCompositeKey(pendingPayout.batch_id).campaign }}
-                      </nuxt-link>
-                    </td>
-                    <td>
-                      <nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}/${pendingPayout.batch_id}`}">
-                        {{ $blockchain.splitCompositeKey(pendingPayout.batch_id).batch }}
-                      </nuxt-link>
-                    </td>
-                    <td>{{ new Date(pendingPayout.last_submission_time).toLocaleDateString() }}</td>
                   </tr>
                 </tbody>
                 <tfoot>
                   <tr>
+                    <th colspan="3" />
                     <th>Total</th>
-                    <td><strong>{{ parseFloat($blockchain.efxPending).toFixed(2) }} EFX</strong></td>
+                    <th><strong>{{ parseFloat($blockchain.efxPending).toFixed(2) }} EFX</strong></th>
                   </tr>
                   <tr>
+                    <th colspan="3" style="border: none" />
                     <th>Claimable</th>
-                    <td><strong>{{ parseFloat($blockchain.efxPayout).toFixed(2) }} EFX</strong></td>
+                    <th><strong>{{ parseFloat($blockchain.efxPayout).toFixed(2) }} EFX</strong></th>
                   </tr>
                 </tfoot>
               </table>
@@ -253,8 +255,8 @@ export default {
   computed: {
     ...mapGetters({
       transactionsByUser: 'transaction/transactionsByUser',
-      getPendingPayouts: 'pendingPayout/getPendingPayouts'
-
+      getPendingPayouts: 'pendingPayout/getPendingPayouts',
+      campaignById: 'campaign/campaignById'
     }),
     transactions () {
       return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)
@@ -336,6 +338,9 @@ button.button.is-small.is-info {
 
 .payout-table {
   transition: all .5s ease-in-out;
+  tfoot tr:last-child th {
+    border-style: dashed;
+  }
 }
 
 @media screen and (max-width: $tablet) {
