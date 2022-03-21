@@ -3,11 +3,11 @@
     <div v-if="loading" class="loading-text subtitle">
       Loading
     </div>
-    <!-- TODO: add polyfill for srcdoc or move to different URL and use src -->
     <iframe
+      v-if="html"
       id="mediaFrame"
       ref="mediaFrame"
-      :src="alternativeFrontendUrl + '/template'"
+      :srcdoc="html"
       name="mediaFrame"
       sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-pointer-lock allow-same-origin"
       allow="geolocation; microphone; camera; autoplay; fullscreen"
@@ -19,22 +19,11 @@
 
 <script>
 export default {
-  props: {
-    html: {
-      type: String,
-      default: null
-    }
-  },
+  layout: 'empty',
   data () {
     return {
-      alternativeFrontendUrl: process.env.NUXT_ENV_ALTERNATIVE_FRONTEND,
-      loading: true
-    }
-  },
-  watch: {
-    html (html) {
-      const frame = document.getElementById('mediaFrame')
-      frame.contentWindow.postMessage({ task: 'template', value: html }, '*')
+      loading: true,
+      html: null
     }
   },
   mounted () {
@@ -66,15 +55,20 @@ export default {
       // TODO: check if sender of event is template iframe
       const data = event.data
       switch (data.task) { // postMessage tasks
+        case 'template':
+          this.html = data.value
+          break
         case 'setHeight':
           // eslint-disable-next-line no-case-declarations
           const frame = document.getElementById('mediaFrame')
           frame.height = (data.height) + 'px'
+          parent.postMessage(data, '*')
           break
         case 'submit':
           // TaskContent handles submit
-          this.$emit('submit', data.values)
+          parent.postMessage(data, '*')
           break
+        case 'key':
         case 'results':
           // eslint-disable-next-line no-case-declarations
           const mediaFrame = document.getElementById('mediaFrame')
@@ -85,7 +79,14 @@ export default {
   }
 }
 </script>
-
+<style>
+html {
+  overflow-y: auto !important;
+}
+#__layout {
+  line-height:0;
+}
+</style>
 <style lang="scss" scoped>
 .template-wrapper {
   width: 100%;
