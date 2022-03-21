@@ -1,6 +1,9 @@
 <template>
   <section class="section is-max-widescreen">
     <div class="container">
+      <div v-if="loading" class="loader-wrapper is-active">
+        <img src="~assets/img/loading.svg">
+      </div>
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
           <li>
@@ -175,7 +178,7 @@
         <form @submit.prevent="uploadBatch">
           <div class="field is-grouped is-justify-content-center mt-6">
             <div class="control">
-              <button type="submit" class="button button is-primary is-wide mr-4" :disabled="!tasks.length || tasks.length > maxAmountTask">
+              <button type="submit" :class="{'is-loading': loading}" class="button button is-primary is-wide mr-4" :disabled="!tasks.length || tasks.length > maxAmountTask">
                 Add Tasks
               </button>
               <button class="button is-outlined is-primary is-wide" @click.prevent="cancel">
@@ -239,7 +242,8 @@ export default {
         name: null,
         content: null
       },
-      error: null
+      error: null,
+      loading: false
     }
   },
   computed: {
@@ -340,6 +344,7 @@ export default {
     },
     async uploadBatch () {
       try {
+        this.loading = true
         const content = {
           tasks: this.tasks
         }
@@ -349,6 +354,7 @@ export default {
       } catch (e) {
         this.$blockchain.handleError(e)
       }
+      this.loading = false
     },
     cancel () {
       this.$router.push('/campaigns/' + this.campaignId)
