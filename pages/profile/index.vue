@@ -158,7 +158,7 @@
           </nuxt-link>
         </div>
 
-        <campaign-list class="mb-5" :grid-toggle="false" :owner="$auth.user.accountName" />
+        <campaign-list class="mb-5" :campaigns="myCampaigns" />
 
         <div class="mb-6">
           <h2 class="title is-4 mt-6 is-spaced">
@@ -219,7 +219,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import VueCountdown from '@chenfengyuan/vue-countdown/dist/vue-countdown.common'
 import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
@@ -258,6 +258,13 @@ export default {
       getPendingPayouts: 'pendingPayout/getPendingPayouts',
       campaignById: 'campaign/campaignById'
     }),
+    ...mapState({
+      campaigns: state => state.campaign.campaigns
+    }),
+    myCampaigns () {
+      if (!this.campaigns) { return }
+      return this.campaigns.filter(c => c.owner[1] === this.$auth.user.accountName)
+    },
     transactions () {
       return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)
     },

@@ -47,7 +47,7 @@
           <h2 class="title is-4">
             Campaigns
           </h2>
-          <campaign-list class="mb-6" :owner="name" />
+          <campaign-list class="mb-6" :campaigns="myCampaigns" />
         </div>
         <div v-else>
           Could not retrieve account
@@ -57,6 +57,8 @@
   </section>
 </template>
 <script>
+import { mapState } from 'vuex'
+
 import CampaignList from '@/components/CampaignList'
 
 export default {
@@ -69,9 +71,19 @@ export default {
       loading: false
     }
   },
+  computed: {
+    ...mapState({
+      campaigns: state => state.campaign.campaigns
+    }),
+    myCampaigns () {
+      if (!this.campaigns) { return }
+      return this.campaigns.filter(c => c.owner[1] === this.name)
+    }
+  },
   created () {
     this.getProfile()
   },
+
   methods: {
     async getProfile () {
       try {

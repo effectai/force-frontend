@@ -2,23 +2,17 @@ export default {
   namespaced: true,
   modules: {},
   mutations: {
-    TOGGLE_GRID_LIST_STATE (state) {
-      state.gridListToggle = !state.gridListToggle
-    }
-  },
-  getters: {
-    getGridListState (state) {
-      return state.gridListToggle
-    }
-  },
-  actions: {
-    toggleGridListState ({ commit }) {
-      commit('TOGGLE_GRID_LIST_STATE')
+    SET_GRID_LIST (state, value) {
+      if (typeof value === 'undefined') {
+        state.grid = !state.grid
+      } else {
+        state.grid = value
+      }
     }
   },
   state: () => {
     return {
-      gridListToggle: true
+      grid: false
     }
   }
 }

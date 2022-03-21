@@ -302,13 +302,10 @@ a.box {
 .pagination-previous[disabled], .pagination-next[disabled], .pagination-link[disabled] {
   pointer-events: none;
 }
-
 .tag {
-  padding: 3px 13px;
-  padding-top: 4px;
-  border-radius: 6px;
-  border: 1px solid;
-  text-transform: capitalize;
+  &.has-border {
+    border: 1px solid $grey;
+  }
 }
 
 /* Mobile margins */
