@@ -9,15 +9,15 @@
         <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
       </div>
       <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount, memo)">
-        <div class="field">
-          <label class="label">Destination Account</label>
+        <!-- <div class="field">
+          <label class="label">Destination EOS Account</label>
           <div class="control">
             <input v-model="account" class="input" type="text" required>
           </div>
-        </div>
+        </div> -->
 
         <div class="field">
-          <label class="label">vAccount Contract Balance</label>
+          <label class="label">Amount to withdraw</label>
           <div class="field has-addons">
             <div class="control is-expanded">
               <input
@@ -38,7 +38,7 @@
           </div>
         </div>
 
-        <div class="field">
+        <!-- <div class="field">
           <label for="" class="label">Memo</label>
           <div class="control">
             <input
@@ -47,7 +47,7 @@
               type="text"
             >
           </div>
-        </div>
+        </div> -->
 
         <div class="field is-grouped is-grouped-right">
           <div class="control">
