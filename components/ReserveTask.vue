@@ -107,8 +107,6 @@ export default {
             }
           }
 
-          console.log(userIndexes, 'should be zeroo')
-
           if (indexes.length > 0) {
             // create object, which holds the count of the task indexes in the submissions
             const indexesCount = {}
