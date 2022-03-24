@@ -56,10 +56,11 @@ export default {
             const result = await this.$blockchain.claimExpiredTask(rvObj.reservation.id)
             this.$store.dispatch('transaction/addTransaction', result)
 
+            // TODO: reuse this retry statement, is not three times the same code in this function
             await retry(async () => {
               const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
               rvObj = await this.getReservationForUser(rvs)
-              if (!rvObj.reservation && !(rvObj.isReleased || rvObj.isExpired)) {
+              if (!rvObj.reservation || rvObj.isReleased || rvObj.isExpired) {
                 throw new Error('Reservation not found')
               }
             }, {
@@ -73,10 +74,11 @@ export default {
             // (re) claim released task
             const result = await this.$blockchain.reclaimTask(rvObj.reservation.id)
             this.$store.dispatch('transaction/addTransaction', result)
+
             await retry(async () => {
               const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
               rvObj = await this.getReservationForUser(rvs)
-              if (!rvObj.reservation && !(rvObj.isReleased || rvObj.isExpired)) {
+              if (!rvObj.reservation || rvObj.isReleased || rvObj.isExpired) {
                 throw new Error('Reservation not found')
               }
             }, {
@@ -87,50 +89,65 @@ export default {
             })
           }
         } else {
-          // TODO THIS
           // User doesn't have reservation yet, so let's make one!
-          const taskIndex = this.batch.tasks_done
+          let taskIndex
 
-          // Check here in submissions if user already did the task of this.batch.tasks_done
+          // First go through the submissions and get all the indexes of the tasks that are done
           const indexes = []
+          const userIndexes = []
+
+          // TODO: improve this, takes ages now
           for (const sub of submissions) {
-            sub.taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, sub.leaf_hash, this.batch.tasks)
-            indexes.push(sub.taskIndex)
-            // if (sub.account_id === this.$auth.user.vAccountRows[0].id) {
-            //   const index = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, sub.leaf_hash, this.batch.tasks)
-            //   indexes.push(index)
-            // }
+            const index = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, sub.leaf_hash, this.batch.tasks)
+            indexes.push(index)
+            if (sub.account_id === this.$auth.user.vAccountRows[0].id) {
+              userIndexes.push(index)
+            }
           }
 
-          console.log('thiss', this.batch)
+          if (indexes.length > 0) {
+            // create object, which holds the count of the task indexes in the submissions
+            const indexesCount = {}
+            for (let i = 0; i < this.batch.num_tasks; i++) {
+              indexesCount[i] = 0
+            }
+            for (const num of indexes) {
+              indexesCount[num] = indexesCount[num] ? indexesCount[num] + 1 : 1
+            }
 
-          // check highest taskindex user has done, and up it
-          // if (indexes.length > 0 && Math.max(indexes) >= this.batch.tasks_done) {
-          //   taskIndex = Math.max(indexes) + 1
-          // }
+            // grab the first available index, that the user hasn't done yet
+            const availableIndex = Object.keys(indexesCount).find(key => indexesCount[key] < this.batch.repetitions && !userIndexes.find(i => i === key))
+            taskIndex = parseInt(availableIndex)
+            console.log('Found an available task index: ', taskIndex)
+          } else {
+            // no submissions yet in batch
+            taskIndex = 0
+          }
 
-          if (taskIndex > this.batch.num_tasks) {
+          // if the taskIndex is empty, it means that there are no available tasks anymore
+          if (taskIndex) {
+            const result = await this.$blockchain.reserveTask(this.batch.id, taskIndex, this.batch.campaign_id, this.batch.tasks)
+            this.$store.dispatch('transaction/addTransaction', result)
+            // get reservations and see if this user has a reservation
+            await retry(async () => {
+              const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
+              rvObj = await this.getReservationForUser(rvs)
+              if (!rvObj.reservation || rvObj.isReleased || rvObj.isExpired) {
+                throw new Error('Reservation not found')
+              }
+            }, {
+              retries: 5,
+              onRetry: (error, number) => {
+                console.log('attempt', number, error)
+              }
+            })
+          } else {
             this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '?batchCompleted=1')
           }
-          const result = await this.$blockchain.reserveTask(this.batch.id, taskIndex, this.batch.campaign_id, this.batch.tasks)
-          this.$store.dispatch('transaction/addTransaction', result)
-          // get reservations and see if this user has a reservation
-          await retry(async () => {
-            const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
-            rvObj = await this.getReservationForUser(rvs)
-            if (!rvObj.reservation) {
-              throw new Error('Reservation not found')
-            }
-          }, {
-            retries: 5,
-            onRetry: (error, number) => {
-              console.log('attempt', number, error)
-            }
-          })
         }
 
         // redirect to reservation
-        if (rvObj.reservation && rvObj.isExpired === false && rvObj.isReleased === false) {
+        if (rvObj.reservation) {
           const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, rvObj.reservation.leaf_hash, this.batch.tasks)
           this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '/' + taskIndex + '?submissionId=' + rvObj.reservation.id)
         } else {
