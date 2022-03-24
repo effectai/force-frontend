@@ -48,15 +48,14 @@ export default {
         let rvObj = await this.getReservationForUser(reservations)
 
         if (rvObj.reservation) {
-          // User has reservation, check if the reservation is either released or expired
-          // If so reclaim that reservation
+          // There is a reservation available that is either from the user OR is expired/released
 
           if (rvObj.isExpired) {
             // (re) claim expired task
             const result = await this.$blockchain.claimExpiredTask(rvObj.reservation.id)
             this.$store.dispatch('transaction/addTransaction', result)
 
-            // TODO: reuse this retry statement, is not three times the same code in this function
+            // TODO: reuse this retry statement, its now three times the same code in this function
             await retry(async () => {
               const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
               rvObj = await this.getReservationForUser(rvs)
@@ -69,8 +68,7 @@ export default {
                 console.log('attempt', number, error)
               }
             })
-          }
-          if (rvObj.isReleased) {
+          } else if (rvObj.isReleased) {
             // (re) claim released task
             const result = await this.$blockchain.reclaimTask(rvObj.reservation.id)
             this.$store.dispatch('transaction/addTransaction', result)
@@ -87,6 +85,10 @@ export default {
                 console.log('attempt', number, error)
               }
             })
+          } else {
+            // user has no reservation
+            const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, rvObj.reservation.leaf_hash, this.batch.tasks)
+            this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '/' + taskIndex + '?submissionId=' + rvObj.reservation.id)
           }
         } else {
           // User doesn't have reservation yet, so let's make one!
@@ -105,6 +107,8 @@ export default {
             }
           }
 
+          console.log(userIndexes, 'should be zeroo')
+
           if (indexes.length > 0) {
             // create object, which holds the count of the task indexes in the submissions
             const indexesCount = {}
@@ -116,8 +120,8 @@ export default {
             }
 
             // grab the first available index, that the user hasn't done yet
-            const availableIndex = Object.keys(indexesCount).find(key => indexesCount[key] < this.batch.repetitions && !userIndexes.find(i => i === key))
-            taskIndex = parseInt(availableIndex)
+            const availableIndex = Object.keys(indexesCount).find(key => indexesCount[key] < this.batch.repetitions && !this.didWorkerDoTask(userIndexes, key))
+            taskIndex = availableIndex ? parseInt(availableIndex) : null
             console.log('Found an available task index: ', taskIndex)
           } else {
             // no submissions yet in batch
@@ -125,7 +129,7 @@ export default {
           }
 
           // if the taskIndex is empty, it means that there are no available tasks anymore
-          if (taskIndex) {
+          if (taskIndex !== null) {
             const result = await this.$blockchain.reserveTask(this.batch.id, taskIndex, this.batch.campaign_id, this.batch.tasks)
             this.$store.dispatch('transaction/addTransaction', result)
             // get reservations and see if this user has a reservation
@@ -158,6 +162,10 @@ export default {
         this.loading = false
         this.$blockchain.handleError(e)
       }
+    },
+    didWorkerDoTask (userIndexes, key) {
+      const item = userIndexes.find(i => parseInt(i) === parseInt(key))
+      return item !== null && item !== undefined
     },
     getReservationForUser (reservations) {
       let reservation = null
