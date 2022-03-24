@@ -2,7 +2,7 @@
   <section class="section">
     <div class="container">
       <div class="text-center">
-        <h1 class="title is-spaced has-text-weight-bold is-full-mobile">
+        <h1 class="title is-spaced has-text-weight-bold">
           <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->
           Effect Account | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
         </h1>
@@ -84,7 +84,7 @@
               </span>
             </div>
           </div>
-          <div v-if="showPayoutDetails" class="is-full-mobile mt-5 payout-table">
+          <div v-if="showPayoutDetails" class="mt-5 payout-table">
             <div v-if="pendingPayoutsStore" class="table-container">
               <table class="table" style="width: 100%">
                 <thead>
@@ -147,7 +147,7 @@
         </div>
 
         <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
-          <h2 class="title is-4 is-full-mobile">
+          <h2 class="title is-4">
             My Tasks
           </h2>
           <nuxt-link class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" to="/campaigns/templates">
@@ -158,7 +158,7 @@
           </nuxt-link>
         </div>
 
-        <campaign-list class="mb-5" :grid-toggle="false" :owner="$auth.user.accountName" />
+        <campaign-list class="mb-5" :campaigns="myCampaigns" />
 
         <div class="mb-6">
           <h2 class="title is-4 mt-6 is-spaced">
@@ -219,7 +219,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import VueCountdown from '@chenfengyuan/vue-countdown/dist/vue-countdown.common'
 import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
@@ -256,8 +256,30 @@ export default {
     ...mapGetters({
       transactionsByUser: 'transaction/transactionsByUser',
       getPendingPayouts: 'pendingPayout/getPendingPayouts',
-      campaignById: 'campaign/campaignById'
+      campaignById: 'campaign/campaignById',
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
+    ...mapState({
+      campaigns: state => state.campaign.campaigns
+    }),
+    myCampaigns () {
+      if (!this.campaigns) { return }
+      const filteredCampaigns = this.campaigns.filter(c => c.owner[1] === this.$auth.user.accountName).map((c) => { return { ...c } })
+
+      for (const i in filteredCampaigns) {
+        const batches = this.batchesByCampaignId(filteredCampaigns[i].id)
+        filteredCampaigns[i].batches = batches
+        if (batches) {
+          filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
+            return a + b.num_tasks
+          }, 0)
+          filteredCampaigns[i].tasks_done = batches.reduce(function (a, b) {
+            return a + b.tasks_done
+          }, 0)
+        }
+      }
+      return filteredCampaigns
+    },
     transactions () {
       return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)
     },

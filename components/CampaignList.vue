@@ -1,47 +1,41 @@
 <template>
   <div>
-    <client-only>
-      <category-filters v-if="categoryFilter" :url-filter="$route.query.category" @clicked="onFilter" />
-      <sort-filters v-if="sortCampaigns" @sorted="onSort" @search="onSearch" @category="onFilter" @status="onStatusFilter" />
-      <div class="is-flex is-justify-content-space-between">
-        <div>
-          <span v-if="$route.query.category && !categories.includes($route.query.category)">
-            Filtering on category: {{ $route.query.category }}
-          </span>
-        </div>
-        <div v-if="gridToggle != false" class="is-hidden-touch">
-          <div class="switch-button mb-1">
-            <input v-model="gridListState" class="switch-button-checkbox" type="checkbox" @click="toggleGridList()">
-            <label class="switch-button-label" for=""><span class="switch-button-label-span"><img height="28px" src="@/assets/img/icons/border-all.svg"></span></label>
-          </div>
+    <div class="is-flex is-justify-content-space-between">
+      <div />
+      <div v-if="gridToggle" class="is-hidden-touch">
+        <div class="switch-button mb-1">
+          <input v-model="list" class="switch-button-checkbox" type="checkbox">
+          <label class="switch-button-label" for=""><span class="switch-button-label-span"><img height="28px" src="@/assets/img/icons/border-all.svg"></span></label>
         </div>
       </div>
-      <hr class="mt-1">
-    </client-only>
-    <div :class="{'is-flex-tablet' : !gridListState || windowWidth < gridBreakpoint}">
-      <nuxt-link
+    </div>
+    <hr class="mt-1">
+    <div class="columns is-multiline" :class="{'grid': grid}">
+      <div
         v-for="campaign in paginatedCampaigns"
         :key="campaign.id"
-        :to="'/campaigns/'+campaign.id"
-        class="campaign-item"
-        :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation, 'column is-one-fifth-desktop is-one-third-tablet is-full-mobile' : !gridListState || windowWidth < gridBreakpoint}"
+        class="column is-one-third-tablet"
+        :class="{'is-one-fifth-desktop': grid, 'is-12-desktop': !grid}"
       >
-        <div class="box p-4" :class="{'mt-5': gridListState}">
-          <div class="columns is-vcentered is-multiline is-mobile">
-            <div class="column is-narrow is-mobile-1">
-              <p class="image has-radius is-vcentered has-background-image" style="width: 52px; height: 52px">
+        <nuxt-link :to="'/campaigns/'+campaign.id" class="box p-4" :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}">
+          <div class="columns is-vcentered is-multiline">
+            <div
+              class="column is-12-touch"
+              :class="{'is-1-desktop': !grid, 'is-12-desktop': grid}"
+            >
+              <p class="image has-radius is-vcentered has-background-image">
                 <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
-                <img class v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
+                <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" class :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
                 <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
               </p>
             </div>
-            <div class="column is-4-desktop is-4-widescreen is-12-touch" :class="{'is-12': !gridListState}">
+            <div class="column" :class="{'is-12': grid, 'is-4-desktop is-4-widescreen is-12-touch': !grid}">
               <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                <div v-if="gridListState" class="is-hidden-touch">
+                <div>
                   <nuxt-link
                     v-if="campaign.info && campaign.info.category"
                     :to="'/?category=' + campaign.info.category"
-                    class="tag is-light mb-2"
+                    class="tag is-light mb-2 has-border is-capitalized"
                     :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
                   >
                     {{ campaign.info.category }}
@@ -70,7 +64,7 @@
                 </div>
               </div>
             </div>
-            <div class="column is-2-desktop is-full-mobile">
+            <div class="column is-12" :class="{'is-2-desktop': !grid}">
               <p class="has-text-grey is-size-7">
                 Requester:
               </p>
@@ -88,39 +82,30 @@
                 {{ campaign.reward.quantity }}
               </h2>
             </div>
-            <div class="column is-hidden-touch" v-if="gridListState" >
+            <div v-if="campaign.num_tasks || campaign.tasks_done" class="column">
               <p class="has-text-grey is-size-7">
                 Tasks:
               </p>
               <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                <span v-if="batchByCampaignId(campaign.id) === null" class="loading-text">
-                  Loading
-                </span>
-                <span v-else>
-                  {{ batchByCampaignId(campaign.id).reduce(function(a,b){
-                    return a + b.num_tasks
-                  },0) - batchByCampaignId(campaign.id).reduce(function(a,b){
-                    return a + b.tasks_done
-                  },0) }}/{{ batchByCampaignId(campaign.id).reduce(function(a,b){
-                    return a + b.num_tasks
-                  },0) }} left
-                  <br>
+                <span>
+                  {{ campaign.num_tasks - campaign.tasks_done }}/{{ campaign.num_tasks }} left
                 </span>
               </h2>
             </div>
-            <div class="column has-text-right is-12-mobile">
-              <button class="button is-wide is-primary has-text-weight-semibold is-fullwidth-mobile" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null}">
+            <div class="column has-text-right" :class="{'is-12': grid}">
+              <button class="button is-primary has-text-weight-semibold is-fullwidth" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null,'is-wide': !grid}">
                 <span v-if="campaign.userHasReservation">Go to Task</span>
                 <span v-else>View</span>
               </button>
             </div>
           </div>
-        </div>
-      </nuxt-link>
+        </nuxt-link>
+      </div>
     </div>
     <pagination
-      v-if="filteredCampaigns"
-      :items="filteredCampaigns.length"
+      v-if="campaigns"
+      class="mt-2"
+      :items="campaigns.length"
       :page="page"
       :per-page="perPage"
       @setPage="setPage"
@@ -131,211 +116,69 @@
     <div v-else-if="!allBatchesLoaded" class="loading-text">
       Batches loading
     </div>
-    <div v-else-if="filteredCampaigns && !filteredCampaigns.length" class="subtitle">
-      No <span v-if="active">active</span> campaigns
+    <div v-else-if="campaigns && !campaigns.length" class="subtitle">
+      No tasks
     </div>
-    <div v-else-if="!filteredCampaigns" class="subtitle has-text-danger">
+    <div v-else-if="!campaigns" class="subtitle has-text-danger">
       Could not retrieve campaigns
     </div>
   </div>
 </template>
 
 <script>
-import _ from 'lodash'
 import { mapState, mapGetters } from 'vuex'
-import CategoryFilters from './CategoryFilters'
-import SortFilters from './SortAndFilters'
 import Pagination from './Pagination.vue'
 
 export default {
   name: 'CampaignList',
   components: {
-    CategoryFilters,
-    SortFilters,
     Pagination
   },
-  props: ['active', 'owner', 'categoryFilter', 'sortCampaigns', 'loadAllCampaigns', 'approvedCampaigns', 'hideCampaigns', 'gridToggle'],
+  props: ['gridToggle', 'campaigns'],
   data () {
     return {
-      filter: null,
-      sort: null,
-      page: 1,
+      page: this.$route.query.page || 1,
       perPage: 30,
-      search: null,
-      status: null,
       ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
-      categories: ['translate', 'captions', 'socials', 'dao'],
-      windowWidth: window.innerWidth,
-      // bulma touch breakpoint
-      gridBreakpoint: 1024
+      categories: ['translate', 'captions', 'socials', 'dao']
     }
   },
   computed: {
     ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId',
-      campaignsByCategory: 'campaign/campaignsByCategory',
-      reservationsByAccountId: 'campaign/reservationsByAccountId',
-      getGridListState: 'view/getGridListState'
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     ...mapState({
-      campaigns: state => state.campaign.campaigns,
       campaignsLoading: state => state.campaign.loading,
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
       allBatchesLoaded: state => state.campaign.allBatchesLoaded,
-      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded,
-      gridListToggle: state => state.gridListToggle
+      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded
     }),
-    gridListState: {
+    list: {
       get () {
-        return this.getGridListState
+        return this.$store.state.view.grid && this.gridToggle
       },
-      set (toggleState) {
-        return toggleState
+      set (value) {
+        this.$store.commit('view/SET_GRID_LIST', value)
       }
     },
-    reservations () {
-      if (!this.$auth || !this.$auth.user || !this.$auth.user.vAccountRows) { return }
-      let userReservations = this.reservationsByAccountId(this.$auth.user.vAccountRows[0].id)
-      if (userReservations) {
-        userReservations = userReservations.filter(r => parseInt(new Date(new Date(r.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.release_task_delay_sec.toFixed(0)) > parseInt((Date.now() / 1000).toFixed(0)))
-      }
-      return userReservations
-    },
-    filteredCampaigns () {
-      const campaigns = this.campaignsByCategory(this.$route.query.category ? this.$route.query.category : this.filter)
-      let filteredCampaigns
-      if (campaigns) {
-        filteredCampaigns = campaigns.map((c) => { return { ...c } })
-        if (this.approvedCampaigns) {
-          filteredCampaigns = filteredCampaigns.filter(c => this.approvedCampaigns.includes(c.id))
-        }
-        if (this.hideCampaigns) {
-          filteredCampaigns = filteredCampaigns.filter(c => !this.hideCampaigns.includes(c.id))
-        }
-        for (const i in filteredCampaigns) {
-          const batches = this.batchByCampaignId(filteredCampaigns[i].id)
-          // get the reservations of the user for this campaign
-          const reservationsOfUser = _.intersectionBy(batches, this.reservations, 'batch_id')
-          filteredCampaigns[i].userHasReservation = (reservationsOfUser.length)
-          if (batches) {
-            filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
-              return a + b.num_tasks
-            }, 0)
-            filteredCampaigns[i].tasks_done = batches.reduce(function (a, b) {
-              return a + b.tasks_done
-            }, 0)
-          }
-        }
-
-        if (this.active) {
-          filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0 || c.userHasReservation)
-          // show the campaigns where the user has a resevation first
-          filteredCampaigns = _.orderBy(filteredCampaigns, ['userHasReservation', 'id'], ['desc', 'asc'])
-        } else {
-          // Show newest campaigns first when we are not filtering active campaigns
-          filteredCampaigns.reverse()
-        }
-        if (this.owner) {
-          filteredCampaigns = filteredCampaigns.filter(c => c.owner[1] === this.owner)
-        }
-        // Search campaigns
-        if (this.search !== null) {
-          filteredCampaigns = filteredCampaigns.filter((c) => {
-            if (c && c.info) {
-              return c.info.title.toLowerCase().includes(this.search.toLowerCase()) || c.info.description.toLowerCase().includes(this.search.toLowerCase())
-            }
-            return false
-          })
-        }
-
-        // Filter by status
-        if (this.status) {
-          switch (this.status) {
-            case 'active':
-              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
-              break
-            case 'ended':
-              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === 0 && c.num_tasks !== 0)
-              break
-            case 'notstarted':
-              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === c.num_tasks)
-              break
-          }
-        }
-
-        // Sort campaigns
-        if (this.sort) {
-          filteredCampaigns = _.orderBy(filteredCampaigns, [(campaign) => {
-            if (typeof _.get(campaign, `${this.sort.value}`) === 'string') {
-              return _.get(campaign, `${this.sort.value}`).toLowerCase()
-            } else {
-              return _.get(campaign, `${this.sort.value}`)
-            }
-          }, 'userHasReservation'], [this.sort.order, 'desc'])
-        }
-      }
-
-      return filteredCampaigns
+    grid () {
+      return !this.list && this.gridToggle
     },
     paginatedCampaigns () {
       const start = (this.page - 1) * this.perPage
-      if (this.filteredCampaigns) {
-        const pageCampaigns = this.filteredCampaigns.slice(start, start + this.perPage)
-        // this.processCampaigns(pageCampaigns)
+      if (this.campaigns) {
+        const pageCampaigns = this.campaigns.slice(start, start + this.perPage)
         return pageCampaigns
       }
       return []
     }
   },
-  watch: {
-    filteredCampaigns: {
-      deep: true,
-      handler () {
-        this.filter = this.$route.query.category ? this.$route.query.category : this.filter
-      }
-    }
-  },
   created () {
     this.getForceInfo()
   },
-  mounted () {
-    this.$nextTick(() => {
-      window.addEventListener('resize', this.onResize)
-    })
-  },
-
-  beforeDestroy () {
-    window.removeEventListener('resize', this.onResize)
-  },
   methods: {
-    async processCampaigns (campaigns) {
-      for (const campaign of campaigns) {
-        if (!this.loadAllCampaigns) {
-          // a short sleep helps for some reason to make interface less laggy
-          await this.$store.dispatch('campaign/processCampaign', campaign)
-        }
-      }
-    },
-    onResize () {
-      this.windowWidth = window.innerWidth
-    },
     setPage (newPage) {
       this.page = newPage
-    },
-    onFilter (category) {
-      if (this.$route.query.category) {
-        this.$router.replace('/')
-      }
-      this.filter = category
-    },
-    onStatusFilter (status) {
-      this.status = status
-    },
-    onSort (sort) {
-      this.sort = sort
-    },
-    onSearch (input) {
-      this.search = input
     },
     getForceInfo () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
@@ -348,9 +191,6 @@ export default {
       if (!this.allSubmissionsLoaded) {
         this.$store.dispatch('campaign/getSubmissions')
       }
-    },
-    toggleGridList () {
-      this.$store.dispatch('view/toggleGridListState')
     }
   }
 
@@ -358,6 +198,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "bulma/sass/utilities/mixins";
+
 .title-section {
   height: 100%;
 }
@@ -380,7 +222,9 @@ export default {
     box-shadow: 0px 0px 14px 5px rgba(17,72,235,0.3);
   }
   .image {
-    border: 1px solid #D2D9EB;
+    img {
+      border: 1px solid #D2D9EB;
+    }
   }
 }
 .card {
@@ -468,21 +312,41 @@ export default {
   }
 }
 
-.is-one-fifth-desktop {
-  display: block;
-  button {
-    width: 100%;
-  }
-  .column {
-    text-align: center;
-    width: 100% !important;
-  }
-  .image {
-    width: 100% !important;
-    height: 90px !important;
-  }
-  .columns {
-    flex-direction: column;
+.image {
+  max-height: 90px;
+}
+
+@media screen and (min-width: 1024px) {
+  .column.is-1-desktop {
+      flex: none;
+      width: 8.33333337%;
+      max-width: 76px;
   }
 }
+
+.grid {
+  text-align: center;
+}
+@include touch {
+  .columns {
+    text-align: center;
+  }
+}
+
+// .is-one-fifth-desktop {
+//   button {
+//     width: 100%;
+//   }
+//   .column {
+//     text-align: center;
+//     width: 100% !important;
+//   }
+//   .image {
+//     width: 100% !important;
+//     height: 90px !important;
+//   }
+//   .columns {
+//     flex-direction: column;
+//   }
+// }
 </style>

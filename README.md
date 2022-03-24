@@ -1,3 +1,5 @@
+![example workflow](https://github.com/effectai/force-frontend-new/actions/workflows/ci.yml/badge.svg)
+
 # Force Frontend
 
 ## Build Setup
