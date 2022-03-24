@@ -143,14 +143,6 @@ object-assign
 
 
 /*!
- * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
- *
- * Copyright (c) 2014-2017, Jon Schlinkert.
- * Released under the MIT License.
- */
-
-
-/*!
  * vue-countdown v1.1.5
  * https://fengyuanchen.github.io/vue-countdown
  *
@@ -158,4 +150,12 @@ object-assign
  * Released under the MIT license
  *
  * Date: 2020-02-25T01:19:32.769Z
+ */
+
+
+/*!
+ * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
+ *
+ * Copyright (c) 2014-2017, Jon Schlinkert.
+ * Released under the MIT License.
  */
