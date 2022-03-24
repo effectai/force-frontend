@@ -14,12 +14,15 @@
          rel="noopener noreferrer">{{ $blockchain.sdk.force.config.eos_relayer }}</a>
       </div>
       <ul>
-        <!-- <li v-for="(status, index) in $blockchain.relayerStatus" :key="index.head_block_num">{{ index }}: {{ status }}</li> -->
-        <li :key="accountNameRelayer"> account_name: {{ accountNameRelayer }} </li>
-        <!-- <li> ram_quota: {{ $blockchain.relayerStatus.ram_quota }} </li> -->
-        <!-- <li> net_weight: {{ $blockchain.relayerStatus.net_weight }} </li> -->
-        <!-- <li> cpu_weight: {{ $blockchain.relayerStatus.cpu_weight }} </li> -->
+        <li>
+          <span>Status:</span>
+          <strong><span>{{ this.relayerOk ? 'Up' : 'Down' }}</span></strong>
+        </li>
 
+        <li>
+          <a :href="`${$blockchain.sdk.config.eos_relayer_url}/status`" target="_blank" rel="noopener noreferrer">{{ $blockchain.sdk.config.eos_relayer_url }}</a>
+        </li>
+        <br>
         <li>
           <div class="has-text-centered">
             RAM: <strong>{{ percentageRam }}%</strong>
@@ -28,17 +31,37 @@
           </div>
           <progress class="progress is-link" name="progress" :value="relayerRamUsage" :max="relayerRamQuota"></progress>
         </li>
-
+        <br>
         <li>
         <div class="has-text-centered">
-          NET: <strong>{{ percentageNet }}%</strong></div>
+          NET: <strong>{{ percentageNet }}%</strong>
+          <br>
+          {{ relayerNetUsage }} / {{ relayerNetQuota }}
+        </div>
         <progress class="progress is-link" :value="relayerNetUsage" :max="relayerNetQuota"></progress>
         </li>
 
+        <br>
         <li>
-        <div class="has-text-centered">CPU: <strong>{{ percentageCpu }}%</strong> | {{ relayerCpuQuota }} / {{ relayerCpuQuota }} </div>
+        <div class="has-text-centered">
+          CPU: <strong>{{ percentageCpu }}%</strong>
+          <br>
+          {{ relayerCpuQuota }} / {{ relayerCpuQuota }}
+        </div>
         <progress class="progress is-link" :value="relayerCpuQuota" :max="relayerCpuQuota"></progress>
         </li>
+
+        <br>
+
+        <li>
+          <button class="button is-primary">
+            <a href="https://eospowerup.io/auto" target="_blank" rel="noopener noreferrer">
+              Power Up Relayer
+            </a>
+          </button>
+        </li>
+
+        <li v-for="tx in $blockchain.relayerTxs" :key="tx"></li>
       </ul>
 
     </div>
@@ -50,13 +73,30 @@ export default {
   name: 'statusPage',
   data () {
     return {
+      relayerOk: false
     }
   },
   created () {
+    this.pingRelayer()
+    this.getRelayerTxs()
   },
   methods: {
 
+    async pingRelayer () {
+      const response = await fetch(`${this.$blockchain.sdk.config.eos_relayer_url}/info`, {
+        mode: 'cors'
+      }).catch(console.error)
+      this.relayerOk = response.ok
+    },
+
+    async getRelayerTxs () {
+      const response = await this.$blockchain.getRelayerTxs().catch(console.error)
+      console.log(response)
+      return response
+    }
+
   },
+
   computed: {
 
     relayer () {
@@ -101,6 +141,10 @@ export default {
 
     percentageCpu () {
       return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.cpu_limit.used / this.$blockchain.relayerStatus.cpu_limit.max * 100, 10) : 0
+    },
+
+    relayerTxs () {
+      return this.$blockchain.relayerTxs ? this.$blockchain.relayerTxs : []
     }
   }
 
