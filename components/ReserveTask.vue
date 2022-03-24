@@ -159,21 +159,6 @@ export default {
         this.$blockchain.handleError(e)
       }
     },
-    async checkReservation () {
-      return await retry(async () => {
-        const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
-        const rvObj = await this.getReservationForUser(rvs)
-        if (!rvObj.reservation || rvObj.reservation.isReleased || rvObj.reservation.isExpired) {
-          throw new Error('Reservation not found')
-        }
-        return rvObj
-      }, {
-        retries: 5,
-        onRetry: (error, number) => {
-          console.log('attempt', number, error)
-        }
-      })
-    },
     getReservationForUser (reservations) {
       let reservation = null
       let isExpired = false
