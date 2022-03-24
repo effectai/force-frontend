@@ -89,22 +89,25 @@ export default {
         } else {
           // TODO THIS
           // User doesn't have reservation yet, so let's make one!
-          let taskIndex = this.batch.tasks_done
+          const taskIndex = this.batch.tasks_done
 
           // Check here in submissions if user already did the task of this.batch.tasks_done
           const indexes = []
           for (const sub of submissions) {
             sub.taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, sub.leaf_hash, this.batch.tasks)
+            indexes.push(sub.taskIndex)
             // if (sub.account_id === this.$auth.user.vAccountRows[0].id) {
             //   const index = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, sub.leaf_hash, this.batch.tasks)
             //   indexes.push(index)
             // }
           }
 
+          console.log('thiss', this.batch)
+
           // check highest taskindex user has done, and up it
-          if (indexes.length > 0 && Math.max(indexes) >= this.batch.tasks_done) {
-            taskIndex = Math.max(indexes) + 1
-          }
+          // if (indexes.length > 0 && Math.max(indexes) >= this.batch.tasks_done) {
+          //   taskIndex = Math.max(indexes) + 1
+          // }
 
           if (taskIndex > this.batch.num_tasks) {
             this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '?batchCompleted=1')
