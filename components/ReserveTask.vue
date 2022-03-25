@@ -54,37 +54,12 @@ export default {
             // (re) claim expired task
             const result = await this.$blockchain.claimExpiredTask(rvObj.reservation.id)
             this.$store.dispatch('transaction/addTransaction', result)
-
-            // TODO: reuse this retry statement, its now three times the same code in this function
-            await retry(async () => {
-              const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
-              rvObj = await this.getReservationForUser(rvs)
-              if (!rvObj.reservation || rvObj.isReleased || rvObj.isExpired) {
-                throw new Error('Reservation not found')
-              }
-            }, {
-              retries: 5,
-              onRetry: (error, number) => {
-                console.log('attempt', number, error)
-              }
-            })
+            rvObj = await this.findReservation(rvObj)
           } else if (rvObj.isReleased) {
             // (re) claim released task
             const result = await this.$blockchain.reclaimTask(rvObj.reservation.id)
             this.$store.dispatch('transaction/addTransaction', result)
-
-            await retry(async () => {
-              const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
-              rvObj = await this.getReservationForUser(rvs)
-              if (!rvObj.reservation || rvObj.isReleased || rvObj.isExpired) {
-                throw new Error('Reservation not found')
-              }
-            }, {
-              retries: 5,
-              onRetry: (error, number) => {
-                console.log('attempt', number, error)
-              }
-            })
+            rvObj = await this.findReservation(rvObj)
           } else {
             // user has no reservation
             const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, rvObj.reservation.leaf_hash, this.batch.tasks)
@@ -131,18 +106,7 @@ export default {
             const result = await this.$blockchain.reserveTask(this.batch.id, taskIndex, this.batch.campaign_id, this.batch.tasks)
             this.$store.dispatch('transaction/addTransaction', result)
             // get reservations and see if this user has a reservation
-            await retry(async () => {
-              const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
-              rvObj = await this.getReservationForUser(rvs)
-              if (!rvObj.reservation || rvObj.isReleased || rvObj.isExpired) {
-                throw new Error('Reservation not found')
-              }
-            }, {
-              retries: 5,
-              onRetry: (error, number) => {
-                console.log('attempt', number, error)
-              }
-            })
+            rvObj = await this.findReservation(rvObj)
           } else {
             this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '?batchCompleted=1')
           }
@@ -185,6 +149,22 @@ export default {
         }
       }
       return { reservation, isReleased, isExpired }
+    },
+    async findReservation (rvObj) {
+      return await retry(async () => {
+        const rvs = await this.$blockchain.getTaskReservationsForBatch(this.batch.batch_id)
+        rvObj = await this.getReservationForUser(rvs)
+        if (!rvObj.reservation || rvObj.isReleased || rvObj.isExpired) {
+          throw new Error('Reservation not found')
+        } else {
+          return rvObj
+        }
+      }, {
+        retries: 5,
+        onRetry: (error, number) => {
+          console.log('attempt', number, error)
+        }
+      })
     }
   }
 }
