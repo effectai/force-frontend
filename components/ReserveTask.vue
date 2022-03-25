@@ -98,9 +98,9 @@ export default {
           const indexes = []
           const userIndexes = []
 
-          // TODO: improve this, takes ages now
+          const treeLeaves = await this.$blockchain.getTreeLeaves(this.batch.campaign_id, this.batch.id, this.batch.tasks)
           for (const sub of submissions) {
-            const index = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, sub.leaf_hash, this.batch.tasks)
+            const index = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, sub.leaf_hash, this.batch.tasks, treeLeaves)
             indexes.push(index)
             if (sub.account_id === this.$auth.user.vAccountRows[0].id) {
               userIndexes.push(index)
