@@ -61,7 +61,7 @@ export default {
             this.$store.dispatch('transaction/addTransaction', result)
             rvObj = await this.findReservation(rvObj)
           } else {
-            // user has no reservation
+            // user has a reservation
             const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, rvObj.reservation.leaf_hash, this.batch.tasks)
             this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '/' + taskIndex + '?submissionId=' + rvObj.reservation.id)
           }
