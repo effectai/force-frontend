@@ -155,7 +155,7 @@ export default {
     }),
     list: {
       get () {
-        return this.$store.state.view.grid && this.gridToggle
+        return this.$store.state.view.grid
       },
       set (value) {
         this.$store.commit('view/SET_GRID_LIST', value)
