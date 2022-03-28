@@ -23,6 +23,11 @@
           rel="noopener noreferrer"
         >{{ $blockchain.sdk.force.config.force_contract }}</a>
       </div>
+      <div class="pl-5">
+        <strong>
+          <nuxt-link to="/status">Status Page</nuxt-link>
+        </strong>
+      </div>
     </div>
   </div>
 </template>
@@ -82,7 +87,7 @@ export default {
 }
 .chain {
   position: fixed;
-  bottom: -35px;
+  bottom: -50px;
   z-index: 29;
   width: 300px;
   right: -270px;
