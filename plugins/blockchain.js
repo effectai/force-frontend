@@ -127,10 +127,6 @@ export default (context, inject) => {
       async getRelayerStatus () {
         this.relayerStatus = await this.eos.getRelayerStatus().catch(console.error)
       },
-      async getRelayerTxs () {
-        this.relayerTxs = await this.eos.getRelayerTxs().catch(console.error)
-        console.log(this.relayerTxs)
-      },
 
       async rememberLogin () {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')

@@ -101,13 +101,8 @@ const eos = {
   async getRelayerStatus () {
     const rpc = new JsonRpc(`${networkHost.protocol}://${networkHost.host}:${networkHost.port}`)
     return await rpc.get_account(process.env.NUXT_ENV_EOS_RELAYER_CONTRACT)
-  },
-
-  async getRelayerTxs () {
-    const rpc = new JsonRpc(`${networkHost.protocol}://${networkHost.host}:${networkHost.port}`)
-    return await rpc.history_get_actions('efxforce1111', 0)
-    // return await rpc.get_account(process.env.NUXT_ENV_EOS_RELAYER_CONTRACT)
   }
+
 }
 
 export default eos
