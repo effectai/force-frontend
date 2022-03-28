@@ -430,8 +430,11 @@ export default (context, inject) => {
       async getSubmissionsAndReservationsForBatch (batchId) {
         return await this.sdk.force.getSubmissionsOfBatch(batchId)
       },
-      async getTaskIndexFromLeaf (campaignId, batchId, leafhash, tasks) {
-        return await this.sdk.force.getTaskIndexFromLeaf(campaignId, batchId, leafhash, tasks)
+      async getTaskIndexFromLeaf (campaignId, batchId, leafhash, tasks, leaves) {
+        return await this.sdk.force.getTaskIndexFromLeaf(campaignId, batchId, leafhash, tasks, leaves)
+      },
+      async getTreeLeaves (campaignId, batchId, tasks) {
+        return await this.sdk.force.getTreeLeaves(campaignId, batchId, tasks)
       },
       async connectAccount () {
         const chain = this.account.blockchain
