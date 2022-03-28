@@ -2,68 +2,102 @@
   <section class="section">
     <div class="container">
       <div class="title">
-        Status Page
+        <span>
+          Relayer Status:
+        </span>
+        <strong>
+          <span>
+            <a
+              class="tag"
+              :class="relayerOk ? 'is-success' : 'is-danger'"
+              :href="`${$blockchain.sdk.config.eos_relayer_url}/status`"
+              target="_blank"
+              rel="noopener
+              noreferrer">
+              {{ relayerOk ? 'Up' : 'Down' }}
+            </a>
+          </span>
+        </strong>
       </div>
 
       <hr>
-      <div class="subtitle">
 
-        <span>Relayer:</span> <a
-          :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.eos_relayer}`"
-         target="_blank"
-         rel="noopener noreferrer">{{ $blockchain.sdk.force.config.eos_relayer }}</a>
-      </div>
-      <ul>
-        <li>
-          <span>Status:</span>
-          <strong><span>{{ this.relayerOk ? 'Up' : 'Down' }}</span></strong>
-        </li>
+      <div class="block mx-auto">
+        <ul>
 
         <li>
-          <a :href="`${$blockchain.sdk.config.eos_relayer_url}/status`" target="_blank" rel="noopener noreferrer">{{ $blockchain.sdk.config.eos_relayer_url }}</a>
-        </li>
-        <br>
-        <li>
-          <div class="has-text-centered">
-            RAM: <strong>{{ percentageRam }}%</strong>
-            <br>
-            {{ relayerRamUsage }} / {{ relayerRamQuota }}
-          </div>
-          <progress class="progress is-link" name="progress" :value="relayerRamUsage" :max="relayerRamQuota"></progress>
-        </li>
-        <br>
-        <li>
-        <div class="has-text-centered">
-          NET: <strong>{{ percentageNet }}%</strong>
-          <br>
-          {{ relayerNetUsage }} / {{ relayerNetQuota }}
-        </div>
-        <progress class="progress is-link" :value="relayerNetUsage" :max="relayerNetQuota"></progress>
-        </li>
-
-        <br>
-        <li>
-        <div class="has-text-centered">
-          CPU: <strong>{{ percentageCpu }}%</strong>
-          <br>
-          {{ relayerCpuQuota }} / {{ relayerCpuQuota }}
-        </div>
-        <progress class="progress is-link" :value="relayerCpuQuota" :max="relayerCpuQuota"></progress>
-        </li>
-
-        <br>
-
-        <li>
-          <button class="button is-primary">
-            <a href="https://eospowerup.io/auto" target="_blank" rel="noopener noreferrer">
+          <div class="subtitle mx-auto has-text-centered">
+            <a class="button is-info" href="https://eospowerup.io/auto" target="_blank" rel="noopener noreferrer">
               Power Up Relayer
             </a>
-          </button>
-        </li>
 
-        <li v-for="tx in $blockchain.relayerTxs" :key="tx"></li>
-      </ul>
+            <br>
+            <br>
 
+            <span>Relayer Contract:</span>
+            <a
+              :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.eos_relayer}`"
+              target="_blank"
+              rel="noopener noreferrer">
+              {{ $blockchain.sdk.force.config.eos_relayer }}
+            </a>
+
+            <br>
+
+            </div>
+          </li>
+
+          <br>
+
+          <li>
+            <div class="has-text-centered">
+              RAM: <strong>{{ percentageRam }}% Used</strong>
+              <br>
+              {{ relayerRamUsage }} / {{ relayerRamQuota }}
+            </div>
+            <progress class="progress is-warning" name="progress" :value="relayerRamUsage" :max="relayerRamQuota"></progress>
+          </li>
+          <br>
+          <li>
+          <div class="has-text-centered">
+            NET: <strong>{{ percentageNet }}% Used</strong>
+            <br>
+            {{ relayerNetUsage }} / {{ relayerNetQuota }}
+          </div>
+          <progress class="progress is-warning" :value="relayerNetUsage" :max="relayerNetQuota"></progress>
+          </li>
+
+          <br>
+          <li>
+          <div class="has-text-centered">
+            CPU: <strong>{{ percentageCpu }}% Used</strong>
+            <br>
+            {{ relayerCpuUsage }} / {{ relayerCpuQuota }}
+          </div>
+          <progress class="progress is-warning" :value="relayerCpuUsage" :max="relayerCpuQuota"></progress>
+          </li>
+
+        </ul>
+      </div>
+
+      <div class="block">
+        <table class="table has-text-centered mx-auto">
+          <thead>
+            <th>Action</th>
+            <th>Net</th>
+            <th>Cpu</th>
+            <th>Estimate</th>
+          </thead>
+          <tbody>
+            <tr v-for="(tx, action) in relayerTxCost" :key="action">
+              <td>{{ action }}</td>
+              <td>{{ tx.net }}</td>
+              <td>{{ tx.cpu }}</td>
+              <td>{{ txEstimate(tx) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
 </template>
@@ -73,7 +107,23 @@ export default {
   name: 'statusPage',
   data () {
     return {
-      relayerOk: false
+      relayerOk: false,
+      relayerTxCost: {
+        // closebatch: { net: 0, cpu: 0 }, // ❌
+        // editcampaign: { net: 0, cpu: 0 }, // ❌
+        // init: { net: 0, cpu: 0 }, // ❌
+        joincampaign: { net: 47, cpu: 434 }, // ✅
+        mkbatch: { net: 66, cpu: 817 }, // ✅
+        mkcampaign: { net: 33, cpu: 240 }, // ✅
+        // payout: { net: 0, cpu: 0 }, // ❌
+        // publishbatch { net: 0, cpu: 0 }, // ❌
+        reclaimtask: { net: 184, cpu: 358 }, // ✅
+        releasetask: { net: 184, cpu: 184 }, // ✅
+        reservetask: { net: 296, cpu: 253 }, // ✅
+        // rmbatch: { net: 0, cpu: 0 }, // ❌
+        // rmcampaign: { net: 0, cpu: 0 }, // ❌
+        submittask: { net: 216, cpu: 1308 } // ✅
+      }
     }
   },
   created () {
@@ -93,6 +143,13 @@ export default {
       const response = await this.$blockchain.getRelayerTxs().catch(console.error)
       console.log(response)
       return response
+    },
+
+    txEstimate (tx) {
+      const cpuEstimate = (this.relayerCpuQuota - this.relayerCpuUsage) / tx.cpu
+      const netEstimate = (this.relayerNetQuota - this.relayerNetUsage) / tx.net
+
+      return Math.min(cpuEstimate, netEstimate).toFixed(0)
     }
 
   },
@@ -146,6 +203,7 @@ export default {
     relayerTxs () {
       return this.$blockchain.relayerTxs ? this.$blockchain.relayerTxs : []
     }
+
   }
 
 }
