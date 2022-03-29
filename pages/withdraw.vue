@@ -9,12 +9,12 @@
         <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
       </div>
       <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount, memo)">
-        <!-- <div class="field">
-          <label class="label">Destination EOS Account</label>
+        <div class="field">
+          <label class="label">Destination {{ $auth.user.blockchain === 'eos' ? 'EOS' : 'BSC' }} Account</label>
           <div class="control">
             <input v-model="account" class="input" type="text" required>
           </div>
-        </div> -->
+        </div>
 
         <div class="field">
           <label class="label">Amount to withdraw</label>
@@ -30,6 +30,7 @@
                 :disabled="amount == -1"
                 placeholder="0.0001"
                 step="0.0001"
+                style="height: 100%;"
               >
             </div>
             <p class="control">
@@ -37,17 +38,6 @@
             </p>
           </div>
         </div>
-
-        <!-- <div class="field">
-          <label for="" class="label">Memo</label>
-          <div class="control">
-            <input
-              v-model="memo"
-              class="input"
-              type="text"
-            >
-          </div>
-        </div> -->
 
         <div class="field is-grouped is-grouped-right">
           <div class="control">
@@ -71,7 +61,7 @@ export default {
   data () {
     return {
       loading: false,
-      account: this.$auth.user.blockchain === 'eos' ? this.$auth.user.accountName : null,
+      account: this.$auth.user.accountName,
       submitted: false,
       message: null,
       err: false,
