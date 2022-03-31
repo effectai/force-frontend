@@ -98,7 +98,7 @@ export default {
         const result = await this.$blockchain.withdraw(account, parseFloat(tokenAmount).toFixed(4), memo)
         if (result) {
           this.err = false
-          this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+          this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
           this.message = 'Withdrawing has been successful. Check your transaction here: '
           await this.$blockchain.waitForTransaction(result)
           this.$blockchain.updateUserInfo()

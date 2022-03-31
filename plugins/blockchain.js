@@ -9,13 +9,6 @@ export default (context, inject) => {
   const blockchain = new Vue({
     data () {
       // Initialize empty SDK, reinitialize when connecting wallet
-      // const eosHost = process.env.NUXT_ENV_EOS_NETWORK.includes('local') ? `http://${process.env.NUXT_ENV_EOS_NODE_URL}:8888` : `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
-      // const sdkOptions = {
-      //   network: process.env.NUXT_ENV_EOS_NETWORK,
-      //   force_contract: process.env.NUXT_ENV_EOS_FORCE_CONTRACT,
-      //   force_vaccount_id: process.env.NUXT_ENV_EOS_FORCE_VACCOUNT_ID,
-      //   host: eosHost
-      // }
       return {
         account: null,
         blockchain: null,

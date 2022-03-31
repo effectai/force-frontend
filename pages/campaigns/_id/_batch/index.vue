@@ -418,7 +418,7 @@ export default {
   middleware: ['auth'],
   data () {
     return {
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
+      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
       campaignId: parseInt(this.$route.params.id),
       batchId: parseInt(this.$route.params.batch),
       batchCompleted: parseInt(this.$route.query.batchCompleted),
