@@ -3,17 +3,19 @@ import Vue from 'vue'
 import eos from '../services/eos'
 import bsc from '../services/bsc'
 
+const effectsdk = new effectSdk.EffectClient(process.env.NUXT_ENV_EOS_NETWORK)
+
 export default (context, inject) => {
   const blockchain = new Vue({
     data () {
       // Initialize empty SDK, reinitialize when connecting wallet
-      const eosHost = process.env.NUXT_ENV_EOS_NETWORK.includes('local') ? `http://${process.env.NUXT_ENV_EOS_NODE_URL}:8888` : `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
-      const sdkOptions = {
-        network: process.env.NUXT_ENV_EOS_NETWORK,
-        force_contract: process.env.NUXT_ENV_EOS_FORCE_CONTRACT,
-        force_vaccount_id: process.env.NUXT_ENV_EOS_FORCE_VACCOUNT_ID,
-        host: eosHost
-      }
+      // const eosHost = process.env.NUXT_ENV_EOS_NETWORK.includes('local') ? `http://${process.env.NUXT_ENV_EOS_NODE_URL}:8888` : `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
+      // const sdkOptions = {
+      //   network: process.env.NUXT_ENV_EOS_NETWORK,
+      //   force_contract: process.env.NUXT_ENV_EOS_FORCE_CONTRACT,
+      //   force_vaccount_id: process.env.NUXT_ENV_EOS_FORCE_VACCOUNT_ID,
+      //   host: eosHost
+      // }
       return {
         account: null,
         blockchain: null,
@@ -25,7 +27,7 @@ export default (context, inject) => {
         pendingPayout: null,
         eos,
         bsc,
-        sdk: new effectSdk.EffectClient(process.env.NUXT_ENV_EOS_NETWORK, sdkOptions),
+        sdk: effectsdk,
         error: null,
         waitForSignatureFrom: null,
         waitForSignature: 0,
@@ -51,8 +53,8 @@ export default (context, inject) => {
           const vAccountRows = context.$auth.user.vAccountRows
           if (vAccountRows) {
             vAccountRows.forEach((row) => {
-              if (row.balance.contract === process.env.NUXT_ENV_EOS_TOKEN_CONTRACT) {
-                balance = parseFloat(row.balance.quantity.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+              if (row.balance.contract === this.sdk.config.efxTokenContract) {
+                balance = parseFloat(row.balance.quantity.replace(` ${this.sdk.config.efxSymbol}`, ''))
               }
             })
           }
@@ -238,8 +240,8 @@ export default (context, inject) => {
           if (!this.bsc.web3.utils.isHex(_chainId)) {
             alert('This chain is not supported, logging out.')
             this.logout()
-          } else if (_chainId !== process.env.NUXT_ENV_BSC_HEX_ID) {
-            alert(`Please switch to the correct chain:\n${process.env.NUXT_ENV_BSC_CHAIN_NAME}, Mainnet, chainId: ${process.env.NUXT_ENV_BSC_NETWORK_ID}\n\nCurrently on: ${this.bsc.web3.utils.hexToNumberString(_chainId)}\n\nLogging out.`)
+          } else if (_chainId !== this.sdk.config.bscHexId) {
+            alert(`Please switch to the correct chain:\n${this.sdk.config.bscChainName}, Mainnet, chainId: ${this.sdk.config.bscNetworkId}\n\nCurrently on: ${this.bsc.web3.utils.hexToNumberString(_chainId)}\n\nLogging out.`)
             // It is recommended to reload the entire window, or to logout the user to make sure the user doesn't do any txs.
             this.logout()
             context.$auth.logout() // Logout
@@ -289,9 +291,9 @@ export default (context, inject) => {
             const balance = await this.getBscEFXBalance(context.$auth.user.address)
             this.efxAvailable = parseFloat(balance)
           } else {
-            const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, context.$auth.user.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
+            const efxRow = (await this.sdk.api.rpc.get_currency_balance(this.sdk.config.efxTokenContract, context.$auth.user.accountName, this.sdk.config.efxSymbol))[0]
             if (efxRow) {
-              this.efxAvailable = parseFloat(efxRow.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+              this.efxAvailable = parseFloat(efxRow.replace(` ${this.sdk.config.efxSymbol}`, ''))
             } else {
               this.efxAvailable = 0
             }
@@ -309,7 +311,7 @@ export default (context, inject) => {
             type: 'function'
           }
         ]
-        const efxAddress = process.env.NUXT_ENV_BSC_EFX_TOKEN_CONTRACT // Token contract address
+        const efxAddress = this.sdk.config.bscEfxTokenContract// Token contract address
         const contract = new this.bsc.web3.eth.Contract(erc20JsonInterface, efxAddress)
         try {
           const balance = await contract.methods.balanceOf(address).call()
