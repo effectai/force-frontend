@@ -85,7 +85,7 @@ export default {
       }
 
       try {
-        const result = await this.$blockchain.withdraw(account, parseFloat(tokenAmount).toFixed(4), memo)
+        const result = await this.$blockchain.withdraw(this.$auth.user.blockchain === 'eos' ? account : 'xbsc.ptokens', parseFloat(tokenAmount).toFixed(4), this.$auth.user.blockchain === 'eos' ? memo : account)
         if (result) {
           this.err = false
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
