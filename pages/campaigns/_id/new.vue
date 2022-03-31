@@ -266,10 +266,10 @@ export default {
       batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     efxAvailable () {
-      return this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable
+      return this.$blockchain.vefxAvailable
     },
     maxAmountTask () {
-      return Math.floor(((this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable) / this.campaign.info.reward) / this.repetitions)
+      return Math.floor(this.$blockchain.vefxAvailable / this.campaign.info.reward / this.repetitions)
     },
     paginatedTasks () {
       const start = (this.page - 1) * this.perPage

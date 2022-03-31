@@ -96,7 +96,13 @@ const eos = {
   async getEosInfo () {
     const rpc = new JsonRpc(`${networkHost.protocol}://${networkHost.host}:${networkHost.port}`)
     return await rpc.get_info()
+  },
+
+  async getRelayerStatus () {
+    const rpc = new JsonRpc(`${networkHost.protocol}://${networkHost.host}:${networkHost.port}`)
+    return await rpc.get_account(process.env.NUXT_ENV_EOS_RELAYER_CONTRACT)
   }
+
 }
 
 export default eos

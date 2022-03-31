@@ -34,6 +34,7 @@ export default (context, inject) => {
         forceRefreshInterval: null,
         templateRefreshInterval: null,
         eosInfo: null,
+        relayerStatus: null,
         triggerGenerate: false
       }
     },
@@ -93,6 +94,7 @@ export default (context, inject) => {
       updateUserInfo () {
         this.getEfxPrice()
         this.getBlockchainInfo()
+        this.getRelayerStatus()
         if (context.$auth.loggedIn) {
           // console.log('updating user and balance..')
           context.$auth.fetchUser()
@@ -122,6 +124,10 @@ export default (context, inject) => {
         }
         this.eosInfo = eosInfo
       },
+      async getRelayerStatus () {
+        this.relayerStatus = await this.eos.getRelayerStatus().catch(console.error)
+      },
+
       async rememberLogin () {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
         // const rememberAccount = null

@@ -2,7 +2,9 @@
   <footer class="footer">
     <div class="level">
       <div class="level-item level-left">
-        <a href="https://github.com/effectai/force-frontend-new/issues/new" target="_blank" rel="noopener noreferrer"><font-awesome-icon class="mx-2 icon" icon="fa-solid fa-code-pull-request" style="color: grey"/></a>
+        <a href="https://github.com/effectai/force-frontend-new/issues/new" target="_blank" rel="noopener noreferrer">
+          <font-awesome-icon class="mx-2 icon" icon="fa-solid fa-bug" style="color: grey"/>
+        </a>
         <a href="https://github.com/effectai" target="_blank" rel="noopener noreferrer"><font-awesome-icon class="mx-2 icon" icon="fa-brands fa-github" style="color: grey"/></a>
         <a href="https://discord.gg/3GrrfJrdyN" target="_blank" rel="noopener noreferrer"><font-awesome-icon class="mx-2 icon" icon="fa-brands fa-discord" style="color: grey"/></a>
         &nbsp;
