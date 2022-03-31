@@ -61,7 +61,7 @@ export default {
   data () {
     return {
       loading: false,
-      account: this.$auth.user.accountName,
+      account: this.$auth.user.blockchain === 'eos' ? this.$auth.user.accountName : this.$auth.user.address,
       submitted: false,
       message: null,
       err: false,
