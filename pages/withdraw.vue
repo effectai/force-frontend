@@ -10,14 +10,14 @@
       </div>
       <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount, memo)">
         <div class="field">
-          <label class="label">Destination Account</label>
+          <label class="label">Destination {{ $auth.user.blockchain === 'eos' ? 'EOS' : 'BSC' }} Account</label>
           <div class="control">
             <input v-model="account" class="input" type="text" required>
           </div>
         </div>
 
         <div class="field">
-          <label class="label">vAccount Contract Balance</label>
+          <label class="label">Amount to withdraw</label>
           <div class="field has-addons">
             <div class="control is-expanded">
               <input
@@ -30,22 +30,12 @@
                 :disabled="amount == -1"
                 placeholder="0.0001"
                 step="0.0001"
+                style="height: 100%;"
               >
             </div>
             <p class="control">
               <span class="button is-primary" :disabled="amount == -1" @click.prevent="tokenAmount = amount">{{ amount }} EFX</span>
             </p>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="" class="label">Memo</label>
-          <div class="control">
-            <input
-              v-model="memo"
-              class="input"
-              type="text"
-            >
           </div>
         </div>
 
@@ -71,7 +61,7 @@ export default {
   data () {
     return {
       loading: false,
-      account: this.$auth.user.blockchain === 'eos' ? this.$auth.user.accountName : null,
+      account: this.$auth.user.blockchain === 'eos' ? this.$auth.user.accountName : this.$auth.user.address,
       submitted: false,
       message: null,
       err: false,
@@ -95,7 +85,7 @@ export default {
       }
 
       try {
-        const result = await this.$blockchain.withdraw(account, parseFloat(tokenAmount).toFixed(4), memo)
+        const result = await this.$blockchain.withdraw(this.$auth.user.blockchain === 'eos' ? account : 'xbsc.ptokens', parseFloat(tokenAmount).toFixed(4), this.$auth.user.blockchain === 'eos' ? memo : this.$auth.user.address)
         if (result) {
           this.err = false
           this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
