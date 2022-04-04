@@ -4,17 +4,21 @@
       <div class="level">
         <div class="level-left">
           <div class="level-item">
-            <h1 class="title has-text-weight-bold" :class="{'has-text-danger': !approved}">
-              <span v-if="approved">Active</span><span v-else>Unmoderated</span> <span v-if="categoryFilter" class="is-capitalized">{{ categoryFilter }}</span> Tasks
+            <h1 class="title has-text-weight-bold">
+              <span v-if="categoryFilter" class="is-capitalized">{{ categoryFilter }}</span> Tasks
             </h1>
           </div>
         </div>
+        <div class="switch-button mb-1" :class="{'approved': approved}">
+          <input v-model="approved" class="switch-button-checkbox" type="checkbox">
+          <label class="switch-button-label" for=""><span class="switch-button-label-span">Approved</span></label>
+        </div>
         <div class="level-right">
-          <div class="level-item">
+          <!-- <div class="level-item">
             <a class="button is-small is-light" :class="{'is-danger': approved, 'is-success': !approved}" @click="approved = !approved">
               View <template v-if="approved">unmoderated</template><template v-else>approved</template> tasks
             </a>
-          </div>
+          </div> -->
           <div class="level-item">
             <nuxt-link class="button is-primary is-small" to="/campaigns/templates">
               <span class="icon">+</span>
@@ -120,4 +124,90 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.switch-button {
+  background: rgba(25, 119, 243, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  text-align: center;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: $text;
+  position: relative;
+  padding: 4px 120px 4px 20px;
+
+  &:before {
+    content: 'Unmoderated';
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    width: auto;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  &.approved::before {
+    color: #fff;
+  }
+  &.approved {
+    .switch-button-checkbox {
+       & + .switch-button-label {
+
+        &:before {
+          width: 110px;
+          left: 0px;
+        }
+      }
+    }
+  }
+
+  &-checkbox {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 2;
+
+    &:checked + .switch-button-label:before {
+      transform: translateX(72px);
+      transition: transform 300ms linear;
+    }
+    &:checked + .switch-button-label {
+      color: $text;
+    }
+
+    & + .switch-button-label {
+      color: #fff;
+      position: relative;
+      padding: 1px 0;
+      display: block;
+      user-select: none;
+      pointer-events: none;
+
+      &:before {
+        content: "";
+        padding: 1px 0;
+        background: #101D56;
+        height: 100%;
+        width: 95px;
+        position: absolute;
+        left: -15px;
+        top: 0;
+        border-radius: 6px;
+        transform: translateX(0);
+        transition: transform 300ms;
+      }
+
+      .switch-button-label-span {
+        position: relative;
+      }
+    }
+  }
+}
 </style>
