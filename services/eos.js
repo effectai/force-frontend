@@ -10,8 +10,8 @@ import { defaultConfiguration } from '@effectai/effect-js'
 const config = defaultConfiguration(process.env.NUXT_ENV_EOS_NETWORK)
 
 const networkHost = {
-  host: config.eosHostName,
-  port: config.eosPort,
+  host: config.eosNodeHost,
+  port: config.eosNodePort,
   protocol: config.eosNodeProtocol,
   chainId: config.eosChainId
 }

@@ -109,7 +109,7 @@ export default {
       copy_message: 'Copy to clipboard',
       modalConfirmation: false,
       memo: this.$auth.user.vAccountRows[0].id,
-      account: this.$blockchain.sdk.account.config.account_contract,
+      account: this.$blockchain.sdk.account.config.accountContract,
       clipboard: navigator.clipboard
     }
   },

@@ -331,7 +331,7 @@ export default (context, inject) => {
           let pending = 0
           if (data) {
             data.rows.forEach((entry) => {
-              if (((new Date(new Date(entry.last_submission_time) + 'UTC').getTime() / 1000) + this.sdk.force.config.payout_delay_sec) < ((Date.now() / 1000))) {
+              if (((new Date(new Date(entry.last_submission_time) + 'UTC').getTime() / 1000) + this.sdk.force.config.payoutDelaySec) < ((Date.now() / 1000))) {
                 pending = pending + parseFloat(entry.pending.quantity)
               }
             })
@@ -459,7 +459,7 @@ export default (context, inject) => {
       },
 
       getPayoutDelay () {
-        return this.sdk.force.config.payout_delay_sec
+        return this.sdk.force.config.payoutDelaySec
       },
 
       handleError (error) {

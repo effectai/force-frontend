@@ -39,7 +39,7 @@
             </div>
             <div class="subtitle">
               <a
-                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${account.id}&upper_bound=${account.id}`"
+                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.accountContract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.accountContract}&scope=${$blockchain.sdk.account.config.accountContract}&limit=1&lower_bound=${account.id}&upper_bound=${account.id}`"
                 target="_blank"
               >View on explorer</a>
             </div>
