@@ -43,7 +43,7 @@
               </div>
               <a
                 class="is-flex is-clipped"
-                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.account_contract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.account_contract}&scope=${$blockchain.sdk.account.config.account_contract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
+                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.accountContract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.accountContract}&scope=${$blockchain.sdk.account.config.accountContract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
                 target="_blank"
               >{{ $auth.user.accountName }}</a>
             </div>
@@ -309,7 +309,7 @@ export default {
       // Here we take the submission  time, add 1 hour, substract time since.
       // Retrieve the submission time in UTC and convert to milliseconds
       const subTimeSec = new Date(`${new Date(submissionTime)}UTC`).getTime()
-      // Retrieve delay and convert to milliseconds, payout_delay_sec = 3600 seconds
+      // Retrieve delay and convert to milliseconds, payoutDelaySec = 3600 seconds
       const delaySec = this.$blockchain.getPayoutDelay() * 1e3
       // retrieve time now in milliseconds
       const now = Date.now()
@@ -332,7 +332,7 @@ export default {
         this.$store.dispatch('transaction/addTransaction', result)
         this.$store.dispatch('pendingPayout/loadPendingPayouts')
         this.$blockchain.updateUserInfo()
-        this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+        this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
         this.successTitle = 'Payout Completed'
         this.successMessage = 'All your available pending payouts have been completed and are added to your Effect account'
       } catch (error) {

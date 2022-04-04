@@ -135,7 +135,7 @@ export default {
       let isReleased = false
       for (const rv of reservations) {
         if ((!rv.data || !rv.data.length)) {
-          if (rv.account_id !== null && parseInt(new Date(new Date(rv.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.release_task_delay_sec.toFixed(0)) < this.now) {
+          if (rv.account_id !== null && parseInt(new Date(new Date(rv.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.releaseTaskDelaySec.toFixed(0)) < this.now) {
             reservation = rv
             isExpired = true
           } else if (rv.account_id === null) {

@@ -347,7 +347,7 @@
                   <div class="block">
                     Blockchain
                     <br>
-                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
+                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
                   </div>
                 </div>
               </div>
@@ -418,7 +418,7 @@ export default {
   middleware: ['auth'],
   data () {
     return {
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
+      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
       campaignId: parseInt(this.$route.params.id),
       batchId: parseInt(this.$route.params.batch),
       batchCompleted: parseInt(this.$route.query.batchCompleted),

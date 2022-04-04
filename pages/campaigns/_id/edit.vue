@@ -282,7 +282,7 @@ export default {
       id: parseInt(this.$route.params.id),
       advanced: false,
       success: false,
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
+      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
       loading: false,
       preview: false,
       campaignIpfs: {
