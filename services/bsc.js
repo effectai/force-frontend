@@ -1,31 +1,32 @@
 // import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3 from 'web3'
-import { createAccount } from '@effectai/effect-js'
+import { createAccount, defaultConfiguration } from '@effectai/effect-js'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+const config = defaultConfiguration(process.env.NUXT_ENV_EOS_NETWORK)
 
 // Used for add chain network functionality. only for metamask atm
 const chainObject = {
-  chainId: process.env.NUXT_ENV_BSC_HEX_ID,
-  chainName: process.env.NUXT_ENV_BSC_CHAIN_NAME,
+  chainId: config.bscHexId,
+  chainName: config.bscChainName,
   nativeCurrency: {
-    name: process.env.NUXT_ENV_BSC_TOKEN_NAME,
-    symbol: process.env.NUXT_ENV_BSC_TOKEN_SYMBOL,
-    decimals: 18
+    name: config.bscTokenName,
+    symbol: config.bscTokenSymbol,
+    decimals: config.bscTokenDecimals
   },
-  rpcUrls: [process.env.NUXT_ENV_BSC_RPC],
-  blockExplorerUrls: [process.env.NUXT_ENV_BSC_EXPLORER_URL]
+  rpcUrls: [config.bscRpcUrl],
+  blockExplorerUrls: [config.bscExplorerUrl]
 }
 
 const bsc = {
   currentProvider: null,
-  web3: new Web3(process.env.NUXT_ENV_BSC_RPC),
+  web3: config.web3, // TODO check this
   wallet: null,
   loginModal: false,
   metamask: window.ethereum || null,
   binance: window.BinanceChain || null,
   walletConnect: null,
-  explorer: process.env.NUXT_ENV_BSC_EXPLORER_URL,
+  explorer: config.bscExplorerUrl,
 
   connect: async (provider, pk) => {
     switch (provider) {
@@ -49,8 +50,8 @@ const bsc = {
       }
     }
     bsc.wallet = null
-    bsc.web3 = new Web3()
-    bsc.web3.setProvider(process.env.NUXT_ENV_BSC_RPC)
+    bsc.web3 = config.web3
+    bsc.web3.setProvider(config.bscRpcUrl)
   },
 
   sign: async (message) => {
@@ -68,7 +69,7 @@ const bsc = {
 
   testTx: () => {
     const web32 = new Web3(bsc.currentProvider)
-    const receiver = '0x541209bd9C60cDb11A5076b785ba1BD44cd15768'
+    const receiver = '0x541209bd9C60cDb11A5076b785ba1BD44cd15768' // TODO who does this belong to?
     const sender = bsc.wallet.address
     web32.eth.sendTransaction({
       to: receiver,
@@ -85,7 +86,7 @@ const bsc = {
 
   checkBscFormat: (bscAddress) => {
     try {
-      return bsc.web3.utils.isAddress(bscAddress, process.NUXT_ENV_BSC_NETWORK_ID)
+      return bsc.web3.utils.isAddress(bscAddress, config.bscNetworkId)
     } catch (error) {
       console.error(error)
     }
@@ -170,13 +171,13 @@ const bsc = {
    */
   addChain: async () => {
     const chainId = await bsc.getCurrentChainNetwork()
-    if (chainId !== parseInt(process.env.NUXT_ENV_BSC_NETWORK_ID)) {
+    if (chainId !== parseInt(config.bscNetworkId)) {
       let correctChain = false
       if (bsc.currentProvider === bsc.metamask) {
         try {
           await bsc.web3.givenProvider.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: process.env.NUXT_ENV_BSC_HEX_ID }]
+            params: [{ chainId: config.bscHexId }]
           })
           correctChain = true
           // Sleep needed to make sure the next popup for request accounts opens

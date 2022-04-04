@@ -94,7 +94,7 @@ export default {
         const result = await this.$blockchain.vTransfer(vaccount[0].id, parseFloat(tokenAmount).toFixed(4))
         if (result) {
           this.err = false
-          this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+          this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
           this.message = 'Transfer has been successful. Check your transaction here: '
           await this.$blockchain.waitForTransaction(result)
           this.$blockchain.updateUserInfo()

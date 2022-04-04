@@ -266,7 +266,7 @@ export default {
         const result = await this.$blockchain.payout()
         this.$store.dispatch('transaction/addTransaction', result)
         this.$store.dispatch('pendingPayout/loadPendingPayouts')
-        this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+        this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
         this.successTitle = 'Payout Completed'
         this.successMessage = 'All your available pending payouts have been completed and are added to your Effect account'
       } catch (error) {

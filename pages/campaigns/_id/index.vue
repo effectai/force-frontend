@@ -277,7 +277,7 @@ export default {
   middleware: ['auth'],
   data () {
     return {
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
+      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
       id: parseInt(this.$route.params.id),
       accountId: this.$auth.user.vAccountRows[0].id,
       body: 'description',
