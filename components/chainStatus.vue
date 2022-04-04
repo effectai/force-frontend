@@ -18,10 +18,10 @@
       </span>
       <div class="pl-5">
         <b>Smart Contract:</b> <a
-          :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}`"
+          :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}`"
           target="_blank"
           rel="noopener noreferrer"
-        >{{ $blockchain.sdk.force.config.force_contract }}</a>
+        >{{ $blockchain.sdk.force.config.forceContract }}</a>
       </div>
       <div class="pl-5">
         <strong>
