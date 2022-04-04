@@ -40,7 +40,7 @@
         </div>
 
         <div v-if="$auth.user.blockchain === 'eos'" class="field">
-          <label for="" class="label">Memo</label>
+          <label for="" class="label">Memo (optional)</label>
           <div class="control">
             <input
               v-model="memo"

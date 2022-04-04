@@ -75,12 +75,12 @@
                       </td>
                       <td>
                         <button class="button is-info is-outlined is-small is-rounded" @click.prevent="previewModal(index)">
-                          <font-awesome-icon icon="fa-solid fa-magnifying-glass" />
+                          <font-awesome-icon icon="fa-solid fa-magnifying-glass" style="height: 11px;" />
                         </button>
                       </td>
                       <td>
                         <button class="button is-danger is-outlined is-small is-rounded" @click.prevent="tasks.splice(index, 1)">
-                          <font-awesome-icon icon="fa-solid fa-trash-can" />
+                          <font-awesome-icon icon="fa-solid fa-trash-can" style="height: 10px;" />
                         </button>
                       </td>
                     </tr>
