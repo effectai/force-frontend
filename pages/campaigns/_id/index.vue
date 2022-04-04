@@ -387,7 +387,7 @@ export default {
       // check if user has reservation for a batch in this campaign
       for (const batch of this.campaignBatches) {
         const reservations = await this.$blockchain.getTaskReservationsForBatch(batch.batch_id)
-        const userReservation = reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id && parseInt(new Date(new Date(r.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.release_task_delay_sec.toFixed(0)) > parseInt((Date.now() / 1000).toFixed(0)))
+        const userReservation = reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id && parseInt(new Date(new Date(r.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.releaseTaskDelaySec.toFixed(0)) > parseInt((Date.now() / 1000).toFixed(0)))
         if (userReservation) {
           this.userReservation = userReservation
         }

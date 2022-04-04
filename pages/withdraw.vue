@@ -39,6 +39,17 @@
           </div>
         </div>
 
+        <div v-if="$auth.user.blockchain === 'eos'" class="field">
+          <label for="" class="label">Memo</label>
+          <div class="control">
+            <input
+              v-model="memo"
+              class="input"
+              type="text"
+            >
+          </div>
+        </div>
+
         <div class="field is-grouped is-grouped-right">
           <div class="control">
             <button class="button is-link is-light" @click.prevent="clearFields()">
