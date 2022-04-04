@@ -108,7 +108,7 @@
                       </div>
                       <div class="column">
                         <p v-if="batch.num_tasks - batch.tasks_done === 0" class="has-text-grey is-size-7">
-                          {{ batch.tasks_done }} Task<span v-if="batch.tasks_done > 1">s</span> <small>(<b class="has-text-success">Done</b>)</small>
+                          {{ batch.tasks_done }} Task<span v-if="batch.tasks_done > 1">s</span> <small>(<b class="has-text-info">Done</b>)</small>
                         </p>
                         <p v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done > 0" class="has-text-grey is-size-7">
                           Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
@@ -116,7 +116,12 @@
                         <p v-else-if="batch.status === 'Paused'" class="has-text-grey is-size-7">
                           {{ batch.tasks_done }} Task <span v-if="batch.tasks_done > 1">s</span><small><b>completed</b></small>
                         </p>
-                        <progress class="progress is-small mt-2" :class="{'is-success': batch ? batch.tasks_done === batch.num_tasks: false }" :value="batch.tasks_done" :max="batch.num_tasks" />
+                        <progress
+                          class="progress is-small mt-2"
+                          :class="getProgressBatch(batch)"
+                          :value="batch.tasks_done"
+                          :max="batch.num_tasks"
+                        />
                       </div>
                     </div>
                   </nuxt-link>
@@ -232,15 +237,15 @@
                 <div class="block">
                   Tasks
                   <br>
-                  <span v-if="batchByCampaignId(campaign.id) === null" class="loading-text">
+                  <span v-if="batchesByCampaignId(campaign.id) === null" class="loading-text">
                     Loading
                   </span>
                   <span v-else>
-                    {{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                    {{ batchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.num_tasks
-                    },0) - batchByCampaignId(campaign.id).reduce(function(a,b){
+                    },0) - batchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.tasks_done
-                    },0) }}/{{ batchByCampaignId(campaign.id).reduce(function(a,b){
+                    },0) }}/{{ batchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.num_tasks
                     },0) }} left
                     <br>
@@ -290,15 +295,14 @@ export default {
   },
   computed: {
     ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId'
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     ...mapState({
-      batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
       batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded
     }),
     campaignBatches () {
-      return this.batchByCampaignId(this.id)
+      return this.batchesByCampaignId(this.id)
     },
     campaign () {
       if (this.campaigns) {
@@ -409,6 +413,18 @@ export default {
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.id)
       // this.campaign = this.campaigns.find(c => c.id === this.id)
+    },
+    getProgressBatch (batch) {
+      switch (batch?.status) {
+        case 'Completed':
+          return 'is-success'
+        case 'Active':
+          return 'is-info'
+        case 'Paused':
+          return 'is-warning'
+        default:
+          break
+      }
     }
   }
 }

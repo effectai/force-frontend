@@ -26,6 +26,7 @@ export default (context, inject) => {
         forceRefreshInterval: null,
         templateRefreshInterval: null,
         eosInfo: null,
+        relayerStatus: null,
         triggerGenerate: false
       }
     },
@@ -85,6 +86,7 @@ export default (context, inject) => {
       updateUserInfo () {
         this.getEfxPrice()
         this.getBlockchainInfo()
+        this.getRelayerStatus()
         if (context.$auth.loggedIn) {
           // console.log('updating user and balance..')
           context.$auth.fetchUser()
@@ -114,6 +116,10 @@ export default (context, inject) => {
         }
         this.eosInfo = eosInfo
       },
+      async getRelayerStatus () {
+        this.relayerStatus = await this.eos.getRelayerStatus().catch(console.error)
+      },
+
       async rememberLogin () {
         const rememberAccount = context.$auth.$storage.getUniversal('rememberAccount')
         // const rememberAccount = null
@@ -416,8 +422,11 @@ export default (context, inject) => {
       async getSubmissionsAndReservationsForBatch (batchId) {
         return await this.sdk.force.getSubmissionsOfBatch(batchId)
       },
-      async getTaskIndexFromLeaf (campaignId, batchId, leafhash, tasks) {
-        return await this.sdk.force.getTaskIndexFromLeaf(campaignId, batchId, leafhash, tasks)
+      async getTaskIndexFromLeaf (campaignId, batchId, leafhash, tasks, leaves) {
+        return await this.sdk.force.getTaskIndexFromLeaf(campaignId, batchId, leafhash, tasks, leaves)
+      },
+      async getTreeLeaves (campaignId, batchId, tasks) {
+        return await this.sdk.force.getTreeLeaves(campaignId, batchId, tasks)
       },
       async connectAccount () {
         const chain = this.account.blockchain

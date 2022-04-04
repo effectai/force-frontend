@@ -88,6 +88,9 @@
           </div>
         </form>
       </div>
+      <div class="has-text-centered mt-5">
+        <a class="button is-light is-primary" href="https://effect.network/token-page" target="_blank">Buy EFX -></a>
+      </div>
     </div>
   </section>
 </template>

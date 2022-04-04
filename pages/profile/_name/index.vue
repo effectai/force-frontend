@@ -47,7 +47,7 @@
           <h2 class="title is-4">
             Campaigns
           </h2>
-          <campaign-list class="mb-6" :owner="name" />
+          <campaign-list class="mb-6" :campaigns="myCampaigns" />
         </div>
         <div v-else>
           Could not retrieve account
@@ -57,6 +57,8 @@
   </section>
 </template>
 <script>
+import { mapState, mapGetters } from 'vuex'
+
 import CampaignList from '@/components/CampaignList'
 
 export default {
@@ -69,9 +71,39 @@ export default {
       loading: false
     }
   },
+  computed: {
+    ...mapState({
+      campaigns: state => state.campaign.campaigns
+    }),
+    ...mapGetters({
+      transactionsByUser: 'transaction/transactionsByUser',
+      getPendingPayouts: 'pendingPayout/getPendingPayouts',
+      campaignById: 'campaign/campaignById',
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
+    }),
+    myCampaigns () {
+      if (!this.campaigns) { return }
+      const filteredCampaigns = this.campaigns.filter(c => c.owner[1] === this.name).map((c) => { return { ...c } })
+
+      for (const i in filteredCampaigns) {
+        const batches = this.batchesByCampaignId(filteredCampaigns[i].id)
+        filteredCampaigns[i].batches = batches
+        if (batches) {
+          filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
+            return a + b.num_tasks
+          }, 0)
+          filteredCampaigns[i].tasks_done = batches.reduce(function (a, b) {
+            return a + b.tasks_done
+          }, 0)
+        }
+      }
+      return filteredCampaigns
+    }
+  },
   created () {
     this.getProfile()
   },
+
   methods: {
     async getProfile () {
       try {

@@ -5,7 +5,7 @@
     role="navigation"
     aria-label="pagination"
   >
-    <span>{{ (page - 1) * perPage + 1 }}-{{ Math.min(page * perPage, items) }} of
+    <span style="padding-left: 0.5em">{{ (page - 1) * perPage + 1 }}-{{ Math.min(page * perPage, items) }} of
       {{ items }}</span>
     <a
       class="pagination-previous"

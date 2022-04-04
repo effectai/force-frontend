@@ -8,6 +8,11 @@
       :show="showInstructionsModal"
       @clicked="showInstructions"
     />
+    <submitted-task-modal
+      v-if="campaign && campaign.reward"
+      :campaign="campaign"
+      :show="showSubmittedTaskModal"
+    />
     <section class="section has-background-secondary py-1 has-text-white">
       <div class="container">
         <div class="columns is-vcentered">
@@ -55,8 +60,6 @@
           @submit="submitTask"
         />
 
-        <!-- SuccessModal -->
-        <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
         <!-- Reserve task -->
         <reserve-task v-if="reserveNextTask" :batch="reserveInBatch ? reserveInBatch : batch" />
       </div>
@@ -76,14 +79,14 @@ import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
-import SuccessModal from '@/components/SuccessModal'
+import SubmittedTaskModal from '@/components/SubmittedTaskModal'
 
 export default {
   components: {
     TemplateMedia,
     ReserveTask,
     InstructionsModal,
-    SuccessModal
+    SubmittedTaskModal
   },
   middleware: ['auth'],
   data () {
@@ -98,9 +101,8 @@ export default {
       task: undefined,
       reserveNextTask: false,
       loading: false,
-      successMessage: null,
-      successTitle: null,
       showInstructionsModal: false,
+      showSubmittedTaskModal: false,
       reserveInBatch: null
     }
   },
@@ -112,10 +114,10 @@ export default {
       batchLoading: state => state.campaign.loadingBatch
     }),
     ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId'
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     campaignBatches () {
-      return this.batchByCampaignId(this.campaignId)
+      return this.batchesByCampaignId(this.campaignId)
     }
   },
   created () {
@@ -147,14 +149,37 @@ export default {
         console.error(e)
       }
     },
+    async reserveTask () {
+      try {
+        this.showSubmittedTaskModal = false
+        this.loading = true
+        this.reserveNextTask = true
+        // if there are no more tasks left in this batch, look in other batches
+        if (this.batch.tasks_done === this.batch.num_tasks || this.taskIndex + 1 >= this.batch.num_tasks) {
+          const batch = this.campaignBatches.find((b) => {
+            return b.num_tasks - b.tasks_done > 0
+          })
+
+          if (!batch) {
+            console.error('Could not find batch with active tasks')
+            this.$router.push('/campaigns/' + this.batch.campaign_id)
+            return
+          }
+          await this.$store.dispatch('campaign/getBatchTasks', batch)
+          this.reserveInBatch = batch
+          this.loading = false
+        }
+      } catch (e) {
+        this.loading = false
+        throw new Error(e)
+      }
+    },
     async submitTask (values) {
       try {
         this.loading = true
         this.reserveNextTask = false
 
         const result = await this.$blockchain.submitTask(this.batch.batch_id, this.submissionId, JSON.stringify(values))
-        this.successTitle = 'Task submitted successfully'
-        this.successMessage = 'Waiting for transaction to complete before continuing'
         await this.$blockchain.waitForTransaction(result)
         this.$store.dispatch('transaction/addTransaction', result)
         this.loading = false
@@ -163,21 +188,7 @@ export default {
         if (this.batch.tasks_done === this.batch.num_tasks || this.taskIndex + 1 >= this.batch.num_tasks) {
           this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '?batchCompleted=1')
         } else {
-          this.reserveNextTask = true
-          // if there are no more tasks left in this batch, look in other batches
-          if (this.batch.tasks_done === this.batch.num_tasks) {
-            const batch = this.campaignBatches.find((b) => {
-              return b.num_tasks - b.tasks_done > 0
-            })
-
-            if (!batch) {
-              console.error('Could not find batch with active tasks')
-              this.$router.push('/campaigns/' + this.batch.campaign_id)
-              return
-            }
-            await this.$store.dispatch('campaign/getBatchTasks', batch)
-            this.reserveInBatch = batch
-          }
+          this.showSubmittedTaskModal = true
         }
       } catch (e) {
         throw new Error(e)

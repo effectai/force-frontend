@@ -1,4 +1,3 @@
-@import '../../node_modules/bulma';
 @import 'variables.scss';
 
 * {
@@ -26,6 +25,11 @@ button {
   }
 }
 
+button:disabled {
+  background-color: $primary !important;
+  border-color: $primary !important;
+}
+
 .is-secondary {
   @extend .is-secondary;
 }
@@ -38,7 +42,7 @@ button {
   @extend .has-text-centered
 }
 
-input {
+input[type="text"], input[type="email"], input[type="number"], input[type="password"] {
   @extend .input;
   &.is-primary {
     &.is-outlined {
@@ -133,3 +137,5 @@ a.box {
   white-space: nowrap;
   overflow: hidden;
 }
+
+@import '../../node_modules/bulma';

@@ -1,6 +1,9 @@
 <template>
   <section class="section is-max-widescreen">
     <div class="container">
+      <div v-if="loading" class="loader-wrapper is-active">
+        <img src="~assets/img/loading.svg">
+      </div>
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
           <li>
@@ -65,8 +68,8 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(task, index) in tasks" :key="task.id">
-                      <td>{{ index + 1 }}</td>
+                    <tr v-for="(task, index) in paginatedTasks" :key="task.id">
+                      <td>{{ task.id }}</td>
                       <td v-for="placeholder in placeholders" :key="placeholder" class="task-placeholder-value">
                         {{ task[placeholder] }}
                       </td>
@@ -97,6 +100,13 @@
                     </tr>
                   </tbody>
                 </table>
+                <pagination
+                  v-if="tasks"
+                  :items="tasks.length"
+                  :page="page"
+                  :per-page="perPage"
+                  @setPage="setPage"
+                />
               </div>
               <div class="control has-text-centered mt-5">
                 <button class="button is-primary is-wide" @click.prevent="createTask">
@@ -117,7 +127,7 @@
                         <span class="file-label has-text-grey is-size-7">
                           Drag and drop or browse to choose a CSV file
                         </span>
-                        <button class="button is-light mt-2 ">
+                        <button class="button is-light mt-2">
                           Choose a .csv file
                         </button>
                       </span>
@@ -175,7 +185,7 @@
         <form @submit.prevent="uploadBatch">
           <div class="field is-grouped is-justify-content-center mt-6">
             <div class="control">
-              <button type="submit" class="button button is-primary is-wide mr-4" :disabled="!tasks.length || tasks.length > maxAmountTask">
+              <button type="submit" :class="{'is-loading': loading}" class="button button is-primary is-wide mr-4" :disabled="!tasks.length || tasks.length > maxAmountTask">
                 Add Tasks
               </button>
               <button class="button is-outlined is-primary is-wide" @click.prevent="cancel">
@@ -205,6 +215,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import { Template } from '@effectai/effect-js'
+import Pagination from '@/components/Pagination.vue'
 import TemplateMedia from '@/components/Template'
 // import templatePreviewModal from '~/components/templatePreviewModal.vue'
 
@@ -221,6 +232,7 @@ function getMatches (string, regex, index) {
 export default {
   components: {
     // templatePreviewModal
+    Pagination,
     TemplateMedia
   },
   middleware: ['auth'],
@@ -239,7 +251,10 @@ export default {
         name: null,
         content: null
       },
-      error: null
+      error: null,
+      loading: false,
+      page: 1,
+      perPage: 30
     }
   },
   computed: {
@@ -248,19 +263,29 @@ export default {
       campaignLoading: state => state.campaign.loading
     }),
     ...mapGetters({
-      batchByCampaignId: 'campaign/batchByCampaignId'
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     efxAvailable () {
-      return this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable
+      return this.$blockchain.vefxAvailable
     },
     maxAmountTask () {
-      return Math.floor(((this.$blockchain.efxAvailable + this.$blockchain.vefxAvailable) / this.campaign.info.reward) / this.repetitions)
+      return Math.floor(this.$blockchain.vefxAvailable / this.campaign.info.reward / this.repetitions)
+    },
+    paginatedTasks () {
+      const start = (this.page - 1) * this.perPage
+      if (this.tasks) {
+        return this.tasks.slice(start, start + this.perPage)
+      }
+      return []
     }
   },
   mounted () {
     this.getCampaign()
   },
   methods: {
+    setPage (newPage) {
+      this.page = newPage
+    },
     dragover (event) {
       event.preventDefault()
       event.currentTarget.classList.add('dragover')
@@ -340,6 +365,7 @@ export default {
     },
     async uploadBatch () {
       try {
+        this.loading = true
         const content = {
           tasks: this.tasks
         }
@@ -349,6 +375,7 @@ export default {
       } catch (e) {
         this.$blockchain.handleError(e)
       }
+      this.loading = false
     },
     cancel () {
       this.$router.push('/campaigns/' + this.campaignId)
