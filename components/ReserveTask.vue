@@ -28,7 +28,7 @@ export default {
       error: null,
       now: 0,
       reserveInBatch: null,
-      openBatches: []
+      availableBatches: []
     }
   },
   computed: {
@@ -41,9 +41,6 @@ export default {
     }),
     campaignBatches () {
       return this.batchesByCampaignId(this.campaignId)
-    },
-    submissions () {
-      return this.submissionsByBatchId(this.batchId)
     }
   },
   mounted () {
@@ -52,6 +49,9 @@ export default {
     this.makeReservation()
   },
   methods: {
+    async submissions (id) {
+      return await this.submissionsByBatchId(id)
+    },
     async getSubmissions () {
       await this.$store.dispatch('campaign/getSubmissions')
     },
@@ -60,24 +60,27 @@ export default {
     },
     async makeReservation () {
       try {
+        let foundReservation = false
         await this.getSubmissions()
         // if there's no batch specified, check in all the batches if there's still available tasks
-        // TODO: check all the batches, could be there are still tasks available, but not for the current worker
         if (!this.batch) {
           for (const batch of this.campaignBatches) {
             if (batch.num_tasks * batch.repetitions > batch.tasks_done) {
               this.reserveInBatch = batch
-              break
+              this.availableBatches.push(batch)
             }
           }
+        } else {
+          this.availableBatches.push(this.batch)
         }
 
-        if (this.reserveInBatch || this.batch) {
-          const batch = this.batch ? this.batch : this.reserveInBatch
+        // go through the batches that have available tasks
+        for (const batch of this.availableBatches) {
           await this.$store.dispatch('campaign/getBatchTasks', batch)
           this.loading = true
-          this.batchId = batch.batch_id
-          const rs = { ...this.submissions }
+          const rs = await this.submissions(batch.batch_id)
+
+          // seperate reservations and submissions
           const reservations = []
           const submissions = []
           for (const r of Object.values(rs)) {
@@ -85,7 +88,6 @@ export default {
               reservations.push(r)
             }
           }
-
           for (const r of Object.values(rs)) {
             if (r.data || r.data.length) {
               submissions.push(r)
@@ -112,23 +114,26 @@ export default {
               // user has a reservation
               const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(batch.campaign_id, batch.id, rvObj.reservation.leaf_hash, batch.tasks)
               this.$router.push('/campaigns/' + batch.campaign_id + '/' + batch.batch_id + '/' + taskIndex + '?submissionId=' + rvObj.reservation.id)
+              foundReservation = true
+              break
             }
           } else {
             // User doesn't have reservation yet, so let's make one!
             rvObj = await this.createNewReservation(batch, submissions, rvObj)
           }
-
           // redirect to reservation
           if (rvObj.reservation) {
+            foundReservation = true
             const taskIndex = await this.$blockchain.getTaskIndexFromLeaf(batch.campaign_id, batch.id, rvObj.reservation.leaf_hash, batch.tasks)
             this.$router.push('/campaigns/' + batch.campaign_id + '/' + batch.batch_id + '/' + taskIndex + '?submissionId=' + rvObj.reservation.id)
-          } else {
-            this.$router.push('/campaigns/' + batch.campaign_id)
+            break
           }
-          this.loading = false
-        } else {
-          this.loading = false
-          throw new Error('No available tasks an anymore in campaign')
+          // no reservation yet? if there are more batches with tasks available it'll try this again
+        }
+        this.loading = false
+        if (!foundReservation) {
+          this.$router.push('/campaigns/' + this.campaignId)
+          throw new Error('No available tasks anymore in campaign')
         }
       } catch (e) {
         this.loading = false
@@ -142,7 +147,6 @@ export default {
       // First go through the submissions and get all the indexes of the tasks that are done
       const indexes = []
       const userIndexes = []
-
       const treeLeaves = await this.$blockchain.getTreeLeaves(batch.campaign_id, batch.id, batch.tasks)
       for await (const sub of submissions) {
         const index = await this.$blockchain.getTaskIndexFromLeaf(batch.campaign_id, batch.id, sub.leaf_hash, batch.tasks, treeLeaves)
@@ -165,7 +169,7 @@ export default {
         // grab the first available index, that the user hasn't done yet
         const availableIndex = Object.keys(indexesCount).find(key => indexesCount[key] < batch.repetitions && !this.didWorkerDoTask(userIndexes, key))
         taskIndex = availableIndex ? parseInt(availableIndex) : null
-        console.log('Found an available task index: ', taskIndex)
+        console.log('taskIndex?', taskIndex)
       } else {
         // no submissions yet in batch
         taskIndex = 0
@@ -178,7 +182,7 @@ export default {
         // get reservations and see if this user has a reservation
         return await this.findReservation(rvObj, batch)
       } else {
-        this.$router.push('/campaigns/' + batch.campaign_id + '/' + batch.batch_id + '?batchCompleted=1')
+        return { reservation: null, isReleased: false, isExpired: false }
       }
     },
     didWorkerDoTask (userIndexes, key) {
