@@ -132,7 +132,7 @@ export default {
     async createNewReservation (batch, submissions, rvObj) {
       let taskIndex
 
-      // First go through the submissions and get all the indexes of the tasks that are done
+      // First go through the submissions & reservations and get all the indexes of the tasks that are done
       const indexes = []
       const userIndexes = []
       const treeLeaves = await this.$blockchain.getTreeLeaves(batch.campaign_id, batch.id, batch.tasks)
