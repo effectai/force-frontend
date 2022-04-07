@@ -259,7 +259,7 @@
     </div>
 
     <!-- SuccessModal -->
-    <success-modal v-if="batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
+    <success-modal v-if="completed && successMessage" :message="successMessage" :title="successTitle" />
   </section>
 </template>
 <script>
