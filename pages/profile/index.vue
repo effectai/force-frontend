@@ -16,8 +16,8 @@
                 <span v-if="$auth.user.blockchain === 'bsc'">
                   <span>&nbsp;BSC Address</span>
                   <button v-if="$auth.user.provider === 'burner-wallet'" class="button is-info is-light is-small" @click="showPK = !showPK">
-                    <span class="is-small icon">
-                      <font-awesome-icon :icon="['fas', 'fa-key']" />
+                    <span>
+                      <font-awesome-icon class="is-small icon" icon="fa-solid fa-key" />
                     </span>
                   </button>
                 </span>
@@ -79,8 +79,8 @@
             <div class="payout-detail mt-3" @click="showPayoutDetails = !showPayoutDetails">
               <span>
                 View Details
-                <font-awesome-icon v-if="!showPayoutDetails" class="ml-1" icon="fa-solid fa-chevron-down" style="width: 10px;" />
-                <font-awesome-icon v-else class="ml-1" icon="fa-solid fa-chevron-up" style="width: 10px;" />
+                <font-awesome-icon v-if="!showPayoutDetails" class="ml-1 icon" icon="fa-solid fa-chevron-down" style="width: 10px;" />
+                <font-awesome-icon v-else class="ml-1 icon" icon="fa-solid fa-chevron-up" style="width: 10px;" />
               </span>
             </div>
           </div>
