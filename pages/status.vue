@@ -98,15 +98,35 @@
           </tbody>
         </table>
       </div>
+      <div>
+        <table class="table mx-auto">
+          <thead>
+            <th>Configuration</th>
+            <th>Values</th>
+          </thead>
+          <tbody>
+            <tr v-for="(val, prop) in config" :key="val">
+              <td>{{ prop }}</td>
+              <td>{{ val }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
+
 </template>
 
 <script>
+import { defaultConfiguration } from '@effectai/effect-js'
+const defaultConfig = defaultConfiguration(process.env.NUXT_ENV_SDK_ENV)
+delete defaultConfig.web3
+
 export default {
   name: 'statusPage',
   data () {
     return {
+      config: defaultConfig,
       relayerOk: false,
       relayerTxCost: {
         // closebatch: { net: 0, cpu: 0 }, // ❌
@@ -128,7 +148,6 @@ export default {
   },
   created () {
     this.pingRelayer()
-    this.getRelayerTxs()
   },
   methods: {
 
@@ -137,12 +156,6 @@ export default {
         mode: 'cors'
       }).catch(console.error)
       this.relayerOk = response.ok
-    },
-
-    async getRelayerTxs () {
-      const response = await this.$blockchain.getRelayerTxs().catch(console.error)
-      console.log(response)
-      return response
     },
 
     txEstimate (tx) {
