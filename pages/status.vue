@@ -129,20 +129,20 @@ export default {
       config: defaultConfig,
       relayerOk: false,
       relayerTxCost: {
-        // closebatch: { net: 0, cpu: 0 }, // ❌
-        // editcampaign: { net: 0, cpu: 0 }, // ❌
-        // init: { net: 0, cpu: 0 }, // ❌
-        joincampaign: { net: 47, cpu: 434 }, // ✅
-        mkbatch: { net: 66, cpu: 817 }, // ✅
-        mkcampaign: { net: 33, cpu: 240 }, // ✅
-        // payout: { net: 0, cpu: 0 }, // ❌
-        // publishbatch { net: 0, cpu: 0 }, // ❌
-        reclaimtask: { net: 184, cpu: 358 }, // ✅
-        releasetask: { net: 184, cpu: 184 }, // ✅
-        reservetask: { net: 296, cpu: 253 }, // ✅
-        // rmbatch: { net: 0, cpu: 0 }, // ❌
-        // rmcampaign: { net: 0, cpu: 0 }, // ❌
-        submittask: { net: 216, cpu: 1308 } // ✅
+        joincampaign: { net: 47, cpu: 434 },
+        mkbatch: { net: 66, cpu: 817 },
+        mkcampaign: { net: 33, cpu: 240 },
+        reclaimtask: { net: 184, cpu: 358 },
+        releasetask: { net: 184, cpu: 184 },
+        reservetask: { net: 296, cpu: 253 },
+        submittask: { net: 216, cpu: 1308 }
+        // closebatch: { net: 0, cpu: 0 },
+        // editcampaign: { net: 0, cpu: 0 },
+        // init: { net: 0, cpu: 0 },
+        // payout: { net: 0, cpu: 0 },
+        // publishbatch { net: 0, cpu: 0 },
+        // rmbatch: { net: 0, cpu: 0 },
+        // rmcampaign: { net: 0, cpu: 0 },
       }
     }
   },
@@ -152,16 +152,17 @@ export default {
   methods: {
 
     async pingRelayer () {
-      const response = await fetch(`${this.$blockchain.sdk.config.eosRelayerUrl}/info`, {
-        mode: 'cors'
-      }).catch(console.error)
+      const response = await fetch(`${this.$blockchain.sdk.config.eosRelayerUrl}/info`, { mode: 'cors' }).catch(console.error)
       this.relayerOk = response.ok
     },
 
+    /**
+     * Return the estimated amount of times a give action can be taken before resources for the relayer run out.
+     * @param tx txObject that represent an Action such as reserveTask.
+     */
     txEstimate (tx) {
       const cpuEstimate = (this.relayerCpuQuota - this.relayerCpuUsage) / tx.cpu
       const netEstimate = (this.relayerNetQuota - this.relayerNetUsage) / tx.net
-
       return Math.min(cpuEstimate, netEstimate).toFixed(0)
     }
 
@@ -211,10 +212,6 @@ export default {
 
     percentageCpu () {
       return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.cpu_limit.used / this.$blockchain.relayerStatus.cpu_limit.max * 100, 10) : 0
-    },
-
-    relayerTxs () {
-      return this.$blockchain.relayerTxs ? this.$blockchain.relayerTxs : []
     }
 
   }
