@@ -257,6 +257,9 @@
         </div>
       </div>
     </div>
+
+    <!-- SuccessModal -->
+    <success-modal v-if="batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
   </section>
 </template>
 <script>
@@ -264,6 +267,7 @@ import { mapState, mapGetters } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
+import SuccessModal from '@/components/SuccessModal'
 import InstructionsModal from '@/components/InstructionsModal'
 import BatchModal from '@/components/BatchModal'
 
@@ -272,11 +276,13 @@ export default {
     TemplateMedia,
     ReserveTask,
     InstructionsModal,
-    BatchModal
+    BatchModal,
+    SuccessModal
   },
   middleware: ['auth'],
   data () {
     return {
+      completed: parseInt(this.$route.query.completed),
       ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
       id: parseInt(this.$route.params.id),
       accountId: this.$auth.user.vAccountRows[0].id,
@@ -311,6 +317,10 @@ export default {
     }
   },
   mounted () {
+    if (this.completed) {
+      this.successTitle = 'Campaign is completed'
+      this.successMessage = 'There are no more available tasks for you in this campaign'
+    }
   },
   created () {
     this.checkUserCampaign()

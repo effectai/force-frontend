@@ -130,9 +130,10 @@ export default {
           // no reservation yet? if there are more batches with tasks available it'll try this again
         }
         this.loading = false
-        if (!foundReservation) {
-          this.$router.push('/campaigns/' + this.campaignId)
-          throw new Error('No available tasks anymore in campaign')
+        if (!foundReservation && this.batch) {
+          this.$router.push('/campaigns/' + this.batch.campaign_id + '/' + this.batch.batch_id + '?batchCompleted=1')
+        } else if (!foundReservation && this.campaignId) {
+          this.$router.push('/campaigns/' + this.campaignId + '?completed=1')
         }
       } catch (e) {
         this.loading = false
