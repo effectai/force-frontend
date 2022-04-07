@@ -26,7 +26,6 @@ export default {
     return {
       loading: false,
       error: null,
-      now: 0,
       availableBatches: []
     }
   },
@@ -43,20 +42,16 @@ export default {
     }
   },
   mounted () {
-    this.updateNow()
-    setInterval(this.updateNow, 1000)
     this.makeReservation()
   },
   methods: {
     async getSubmissions () {
       await this.$store.dispatch('campaign/getSubmissions')
     },
-    updateNow () {
-      this.now = parseInt((Date.now() / 1000).toFixed(0))
-    },
     async makeReservation () {
       try {
         let foundReservation = false
+        // TODO: only refresh submissions for this specific batch
         await this.getSubmissions()
         // if there's no batch specified, check in all the batches if there's still available tasks
         if (!this.batch) {
@@ -81,10 +76,7 @@ export default {
           for (const r of Object.values(rs)) {
             if (!r.data || !r.data.length) {
               reservations.push(r)
-            }
-          }
-          for (const r of Object.values(rs)) {
-            if (r.data || r.data.length) {
+            } else {
               submissions.push(r)
             }
           }
@@ -189,7 +181,7 @@ export default {
       let isReleased = false
       for (const rv of reservations) {
         if ((!rv.data || !rv.data.length)) {
-          if (rv.account_id !== null && parseInt(new Date(new Date(rv.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.releaseTaskDelaySec.toFixed(0)) < this.now) {
+          if (rv.account_id !== null && parseInt(new Date(new Date(rv.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.releaseTaskDelaySec.toFixed(0)) < parseInt((Date.now() / 1000).toFixed(0))) {
             reservation = rv
             isExpired = true
           } else if (rv.account_id === null) {
