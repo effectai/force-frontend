@@ -380,8 +380,8 @@ export default (context, inject) => {
       async reserveTask (batchId, taskIndex, campaignId, tasks) {
         return await this.sdk.force.reserveTask(batchId, taskIndex, campaignId, tasks)
       },
-      async claimExpiredTask (taskId) {
-        return await this.sdk.force.claimExpiredTask(taskId)
+      async claimExpiredTask (taskId, accountId) {
+        return await this.sdk.force.claimExpiredTask(taskId, accountId)
       },
       async releaseTask (taskId) {
         return await this.sdk.force.releaseTask(taskId)

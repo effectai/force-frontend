@@ -3,7 +3,7 @@
     <!-- Instructions modal -->
     <instructions-modal v-if="campaign && campaign.info" :show="joinCampaignPopup" :campaign="campaign" :info="campaign.info" @clicked="campaignModalChange" />
     <!-- Reserve task -->
-    <reserve-task v-if="showReserveTask" :batch="reserveInBatch" />
+    <reserve-task v-if="showReserveTask" :campaign-id="campaign.id" />
     <!-- Batch modal -->
     <batch-modal v-if="campaign && campaignBatches" :show="$auth.user.accountName === campaign.owner[1] && showBatchesPopup && !cancelledBatchesPopup" @cancelled="cancelBatchModal" />
 
@@ -257,6 +257,9 @@
         </div>
       </div>
     </div>
+
+    <!-- SuccessModal -->
+    <success-modal v-if="completed && successMessage" :message="successMessage" :title="successTitle" />
   </section>
 </template>
 <script>
@@ -264,6 +267,7 @@ import { mapState, mapGetters } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import ReserveTask from '@/components/ReserveTask'
+import SuccessModal from '@/components/SuccessModal'
 import InstructionsModal from '@/components/InstructionsModal'
 import BatchModal from '@/components/BatchModal'
 
@@ -272,11 +276,13 @@ export default {
     TemplateMedia,
     ReserveTask,
     InstructionsModal,
-    BatchModal
+    BatchModal,
+    SuccessModal
   },
   middleware: ['auth'],
   data () {
     return {
+      completed: parseInt(this.$route.query.completed),
       ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
       id: parseInt(this.$route.params.id),
       accountId: this.$auth.user.vAccountRows[0].id,
@@ -285,7 +291,6 @@ export default {
       loading: false,
       joinCampaignPopup: false,
       showReserveTask: false,
-      reserveInBatch: null,
       userReservation: null,
       cancelledBatchesPopup: false,
       showBatchesPopup: false,
@@ -312,6 +317,10 @@ export default {
     }
   },
   mounted () {
+    if (this.completed) {
+      this.successTitle = 'Campaign is completed'
+      this.successMessage = 'There are no more available tasks for you in this campaign'
+    }
   },
   created () {
     this.checkUserCampaign()
@@ -319,21 +328,8 @@ export default {
     this.getBatches()
   },
   methods: {
-    async reserveTask () {
-      await this.prepareReserveTask()
+    reserveTask () {
       this.showReserveTask = true
-    },
-    async prepareReserveTask () {
-      const batch = this.campaignBatches.find((b) => {
-        return b.num_tasks - b.tasks_done > 0
-      })
-
-      if (!batch) {
-        console.error('Could not find batch with active tasks')
-        return
-      }
-      await this.$store.dispatch('campaign/getBatchTasks', batch)
-      this.reserveInBatch = batch
     },
     async goToTask () {
       const batch = this.campaignBatches.find((b) => {
@@ -357,9 +353,8 @@ export default {
       try {
         // function that makes the user join this campaign.
         this.loading = true
-        await this.prepareReserveTask()
         this.joinCampaignPopup = false
-        const data = await this.$blockchain.joinCampaignAndReserveTask(this.id, this.reserveInBatch.id, this.reserveInBatch.tasks_done, this.reserveInBatch.tasks)
+        const data = await this.$blockchain.joinCampaign(this.id)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
