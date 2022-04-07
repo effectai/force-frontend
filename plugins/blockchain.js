@@ -353,6 +353,28 @@ export default (context, inject) => {
           return null
         }
       },
+      async makeReservation (batches) {
+        if (!Array.isArray(batches)) {
+          batches = [batches]
+        }
+        let reservation
+        // go through the batches that have available tasks
+        for (let i = 0; i < batches.length; i++) {
+          await context.store.dispatch('campaign/getBatchTasks', batches[i])
+          try {
+            reservation = await this.reserveOrClaimTask(batches[i], batches[i].tasks)
+            context.app.router.push('/campaigns/' + batches[i].campaign_id + '/' + batches[i].batch_id + '/' + reservation.task_index + '?submissionId=' + reservation.id)
+            return
+          } catch (error) {
+            if (i === batches.length - 1) {
+              // no more batches to try..
+              throw error
+            }
+            console.error('reservation error, trying next batch..', error)
+            // there are more batches, so lets try this again
+          }
+        }
+      },
       async getBatches (nextKey, limit = 50, processBatch = true) {
         return await this.sdk.force.getBatches(nextKey, limit, processBatch)
       },
@@ -376,6 +398,9 @@ export default (context, inject) => {
       },
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)
+      },
+      async reserveOrClaimTask (batch, tasks) {
+        return await this.sdk.force.reserveOrClaimTask(batch, tasks)
       },
       async reserveTask (batchId, taskIndex, campaignId, tasks) {
         return await this.sdk.force.reserveTask(batchId, taskIndex, campaignId, tasks)
@@ -407,14 +432,8 @@ export default (context, inject) => {
       async createCampaign (hash, reward) {
         return await this.sdk.force.createCampaign(hash, reward)
       },
-      async getReservations () {
-        return await this.sdk.force.getReservations()
-      },
       async payout () {
         return await this.sdk.force.payout()
-      },
-      async getMyReservations () {
-        return await this.sdk.force.getMyReservations()
       },
       async getTaskSubmissionsForBatch (batchId) {
         return await this.sdk.force.getSubmissionsOfBatch(batchId, 'submissions')

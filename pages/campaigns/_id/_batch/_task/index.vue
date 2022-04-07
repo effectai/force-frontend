@@ -61,7 +61,10 @@
         />
 
         <!-- Reserve task -->
-        <reserve-task v-if="reserveNextTask" :batch="batch" />
+        <div v-if="loadingReservation" class="loader-wrapper is-active">
+          <img src="~assets/img/loading.svg">
+          <br><span class="loading-text">Making reservation</span>
+        </div>
       </div>
     </section>
     <section class="py-3 has-background-light">
@@ -77,14 +80,12 @@
 import { mapState } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
-import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
 import SubmittedTaskModal from '@/components/SubmittedTaskModal'
 
 export default {
   components: {
     TemplateMedia,
-    ReserveTask,
     InstructionsModal,
     SubmittedTaskModal
   },
@@ -98,8 +99,8 @@ export default {
       campaign: undefined,
       batch: undefined,
       task: undefined,
-      reserveNextTask: false,
       loading: false,
+      loadingReservation: false,
       showInstructionsModal: false,
       showSubmittedTaskModal: false,
       reserveInBatch: null
@@ -118,6 +119,15 @@ export default {
     this.getCampaign()
   },
   methods: {
+    async reserveNextTask () {
+      this.loadingReservation = true
+      try {
+        await this.$blockchain.makeReservation(this.batch)
+      } catch (error) {
+        this.$blockchain.handleError(error)
+      }
+      this.loadingReservation = false
+    },
     showInstructions (val = true) {
       this.showInstructionsModal = val
     },
@@ -145,7 +155,7 @@ export default {
     reserveTask () {
       try {
         this.showSubmittedTaskModal = false
-        this.reserveNextTask = true
+        this.reserveNextTask()
       } catch (e) {
         this.loading = false
         throw new Error(e)
@@ -154,7 +164,6 @@ export default {
     async submitTask (values) {
       try {
         this.loading = true
-        this.reserveNextTask = false
 
         const result = await this.$blockchain.submitTask(this.batch.batch_id, this.submissionId, JSON.stringify(values))
         await this.$blockchain.waitForTransaction(result)

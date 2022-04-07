@@ -293,7 +293,8 @@
                   class="progress"
                   :class="getProgressBatch(batch)"
                   :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined"
-                  :max="batch ? batch.num_tasks : undefined">
+                  :max="batch ? batch.num_tasks : undefined"
+                >
                   Left
                 </progress>
               </div>
@@ -366,10 +367,10 @@
                 <button v-else-if="!userJoined" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                   Qualify
                 </button>
-                <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
+                <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
                   Resume Task
                 </button>
-                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations.length > 0" class="button is-fullwidth is-primary" @click.prevent="reserveTask = true">
+                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations.length > 0" class="button is-fullwidth is-primary" @click.prevent="reserveTask">
                   Make Task Reservation
                 </button>
                 <template v-else>
@@ -389,7 +390,10 @@
         <success-modal v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
 
         <!-- Reserve task -->
-        <reserve-task v-if="reserveTask" :batch="batch" />
+        <div v-if="loadingReservation" class="loader-wrapper is-active">
+          <img src="~assets/img/loading.svg">
+          <br><span class="loading-text">Making reservation</span>
+        </div>
 
         <!-- Instructions modal -->
         <instructions-modal v-if="campaign && campaign.info" :campaign="campaign" :info="campaign.info" :show="joinCampaignPopup" @clicked="campaignModalChange" />
@@ -401,7 +405,6 @@
 import { mapState } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
-import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
 import SuccessModal from '@/components/SuccessModal'
 import Pagination from '@/components/Pagination'
@@ -410,7 +413,6 @@ const jsonexport = require('jsonexport/dist')
 export default {
   components: {
     TemplateMedia,
-    ReserveTask,
     InstructionsModal,
     SuccessModal,
     Pagination
@@ -428,8 +430,8 @@ export default {
       accountId: this.$auth.user.vAccountRows[0].id,
       userJoined: null,
       loading: false,
+      loadingReservation: false,
       joinCampaignPopup: false,
-      reserveTask: false,
       submissions: null,
       pageR: 1,
       page: 1,
@@ -512,6 +514,15 @@ export default {
         this.$blockchain.handleError(e)
       }
     },
+    async reserveTask () {
+      this.loadingReservation = true
+      try {
+        await this.$blockchain.makeReservation(this.batch)
+      } catch (error) {
+        this.$blockchain.handleError(error)
+      }
+      this.loadingReservation = false
+    },
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
@@ -526,7 +537,7 @@ export default {
           await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
           if (this.userJoined) {
-            this.reserveTask = true
+            this.reserveTask()
           }
         }
         this.waitingOnTransaction = false
