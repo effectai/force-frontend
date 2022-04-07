@@ -96,13 +96,14 @@ export default {
 
           // get a reservation for the user
           // could be an active reservation of the user, or an expired/released reservation in the batch
-          let rvObj = await this.getReservationForUser(reservations)
+          let rvObj = await this.pickReservationForUser(reservations)
+          console.log('hi', rvObj)
           if (rvObj.reservation) {
             // There is a reservation available that is either from the user OR is expired/released
 
             if (rvObj.isExpired) {
               // (re) claim expired task
-              const result = await this.$blockchain.claimExpiredTask(rvObj.reservation.id)
+              const result = await this.$blockchain.claimExpiredTask(rvObj.reservation.id, rvObj.reservation.account_id)
               this.$store.dispatch('transaction/addTransaction', result)
               rvObj = await this.findReservation(rvObj, batch)
             } else if (rvObj.isReleased) {
@@ -189,7 +190,7 @@ export default {
       const item = userIndexes.find(i => parseInt(i) === parseInt(key))
       return item !== null && item !== undefined
     },
-    getReservationForUser (reservations) {
+    pickReservationForUser (reservations) {
       let reservation = null
       let isExpired = false
       let isReleased = false
@@ -204,6 +205,8 @@ export default {
             break
           } else if (rv.account_id === this.$auth.user.vAccountRows[0].id) {
             reservation = rv
+            isExpired = false
+            isReleased = false
             break
           }
         }
@@ -212,8 +215,15 @@ export default {
     },
     async findReservation (rvObj, batch) {
       return await retry(async () => {
-        const rvs = await this.$blockchain.getTaskReservationsForBatch(batch.batch_id)
-        rvObj = await this.getReservationForUser(rvs)
+        await this.getSubmissions()
+        const rvs = await this.submissions(batch.batch_id)
+        const reservations = []
+        for (const r of Object.values(rvs)) {
+          if (!r.data || !r.data.length) {
+            reservations.push(r)
+          }
+        }
+        rvObj = await this.pickReservationForUser(reservations)
         if (!rvObj.reservation || rvObj.isReleased || rvObj.isExpired) {
           throw new Error('Reservation not found')
         } else {
