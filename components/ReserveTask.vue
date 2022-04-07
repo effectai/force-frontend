@@ -95,7 +95,6 @@ export default {
           // get a reservation for the user
           // could be an active reservation of the user, or an expired/released reservation in the batch
           let rvObj = await this.pickReservationForUser(reservations)
-          console.log('hi', rvObj)
           if (rvObj.reservation) {
             // There is a reservation available that is either from the user OR is expired/released
 
@@ -118,7 +117,7 @@ export default {
             }
           } else {
             // User doesn't have reservation yet, so let's make one!
-            rvObj = await this.createNewReservation(batch, submissions, rvObj)
+            rvObj = await this.createNewReservation(batch, rs, rvObj)
           }
           // redirect to reservation
           if (rvObj.reservation) {
@@ -165,11 +164,9 @@ export default {
         for (const num of indexes) {
           indexesCount[num] = indexesCount[num] ? indexesCount[num] + 1 : 1
         }
-
         // grab the first available index, that the user hasn't done yet
         const availableIndex = Object.keys(indexesCount).find(key => indexesCount[key] < batch.repetitions && !this.didWorkerDoTask(userIndexes, key))
         taskIndex = availableIndex ? parseInt(availableIndex) : null
-        console.log('taskIndex?', taskIndex)
       } else {
         // no submissions yet in batch
         taskIndex = 0
