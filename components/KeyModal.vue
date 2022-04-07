@@ -6,13 +6,15 @@
 
       <div class="field has-addons has-addons-centered is-centered">
         <div class="control has-icons-right has-icons-left is-expanded">
-          <input class="input" :type="password_hidden ? 'password' : 'text'" :value="messageContent" readonly>
-          <span class="p-2 icon is-small is-left is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="visibility_message" @click.prevent="togglePasswordVisibility()" @mouseout="visibility_message = 'Toggle visibility'">
-            <font-awesome-icon v-if="password_hidden" class="unselectable" icon="fa-solid fa-eye" />
-            <font-awesome-icon v-else class="unselectable" icon="fa-solid fa-eye-slash" />
+          <input class="input " :type="password_hidden ? 'password' : 'text'" :value="messageContent" readonly>
+          <span class="p-2 icon is-left is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="visibility_message" @click.prevent="togglePasswordVisibility()" @mouseout="visibility_message = 'Toggle visibility'">
+            <font-awesome-icon class="mx-2 is-small unselectable" v-if="password_hidden" icon="fa-solid fa-eye" />
+            <font-awesome-icon class="mx-2 is-small unselectable" v-else icon="fa-solid fa-eye-slash" />
           </span>
-          <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="copy_message" @click.prevent="copyToClipboard(messageContent)" @mouseout="copy_message = 'Copy to clipboard'">
-            <img src="~assets/img/icons/copy.svg" class="unselectable" alt="Copy">
+          <span class="p-2 icon is-right is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="copy_message" @click.prevent="copyToClipboard(messageContent)" @mouseout="copy_message = 'Copy'">
+            <!-- <img src="~assets/img/icons/copy.svg" class=".unselectable" alt="Copy"> -->
+            <font-awesome-icon v-if="copy_state" class=" is-small" icon="fa-solid fa-copy" />
+            <font-awesome-icon v-else icon="fa-solid fa-square-check" />
           </span>
         </div>
       </div>
@@ -42,6 +44,7 @@ export default {
       messageTitle: this.title,
       messageContent: this.message,
       copy_message: 'Copy',
+      copy_state: true,
       input_type: 'password',
       password_hidden: true
 
@@ -51,8 +54,10 @@ export default {
     async copyToClipboard (content) {
       await navigator.clipboard.writeText(content).catch(console.error)
       this.copy_message = 'Copied!'
+      this.copy_state = false
       setTimeout(() => {
         this.copy_message = 'Copy'
+        this.copy_state = true
       }, 5e3)
     },
     togglePasswordVisibility () {

@@ -277,24 +277,23 @@
               <div class="block">
                 <b>Tasks</b>
                 <br>
-                <template v-if="batch && batch.num_tasks - batch.tasks_done === 0">
+                <template v-if="batch && batch.num_tasks - batch.real_tasks_done === 0">
                   <span>{{ batch.num_tasks }} Tasks done.</span>
                 </template>
-                <template v-else-if="batch && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
-                  <span>{{ batch.num_tasks - (batch.tasks_done - releasedReservations.length) }}</span>
+                <template v-else-if="batch && batch.num_tasks - batch.real_tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
+                  <span>{{ batch.num_tasks - (batch.real_tasks_done - releasedReservations.length) }}</span>
                   <span>/ {{ batch.num_tasks }} left</span>
                 </template>
-                <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations && batch.reservations.length)">
-                  <span>{{ batch.num_tasks - batch.tasks_done }}</span>
+                <template v-else-if="(batch && batch.num_tasks - batch.real_tasks_done > 0) || (batch && batch.reservations && batch.reservations.length)">
+                  <span>{{ batch.num_tasks - batch.real_tasks_done }}</span>
                   <span>/ {{ batch.num_tasks }} left</span>
                 </template>
                 <span v-else>...</span>
                 <progress
                   class="progress"
                   :class="getProgressBatch(batch)"
-                  :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined"
-                  :max="batch ? batch.num_tasks : undefined"
-                >
+                  :value="batch && releasedReservations ? ( batch.real_tasks_done - releasedReservations.length): undefined"
+                  :max="batch ? batch.num_tasks : undefined">
                   Left
                 </progress>
               </div>
@@ -370,7 +369,7 @@
                 <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
                   Resume Task
                 </button>
-                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations.length > 0" class="button is-fullwidth is-primary" @click.prevent="reserveTask">
+                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.real_tasks_done !== 0 && !userReservation || releasedReservations.length > 0" class="button is-fullwidth is-primary" @click.prevent="reserveTask">
                   Make Task Reservation
                 </button>
                 <template v-else>
@@ -387,7 +386,7 @@
         </div>
 
         <!-- SuccessModal -->
-        <success-modal v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
+        <success-modal v-if="batch && batch.num_tasks - batch.real_tasks_done === 0 && batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
 
         <!-- Reserve task -->
         <div v-if="loadingReservation" class="loader-wrapper is-active">
@@ -528,7 +527,7 @@ export default {
         // function that makes the user join this campaign.
         this.loading = true
         this.joinCampaignPopup = false
-        const data = await this.$blockchain.joinCampaignAndReserveTask(this.campaignId, this.batch.id, this.batch.tasks_done, this.batch.tasks)
+        const data = await this.$blockchain.joinCampaignAndReserveTask(this.campaignId, this.batch.id, this.batch.real_tasks_done, this.batch.tasks)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true

@@ -148,7 +148,12 @@ export default {
       commit('SET_LOADING_BATCH', true)
       try {
         const data = await this.$blockchain.getBatches(nextKey, 200, false)
-        commit('UPSERT_BATCHES', data.rows)
+        const batches = []
+        for (const batch of data.rows) {
+          batch.real_tasks_done = Math.floor(batch.tasks_done / batch.repetitions)
+          batches.push(batch)
+        }
+        commit('UPSERT_BATCHES', batches)
 
         if (data.more) {
           console.log('retrieving more batches..')

@@ -108,19 +108,19 @@
                         </h2>
                       </div>
                       <div class="column">
-                        <p v-if="batch.num_tasks - batch.tasks_done === 0" class="has-text-grey is-size-7">
-                          {{ batch.tasks_done }} Task<span v-if="batch.tasks_done > 1">s</span> <small>(<b class="has-text-info">Done</b>)</small>
+                        <p v-if="batch.num_tasks - batch.real_tasks_done === 0" class="has-text-grey is-size-7">
+                          {{ batch.real_tasks_done }} Task<span v-if="batch.real_tasks_done > 1">s</span> <small>(<b class="has-text-info">Done</b>)</small>
                         </p>
-                        <p v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done > 0" class="has-text-grey is-size-7">
-                          Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
+                        <p v-else-if="batch.status === 'Active' && batch.num_tasks - batch.real_tasks_done > 0" class="has-text-grey is-size-7">
+                          Tasks <small>(<b>{{ batch.num_tasks - batch.real_tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
                         </p>
                         <p v-else-if="batch.status === 'Paused'" class="has-text-grey is-size-7">
-                          {{ batch.tasks_done }} Task <span v-if="batch.tasks_done > 1">s</span><small><b>completed</b></small>
+                          {{ batch.real_tasks_done }} Task <span v-if="batch.real_tasks_done > 1">s</span><small><b>completed</b></small>
                         </p>
                         <progress
                           class="progress is-small mt-2"
                           :class="getProgressBatch(batch)"
-                          :value="batch.tasks_done"
+                          :value="batch.real_tasks_done"
                           :max="batch.num_tasks"
                         />
                       </div>
@@ -194,7 +194,7 @@
                     Qualify
                   </button>
                   <button
-                    v-else-if="campaignBatches.reduce((a,b) => a + b.num_tasks, 0) - campaignBatches.reduce((a,b) => a + b.tasks_done, 0) > 0 && !userReservation"
+                    v-else-if="campaignBatches.reduce((a,b) => a + b.num_tasks, 0) - campaignBatches.reduce((a,b) => a + b.real_tasks_done, 0) > 0 && !userReservation"
                     class="button is-fullwidth is-primary"
                     @click.prevent="reserveTask"
                   >
@@ -245,7 +245,7 @@
                     {{ batchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.num_tasks
                     },0) - batchesByCampaignId(campaign.id).reduce(function(a,b){
-                      return a + b.tasks_done
+                      return a + b.real_tasks_done
                     },0) }}/{{ batchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.num_tasks
                     },0) }} left
