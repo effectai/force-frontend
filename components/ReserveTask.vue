@@ -27,7 +27,6 @@ export default {
       loading: false,
       error: null,
       now: 0,
-      reserveInBatch: null,
       availableBatches: []
     }
   },
@@ -66,7 +65,6 @@ export default {
         if (!this.batch) {
           for (const batch of this.campaignBatches) {
             if (batch.num_tasks * batch.repetitions > batch.tasks_done) {
-              this.reserveInBatch = batch
               this.availableBatches.push(batch)
             }
           }
