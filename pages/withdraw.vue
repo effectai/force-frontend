@@ -4,6 +4,31 @@
       <h1 class="title mt-5">
         Withdraw tokens
       </h1>
+
+      <div class="tabs is-centered is-large">
+        <ul>
+          <li
+            :class="[withdrawalBlockchain === 'eos' ? 'is-active' : '']"
+            @click.prevent="withdrawalBlockchain = 'eos'"
+          >
+            <a>
+              <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span>
+              <span>EOS</span>
+            </a>
+          </li>
+          <li>|</li>
+          <li
+            :class="[withdrawalBlockchain === 'bsc' ? 'is-active' : ''] "
+            @click.prevent="withdrawalBlockchain = 'bsc'"
+          >
+            <a>
+              <span>BSC</span>
+              <span class="icon is-large"><img src="@/assets/img/providers/BSC-logo.svg" alt="BSC" /></span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
       <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
         {{ message }}
         <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
@@ -78,7 +103,8 @@ export default {
       err: false,
       tokenAmount: null,
       memo: null,
-      transactionUrl: null
+      transactionUrl: null,
+      withdrawalBlockchain: this.$auth.user.blockchain
     }
   },
   computed: {
@@ -100,7 +126,7 @@ export default {
         if (result) {
           this.err = false
           this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
-          this.message = 'Withdrawing has been successful. Check your transaction here: '
+          this.message = 'Withdrawal successful. Check your transaction here: '
           await this.$blockchain.waitForTransaction(result)
           this.$blockchain.updateUserInfo()
           this.submitted = true
