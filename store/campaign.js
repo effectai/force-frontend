@@ -153,7 +153,6 @@ export default {
           batch.real_tasks_done = Math.floor(batch.tasks_done / batch.repetitions)
           batches.push(batch)
         }
-        console.log('ey', batches)
         commit('UPSERT_BATCHES', batches)
 
         if (data.more) {
