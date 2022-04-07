@@ -48,9 +48,6 @@ export default {
     this.makeReservation()
   },
   methods: {
-    async submissions (id) {
-      return await this.submissionsByBatchId(id)
-    },
     async getSubmissions () {
       await this.$store.dispatch('campaign/getSubmissions')
     },
@@ -76,7 +73,7 @@ export default {
         for (const batch of this.availableBatches) {
           await this.$store.dispatch('campaign/getBatchTasks', batch)
           this.loading = true
-          const rs = await this.submissions(batch.batch_id)
+          const rs = await this.submissionsByBatchId(batch.batch_id)
 
           // seperate reservations and submissions
           const reservations = []
@@ -212,7 +209,7 @@ export default {
     async findReservation (rvObj, batch) {
       return await retry(async () => {
         await this.getSubmissions()
-        const rvs = await this.submissions(batch.batch_id)
+        const rvs = await this.submissionsByBatchId(batch.batch_id)
         const reservations = []
         for (const r of Object.values(rvs)) {
           if (!r.data || !r.data.length) {
