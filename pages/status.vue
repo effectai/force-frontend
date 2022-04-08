@@ -122,7 +122,7 @@ export default {
         reservetask: { net: 296, cpu: 253 }, // ✅
         // rmbatch: { net: 0, cpu: 0 }, // ❌
         // rmcampaign: { net: 0, cpu: 0 }, // ❌
-        submittask: { net: 216, cpu: 1308 } // ✅
+        submittask: { net: 248, cpu: 269 } // ✅
       }
     }
   },
