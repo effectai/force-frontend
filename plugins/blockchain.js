@@ -366,6 +366,10 @@ export default (context, inject) => {
             context.app.router.push('/campaigns/' + batches[i].campaign_id + '/' + batches[i].batch_id + '/' + reservation.task_index + '?submissionId=' + reservation.id)
             return
           } catch (error) {
+            if (error.message === 'no available tasks') {
+              context.app.router.push('/campaigns/' + batches[i].campaign_id + '?completed=1')
+              return
+            }
             if (i === batches.length - 1) {
               // no more batches to try..
               throw error

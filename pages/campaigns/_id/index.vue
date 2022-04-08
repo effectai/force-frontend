@@ -333,7 +333,7 @@ export default {
     showCompletedPopup () {
       if (this.completed) {
         this.successTitle = 'No more tasks available for you in this campaign'
-        this.successMessage = 'This could either that mean all the available tasks are already reserved, or you already completed the still available tasks.'
+        this.successMessage = 'This could either mean that all the available tasks are already reserved, or you already completed the still available tasks.'
       }
     },
     async reserveTask () {
