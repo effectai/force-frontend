@@ -135,7 +135,7 @@ export default {
         reclaimtask: { net: 184, cpu: 358 },
         releasetask: { net: 184, cpu: 184 },
         reservetask: { net: 296, cpu: 253 },
-        submittask: { net: 216, cpu: 1308 }
+        submittask: { net: 248, cpu: 269 }
         // closebatch: { net: 0, cpu: 0 },
         // editcampaign: { net: 0, cpu: 0 },
         // init: { net: 0, cpu: 0 },
