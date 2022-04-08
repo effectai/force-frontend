@@ -297,6 +297,7 @@ export default {
   mounted () {
     console.log('mounted')
     this.$store.dispatch('pendingPayout/loadPendingPayouts')
+    // console.debug(this.$auth)
   },
   methods: {
     async logout () {

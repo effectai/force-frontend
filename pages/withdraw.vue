@@ -33,7 +33,9 @@
         {{ message }}
         <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
       </div>
+
       <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount, memo)">
+
         <div class="field">
           <label class="label">Destination {{ $auth.user.blockchain === 'eos' ? 'EOS' : 'BSC' }} Account</label>
           <div class="control">
@@ -88,9 +90,11 @@
           </div>
         </div>
       </form>
+
     </div>
   </section>
 </template>
+
 <script>
 export default {
   middleware: ['auth'],
