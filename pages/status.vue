@@ -98,57 +98,71 @@
           </tbody>
         </table>
       </div>
+      <div>
+        <table class="table mx-auto">
+          <thead>
+            <th>Configuration</th>
+            <th>Values</th>
+          </thead>
+          <tbody>
+            <tr v-for="(val, prop) in config" :key="val">
+              <td>{{ prop }}</td>
+              <td>{{ val }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
+
 </template>
 
 <script>
+import { defaultConfiguration } from '@effectai/effect-js'
+const defaultConfig = defaultConfiguration(process.env.NUXT_ENV_SDK_ENV)
+delete defaultConfig.web3
+
 export default {
   name: 'statusPage',
   data () {
     return {
+      config: defaultConfig,
       relayerOk: false,
       relayerTxCost: {
-        // closebatch: { net: 0, cpu: 0 }, // ❌
-        // editcampaign: { net: 0, cpu: 0 }, // ❌
-        // init: { net: 0, cpu: 0 }, // ❌
-        joincampaign: { net: 47, cpu: 434 }, // ✅
-        mkbatch: { net: 66, cpu: 817 }, // ✅
-        mkcampaign: { net: 33, cpu: 240 }, // ✅
-        // payout: { net: 0, cpu: 0 }, // ❌
-        // publishbatch { net: 0, cpu: 0 }, // ❌
-        reclaimtask: { net: 184, cpu: 358 }, // ✅
-        releasetask: { net: 184, cpu: 184 }, // ✅
-        reservetask: { net: 296, cpu: 253 }, // ✅
-        // rmbatch: { net: 0, cpu: 0 }, // ❌
-        // rmcampaign: { net: 0, cpu: 0 }, // ❌
-        submittask: { net: 248, cpu: 269 } // ✅
+        joincampaign: { net: 47, cpu: 434 },
+        mkbatch: { net: 66, cpu: 817 },
+        mkcampaign: { net: 33, cpu: 240 },
+        reclaimtask: { net: 184, cpu: 358 },
+        releasetask: { net: 184, cpu: 184 },
+        reservetask: { net: 296, cpu: 253 },
+        submittask: { net: 248, cpu: 269 }
+        // closebatch: { net: 0, cpu: 0 },
+        // editcampaign: { net: 0, cpu: 0 },
+        // init: { net: 0, cpu: 0 },
+        // payout: { net: 0, cpu: 0 },
+        // publishbatch { net: 0, cpu: 0 },
+        // rmbatch: { net: 0, cpu: 0 },
+        // rmcampaign: { net: 0, cpu: 0 },
       }
     }
   },
   created () {
     this.pingRelayer()
-    this.getRelayerTxs()
   },
   methods: {
 
     async pingRelayer () {
-      const response = await fetch(`${this.$blockchain.sdk.config.eosRelayerUrl}/info`, {
-        mode: 'cors'
-      }).catch(console.error)
+      const response = await fetch(`${this.$blockchain.sdk.config.eosRelayerUrl}/info`, { mode: 'cors' }).catch(console.error)
       this.relayerOk = response.ok
     },
 
-    async getRelayerTxs () {
-      const response = await this.$blockchain.getRelayerTxs().catch(console.error)
-      console.log(response)
-      return response
-    },
-
+    /**
+     * Return the estimated amount of times a give action can be taken before resources for the relayer run out.
+     * @param tx txObject that represent an Action such as reserveTask.
+     */
     txEstimate (tx) {
       const cpuEstimate = (this.relayerCpuQuota - this.relayerCpuUsage) / tx.cpu
       const netEstimate = (this.relayerNetQuota - this.relayerNetUsage) / tx.net
-
       return Math.min(cpuEstimate, netEstimate).toFixed(0)
     }
 
@@ -198,10 +212,6 @@ export default {
 
     percentageCpu () {
       return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.cpu_limit.used / this.$blockchain.relayerStatus.cpu_limit.max * 100, 10) : 0
-    },
-
-    relayerTxs () {
-      return this.$blockchain.relayerTxs ? this.$blockchain.relayerTxs : []
     }
 
   }

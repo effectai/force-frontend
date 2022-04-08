@@ -27,7 +27,7 @@
         <p>
           We're working hard to make Effect a safe and friendly environment to
           work in the crypto
-          space. <a href="http://discord.gg/effectnetwork/">Join our
+          space. <a href="https://discord.gg/effectnetwork" target="_blank">Join our
           Discord</a> and let us know what you think!
         </p>
       </div>

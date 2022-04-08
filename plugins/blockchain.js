@@ -3,7 +3,7 @@ import Vue from 'vue'
 import eos from '../services/eos'
 import bsc from '../services/bsc'
 
-const effectsdk = new effectSdk.EffectClient(process.env.NUXT_ENV_EOS_NETWORK)
+const effectsdk = new effectSdk.EffectClient(process.env.NUXT_ENV_SDK_ENV)
 
 export default (context, inject) => {
   const blockchain = new Vue({
