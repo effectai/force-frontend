@@ -12,8 +12,8 @@
             @click.prevent="withdrawalBlockchain = 'eos'"
           >
             <a>
-              <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span>
               <span>EOS</span>
+              <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span>
             </a>
           </li>
           <li>|</li>
@@ -22,8 +22,8 @@
             @click.prevent="withdrawalBlockchain = 'bsc'"
           >
             <a>
-              <span>BSC</span>
               <span class="icon is-large"><img src="@/assets/img/providers/BSC-logo.svg" alt="BSC" /></span>
+              <span>BSC</span>
             </a>
           </li>
         </ul>

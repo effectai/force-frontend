@@ -43,6 +43,7 @@
     "lodash": "^4.17.21",
     "marked": "^1.2.5",
     "nuxt": "^2.15.3",
+    "ptokens-peosio-token": "^0.14.0",
     "qs": "^6.10.1",
     "sanitize-html": "^2.5.3",
     "splitpanes": "^2.4.1",
