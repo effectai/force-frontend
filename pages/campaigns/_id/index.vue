@@ -316,11 +316,14 @@ export default {
       return undefined
     }
   },
-  mounted () {
-    if (this.completed) {
-      this.successTitle = 'Campaign is completed'
-      this.successMessage = 'There are no more available tasks for you in this campaign'
+  watch: {
+    '$route.query.completed' (completed) {
+      this.completed = parseInt(completed)
+      this.showCompletedPopup()
     }
+  },
+  mounted () {
+    this.showCompletedPopup()
   },
   created () {
     this.checkUserCampaign()
@@ -328,6 +331,12 @@ export default {
     this.getBatches()
   },
   methods: {
+    showCompletedPopup () {
+      if (this.completed) {
+        this.successTitle = 'No more tasks available for you in this campaign'
+        this.successMessage = 'This could either that mean all the available tasks are already reserved, or you already completed the still available tasks.'
+      }
+    },
     reserveTask () {
       this.showReserveTask = true
     },
