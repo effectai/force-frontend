@@ -49,6 +49,7 @@
             <div class="control is-expanded">
               <input
                 v-model="tokenAmount"
+                @submit="checkWithdrawal"
                 required
                 class="input"
                 type="number"
@@ -92,6 +93,8 @@
 </template>
 
 <script>
+import { isAddress } from 'web3'
+
 export default {
   middleware: ['auth'],
   data () {
@@ -139,7 +142,36 @@ export default {
     clearFields () {
       this.tokenAmount = null
       this.account = null
+    },
+    checkWithdrawal (e) {
+      console.debug('checkform', this.account)
+      if (!this.account) {
+        this.message = 'Please fill in a valid EOS account or BSC address'
+        this.err = true
+      } else if (!this.validEosAccount(this.account) && this.withdrawalBlockchain === 'eos') {
+        this.message = 'Invalid EOS account'
+        this.err = true
+      } else if (!this.validBscAddress(this.account && this.withdrawalBlockchain === 'bsc')) {
+        this.message = 'Invalid BSC address'
+        this.err = true
+      } else {
+        return true
+      }
+
+      e.preventDefault()
+    },
+    validEosAccount (account) {
+      const validEosChars = 'abcdefghijklmnopqrstuvwxyz12345' // Allowed characters for EOS account name
+      const maxEosLength = 12
+      const validChars = account.split('').every(ela => validEosChars.split('').includes(elb => elb === ela))
+      const length = account.length <= maxEosLength
+      console.debug('valideosaccount', validChars, length)
+      return validChars && length
+    },
+    validBscAddress (address) {
+      return isAddress(address)
     }
+
   }
 }
 </script>
