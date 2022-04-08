@@ -65,7 +65,7 @@ export default {
               return a + b.num_tasks
             }, 0)
             filteredCampaigns[i].tasks_done = batches.reduce(function (a, b) {
-              return a + b.tasks_done
+              return a + b.real_tasks_done
             }, 0)
           }
         }
@@ -88,13 +88,13 @@ export default {
         if (this.status) {
           switch (this.status) {
             case 'active':
-              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0)
+              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.real_tasks_done > 0)
               break
             case 'ended':
-              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === 0 && c.num_tasks !== 0)
+              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.real_tasks_done === 0 && c.num_tasks !== 0)
               break
             case 'notstarted':
-              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done === c.num_tasks)
+              filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.real_tasks_done === c.num_tasks)
               break
           }
         }

@@ -93,7 +93,7 @@ export default {
             return a + b.num_tasks
           }, 0)
           filteredCampaigns[i].tasks_done = batches.reduce(function (a, b) {
-            return a + b.tasks_done
+            return a + b.real_tasks_done
           }, 0)
         }
       }
