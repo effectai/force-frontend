@@ -12,8 +12,8 @@
             @click.prevent="withdrawalBlockchain = 'eos'"
           >
             <a>
-              <span>EOS</span>
               <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span>
+              <span>EOS</span>
             </a>
           </li>
           <li>|</li>
@@ -22,8 +22,8 @@
             @click.prevent="withdrawalBlockchain = 'bsc'"
           >
             <a>
-              <span class="icon is-large"><img src="@/assets/img/providers/BSC-logo.svg" alt="BSC" /></span>
               <span>BSC</span>
+              <span class="icon is-large"><img src="@/assets/img/providers/BSC-logo.svg" alt="BSC" /></span>
             </a>
           </li>
         </ul>
@@ -37,7 +37,7 @@
       <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount, memo)">
 
         <div class="field">
-          <label class="label">Destination {{ $auth.user.blockchain === 'eos' ? 'EOS' : 'BSC' }} Account</label>
+          <label class="label">Destination {{ withdrawalBlockchain === 'eos' ? 'EOS' : 'BSC' }} Account</label>
           <div class="control">
             <input v-model="account" class="input" type="text" required>
           </div>
@@ -66,14 +66,10 @@
           </div>
         </div>
 
-        <div v-if="$auth.user.blockchain === 'eos'" class="field">
+        <div v-if="withdrawalBlockchain === 'eos'" class="field">
           <label for="" class="label">Memo (optional)</label>
           <div class="control">
-            <input
-              v-model="memo"
-              class="input"
-              type="text"
-            >
+            <input v-model="memo" class="input" type="text" >
           </div>
         </div>
 
