@@ -39,6 +39,17 @@
           </div>
         </div>
 
+        <div v-if="$auth.user.blockchain === 'eos'" class="field">
+          <label for="" class="label">Memo (optional)</label>
+          <div class="control">
+            <input
+              v-model="memo"
+              class="input"
+              type="text"
+            >
+          </div>
+        </div>
+
         <div class="field is-grouped is-grouped-right">
           <div class="control">
             <button class="button is-link is-light" @click.prevent="clearFields()">
@@ -88,7 +99,7 @@ export default {
         const result = await this.$blockchain.withdraw(this.$auth.user.blockchain === 'eos' ? account : 'xbsc.ptokens', parseFloat(tokenAmount).toFixed(4), this.$auth.user.blockchain === 'eos' ? memo : this.$auth.user.address)
         if (result) {
           this.err = false
-          this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+          this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
           this.message = 'Withdrawing has been successful. Check your transaction here: '
           await this.$blockchain.waitForTransaction(result)
           this.$blockchain.updateUserInfo()

@@ -109,7 +109,7 @@ export default {
       copy_message: 'Copy to clipboard',
       modalConfirmation: false,
       memo: this.$auth.user.vAccountRows[0].id,
-      account: this.$blockchain.sdk.account.config.account_contract,
+      account: this.$blockchain.sdk.account.config.accountContract,
       clipboard: navigator.clipboard
     }
   },
@@ -131,7 +131,7 @@ export default {
         const result = await this.$blockchain.deposit(parseFloat(tokenAmount).toFixed(4))
         if (result) {
           this.$store.dispatch('transaction/addTransaction', result)
-          this.transactionUrl = process.env.NUXT_ENV_EOS_EXPLORER_URL + '/transaction/' + result.transaction_id
+          this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
           this.message = 'Withdrawing has been successful. Check your transaction here: '
           await this.$blockchain.waitForTransaction(result)
           this.$blockchain.updateUserInfo()

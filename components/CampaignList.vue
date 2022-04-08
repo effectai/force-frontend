@@ -139,7 +139,7 @@ export default {
     return {
       page: this.$route.query.page || 1,
       perPage: 30,
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
+      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
       categories: ['translate', 'captions', 'socials', 'dao']
     }
   },

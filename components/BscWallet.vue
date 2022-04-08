@@ -38,8 +38,8 @@
                 <label class="label">Public key</label>
                 <div class="control has-icons-right">
                   <input class="input blockchain-address" type="text" :value="keypair.address" readonly>
-                  <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="copy_message" @click.prevent="copyToClipboard(keypair.address)" @mouseout="copy_message = 'Copy to clipboard'">
-                    <img src="~assets/img/icons/copy.svg" alt="Copy">
+                  <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="copy_message" @click.prevent="copyToClipboard(keypair.address)" @mouseout="copy_message = 'Copy'">
+                    <font-awesome-icon class=" is-small" icon="fa-solid fa-copy" />
                   </span>
                 </div>
               </div>
@@ -47,12 +47,12 @@
                 <label class="label">Private key</label>
                 <div class="control has-icons-right has-icons-left">
                   <input class="input blockchain-address" :type="password_hidden ? 'password' : 'text'" :value="keypair.privateKey" readonly>
-                  <span class="p-2 icon is-small is-left is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="visibility_message" @click.prevent="togglePasswordVisibility()" @mouseout="visibility_message = 'Toggle visibility'">
-                    <font-awesome-icon v-if="password_hidden" icon="fa-solid fa-eye" />
-                    <font-awesome-icon v-else icon="fa-solid fa-eye-slash" />
+                  <span class="icon is-left" :data-tooltip="visibility_message" @click.prevent="togglePasswordVisibility()" @mouseout="visibility_message = 'Toggle visibility'">
+                    <font-awesome-icon class="p-2 is-small is-clickable has-tooltip-arrow has-tooltip-fade unselectable" v-if="password_hidden" icon="fa-solid fa-eye" />
+                    <font-awesome-icon class="p-2 is-small is-clickable has-tooltip-arrow has-tooltip-fade unselectable" v-else icon="fa-solid fa-eye-slash" />
                   </span>
-                  <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="copy_message" @click.prevent="copyToClipboard(keypair.privateKey)" @mouseout="copy_message = 'Copy to clipboard'">
-                    <img src="~assets/img/icons/copy.svg" alt="Copy">
+                  <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="copy_message" @click.prevent="copyToClipboard(keypair.privateKey)" @mouseout="copy_message = 'Copy'">
+                    <font-awesome-icon class="is-small" icon="fa-solid fa-copy" />
                   </span>
                 </div>
               </div>
@@ -143,7 +143,9 @@ export default {
       privateKey: null,
       burnerWallet: false,
       showKeypairDetails: false,
-      copy_message: 'Copy to clipboard',
+      copy_message: 'Copy',
+      copy_private: true,
+      copy_public: true,
       password_hidden: true,
       keypair: {
         address: '',
@@ -175,8 +177,9 @@ export default {
     togglePasswordVisibility () {
       this.password_hidden = !this.password_hidden
     },
-    copyToClipboard (content) {
-      navigator.clipboard.writeText(content).then(() => {
+    async copyToClipboard (content) {
+      await navigator.clipboard.writeText(content)
+      setTimeout(() => {
         this.copy_message = 'Copied!'
       })
     },

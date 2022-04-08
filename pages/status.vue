@@ -10,7 +10,7 @@
             <a
               class="tag"
               :class="relayerOk ? 'is-success' : 'is-danger'"
-              :href="`${$blockchain.sdk.config.eos_relayer_url}/status`"
+              :href="`${$blockchain.sdk.config.eosRelayerUrl}/status`"
               target="_blank"
               rel="noopener
               noreferrer">
@@ -22,7 +22,7 @@
 
       <hr>
 
-      <div class="block mx-auto">
+      <div class="block mx-auto is-half-desktop">
         <ul>
 
         <li>
@@ -36,10 +36,10 @@
 
             <span>Relayer Contract:</span>
             <a
-              :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.eos_relayer}`"
+              :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.eosRelayerAccount}`"
               target="_blank"
               rel="noopener noreferrer">
-              {{ $blockchain.sdk.force.config.eos_relayer }}
+              {{ $blockchain.sdk.force.config.eosRelayerAccount }}
             </a>
 
             <br>
@@ -133,7 +133,7 @@ export default {
   methods: {
 
     async pingRelayer () {
-      const response = await fetch(`${this.$blockchain.sdk.config.eos_relayer_url}/info`, {
+      const response = await fetch(`${this.$blockchain.sdk.config.eosRelayerUrl}/info`, {
         mode: 'cors'
       }).catch(console.error)
       this.relayerOk = response.ok

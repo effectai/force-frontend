@@ -62,7 +62,7 @@ export default {
       if (!this.$auth || !this.$auth.user || !this.$auth.user.vAccountRows) { return }
       let userReservations = this.reservationsByAccountId(this.$auth.user.vAccountRows[0].id)
       if (userReservations) {
-        userReservations = userReservations.filter(r => parseInt(new Date(new Date(r.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.release_task_delay_sec.toFixed(0)) > parseInt((Date.now() / 1000).toFixed(0)))
+        userReservations = userReservations.filter(r => parseInt(new Date(new Date(r.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.releaseTaskDelaySec.toFixed(0)) > parseInt((Date.now() / 1000).toFixed(0)))
       }
       return userReservations
     },
@@ -87,7 +87,7 @@ export default {
               return a + b.num_tasks
             }, 0)
             filteredCampaigns[i].tasks_done = batches.reduce(function (a, b) {
-              return a + b.tasks_done
+              return a + b.real_tasks_done
             }, 0)
           }
         }

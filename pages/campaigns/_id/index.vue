@@ -2,11 +2,12 @@
   <section class="section is-max-widescreen">
     <!-- Instructions modal -->
     <instructions-modal v-if="campaign && campaign.info" :show="joinCampaignPopup" :campaign="campaign" :info="campaign.info" @clicked="campaignModalChange" />
-    <!-- Reserve task -->
-    <reserve-task v-if="showReserveTask" :batch="reserveInBatch" />
     <!-- Batch modal -->
     <batch-modal v-if="campaign && campaignBatches" :show="$auth.user.accountName === campaign.owner[1] && showBatchesPopup && !cancelledBatchesPopup" @cancelled="cancelBatchModal" />
-
+    <div v-if="loadingReservation" class="loader-wrapper is-active">
+      <img src="~assets/img/loading.svg">
+      <br><span class="loading-text">Making reservation</span>
+    </div>
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
@@ -107,19 +108,19 @@
                         </h2>
                       </div>
                       <div class="column">
-                        <p v-if="batch.num_tasks - batch.tasks_done === 0" class="has-text-grey is-size-7">
-                          {{ batch.tasks_done }} Task<span v-if="batch.tasks_done > 1">s</span> <small>(<b class="has-text-info">Done</b>)</small>
+                        <p v-if="batch.num_tasks - batch.real_tasks_done === 0" class="has-text-grey is-size-7">
+                          {{ batch.real_tasks_done }} Task<span v-if="batch.real_tasks_done > 1">s</span> <small>(<b class="has-text-info">Done</b>)</small>
                         </p>
-                        <p v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done > 0" class="has-text-grey is-size-7">
-                          Tasks <small>(<b>{{ batch.num_tasks - batch.tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
+                        <p v-else-if="batch.status === 'Active' && batch.num_tasks - batch.real_tasks_done > 0" class="has-text-grey is-size-7">
+                          Tasks <small>(<b>{{ batch.num_tasks - batch.real_tasks_done }} / {{ batch.num_tasks }}</b> left)</small>
                         </p>
                         <p v-else-if="batch.status === 'Paused'" class="has-text-grey is-size-7">
-                          {{ batch.tasks_done }} Task <span v-if="batch.tasks_done > 1">s</span><small><b>completed</b></small>
+                          {{ batch.real_tasks_done }} Task <span v-if="batch.real_tasks_done > 1">s</span><small><b>completed</b></small>
                         </p>
                         <progress
                           class="progress is-small mt-2"
                           :class="getProgressBatch(batch)"
-                          :value="batch.tasks_done"
+                          :value="batch.real_tasks_done"
                           :max="batch.num_tasks"
                         />
                       </div>
@@ -193,13 +194,13 @@
                     Qualify
                   </button>
                   <button
-                    v-else-if="campaignBatches.reduce((a,b) => a + b.num_tasks, 0) - campaignBatches.reduce((a,b) => a + b.tasks_done, 0) > 0 && !userReservation"
+                    v-else-if="campaignBatches.reduce((a,b) => a + b.num_tasks, 0) - campaignBatches.reduce((a,b) => a + b.real_tasks_done, 0) > 0 && !userReservation"
                     class="button is-fullwidth is-primary"
                     @click.prevent="reserveTask"
                   >
                     Make Task Reservation
                   </button>
-                  <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="goToTask">
+                  <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
                     Go To Task
                   </button>
                   <template v-else>
@@ -232,7 +233,7 @@
                 <div class="block">
                   Blockchain
                   <br>
-                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
+                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
                 </div>
                 <div class="block">
                   Tasks
@@ -244,7 +245,7 @@
                     {{ batchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.num_tasks
                     },0) - batchesByCampaignId(campaign.id).reduce(function(a,b){
-                      return a + b.tasks_done
+                      return a + b.real_tasks_done
                     },0) }}/{{ batchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.num_tasks
                     },0) }} left
@@ -257,37 +258,40 @@
         </div>
       </div>
     </div>
+
+    <!-- SuccessModal -->
+    <success-modal v-if="completed && successMessage" :message="successMessage" :title="successTitle" />
   </section>
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
-import ReserveTask from '@/components/ReserveTask'
+import SuccessModal from '@/components/SuccessModal'
 import InstructionsModal from '@/components/InstructionsModal'
 import BatchModal from '@/components/BatchModal'
 
 export default {
   components: {
     TemplateMedia,
-    ReserveTask,
     InstructionsModal,
-    BatchModal
+    BatchModal,
+    SuccessModal
   },
   middleware: ['auth'],
   data () {
     return {
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
+      completed: parseInt(this.$route.query.completed),
+      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
       id: parseInt(this.$route.params.id),
       accountId: this.$auth.user.vAccountRows[0].id,
       body: 'description',
       userJoined: null,
       loading: false,
       joinCampaignPopup: false,
-      showReserveTask: false,
-      reserveInBatch: null,
       userReservation: null,
       cancelledBatchesPopup: false,
+      loadingReservation: false,
       showBatchesPopup: false,
       waitingOnTransaction: false,
       categories: ['translate', 'captions', 'socials', 'dao']
@@ -311,7 +315,14 @@ export default {
       return undefined
     }
   },
+  watch: {
+    '$route.query.completed' (completed) {
+      this.completed = parseInt(completed)
+      this.showCompletedPopup()
+    }
+  },
   mounted () {
+    this.showCompletedPopup()
   },
   created () {
     this.checkUserCampaign()
@@ -319,30 +330,26 @@ export default {
     this.getBatches()
   },
   methods: {
-    async reserveTask () {
-      await this.prepareReserveTask()
-      this.showReserveTask = true
-    },
-    async prepareReserveTask () {
-      const batch = this.campaignBatches.find((b) => {
-        return b.num_tasks - b.tasks_done > 0
-      })
-
-      if (!batch) {
-        console.error('Could not find batch with active tasks')
-        return
+    showCompletedPopup () {
+      if (this.completed) {
+        this.successTitle = 'No more tasks available for you in this campaign'
+        this.successMessage = 'This could either mean that all the available tasks are already reserved, or you already completed the still available tasks.'
       }
-      await this.$store.dispatch('campaign/getBatchTasks', batch)
-      this.reserveInBatch = batch
     },
-    async goToTask () {
-      const batch = this.campaignBatches.find((b) => {
-        return parseInt(b.batch_id) === parseInt(this.userReservation.batch_id)
-      })
-      await this.$store.dispatch('campaign/getBatchTasks', batch)
-
-      this.reserveInBatch = batch
-      this.showReserveTask = true
+    async reserveTask () {
+      this.loadingReservation = true
+      const availableBatches = []
+      for (const batch of this.campaignBatches) {
+        if (batch.num_tasks * batch.repetitions > batch.tasks_done) {
+          availableBatches.push(batch)
+        }
+      }
+      try {
+        await this.$blockchain.makeReservation(availableBatches)
+      } catch (error) {
+        this.$blockchain.handleError(error)
+      }
+      this.loadingReservation = false
     },
     renderTemplate (template, placeholders = {}, options = {}) {
       return new Template(template, placeholders, options).render()
@@ -357,9 +364,8 @@ export default {
       try {
         // function that makes the user join this campaign.
         this.loading = true
-        await this.prepareReserveTask()
         this.joinCampaignPopup = false
-        const data = await this.$blockchain.joinCampaignAndReserveTask(this.id, this.reserveInBatch.id, this.reserveInBatch.tasks_done, this.reserveInBatch.tasks)
+        const data = await this.$blockchain.joinCampaign(this.id)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
@@ -387,7 +393,7 @@ export default {
       // check if user has reservation for a batch in this campaign
       for (const batch of this.campaignBatches) {
         const reservations = await this.$blockchain.getTaskReservationsForBatch(batch.batch_id)
-        const userReservation = reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id && parseInt(new Date(new Date(r.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.release_task_delay_sec.toFixed(0)) > parseInt((Date.now() / 1000).toFixed(0)))
+        const userReservation = reservations.find(r => r.account_id === this.$auth.user.vAccountRows[0].id && parseInt(new Date(new Date(r.submitted_on) + 'UTC').getTime() / 1000) + parseInt(this.$blockchain.sdk.force.config.releaseTaskDelaySec.toFixed(0)) > parseInt((Date.now() / 1000).toFixed(0)))
         if (userReservation) {
           this.userReservation = userReservation
         }

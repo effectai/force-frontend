@@ -3,17 +3,12 @@ import Vue from 'vue'
 import eos from '../services/eos'
 import bsc from '../services/bsc'
 
+const effectsdk = new effectSdk.EffectClient(process.env.NUXT_ENV_EOS_NETWORK)
+
 export default (context, inject) => {
   const blockchain = new Vue({
     data () {
       // Initialize empty SDK, reinitialize when connecting wallet
-      const eosHost = process.env.NUXT_ENV_EOS_NETWORK.includes('local') ? `http://${process.env.NUXT_ENV_EOS_NODE_URL}:8888` : `https://${process.env.NUXT_ENV_EOS_NODE_URL}:443`
-      const sdkOptions = {
-        network: process.env.NUXT_ENV_EOS_NETWORK,
-        force_contract: process.env.NUXT_ENV_EOS_FORCE_CONTRACT,
-        force_vaccount_id: process.env.NUXT_ENV_EOS_FORCE_VACCOUNT_ID,
-        host: eosHost
-      }
       return {
         account: null,
         blockchain: null,
@@ -25,7 +20,7 @@ export default (context, inject) => {
         pendingPayout: null,
         eos,
         bsc,
-        sdk: new effectSdk.EffectClient(process.env.NUXT_ENV_EOS_NETWORK, sdkOptions),
+        sdk: effectsdk,
         error: null,
         waitForSignatureFrom: null,
         waitForSignature: 0,
@@ -51,8 +46,8 @@ export default (context, inject) => {
           const vAccountRows = context.$auth.user.vAccountRows
           if (vAccountRows) {
             vAccountRows.forEach((row) => {
-              if (row.balance.contract === process.env.NUXT_ENV_EOS_TOKEN_CONTRACT) {
-                balance = parseFloat(row.balance.quantity.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+              if (row.balance.contract === this.sdk.config.efxTokenContract) {
+                balance = parseFloat(row.balance.quantity.replace(` ${this.sdk.config.efxSymbol}`, ''))
               }
             })
           }
@@ -238,8 +233,8 @@ export default (context, inject) => {
           if (!this.bsc.web3.utils.isHex(_chainId)) {
             alert('This chain is not supported, logging out.')
             this.logout()
-          } else if (_chainId !== process.env.NUXT_ENV_BSC_HEX_ID) {
-            alert(`Please switch to the correct chain:\n${process.env.NUXT_ENV_BSC_CHAIN_NAME}, Mainnet, chainId: ${process.env.NUXT_ENV_BSC_NETWORK_ID}\n\nCurrently on: ${this.bsc.web3.utils.hexToNumberString(_chainId)}\n\nLogging out.`)
+          } else if (_chainId !== this.sdk.config.bscHexId) {
+            alert(`Please switch to the correct chain:\n${this.sdk.config.bscChainName}, Mainnet, chainId: ${this.sdk.config.bscNetworkId}\n\nCurrently on: ${this.bsc.web3.utils.hexToNumberString(_chainId)}\n\nLogging out.`)
             // It is recommended to reload the entire window, or to logout the user to make sure the user doesn't do any txs.
             this.logout()
             context.$auth.logout() // Logout
@@ -289,9 +284,9 @@ export default (context, inject) => {
             const balance = await this.getBscEFXBalance(context.$auth.user.address)
             this.efxAvailable = parseFloat(balance)
           } else {
-            const efxRow = (await this.sdk.api.rpc.get_currency_balance(process.env.NUXT_ENV_EOS_TOKEN_CONTRACT, context.$auth.user.accountName, process.env.NUXT_ENV_EOS_EFX_TOKEN))[0]
+            const efxRow = (await this.sdk.api.rpc.get_currency_balance(this.sdk.config.efxTokenContract, context.$auth.user.accountName, this.sdk.config.efxSymbol))[0]
             if (efxRow) {
-              this.efxAvailable = parseFloat(efxRow.replace(` ${process.env.NUXT_ENV_EOS_EFX_TOKEN}`, ''))
+              this.efxAvailable = parseFloat(efxRow.replace(` ${this.sdk.config.efxSymbol}`, ''))
             } else {
               this.efxAvailable = 0
             }
@@ -309,7 +304,7 @@ export default (context, inject) => {
             type: 'function'
           }
         ]
-        const efxAddress = process.env.NUXT_ENV_BSC_EFX_TOKEN_CONTRACT // Token contract address
+        const efxAddress = this.sdk.config.bscEfxTokenContract// Token contract address
         const contract = new this.bsc.web3.eth.Contract(erc20JsonInterface, efxAddress)
         try {
           const balance = await contract.methods.balanceOf(address).call()
@@ -336,7 +331,7 @@ export default (context, inject) => {
           let pending = 0
           if (data) {
             data.rows.forEach((entry) => {
-              if (((new Date(new Date(entry.last_submission_time) + 'UTC').getTime() / 1000) + this.sdk.force.config.payout_delay_sec) < ((Date.now() / 1000))) {
+              if (((new Date(new Date(entry.last_submission_time) + 'UTC').getTime() / 1000) + this.sdk.force.config.payoutDelaySec) < ((Date.now() / 1000))) {
                 pending = pending + parseFloat(entry.pending.quantity)
               }
             })
@@ -356,6 +351,33 @@ export default (context, inject) => {
           return data
         } else {
           return null
+        }
+      },
+      async makeReservation (batches) {
+        if (!Array.isArray(batches)) {
+          batches = [batches]
+        }
+        let reservation
+        // go through the batches that have available tasks
+        for (let i = 0; i < batches.length; i++) {
+          await context.store.dispatch('campaign/getBatchTasks', batches[i])
+          try {
+            reservation = await this.reserveOrClaimTask(batches[i], batches[i].tasks)
+            context.app.router.push('/campaigns/' + batches[i].campaign_id + '/' + batches[i].batch_id + '/' + reservation.task_index + '?submissionId=' + reservation.id)
+            return
+          } catch (error) {
+            if (i === batches.length - 1) {
+              // no more batches to try..
+              if (error.message === 'no available tasks') {
+                context.app.router.push('/campaigns/' + batches[i].campaign_id + '?completed=1')
+                return
+              } else {
+                throw error
+              }
+            }
+            console.error('reservation error, trying next batch..', error)
+            // there are more batches, so lets try this again
+          }
         }
       },
       async getBatches (nextKey, limit = 50, processBatch = true) {
@@ -382,11 +404,14 @@ export default (context, inject) => {
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)
       },
+      async reserveOrClaimTask (batch, tasks) {
+        return await this.sdk.force.reserveOrClaimTask(batch, tasks)
+      },
       async reserveTask (batchId, taskIndex, campaignId, tasks) {
         return await this.sdk.force.reserveTask(batchId, taskIndex, campaignId, tasks)
       },
-      async claimExpiredTask (taskId) {
-        return await this.sdk.force.claimExpiredTask(taskId)
+      async claimExpiredTask (taskId, accountId) {
+        return await this.sdk.force.claimExpiredTask(taskId, accountId)
       },
       async releaseTask (taskId) {
         return await this.sdk.force.releaseTask(taskId)
@@ -412,14 +437,8 @@ export default (context, inject) => {
       async createCampaign (hash, reward) {
         return await this.sdk.force.createCampaign(hash, reward)
       },
-      async getReservations () {
-        return await this.sdk.force.getReservations()
-      },
       async payout () {
         return await this.sdk.force.payout()
-      },
-      async getMyReservations () {
-        return await this.sdk.force.getMyReservations()
       },
       async getTaskSubmissionsForBatch (batchId) {
         return await this.sdk.force.getSubmissionsOfBatch(batchId, 'submissions')
@@ -464,7 +483,7 @@ export default (context, inject) => {
       },
 
       getPayoutDelay () {
-        return this.sdk.force.config.payout_delay_sec
+        return this.sdk.force.config.payoutDelaySec
       },
 
       handleError (error) {

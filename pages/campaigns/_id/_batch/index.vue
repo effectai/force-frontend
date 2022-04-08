@@ -277,22 +277,22 @@
               <div class="block">
                 <b>Tasks</b>
                 <br>
-                <template v-if="batch && batch.num_tasks - batch.tasks_done === 0">
+                <template v-if="batch && batch.num_tasks - batch.real_tasks_done === 0">
                   <span>{{ batch.num_tasks }} Tasks done.</span>
                 </template>
-                <template v-else-if="batch && batch.num_tasks - batch.tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
-                  <span>{{ batch.num_tasks - (batch.tasks_done - releasedReservations.length) }}</span>
+                <template v-else-if="batch && batch.num_tasks - batch.real_tasks_done > 0 && releasedReservations || (batch && batch.reservations && batch.reservations.length) && releasedReservations">
+                  <span>{{ batch.num_tasks - (batch.real_tasks_done - releasedReservations.length) }}</span>
                   <span>/ {{ batch.num_tasks }} left</span>
                 </template>
-                <template v-else-if="(batch && batch.num_tasks - batch.tasks_done > 0) || (batch && batch.reservations && batch.reservations.length)">
-                  <span>{{ batch.num_tasks - batch.tasks_done }}</span>
+                <template v-else-if="(batch && batch.num_tasks - batch.real_tasks_done > 0) || (batch && batch.reservations && batch.reservations.length)">
+                  <span>{{ batch.num_tasks - batch.real_tasks_done }}</span>
                   <span>/ {{ batch.num_tasks }} left</span>
                 </template>
                 <span v-else>...</span>
                 <progress
                   class="progress"
                   :class="getProgressBatch(batch)"
-                  :value="batch && releasedReservations ? ( batch.tasks_done - releasedReservations.length): undefined"
+                  :value="batch && releasedReservations ? ( batch.real_tasks_done - releasedReservations.length): undefined"
                   :max="batch ? batch.num_tasks : undefined">
                   Left
                 </progress>
@@ -347,7 +347,7 @@
                   <div class="block">
                     Blockchain
                     <br>
-                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.force_contract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.force_contract}&scope=${$blockchain.sdk.force.config.force_contract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
+                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=batch&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${batchId}&upper_bound=${batchId}`">View Batch on Explorer</a>
                   </div>
                 </div>
               </div>
@@ -366,10 +366,10 @@
                 <button v-else-if="!userJoined" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                   Qualify
                 </button>
-                <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask = true">
+                <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
                   Resume Task
                 </button>
-                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.tasks_done !== 0 && !userReservation || releasedReservations.length > 0" class="button is-fullwidth is-primary" @click.prevent="reserveTask = true">
+                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.real_tasks_done !== 0 && !userReservation || releasedReservations.length > 0" class="button is-fullwidth is-primary" @click.prevent="reserveTask">
                   Make Task Reservation
                 </button>
                 <template v-else>
@@ -386,10 +386,13 @@
         </div>
 
         <!-- SuccessModal -->
-        <success-modal v-if="batch && batch.num_tasks - batch.tasks_done === 0 && batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
+        <success-modal v-if="batch && batch.num_tasks - batch.real_tasks_done === 0 && batchCompleted && successMessage" :message="successMessage" :title="successTitle" />
 
         <!-- Reserve task -->
-        <reserve-task v-if="reserveTask" :batch="batch" />
+        <div v-if="loadingReservation" class="loader-wrapper is-active">
+          <img src="~assets/img/loading.svg">
+          <br><span class="loading-text">Making reservation</span>
+        </div>
 
         <!-- Instructions modal -->
         <instructions-modal v-if="campaign && campaign.info" :campaign="campaign" :info="campaign.info" :show="joinCampaignPopup" @clicked="campaignModalChange" />
@@ -401,7 +404,6 @@
 import { mapState } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
-import ReserveTask from '@/components/ReserveTask'
 import InstructionsModal from '@/components/InstructionsModal'
 import SuccessModal from '@/components/SuccessModal'
 import Pagination from '@/components/Pagination'
@@ -410,7 +412,6 @@ const jsonexport = require('jsonexport/dist')
 export default {
   components: {
     TemplateMedia,
-    ReserveTask,
     InstructionsModal,
     SuccessModal,
     Pagination
@@ -418,7 +419,7 @@ export default {
   middleware: ['auth'],
   data () {
     return {
-      ipfsExplorer: process.env.NUXT_ENV_IPFS_EXPLORER,
+      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
       campaignId: parseInt(this.$route.params.id),
       batchId: parseInt(this.$route.params.batch),
       batchCompleted: parseInt(this.$route.query.batchCompleted),
@@ -428,8 +429,8 @@ export default {
       accountId: this.$auth.user.vAccountRows[0].id,
       userJoined: null,
       loading: false,
+      loadingReservation: false,
       joinCampaignPopup: false,
-      reserveTask: false,
       submissions: null,
       pageR: 1,
       page: 1,
@@ -512,12 +513,21 @@ export default {
         this.$blockchain.handleError(e)
       }
     },
+    async reserveTask () {
+      this.loadingReservation = true
+      try {
+        await this.$blockchain.makeReservation(this.batch)
+      } catch (error) {
+        this.$blockchain.handleError(error)
+      }
+      this.loadingReservation = false
+    },
     async joinCampaign () {
       try {
         // function that makes the user join this campaign.
         this.loading = true
         this.joinCampaignPopup = false
-        const data = await this.$blockchain.joinCampaignAndReserveTask(this.campaignId, this.batch.id, this.batch.tasks_done, this.batch.tasks)
+        const data = await this.$blockchain.joinCampaignAndReserveTask(this.campaignId, this.batch.id, this.batch.real_tasks_done, this.batch.tasks)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
@@ -526,7 +536,7 @@ export default {
           await this.$blockchain.waitForTransaction(data)
           await this.checkUserCampaign()
           if (this.userJoined) {
-            this.reserveTask = true
+            this.reserveTask()
           }
         }
         this.waitingOnTransaction = false

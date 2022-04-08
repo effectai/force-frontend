@@ -148,7 +148,12 @@ export default {
       commit('SET_LOADING_BATCH', true)
       try {
         const data = await this.$blockchain.getBatches(nextKey, 200, false)
-        commit('UPSERT_BATCHES', data.rows)
+        const batches = []
+        for (const batch of data.rows) {
+          batch.real_tasks_done = Math.floor(batch.tasks_done / batch.repetitions)
+          batches.push(batch)
+        }
+        commit('UPSERT_BATCHES', batches)
 
         if (data.more) {
           console.log('retrieving more batches..')
@@ -172,7 +177,9 @@ export default {
           const data = await this.$blockchain.getBatches(batchId, 1)
 
           if (data.rows.length > 0) {
-            await commit('ADD_BATCH', data.rows[0])
+            const batch = data.rows[0]
+            batch.real_tasks_done = Math.floor(batch.tasks_done / batch.repetitions)
+            await commit('ADD_BATCH', batch)
           } else {
             throw new Error('Cannot find batch with the given id.')
           }
