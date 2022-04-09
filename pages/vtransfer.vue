@@ -80,11 +80,6 @@ export default {
   methods: {
     async vtransfer (account, tokenAmount) {
       this.loading = true
-      if (this.tokenAmount > this.amount || this.tokenAmount < 0) {
-        this.message = 'Quantity cannot be higher than your balance.'
-        this.err = true
-        return
-      }
 
       try {
         const vaccount = await this.$blockchain.getVAccountByName(account)
