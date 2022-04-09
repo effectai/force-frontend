@@ -2,11 +2,12 @@
   <section class="section is-max-widescreen">
     <!-- Instructions modal -->
     <instructions-modal v-if="campaign && campaign.info" :show="joinCampaignPopup" :campaign="campaign" :info="campaign.info" @clicked="campaignModalChange" />
-    <!-- Reserve task -->
-    <reserve-task v-if="showReserveTask" :campaign-id="campaign.id" />
     <!-- Batch modal -->
     <batch-modal v-if="campaign && campaignBatches" :show="$auth.user.accountName === campaign.owner[1] && showBatchesPopup && !cancelledBatchesPopup" @cancelled="cancelBatchModal" />
-
+    <div v-if="loadingReservation" class="loader-wrapper is-active">
+      <img src="~assets/img/loading.svg">
+      <br><span class="loading-text">Making reservation</span>
+    </div>
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
@@ -199,7 +200,7 @@
                   >
                     Make Task Reservation
                   </button>
-                  <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="goToTask">
+                  <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
                     Go To Task
                   </button>
                   <template v-else>
@@ -266,7 +267,6 @@
 import { mapState, mapGetters } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
-import ReserveTask from '@/components/ReserveTask'
 import SuccessModal from '@/components/SuccessModal'
 import InstructionsModal from '@/components/InstructionsModal'
 import BatchModal from '@/components/BatchModal'
@@ -274,7 +274,6 @@ import BatchModal from '@/components/BatchModal'
 export default {
   components: {
     TemplateMedia,
-    ReserveTask,
     InstructionsModal,
     BatchModal,
     SuccessModal
@@ -290,9 +289,9 @@ export default {
       userJoined: null,
       loading: false,
       joinCampaignPopup: false,
-      showReserveTask: false,
       userReservation: null,
       cancelledBatchesPopup: false,
+      loadingReservation: false,
       showBatchesPopup: false,
       waitingOnTransaction: false,
       categories: ['translate', 'captions', 'socials', 'dao']
@@ -316,11 +315,14 @@ export default {
       return undefined
     }
   },
-  mounted () {
-    if (this.completed) {
-      this.successTitle = 'Campaign is completed'
-      this.successMessage = 'There are no more available tasks for you in this campaign'
+  watch: {
+    '$route.query.completed' (completed) {
+      this.completed = parseInt(completed)
+      this.showCompletedPopup()
     }
+  },
+  mounted () {
+    this.showCompletedPopup()
   },
   created () {
     this.checkUserCampaign()
@@ -328,17 +330,26 @@ export default {
     this.getBatches()
   },
   methods: {
-    reserveTask () {
-      this.showReserveTask = true
+    showCompletedPopup () {
+      if (this.completed) {
+        this.successTitle = 'No more tasks available for you in this campaign'
+        this.successMessage = 'This could either mean that all the available tasks are already reserved, or you already completed the still available tasks.'
+      }
     },
-    async goToTask () {
-      const batch = this.campaignBatches.find((b) => {
-        return parseInt(b.batch_id) === parseInt(this.userReservation.batch_id)
-      })
-      await this.$store.dispatch('campaign/getBatchTasks', batch)
-
-      this.reserveInBatch = batch
-      this.showReserveTask = true
+    async reserveTask () {
+      this.loadingReservation = true
+      const availableBatches = []
+      for (const batch of this.campaignBatches) {
+        if (batch.num_tasks * batch.repetitions > batch.tasks_done) {
+          availableBatches.push(batch)
+        }
+      }
+      try {
+        await this.$blockchain.makeReservation(availableBatches)
+      } catch (error) {
+        this.$blockchain.handleError(error)
+      }
+      this.loadingReservation = false
     },
     renderTemplate (template, placeholders = {}, options = {}) {
       return new Template(template, placeholders, options).render()
