@@ -10,6 +10,9 @@
         {{ message }}
         <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
       </div>
+      <div v-if="err" class="notification is-light is-danger">
+        {{ message }}
+      </div>
       <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="vtransfer(account, tokenAmount)">
         <div class="field">
           <label class="label">Destination VAccount Name</label>
@@ -30,8 +33,8 @@
                 min="0"
                 :max="amount"
                 :disabled="amount == -1"
-                placeholder="0.0001"
-                step="0.0001"
+                placeholder="1.0000"
+                step="1"
                 style="height: 100%;"
               >
             </div>
@@ -80,20 +83,25 @@ export default {
   methods: {
     async vtransfer (account, tokenAmount) {
       this.loading = true
+      this.err = false
+      this.message = null
 
       try {
         const vaccount = await this.$blockchain.getVAccountByName(account)
         if (!vaccount[0]) {
-          throw new Error("Can't find vAccount")
-        }
-        const result = await this.$blockchain.vTransfer(vaccount[0].id, parseFloat(tokenAmount).toFixed(4))
-        if (result) {
-          this.err = false
-          this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
-          this.message = 'Transfer has been successful. Check your transaction here: '
-          await this.$blockchain.waitForTransaction(result)
-          this.$blockchain.updateUserInfo()
-          this.submitted = true
+          this.message = "Can't find vAccount"
+          this.err = true
+          this.loading = false
+        } else {
+          const result = await this.$blockchain.vTransfer(vaccount[0].id, parseFloat(tokenAmount).toFixed(4))
+          if (result) {
+            this.err = false
+            this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
+            this.message = 'Transfer has been successful. Check your transaction here: '
+            await this.$blockchain.waitForTransaction(result)
+            this.$blockchain.updateUserInfo()
+            this.submitted = true
+          }
         }
       } catch (error) {
         this.$blockchain.handleError(error)

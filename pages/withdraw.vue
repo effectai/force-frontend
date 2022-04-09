@@ -138,6 +138,8 @@ export default {
   methods: {
     async withdraw () {
       this.loading = true
+      this.err = false
+      this.message = null
 
       const destinationAccount = this.destinationBlockchain === 'eos' ? this.account : 'xbsc.ptokens'
       const withDrawAmount = parseFloat(this.tokenAmount).toFixed(4)
@@ -145,10 +147,8 @@ export default {
       this.destinationSubmitted = this.destinationBlockchain === 'eos' ? 'eos' : 'bsc'
 
       try {
-        // console.log('Withdraaaaaaw', destinationAccount, withDrawAmount, withDrawMemo)
         const result = await this.$blockchain.withdraw(destinationAccount, withDrawAmount, withDrawMemo)
         if (result) {
-          this.err = false
           this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
           this.message = 'Withdrawal successful. Check your transaction here: '
           await this.$blockchain.waitForTransaction(result)
@@ -158,7 +158,6 @@ export default {
       } catch (error) {
         this.$blockchain.handleError(error)
       }
-
       this.loading = false
     },
     clearFields () {
