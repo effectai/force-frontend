@@ -40,7 +40,7 @@
       >
         {{ message }}
         <br>
-        <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
+        <a class="" target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
         <br>
         Withdrawing to a BSC address can take a while, thank you for your patience.
       </div>
@@ -52,7 +52,7 @@
       >
         {{ message }}
         <br>
-        <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
+        <a class="" target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
         <br>
       </div>
 
@@ -140,6 +140,7 @@ export default {
       this.loading = true
       this.err = false
       this.message = null
+      this.destinationSubmitted = null
 
       const destinationAccount = this.destinationBlockchain === 'eos' ? this.account : 'xbsc.ptokens'
       const withDrawAmount = parseFloat(this.tokenAmount).toFixed(4)
@@ -149,11 +150,13 @@ export default {
       try {
         const result = await this.$blockchain.withdraw(destinationAccount, withDrawAmount, withDrawMemo)
         if (result) {
-          this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
-          this.message = 'Withdrawal successful. Check your transaction here: '
-          await this.$blockchain.waitForTransaction(result)
+          const awaitTx = await this.$blockchain.waitForTransaction(result)
           this.$blockchain.updateUserInfo()
-          this.submitted = true
+          if (awaitTx) {
+            this.submitted = true
+            this.message = 'Withdrawal successful. Check your transaction here: '
+            this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
+          }
         }
       } catch (error) {
         this.$blockchain.handleError(error)
@@ -174,6 +177,9 @@ export default {
     },
     validateWithdrawForm (e) {
       e.preventDefault()
+      this.err = false
+      this.message = null
+      this.destinationSubmitted = null
 
       if (!this.account) {
         this.message = 'Please fill in a valid EOS account or BSC address'
