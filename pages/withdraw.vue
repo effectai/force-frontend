@@ -33,14 +33,29 @@
         {{ message }}
       </div>
 
-      <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
+      <div
+        v-if="submitted && destinationSubmitted === 'bsc' && destinationBlockchain === 'bsc'"
+        class="notification is-light"
+        :class="{'is-danger': err === true, 'is-success': err === false}"
+      >
         {{ message }}
+        <br>
         <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
         <br>
-        <p v-if="destinationBlockchain === 'bsc'">
-          Withdrawing to a BSC addresses will take a while, thank you for your patience.
-        </p>
+        Withdrawing to a BSC address can take a while, thank you for your patience.
       </div>
+
+      <div
+        v-if="submitted && destinationSubmitted === 'eos' && destinationBlockchain === 'eos'"
+        class="notification is-light"
+        :class="{'is-danger': err === true, 'is-success': err === false}"
+      >
+        {{ message }}
+        <br>
+        <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
+        <br>
+      </div>
+
       <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="validateWithdrawForm">
 
         <div class="field">
@@ -59,11 +74,11 @@
                 required
                 class="input"
                 type="number"
-                min="0"
+                min="1"
                 :max="amount"
                 :disabled="amount == -1"
-                placeholder="0.0001"
-                step="0.0001"
+                placeholder="1.0000"
+                step="1"
                 style="height: 100%;"
               >
             </div>
@@ -106,6 +121,7 @@ export default {
       loading: false,
       account: this.$auth.user.blockchain === 'eos' ? this.$auth.user.accountName : this.$auth.user.address,
       submitted: false,
+      destinationSubmitted: null,
       message: null,
       err: false,
       tokenAmount: null,
@@ -123,25 +139,14 @@ export default {
     async withdraw () {
       this.loading = true
 
-      const withDrawAccount = this.destinationBlockchain === 'eos' ? this.account : 'xbsc.ptokens'
+      const destinationAccount = this.destinationBlockchain === 'eos' ? this.account : 'xbsc.ptokens'
       const withDrawAmount = parseFloat(this.tokenAmount).toFixed(4)
       const withDrawMemo = this.destinationBlockchain === 'eos' ? this.memo : this.account
-      // const userBalance = parseFloat(this.amount).toFixed(4)
-
-      // TODO this makes no sense remove this if you can. there be dragon's here.
-      // const booleanresult = withDrawAmount > userBalance || withDrawAmount < 0
-      // console.debug('withdrawamount > userblance', withDrawAmount, '>', userBalance, withDrawAmount > userBalance, 'withdrawamount < 0 ', withDrawAmount < 0)
-      // if (booleanresult) {
-      //   console.debug('amount', withDrawAmount, 'userbalance', userBalance)
-      //   this.message = 'Quantity cannot be higher than your balance.'
-      //   this.err = true
-      //   this.loading = false
-      //   return
-      // }
+      this.destinationSubmitted = this.destinationBlockchain === 'eos' ? 'eos' : 'bsc'
 
       try {
-        // console.log('Withdraaaaaaw', withDrawAccount, withDrawAmount, withDrawMemo)
-        const result = await this.$blockchain.withdraw(withDrawAccount, withDrawAmount, withDrawMemo)
+        // console.log('Withdraaaaaaw', destinationAccount, withDrawAmount, withDrawMemo)
+        const result = await this.$blockchain.withdraw(destinationAccount, withDrawAmount, withDrawMemo)
         if (result) {
           this.err = false
           this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
@@ -153,6 +158,7 @@ export default {
       } catch (error) {
         this.$blockchain.handleError(error)
       }
+
       this.loading = false
     },
     clearFields () {
