@@ -8,8 +8,8 @@
       <div class="tabs is-centered is-large">
         <ul>
           <li
-            :class="[withdrawalBlockchain === 'eos' ? 'is-active' : '']"
-            @click.prevent="withdrawalBlockchain = 'eos'"
+            :class="[destinationBlockchain === 'eos' ? 'is-active' : '']"
+            @click.prevent="toggleDestination('eos')"
           >
             <a>
               <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span>
@@ -18,8 +18,8 @@
           </li>
           <li>|</li>
           <li
-            :class="[withdrawalBlockchain === 'bsc' ? 'is-active' : ''] "
-            @click.prevent="withdrawalBlockchain = 'bsc'"
+            :class="[destinationBlockchain === 'bsc' ? 'is-active' : ''] "
+            @click.prevent="toggleDestination('bsc')"
           >
             <a>
               <span>BSC</span>
@@ -29,15 +29,22 @@
         </ul>
       </div>
 
+      <div v-if="err" class="notification is-light is-danger">
+        {{ message }}
+      </div>
+
       <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
         {{ message }}
         <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
+        <br>
+        <p v-if="destinationBlockchain === 'bsc'">
+          Withdrawing to a BSC addresses will take a while, thank you for your patience.
+        </p>
       </div>
-
-      <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount, memo)">
+      <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="validateWithdrawForm">
 
         <div class="field">
-          <label class="label">Destination {{ withdrawalBlockchain === 'eos' ? 'EOS' : 'BSC' }} Account</label>
+          <label class="label">Destination {{ destinationBlockchain === 'eos' ? 'EOS' : 'BSC' }} Account</label>
           <div class="control">
             <input v-model="account" class="input" type="text" required>
           </div>
@@ -49,7 +56,6 @@
             <div class="control is-expanded">
               <input
                 v-model="tokenAmount"
-                @submit="checkWithdrawal"
                 required
                 class="input"
                 type="number"
@@ -67,7 +73,7 @@
           </div>
         </div>
 
-        <div v-if="withdrawalBlockchain === 'eos'" class="field">
+        <div v-if="destinationBlockchain === 'eos'" class="field">
           <label for="" class="label">Memo (optional)</label>
           <div class="control">
             <input v-model="memo" class="input" type="text" >
@@ -93,8 +99,6 @@
 </template>
 
 <script>
-import { isAddress } from 'web3'
-
 export default {
   middleware: ['auth'],
   data () {
@@ -107,7 +111,7 @@ export default {
       tokenAmount: null,
       memo: null,
       transactionUrl: null,
-      withdrawalBlockchain: this.$auth.user.blockchain
+      destinationBlockchain: this.$auth.user.blockchain
     }
   },
   computed: {
@@ -116,16 +120,28 @@ export default {
     }
   },
   methods: {
-    async withdraw (account, tokenAmount, memo) {
+    async withdraw () {
       this.loading = true
-      if (this.tokenAmount > this.amount || this.tokenAmount < 0) {
-        this.message = 'Quantity cannot be higher than your balance.'
-        this.err = true
-        return
-      }
+
+      const withDrawAccount = this.destinationBlockchain === 'eos' ? this.account : 'xbsc.ptokens'
+      const withDrawAmount = parseFloat(this.tokenAmount).toFixed(4)
+      const withDrawMemo = this.destinationBlockchain === 'eos' ? this.memo : this.account
+      // const userBalance = parseFloat(this.amount).toFixed(4)
+
+      // TODO this makes no sense remove this if you can. there be dragon's here.
+      // const booleanresult = withDrawAmount > userBalance || withDrawAmount < 0
+      // console.debug('withdrawamount > userblance', withDrawAmount, '>', userBalance, withDrawAmount > userBalance, 'withdrawamount < 0 ', withDrawAmount < 0)
+      // if (booleanresult) {
+      //   console.debug('amount', withDrawAmount, 'userbalance', userBalance)
+      //   this.message = 'Quantity cannot be higher than your balance.'
+      //   this.err = true
+      //   this.loading = false
+      //   return
+      // }
 
       try {
-        const result = await this.$blockchain.withdraw(this.$auth.user.blockchain === 'eos' ? account : 'xbsc.ptokens', parseFloat(tokenAmount).toFixed(4), this.$auth.user.blockchain === 'eos' ? memo : this.$auth.user.address)
+        // console.log('Withdraaaaaaw', withDrawAccount, withDrawAmount, withDrawMemo)
+        const result = await this.$blockchain.withdraw(withDrawAccount, withDrawAmount, withDrawMemo)
         if (result) {
           this.err = false
           this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
@@ -143,35 +159,34 @@ export default {
       this.tokenAmount = null
       this.account = null
     },
-    checkWithdrawal (e) {
-      console.debug('checkform', this.account)
+    toggleDestination (destBlockChain) {
+      this.destinationBlockchain = destBlockChain
+      if (destBlockChain === 'bsc') {
+        this.account = this.$auth.user.blockchain === 'bsc' ? this.$auth.user.address : ''
+      } else {
+        this.account = this.$auth.user.blockchain === 'eos' ? this.$auth.user.accountName : ''
+      }
+    },
+    validateWithdrawForm (e) {
+      e.preventDefault()
+
       if (!this.account) {
         this.message = 'Please fill in a valid EOS account or BSC address'
         this.err = true
-      } else if (!this.validEosAccount(this.account) && this.withdrawalBlockchain === 'eos') {
-        this.message = 'Invalid EOS account'
-        this.err = true
-      } else if (!this.validBscAddress(this.account && this.withdrawalBlockchain === 'bsc')) {
-        this.message = 'Invalid BSC address'
+      } else if (this.destinationBlockchain === 'eos') {
+        if (!this.$blockchain.isEosAccount(this.account)) {
+          this.message = 'Invalid EOS Account'
+          this.err = true
+        } else {
+          this.withdraw()
+        }
+      } else if (!this.$blockchain.isBscAddress(this.account)) {
+        this.message = 'Invalid BSC Address'
         this.err = true
       } else {
-        return true
+        this.withdraw()
       }
-
-      e.preventDefault()
-    },
-    validEosAccount (account) {
-      const validEosChars = 'abcdefghijklmnopqrstuvwxyz12345' // Allowed characters for EOS account name
-      const maxEosLength = 12
-      const validChars = account.split('').every(ela => validEosChars.split('').includes(elb => elb === ela))
-      const length = account.length <= maxEosLength
-      console.debug('valideosaccount', validChars, length)
-      return validChars && length
-    },
-    validBscAddress (address) {
-      return isAddress(address)
     }
-
   }
 }
 </script>
