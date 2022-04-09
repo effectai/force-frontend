@@ -175,13 +175,13 @@
                   <p>... EFX</p>
                 </button>
               </div>
-              <div class="column is-4">
-                <nuxt-link to="/deposit" class="button is-primary is-wide">
+              <div class="column is-4" @click="showBalanceModal = false">
+                <nuxt-link to="/deposit"  class="button is-primary is-wide">
                   Deposit
                 </nuxt-link>
               </div>
-              <div class="column is-4">
-                <nuxt-link to="/withdraw" class="button is-wide is-primary is-outlined">
+              <div class="column is-4" @click="showBalanceModal = false">
+                <nuxt-link to="/withdraw"  class="button is-wide is-primary is-outlined">
                   Withdraw
                 </nuxt-link>
               </div>
