@@ -7,7 +7,7 @@ import { JsonRpc } from 'eosjs'
 import { defaultConfiguration } from '@effectai/effect-js'
 
 // Not able to access this.$blockchain here. so opting to use a global variable here.
-const config = defaultConfiguration(process.env.NUXT_ENV_EOS_NETWORK)
+const config = defaultConfiguration(process.env.NUXT_ENV_SDK_ENV)
 
 const networkHost = {
   host: config.eosNodeHost,

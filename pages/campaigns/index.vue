@@ -47,7 +47,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      batchesByCampaignId: 'campaign/batchesByCampaignId',
+      activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId',
       campaignsByCategory: 'campaign/campaignsByCategory',
       reservationsByAccountId: 'campaign/reservationsByAccountId',
       getGridListState: 'view/getGridListState'
@@ -58,7 +58,7 @@ export default {
       if (campaigns) {
         filteredCampaigns = campaigns.map((c) => { return { ...c } })
         for (const i in filteredCampaigns) {
-          const batches = this.batchesByCampaignId(filteredCampaigns[i].id)
+          const batches = this.activeBatchesByCampaignId(filteredCampaigns[i].id)
           filteredCampaigns[i].batches = batches
           if (batches) {
             filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
