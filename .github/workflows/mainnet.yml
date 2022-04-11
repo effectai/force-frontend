@@ -3,7 +3,6 @@ name: Deploy on gh-pages
 on:
   push:
     branches:
-      - main
       - mainnet-config
 
 jobs:
