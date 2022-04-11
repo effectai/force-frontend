@@ -293,7 +293,8 @@
                   class="progress"
                   :class="getProgressBatch(batch)"
                   :value="batch && releasedReservations ? ( batch.real_tasks_done - releasedReservations.length): undefined"
-                  :max="batch ? batch.num_tasks : undefined">
+                  :max="batch ? batch.num_tasks : undefined"
+                >
                   Left
                 </progress>
               </div>
@@ -527,7 +528,7 @@ export default {
         // function that makes the user join this campaign.
         this.loading = true
         this.joinCampaignPopup = false
-        const data = await this.$blockchain.joinCampaignAndReserveTask(this.campaignId, this.batch.id, this.batch.real_tasks_done, this.batch.tasks)
+        const data = await this.$blockchain.joinCampaign(this.campaignId)
         this.$store.dispatch('transaction/addTransaction', data)
         if (data) {
           this.loading = true
