@@ -3,7 +3,7 @@ import Web3 from 'web3'
 import { createAccount, defaultConfiguration } from '@effectai/effect-js'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-const config = defaultConfiguration(process.env.NUXT_ENV_EOS_NETWORK)
+const config = defaultConfiguration(process.env.NUXT_ENV_SDK_ENV)
 
 // Used for add chain network functionality. only for metamask atm
 const chainObject = {
