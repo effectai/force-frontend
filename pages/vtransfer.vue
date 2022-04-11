@@ -34,7 +34,7 @@
                 :max="amount"
                 :disabled="amount == -1"
                 placeholder="1.0000"
-                step="1"
+                step="0.0001"
                 style="height: 100%;"
               >
             </div>

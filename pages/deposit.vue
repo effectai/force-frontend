@@ -74,7 +74,7 @@
                   :max="$blockchain.efxAvailable"
                   :disabled="!$blockchain.efxAvailable"
                   placeholder="1.0000"
-                  step="1"
+                  step="0.0001"
                 >
               </div>
               <p class="control">
