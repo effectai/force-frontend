@@ -54,7 +54,11 @@
         </div>
         <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
           {{ message }}
+          <br>
           <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
+        </div>
+        <div v-if="err" class="is-notification is-light is-danger">
+          {{ message }}
         </div>
         <form class="box is-horizontal-centered has-limited-width" accept-charset="UTF-8" @submit.prevent="deposit(tokenAmount)">
           <div class="field">
@@ -69,7 +73,7 @@
                   min="0"
                   :max="$blockchain.efxAvailable"
                   :disabled="!$blockchain.efxAvailable"
-                  placeholder="0.0001"
+                  placeholder="1.0000"
                   step="0.0001"
                 >
               </div>
@@ -121,28 +125,23 @@ export default {
     },
     async deposit (tokenAmount) {
       this.loading = true
-      if (this.tokenAmount > this.$blockchain.efxAvailable || this.tokenAmount < 0) {
-        this.message = 'Quantity cannot be higher than your balance.'
-        this.err = true
-        return
-      }
+      this.err = false
+      this.message = null
 
       try {
         const result = await this.$blockchain.deposit(parseFloat(tokenAmount).toFixed(4))
         if (result) {
           this.$store.dispatch('transaction/addTransaction', result)
           this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
-          this.message = 'Withdrawing has been successful. Check your transaction here: '
+          this.message = 'Deposit successful. Check your transaction here: '
           await this.$blockchain.waitForTransaction(result)
           this.$blockchain.updateUserInfo()
+          this.submitted = true
         }
       } catch (error) {
         this.$blockchain.handleError(error)
-        this.message = error
-        this.err = true
       }
       this.loading = false
-      this.submitted = true
     }
   }
 }

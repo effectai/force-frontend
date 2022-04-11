@@ -4,13 +4,62 @@
       <h1 class="title mt-5">
         Withdraw tokens
       </h1>
-      <div v-if="submitted" class="notification is-light" :class="{'is-danger': err === true, 'is-success': err === false}">
-        {{ message }}
-        <a target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
+
+      <div class="tabs is-centered is-large">
+        <ul>
+          <li
+            :class="[destinationBlockchain === 'eos' ? 'is-active' : '']"
+            @click.prevent="toggleDestination('eos')"
+          >
+            <a>
+              <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span>
+              <span>EOS</span>
+            </a>
+          </li>
+          <li>|</li>
+          <li
+            :class="[destinationBlockchain === 'bsc' ? 'is-active' : ''] "
+            @click.prevent="toggleDestination('bsc')"
+          >
+            <a>
+              <span>BSC</span>
+              <span class="icon is-large"><img src="@/assets/img/providers/BSC-logo.svg" alt="BSC" /></span>
+            </a>
+          </li>
+        </ul>
       </div>
-      <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="withdraw(account, tokenAmount, memo)">
+
+      <div v-if="err" class="notification is-light is-danger">
+        {{ message }}
+      </div>
+
+      <div
+        v-if="submitted && destinationSubmitted === 'bsc' && destinationBlockchain === 'bsc'"
+        class="notification is-light"
+        :class="{'is-danger': err === true, 'is-success': err === false}"
+      >
+        {{ message }}
+        <br>
+        <a class="" target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
+        <br>
+        Withdrawing to a BSC address can take a while, thank you for your patience.
+      </div>
+
+      <div
+        v-if="submitted && destinationSubmitted === 'eos' && destinationBlockchain === 'eos'"
+        class="notification is-light"
+        :class="{'is-danger': err === true, 'is-success': err === false}"
+      >
+        {{ message }}
+        <br>
+        <a class="" target="_blank" :href="transactionUrl">{{ transactionUrl }}</a>
+        <br>
+      </div>
+
+      <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="validateWithdrawForm">
+
         <div class="field">
-          <label class="label">Destination {{ $auth.user.blockchain === 'eos' ? 'EOS' : 'BSC' }} Account</label>
+          <label class="label">Destination {{ destinationBlockchain === 'eos' ? 'EOS' : 'BSC' }} Account</label>
           <div class="control">
             <input v-model="account" class="input" type="text" required>
           </div>
@@ -25,10 +74,10 @@
                 required
                 class="input"
                 type="number"
-                min="0"
+                min="1"
                 :max="amount"
                 :disabled="amount == -1"
-                placeholder="0.0001"
+                placeholder="1.0000"
                 step="0.0001"
                 style="height: 100%;"
               >
@@ -39,14 +88,10 @@
           </div>
         </div>
 
-        <div v-if="$auth.user.blockchain === 'eos'" class="field">
+        <div v-if="destinationBlockchain === 'eos'" class="field">
           <label for="" class="label">Memo (optional)</label>
           <div class="control">
-            <input
-              v-model="memo"
-              class="input"
-              type="text"
-            >
+            <input v-model="memo" class="input" type="text" >
           </div>
         </div>
 
@@ -63,9 +108,11 @@
           </div>
         </div>
       </form>
+
     </div>
   </section>
 </template>
+
 <script>
 export default {
   middleware: ['auth'],
@@ -74,11 +121,13 @@ export default {
       loading: false,
       account: this.$auth.user.blockchain === 'eos' ? this.$auth.user.accountName : this.$auth.user.address,
       submitted: false,
+      destinationSubmitted: null,
       message: null,
       err: false,
       tokenAmount: null,
       memo: null,
-      transactionUrl: null
+      transactionUrl: null,
+      destinationBlockchain: this.$auth.user.blockchain
     }
   },
   computed: {
@@ -87,23 +136,27 @@ export default {
     }
   },
   methods: {
-    async withdraw (account, tokenAmount, memo) {
+    async withdraw () {
       this.loading = true
-      if (this.tokenAmount > this.amount || this.tokenAmount < 0) {
-        this.message = 'Quantity cannot be higher than your balance.'
-        this.err = true
-        return
-      }
+      this.err = false
+      this.message = null
+      this.destinationSubmitted = null
+
+      const destinationAccount = this.destinationBlockchain === 'eos' ? this.account : 'xbsc.ptokens'
+      const withDrawAmount = parseFloat(this.tokenAmount).toFixed(4)
+      const withDrawMemo = this.destinationBlockchain === 'eos' ? this.memo : this.account
+      this.destinationSubmitted = this.destinationBlockchain === 'eos' ? 'eos' : 'bsc'
 
       try {
-        const result = await this.$blockchain.withdraw(this.$auth.user.blockchain === 'eos' ? account : 'xbsc.ptokens', parseFloat(tokenAmount).toFixed(4), this.$auth.user.blockchain === 'eos' ? memo : this.$auth.user.address)
+        const result = await this.$blockchain.withdraw(destinationAccount, withDrawAmount, withDrawMemo)
         if (result) {
-          this.err = false
-          this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
-          this.message = 'Withdrawing has been successful. Check your transaction here: '
-          await this.$blockchain.waitForTransaction(result)
+          const awaitTx = await this.$blockchain.waitForTransaction(result)
           this.$blockchain.updateUserInfo()
-          this.submitted = true
+          if (awaitTx) {
+            this.submitted = true
+            this.message = 'Withdrawal successful. Check your transaction here: '
+            this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
+          }
         }
       } catch (error) {
         this.$blockchain.handleError(error)
@@ -113,6 +166,37 @@ export default {
     clearFields () {
       this.tokenAmount = null
       this.account = null
+    },
+    toggleDestination (destBlockChain) {
+      this.destinationBlockchain = destBlockChain
+      if (destBlockChain === 'bsc') {
+        this.account = this.$auth.user.blockchain === 'bsc' ? this.$auth.user.address : ''
+      } else {
+        this.account = this.$auth.user.blockchain === 'eos' ? this.$auth.user.accountName : ''
+      }
+    },
+    validateWithdrawForm (e) {
+      e.preventDefault()
+      this.err = false
+      this.message = null
+      this.destinationSubmitted = null
+
+      if (!this.account) {
+        this.message = 'Please fill in a valid EOS account or BSC address'
+        this.err = true
+      } else if (this.destinationBlockchain === 'eos') {
+        if (!this.$blockchain.isEosAccount(this.account)) {
+          this.message = 'Invalid EOS Account'
+          this.err = true
+        } else {
+          this.withdraw()
+        }
+      } else if (!this.$blockchain.isBscAddress(this.account)) {
+        this.message = 'Invalid BSC Address'
+        this.err = true
+      } else {
+        this.withdraw()
+      }
     }
   }
 }

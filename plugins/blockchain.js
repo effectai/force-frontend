@@ -486,6 +486,14 @@ export default (context, inject) => {
         return this.sdk.force.config.payoutDelaySec
       },
 
+      isBscAddress (address) {
+        return effectSdk.isBscAddress(address)
+      },
+
+      isEosAccount (accountName) {
+        return effectSdk.isEosAccount(accountName)
+      },
+
       handleError (error) {
         console.error(error) // eslint-disable-line no-console
         if (error.response && error.response.data) {

@@ -51,14 +51,14 @@
                 <img src="~assets/img/icons/notification.svg" style="height: 26px">
               </div>
             </div>
-            <div class="navbar-item is-hidden-mobile" @click="mobileMenu = false, showUserModal = !showUserModal">
+            <div class="navbar-item is-hidden-touch" @click="mobileMenu = false, showUserModal = !showUserModal">
               <button :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/user.svg" style="height: 24px">
                 </span>
               </button>
             </div>
-            <div class="navbar-item is-hidden-desktop">
+            <div class="navbar-item is-hidden-desktop" @click="mobileMenu = false, showUserModal = !showUserModal">
               <nuxt-link :key="$auth.user ? $auth.user.vAccountRows[0].id : null" to="/profile" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/user.svg" style="height: 24px">
@@ -175,13 +175,13 @@
                   <p>... EFX</p>
                 </button>
               </div>
-              <div class="column is-4">
-                <nuxt-link to="/deposit" class="button is-primary is-wide">
+              <div class="column is-4" @click="showBalanceModal = false">
+                <nuxt-link to="/deposit"  class="button is-primary is-wide">
                   Deposit
                 </nuxt-link>
               </div>
-              <div class="column is-4">
-                <nuxt-link to="/withdraw" class="button is-wide is-primary is-outlined">
+              <div class="column is-4" @click="showBalanceModal = false">
+                <nuxt-link to="/withdraw"  class="button is-wide is-primary is-outlined">
                   Withdraw
                 </nuxt-link>
               </div>
