@@ -126,6 +126,9 @@ export default {
     batchesByCampaignId (state) {
       return id => state.batches ? state.batches.filter(b => b.campaign_id === id) : null
     },
+    activeBatchesByCampaignId (state) {
+      return id => state.batches ? state.batches.filter(b => b.campaign_id === id && (b.status !== 'Paused' && b.status !== 'Not Published')) : null
+    },
     campaignsByCategory (state) {
       return category => state.campaigns && category ? state.campaigns.filter(c => c.info ? c.info.category === category : false) : state.campaigns
     },

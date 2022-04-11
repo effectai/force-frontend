@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      batchesByCampaignId: 'campaign/batchesByCampaignId',
+      activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId',
       campaignsByCategory: 'campaign/campaignsByCategory',
       reservationsByAccountId: 'campaign/reservationsByAccountId'
     }),
@@ -73,10 +73,7 @@ export default {
           filteredCampaigns = filteredCampaigns.filter(c => !this.approvedCampaigns.includes(c.id))
         }
         for (const i in filteredCampaigns) {
-          let batches = this.batchesByCampaignId(filteredCampaigns[i].id)
-          batches = batches.filter((obj) => {
-            return obj.status !== 'Paused'
-          })
+          const batches = this.activeBatchesByCampaignId(filteredCampaigns[i].id)
 
           // get the reservations of the user for this campaign
           const reservationsOfUser = _.intersectionBy(batches, this.reservations, 'batch_id')
