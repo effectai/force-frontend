@@ -294,7 +294,8 @@ export default {
       loadingReservation: false,
       showBatchesPopup: false,
       waitingOnTransaction: false,
-      categories: ['translate', 'captions', 'socials', 'dao']
+      categories: ['translate', 'captions', 'socials', 'dao'],
+      successMessage: null
     }
   },
   computed: {
