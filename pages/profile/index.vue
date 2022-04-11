@@ -257,7 +257,7 @@ export default {
       transactionsByUser: 'transaction/transactionsByUser',
       getPendingPayouts: 'pendingPayout/getPendingPayouts',
       campaignById: 'campaign/campaignById',
-      batchesByCampaignId: 'campaign/batchesByCampaignId'
+      activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId'
     }),
     ...mapState({
       campaigns: state => state.campaign.campaigns
@@ -267,10 +267,7 @@ export default {
       const filteredCampaigns = this.campaigns.filter(c => c.owner[1] === this.$auth.user.accountName).map((c) => { return { ...c } })
 
       for (const i in filteredCampaigns) {
-        let batches = this.batchesByCampaignId(filteredCampaigns[i].id)
-        batches = batches.filter((obj) => {
-          return obj.status !== 'Paused'
-        })
+        const batches = this.activeBatchesByCampaignId(filteredCampaigns[i].id)
         filteredCampaigns[i].batches = batches
         if (batches) {
           filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {

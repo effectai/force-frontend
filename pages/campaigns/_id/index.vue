@@ -194,7 +194,7 @@
                     Qualify
                   </button>
                   <button
-                    v-else-if="campaignBatches.reduce((a,b) => a + b.num_tasks, 0) - campaignBatches.reduce((a,b) => a + b.real_tasks_done, 0) > 0 && !userReservation"
+                    v-else-if="activeCampaignBatches.reduce((a,b) => a + b.num_tasks, 0) - activeCampaignBatches.reduce((a,b) => a + b.real_tasks_done, 0) > 0 && !userReservation"
                     class="button is-fullwidth is-primary"
                     @click.prevent="reserveTask"
                   >
@@ -238,15 +238,15 @@
                 <div class="block">
                   Tasks
                   <br>
-                  <span v-if="batchesByCampaignId(campaign.id) === null" class="loading-text">
+                  <span v-if="activeBatchesByCampaignId(campaign.id) === null" class="loading-text">
                     Loading
                   </span>
                   <span v-else>
-                    {{ batchesByCampaignId(campaign.id).reduce(function(a,b){
+                    {{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.num_tasks
-                    },0) - batchesByCampaignId(campaign.id).reduce(function(a,b){
+                    },0) - activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.real_tasks_done
-                    },0) }}/{{ batchesByCampaignId(campaign.id).reduce(function(a,b){
+                    },0) }}/{{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
                       return a + b.num_tasks
                     },0) }} left
                     <br>
@@ -299,7 +299,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      batchesByCampaignId: 'campaign/batchesByCampaignId'
+      batchesByCampaignId: 'campaign/batchesByCampaignId',
+      activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId'
     }),
     ...mapState({
       campaigns: state => state.campaign.campaigns,
@@ -307,6 +308,9 @@ export default {
     }),
     campaignBatches () {
       return this.batchesByCampaignId(this.id)
+    },
+    activeCampaignBatches () {
+      return this.activeBatchesByCampaignId(this.id)
     },
     campaign () {
       if (this.campaigns) {
