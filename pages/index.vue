@@ -8,10 +8,11 @@
               <span v-if="categoryFilter" class="is-capitalized">{{ categoryFilter }}</span> Tasks
             </h1>
           </div>
-        </div>
-        <div class="switch-button mb-1" :class="{'approved': approved}">
-          <input v-model="approved" class="switch-button-checkbox" type="checkbox">
-          <label class="switch-button-label" for=""><span class="switch-button-label-span">Approved</span></label>
+          <div class="switch-button mt-1 ml-3" :class="{'unmoderated': unmoderated}">
+            <input v-model="unmoderated" class="switch-button-checkbox" type="checkbox">
+            <label class="switch-button-label" for=""><span class="switch-button-label-span">Approved</span></label>
+            <img src="@/assets/img/icons/info.svg">
+          </div>
         </div>
         <div class="level-right">
           <!-- <div class="level-item">
@@ -48,7 +49,7 @@ export default {
   data () {
     return {
       approvedCampaigns,
-      approved: true,
+      unmoderated: false,
       categoryFilter: this.$route.query.category
     }
   },
@@ -71,7 +72,7 @@ export default {
       let filteredCampaigns
       if (campaigns) {
         filteredCampaigns = campaigns.map((c) => { return { ...c } })
-        if (this.approved) {
+        if (!this.unmoderated) {
           filteredCampaigns = filteredCampaigns.filter(c => this.approvedCampaigns.includes(c.id))
         } else {
           filteredCampaigns = filteredCampaigns.filter(c => !this.approvedCampaigns.includes(c.id))
@@ -134,13 +135,13 @@ export default {
   letter-spacing: 1px;
   color: $text;
   position: relative;
-  padding: 4px 120px 4px 20px;
+  padding: 4px 130px 4px 20px;
 
   &:before {
     content: 'Unmoderated';
     position: absolute;
     top: 5px;
-    right: 10px;
+    right: 20px;
     width: auto;
     align-items: center;
     justify-content: center;
@@ -148,10 +149,25 @@ export default {
     pointer-events: none;
   }
 
-  &.approved::before {
+  img {
+    display: block;
+    position: absolute;
+    top: 5px;
+    height: 10px;
+    width: 10px;
+    right: 7px;
+    border-radius: 50%;
+    z-index: 10;
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  &.unmoderated::before {
     color: #fff;
   }
-  &.approved {
+  &.unmoderated {
     .switch-button-checkbox {
        & + .switch-button-label {
 
