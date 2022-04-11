@@ -46,7 +46,7 @@
                   Tap into a diverse workforce of over 10,000 people that
                   complete tasks for you. Choose one of the default task
                   templates to get started with text analysis, document
-                  transcription, image annotations, sentitment analyis and many
+                  transcription, image annotations, sentiment analyis and many
                   more!
                 </p>
                 <p class="block">
