@@ -267,7 +267,10 @@ export default {
       const filteredCampaigns = this.campaigns.filter(c => c.owner[1] === this.$auth.user.accountName).map((c) => { return { ...c } })
 
       for (const i in filteredCampaigns) {
-        const batches = this.batchesByCampaignId(filteredCampaigns[i].id)
+        let batches = this.batchesByCampaignId(filteredCampaigns[i].id)
+        batches = batches.filter((obj) => {
+          return obj.status !== 'Paused'
+        })
         filteredCampaigns[i].batches = batches
         if (batches) {
           filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
