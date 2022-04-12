@@ -70,6 +70,16 @@
               </a>
             </div>
           </div>
+          <label for="" class="label">
+            Estimated Time to complete one Task
+            <span class="has-text-info">*</span>
+          </label>
+          <div class="field has-addons">
+            <div class="control">
+              <input v-model="campaignIpfs.estimated_time" class="input" type="number" placeholder="1" step="1">
+            </div>
+            <div class="control"><a href="" class="button is-primary">Seconds</a></div>
+          </div>
           <div class="control">
             <div class="field">
               <label class="label">
@@ -293,7 +303,8 @@ export default {
         category: '',
         example_task: {},
         version: 1,
-        reward: null
+        reward: null,
+        estimated_time: null
       },
       campaign: {
         content_hash: null
@@ -403,7 +414,8 @@ export default {
       if (
         this.campaignIpfs.title && this.campaignIpfs.description &&
         this.campaignIpfs.reward && this.campaignIpfs.category &&
-        this.campaignIpfs.instructions && this.campaignIpfs.template
+        this.campaignIpfs.instructions && this.campaignIpfs.template &&
+        this.campaignIpfs.estimated_time
       ) {
         return true
       }
@@ -424,6 +436,9 @@ export default {
       }
       if (!this.campaignIpfs.template) {
         this.errors.push('Template is required.')
+      }
+      if (!this.campaignIpfs.estimated_time) {
+        this.errors.push('Estimated time is required.')
       }
       return false
     },
@@ -469,7 +484,8 @@ export default {
             category: '',
             example_task: {},
             version: 1,
-            reward: null
+            reward: null,
+            estimated_time: null
           }
           this.loading = false
           this.submitted = true
