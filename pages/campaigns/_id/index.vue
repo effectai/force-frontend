@@ -181,8 +181,7 @@
                   Reward
                   <br>
                   <b><span>{{ campaign.reward.quantity }}</span></b>
-                  <br>
-                  <br>
+                  <br><br>
                   Estimated Time
                   <br>
                   <b>
