@@ -11,7 +11,9 @@
           <div class="switch-button mt-1 ml-3" :class="{'unmoderated': unmoderated}">
             <input v-model="unmoderated" class="switch-button-checkbox" type="checkbox">
             <label class="switch-button-label" for=""><span class="switch-button-label-span">Approved</span></label>
-            <img src="@/assets/img/icons/info.svg">
+            <div class="has-tooltip-arrow" data-tooltip="Use at your own risk!">
+              <img src="@/assets/img/icons/info.svg">
+            </div>
           </div>
         </div>
         <div class="level-right">
@@ -127,22 +129,22 @@ export default {
 
 <style lang="scss" scoped>
 .switch-button {
-  background: rgba(25, 119, 243, 0.1);
+  background: #F7F9FB;
+  border: 1px solid #E8EEFF;
   border-radius: 6px;
-  overflow: hidden;
   text-align: center;
   font-size: .75rem;
   font-weight: 600;
   letter-spacing: 1px;
   color: $text;
   position: relative;
-  padding: 4px 130px 4px 20px;
+  padding: 4px 135px 4px 20px;
 
   &:before {
     content: 'Unmoderated';
     position: absolute;
-    top: 5px;
-    right: 20px;
+    top: 6px;
+    right: 16px;
     width: auto;
     align-items: center;
     justify-content: center;
@@ -150,16 +152,20 @@ export default {
     pointer-events: none;
   }
 
-  img {
+  .has-tooltip-arrow {
     display: block;
     position: absolute;
-    top: 5px;
+    top: 6px;
     height: 10px;
     width: 10px;
-    right: 7px;
+    right:5px;
     border-radius: 50%;
     z-index: 10;
     cursor: pointer;
+    &::before {
+      margin-top: -4px !important;
+      border-radius: 8px;
+    }
     &:hover {
       background-color: rgba(0, 0, 0, 0.2);
     }
@@ -173,7 +179,7 @@ export default {
        & + .switch-button-label {
 
         &:before {
-          width: 110px;
+          width: 115px;
           left: 0px;
         }
       }
@@ -192,7 +198,7 @@ export default {
     z-index: 2;
 
     &:checked + .switch-button-label:before {
-      transform: translateX(72px);
+      transform: translateX(83px);
       transition: transform 300ms linear;
     }
     &:checked + .switch-button-label {
@@ -202,7 +208,7 @@ export default {
     & + .switch-button-label {
       color: #fff;
       position: relative;
-      padding: 1px 0;
+      padding: 2px 0;
       display: block;
       user-select: none;
       pointer-events: none;
