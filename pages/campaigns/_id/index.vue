@@ -181,6 +181,14 @@
                   Reward
                   <br>
                   <b><span>{{ campaign.reward.quantity }}</span></b>
+                  <br>
+                  <br>
+                  Estimated Time
+                  <br>
+                  <b>
+                    <span v-if="campaign.info.estimated_time">{{ campaign.info.estimated_time }} Seconds</span>
+                    <span v-else>...</span>
+                  </b>
                 </div>
               </div>
 

@@ -98,6 +98,16 @@
               </a>
             </div>
           </div>
+          <label for="" class="label">
+            Estimated Time to complete one Task
+            <span class="has-text-info">*</span>
+          </label>
+          <div class="field has-addons">
+            <div class="control">
+              <input v-model="campaignIpfs.estimated_time" class="input" type="number" placeholder="1" step="1">
+            </div>
+            <div class="control"><a href="" class="button is-primary">Seconds</a></div>
+          </div>
           <div class="control">
             <div class="field">
               <label class="label">
@@ -294,7 +304,8 @@ export default {
         category: '',
         example_task: {},
         version: 1,
-        reward: null
+        reward: null,
+        estimated_time: null
       },
       campaign: null,
       formGroup: 'basic-info',
