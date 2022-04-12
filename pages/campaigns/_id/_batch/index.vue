@@ -323,7 +323,13 @@
                     Reward
                     <br>
                     <span v-if="campaign"><b>{{ campaign.reward.quantity }}</b></span>
-                    <span v-else>.....</span>
+                    <span v-else>...</span>
+                  </div>
+                  <div class="block">
+                    Repititions
+                    <br>
+                    <span v-if="batch"><b>{{ batch.repetitions }}</b></span>
+                    <span v-else>...</span>
                   </div>
                 </div>
                 <div class="column is-half">

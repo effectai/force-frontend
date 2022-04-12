@@ -162,7 +162,9 @@
                 <b>Information</b>
               </h4>
             </div>
-            <div class="columns p-5">
+
+            <div class="p-5">
+            <div class="columns ">
               <div class="column is-half">
                 <div v-if="campaign.info" class="block">
                   <nuxt-link
@@ -180,39 +182,8 @@
                   <br>
                   <b><span>{{ campaign.reward.quantity }}</span></b>
                 </div>
-                <div class="block">
-                  <div v-if="$auth.user.accountName === campaign.owner[1]">
-                    <nuxt-link :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
-                      Edit Task
-                    </nuxt-link>
-                    <br>
-                  </div>
-                  <button v-if="loading || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
-                    Loading
-                  </button>
-                  <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="joinCampaignPopup = true">
-                    Qualify
-                  </button>
-                  <button
-                    v-else-if="activeCampaignBatches.reduce((a,b) => a + b.num_tasks, 0) - activeCampaignBatches.reduce((a,b) => a + b.real_tasks_done, 0) > 0 && !userReservation"
-                    class="button is-fullwidth is-primary"
-                    @click.prevent="reserveTask"
-                  >
-                    Make Task Reservation
-                  </button>
-                  <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
-                    Go To Task
-                  </button>
-                  <template v-else>
-                    <button v-if="userJoined" class="button is-fullwidth is-primary" :disabled="true">
-                      Qualified for Task
-                    </button>
-                    <div class="has-text-centered">
-                      <i>No active tasks currently</i>
-                    </div>
-                  </template>
-                </div>
               </div>
+
               <div class="column is-half">
                 <div class="block">
                   Requester
@@ -254,6 +225,42 @@
                 </div>
               </div>
             </div>
+
+              <div class="block is-vcentered ">
+                <div v-if="$auth.user.accountName === campaign.owner[1]">
+                  <nuxt-link :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
+                    Edit Task
+                  </nuxt-link>
+                  <br>
+                </div>
+                <button v-if="loading || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
+                  Loading
+                </button>
+                <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="joinCampaignPopup = true">
+                  Qualify
+                </button>
+                <button
+                  v-else-if="activeCampaignBatches.reduce((a,b) => a + b.num_tasks, 0) - activeCampaignBatches.reduce((a,b) => a + b.real_tasks_done, 0) > 0 && !userReservation"
+                  class="button is-fullwidth is-primary"
+                  @click.prevent="reserveTask"
+                >
+                  Make Task Reservation
+                </button>
+                <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
+                  Go To Task
+                </button>
+                <template v-else>
+                  <button v-if="userJoined" class="button is-fullwidth is-primary" :disabled="true">
+                    Qualified for Task
+                  </button>
+                  <div class="has-text-centered">
+                    <i>No active tasks currently</i>
+                  </div>
+                </template>
+              </div>
+
+            </div>
+
           </div>
         </div>
       </div>
