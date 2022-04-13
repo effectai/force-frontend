@@ -362,7 +362,7 @@ export default {
       const blob = new Blob([JSON.stringify(this.campaignIpfs)], { type: 'application/json' })
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      link.download = 'campaign'
+      link.download = `effect-${this.campaign.info.title}.json`
       link.click()
       URL.revokeObjectURL(link.href)
     },

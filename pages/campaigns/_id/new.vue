@@ -134,7 +134,7 @@
                     </label>
                   </div>
                   <div>
-                    <a ref="csvfiledownload" class="is-size-7" href="" :download="'tasks_example'+campaignId+'.csv'">Download example CSV</a>
+                    <a ref="csvfiledownload" class="is-size-7" href="" :download="`example-${campaignTitle}.csv`">Download example CSV</a>
                   </div>
                   <p v-if="file.name" class="has-text-success mt-2">
                     Imported file: {{ file.name }}
@@ -277,6 +277,9 @@ export default {
         return this.tasks.slice(start, start + this.perPage)
       }
       return []
+    },
+    campaignTitle () {
+      return this.campaign?.info.title.toString() ?? 'Effect-Force-Campaign'
     }
   },
   mounted () {

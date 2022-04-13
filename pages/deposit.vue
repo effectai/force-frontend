@@ -25,6 +25,24 @@
         Deposit EFX tokens
       </h1>
 
+      <div class="tabs is-centered is-large">
+        <ul>
+          <li class="is-active">
+            <a>
+              <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span>
+              <span>EOS</span>
+            </a>
+          </li>
+          <!-- <li>|</li>
+          <li>
+            <a>
+              <span class="has-text-grey-light"><del>BSC</del></span>
+              <span class="icon is-large"><img src="@/assets/img/providers/BSC-logo.svg" alt="BSC" /></span>
+            </a>
+          </li> -->
+        </ul>
+      </div>
+
       <div class="notification is-danger is-light mt-3" role="alert">
         When depositing to this address, you must enter the "memo" in the message field of the transaction. Forgetting this will result in funds not arriving at your address.
       </div>
@@ -114,7 +132,8 @@ export default {
       modalConfirmation: false,
       memo: this.$auth.user.vAccountRows[0].id,
       account: this.$blockchain.sdk.account.config.accountContract,
-      clipboard: navigator.clipboard
+      clipboard: navigator.clipboard,
+      bscToolTip: 'BSC deposit not supported at this time.'
     }
   },
   methods: {
