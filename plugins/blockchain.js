@@ -110,6 +110,14 @@ export default (context, inject) => {
             }
           })
       },
+      async estimateMinPricePerTask (efx, currency = 'usd') {
+        const price = await this.getEfxPrice(currency).catch(console.error)
+        if (price) {
+          const res = this.sdk.config.taskEstimatedTime < efx * price
+          console.log('Minimum price efx', res)
+          return res
+        }
+      },
       async getBlockchainInfo () {
         let eosInfo
         try {
