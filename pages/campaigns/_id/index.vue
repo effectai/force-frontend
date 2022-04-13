@@ -181,6 +181,27 @@
                   Reward
                   <br>
                   <b><span>{{ campaign.reward.quantity }}</span></b>
+                  <br><br>
+                  Time <strong>/</strong> Task
+                  <br>
+                  <b>
+                    <span v-if="campaign.info && campaign.info.estimated_time">{{ campaign.info.estimated_time }} Seconds</span>
+                    <span v-else>...</span>
+                  </b>
+                  <br><br>
+                  EFX <strong>/</strong> Hour
+                  <br>
+                  <div v-if="campaign.info && campaign.info.estimated_time">
+                    <b>
+                      <span>{{ estimatedEarnings.efxPerHour }} EFX</span>
+                      <span>(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
+                    </b>
+                  </div>
+                  <div v-else>
+                    <b>
+                      <span>...</span>
+                    </b>
+                  </div>
                 </div>
               </div>
 
@@ -325,6 +346,16 @@ export default {
         return this.campaigns.find(c => c.id === this.id)
       }
       return undefined
+    },
+    estimatedEarnings () {
+      const hourInSec = 3600
+      if (this.campaign && this.campaign.info.estimated_time && this.campaign.info.reward) {
+        const efxPerHour = hourInSec / this.campaign.info.estimated_time * this.campaign.info.reward
+        const dollarPerHour = efxPerHour * this.$blockchain.efxPrice
+        return { efxPerHour, dollarPerHour }
+      } else {
+        return { efxPerHour: 0, dollarPerHour: 0 }
+      }
     }
   },
   watch: {

@@ -77,53 +77,87 @@
               <input v-model="campaignIpfs.image" class="input" type="text" placeholder="Image URL">
             </div>
           </div>
-          <label class="label">
-            Reward per task
+          <div class="field">
+            <label class="label">
+              Category
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="select">
+              <select v-model="campaignIpfs.category" required>
+                <option>---</option>
+                <option value="dao">
+                  Effect DAO
+                </option>
+                <option value="translate">
+                  Effect Translate
+                </option>
+                <option value="socials">
+                  Effect Socials
+                </option>
+                <option value="captions">
+                  Effect Captions
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">
+              EFX <strong>/</strong> Task
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="field has-addons">
+              <div class="control">
+                <input
+                  v-model="campaignIpfs.reward"
+                  required
+                  class="input"
+                  type="number"
+                  placeholder="Reward per task"
+                  step="0.0001"
+                >
+              </div>
+              <div class="control">
+                <a class="button is-primary">
+                  EFX
+                </a>
+              </div>
+            </div>
+          </div>
+
+        <div class="field">
+          <label for="" class="label">
+            Time <strong>/</strong> Task
             <span class="has-text-info">*</span>
           </label>
           <div class="field has-addons">
             <div class="control">
-              <input
-                v-model="campaignIpfs.reward"
-                required
-                class="input"
-                type="number"
-                placeholder="Reward per task"
-                step="0.0001"
-              >
+              <input v-model="campaignIpfs.estimated_time" class="input" type="number" placeholder="1" step="10">
             </div>
-            <div class="control">
-              <a class="button is-primary">
-                EFX
-              </a>
-            </div>
+            <div class="control"><a href="" class="button is-primary">Seconds</a></div>
           </div>
-          <div class="control">
-            <div class="field">
-              <label class="label">
-                Category
-                <span class="has-text-info">*</span>
-              </label>
-              <div class="select">
-                <select v-model="campaignIpfs.category" required>
-                  <option>---</option>
-                  <option value="dao">
-                    Effect DAO
-                  </option>
-                  <option value="translate">
-                    Effect Translate
-                  </option>
-                  <option value="socials">
-                    Effect Socials
-                  </option>
-                  <option value="captions">
-                    Effect Captions
-                  </option>
-                </select>
-              </div>
+        </div>
+
+        <div class="field">
+          <label for="" class="label">
+            EFX <strong>/</strong> Hour
+          </label>
+          <div class="field">
+            <div v-if="campaignIpfs && campaignIpfs.estimated_time && campaignIpfs.reward">
+              <b>
+                <span>{{ parseFloat(estimatedEarnings.efxPerHour).toFixed(4) }} EFX</span>
+                <span>(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
+              </b>
+            </div>
+            <div v-else>
+              <b>
+                <span>...</span>
+              </b>
             </div>
           </div>
         </div>
+        </div>
+
         <div v-show="formGroup === 'instructions'" class="block instructions-group">
           <div class="columns">
             <div class="column is-two-fifths">
@@ -294,7 +328,8 @@ export default {
         category: '',
         example_task: {},
         version: 1,
-        reward: null
+        reward: null,
+        estimated_time: null
       },
       campaign: null,
       formGroup: 'basic-info',
@@ -313,6 +348,16 @@ export default {
     // Compares live campaign info to stored campaign info
     hasChanged () {
       return this.campaign && !_.isEqual(this.campaignIpfs, this.campaign.info)
+    },
+    estimatedEarnings () {
+      const hourInSec = 3600
+      if (this.campaignIpfs && this.campaignIpfs.estimated_time && this.campaignIpfs.reward) {
+        const efxPerHour = (hourInSec / this.campaignIpfs.estimated_time) * this.campaignIpfs.reward
+        const dollarPerHour = efxPerHour * this.$blockchain.efxPrice
+        return { efxPerHour, dollarPerHour }
+      } else {
+        return { efxPerHour: 0, dollarPerHour: 0 }
+      }
     }
   },
   watch: {
