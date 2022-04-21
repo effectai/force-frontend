@@ -474,6 +474,22 @@ export default (context, inject) => {
       async joinCampaignAndReserveTask (id, batchId, tasksDone, tasks) {
         return await this.sdk.force.joinCampaignAndReserveTask(id, batchId, tasksDone, tasks)
       },
+      // createQualification = async (name: string, description: string, type: number, image?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+      async createQualification (name, description, type, image) {
+        return await this.sdk.force.createQualification(name, description, type, image)
+      },
+      // assignQualification = async (qualificationId: number, campaignId: number, hash: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+      async assignQualification (qualificationId, campaignId, hash) {
+        return await this.sdk.force.assignQualification(qualificationId, campaignId, hash)
+      },
+      // getQualification = async (id: number): Promise<Qualification> => {
+      async getQualification (id) {
+        return await this.sdk.force.getQualification(id)
+      },
+      // getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
+      async getUserQualifications (id) {
+        return await this.sdk.force.getUserQualifications(id)
+      },
 
       async recoverPublicKey () {
         const message = 'Effect Account'

@@ -150,12 +150,20 @@
           <h2 class="title is-4">
             My Tasks
           </h2>
-          <nuxt-link class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" to="/campaigns/templates">
-            <span class="icon">
-              +
-            </span>
-            <span>Create Task</span>
-          </nuxt-link>
+          <div class="is-pulled-right no-float-mobile has-margin-bottom-mobile">
+            <nuxt-link class="button is-primary" to="/campaigns/templates">
+              <span class="icon">
+                +
+              </span>
+              <span>Create Task</span>
+            </nuxt-link>
+            <nuxt-link class="button is-primary" to="/qualifications/new">
+              <span class="icon">
+                +
+              </span>
+              <span>Create Qualifier</span>
+            </nuxt-link>
+          </div>
         </div>
 
         <campaign-list class="mb-5" :campaigns="myCampaigns" />
