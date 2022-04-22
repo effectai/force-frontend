@@ -21,7 +21,7 @@
             <span class="has-text-info">*</span>
           </label>
           <div class="control">
-            <input v-model="qualificationIpfs.name" type="text" class="input" placeholder="Qualification Name" required>
+            <input v-model="qualificationIpfs.name" type="text" class="input" placeholder="Public name for your qualification" required>
           </div>
         </div>
 
@@ -33,7 +33,7 @@
           <div class="control">
             <vue-simplemde
             v-model="qualificationIpfs.description"
-            :configs="{promptUrls: true, status: false, spellChecker: false, placeHolder: 'Public description for your qualification'}" />
+            :configs="{promptUrls: true, status: false, spellChecker: false, placeholder: 'Public description for your qualification'}" />
             <!-- <textarea class="textarea" rows="5" placeholder="Qualification Description"></textarea> -->
           </div>
         </div>
@@ -50,14 +50,14 @@
 
         <div class="field">
           <label class="label">
-            Qualification Type (Inclusive / Exclusive)
+            Qualification Type
             <span class="has-text-info">*</span>
           </label>
           <div class="select is-medium">
             <select v-model="qualificationIpfs.type" class="select" required>
               <option :value="selectNull" selected="selectType">{{ selectType }}</option>
-              <option value="0">Inclusive</option>
-              <option value="1">Exclusive</option>
+              <option value="0">Required</option>
+              <option value="1">Exclude</option>
             </select>
           </div>
         </div>
