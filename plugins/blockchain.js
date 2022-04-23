@@ -486,6 +486,9 @@ export default (context, inject) => {
       async getQualification (id) {
         return await this.sdk.force.getQualification(id)
       },
+      async getAllQualifications () {
+        return await this.sdk.force.getAllQualifications()
+      },
       // getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
       async getUserQualifications (id) {
         return await this.sdk.force.getUserQualifications(id)
