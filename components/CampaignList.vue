@@ -151,7 +151,8 @@ export default {
       campaignsLoading: state => state.campaign.loading,
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
       allBatchesLoaded: state => state.campaign.allBatchesLoaded,
-      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded
+      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded,
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
     }),
     list: {
       get () {
@@ -190,6 +191,9 @@ export default {
       }
       if (!this.allSubmissionsLoaded) {
         this.$store.dispatch('campaign/getSubmissions')
+      }
+      if (!this.allQualificationsLoaded) {
+        this.$store.dispatch('qualification/getQualifications')
       }
     }
   }

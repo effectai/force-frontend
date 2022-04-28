@@ -79,6 +79,21 @@
               </select>
             </div>
           </div>
+          {{qualificationsDropdownData}}
+          <div class="field">
+            <multiselect
+              v-model="value"
+              tag-placeholder="Add this as new tag"
+              placeholder="Search or add a tag"
+              label="name"
+              track-by="code"
+              :options="qualificationsDropdownData"
+              :multiple="true"
+              :taggable="true"
+              @tag="addTag">
+            </multiselect>
+          </div>
+          <hr>
           <div class="field">
             <label class="label">
               EFX <strong>/</strong> Task
@@ -246,8 +261,10 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import VueSimplemde from 'vue-simplemde'
 import { Template } from '@effectai/effect-js'
+import Multiselect from 'vue-multiselect'
 import { codemirror } from 'vue-codemirror'
 import { Splitpanes, Pane } from 'splitpanes'
 import InstructionsModal from '@/components/InstructionsModal'
@@ -279,7 +296,8 @@ export default {
     InstructionsModal,
     SuccessModal,
     Splitpanes,
-    Pane
+    Pane,
+    Multiselect
   },
 
   filters: {
@@ -338,10 +356,23 @@ export default {
       successMessage: null,
       successTitle: null,
       answer: null,
-      windowWidth: 0
+      windowWidth: 0,
+      value: [],
+      options: [
+        { name: 'Vue.js', code: 'vu' },
+        { name: 'Javascript', code: 'js' },
+        { name: 'Open Source', code: 'os' }
+      ]
     }
   },
   computed: {
+    ...mapState({
+      campaignsLoading: state => state.campaign.loading,
+      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
+      allBatchesLoaded: state => state.campaign.allBatchesLoaded,
+      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded,
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
+    }),
     // Compares cached user data to live data
     hasChanged () {
       return this.cachedFormData !== this.formDataForComparison()
@@ -355,6 +386,18 @@ export default {
       } else {
         return { efxPerHour: 0, dollarPerHour: 0 }
       }
+    },
+    qualificationsDropdownData () {
+      const qualifications = []
+      for (const qualification of this.$store.state.qualification.qualifications) {
+        qualifications.push(
+          {
+            name: qualification.info.name,
+            code: qualification.id
+          }
+        )
+      }
+      return qualifications
     }
   },
   watch: {
@@ -384,6 +427,7 @@ export default {
   },
 
   created () {
+    this.$store.dispatch('qualification/getQualifications')
     this.cacheFormData()
     // eslint-disable-next-line nuxt/no-globals-in-created
     window.addEventListener('resize', this.handleResize)
@@ -398,6 +442,14 @@ export default {
   },
 
   methods: {
+    addTag (newTag) {
+      const tag = {
+        name: newTag,
+        code: newTag.substring(0, 2) + Math.floor((Math.random() * 10000000))
+      }
+      this.options.push(tag)
+      this.value.push(tag)
+    },
     handleResize () {
       this.windowWidth = window.innerWidth
     },
@@ -570,3 +622,4 @@ div.instructions-group .textarea {
   }
 }
 </style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

@@ -80,6 +80,7 @@ export default (context, inject) => {
         context.store.dispatch('campaign/getCampaigns')
         context.store.dispatch('campaign/getBatches')
         context.store.dispatch('campaign/getSubmissions')
+        context.store.dispatch('qualification/getQualifications')
         context.store.dispatch('pendingPayout/loadPendingPayouts')
       },
       updateTemplates () {
@@ -485,6 +486,9 @@ export default (context, inject) => {
       // getQualification = async (id: number): Promise<Qualification> => {
       async getQualification (id) {
         return await this.sdk.force.getQualification(id)
+      },
+      async getQualifications (nextKey, limit = 50, processCampaign = true) {
+        return await this.sdk.force.getQualifications(nextKey, limit, processCampaign)
       },
       // getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
       async getUserQualifications (id) {
