@@ -79,19 +79,42 @@
               </select>
             </div>
           </div>
-          {{qualificationsDropdownData}}
+          <hr>
           <div class="field">
+            <label class="label">
+              Worker must have qualifications
+            </label>
             <multiselect
-              v-model="value"
-              tag-placeholder="Add this as new tag"
-              placeholder="Search or add a tag"
+              v-if="allQualificationsLoaded"
+              v-model="inclusiveQualis"
+              tag-placeholder="Add"
+              placeholder="Select Qualifications"
               label="name"
               track-by="code"
               :options="qualificationsDropdownData"
               :multiple="true"
               :taggable="true"
-              @tag="addTag">
-            </multiselect>
+              :show-labels="false"
+              @tag="addInclusiveQuali"
+            />
+          </div>
+          <div class="field">
+            <label class="label">
+              Deny workers with qualification
+            </label>
+            <multiselect
+              v-if="allQualificationsLoaded"
+              v-model="exclusiveQualis"
+              tag-placeholder="Add"
+              placeholder="Select Qualifications"
+              label="name"
+              track-by="code"
+              :options="qualificationsDropdownData"
+              :multiple="true"
+              :taggable="true"
+              :show-labels="false"
+              @tag="addExclusiveQuali"
+            />
           </div>
           <hr>
           <div class="field">
@@ -357,20 +380,13 @@ export default {
       successTitle: null,
       answer: null,
       windowWidth: 0,
-      value: [],
-      options: [
-        { name: 'Vue.js', code: 'vu' },
-        { name: 'Javascript', code: 'js' },
-        { name: 'Open Source', code: 'os' }
-      ]
+      inclusiveQualis: [],
+      exclusiveQualis: [],
+      options: []
     }
   },
   computed: {
     ...mapState({
-      campaignsLoading: state => state.campaign.loading,
-      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
-      allBatchesLoaded: state => state.campaign.allBatchesLoaded,
-      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded,
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
     }),
     // Compares cached user data to live data
@@ -390,12 +406,14 @@ export default {
     qualificationsDropdownData () {
       const qualifications = []
       for (const qualification of this.$store.state.qualification.qualifications) {
-        qualifications.push(
-          {
-            name: qualification.info.name,
-            code: qualification.id
-          }
-        )
+        if (qualification.info.name) {
+          qualifications.push(
+            {
+              name: qualification.info.name,
+              code: qualification.id
+            }
+          )
+        }
       }
       return qualifications
     }
@@ -427,7 +445,7 @@ export default {
   },
 
   created () {
-    this.$store.dispatch('qualification/getQualifications')
+    this.getQualifications()
     this.cacheFormData()
     // eslint-disable-next-line nuxt/no-globals-in-created
     window.addEventListener('resize', this.handleResize)
@@ -442,13 +460,24 @@ export default {
   },
 
   methods: {
-    addTag (newTag) {
-      const tag = {
-        name: newTag,
-        code: newTag.substring(0, 2) + Math.floor((Math.random() * 10000000))
+    async getQualifications () {
+      if (!this.allQualificationsLoaded) {
+        await this.$store.dispatch('qualification/getQualifications')
       }
-      this.options.push(tag)
-      this.value.push(tag)
+    },
+    addExclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.exclusiveQualis.push(tag)
+    },
+    addInclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.inclusiveQualis.push(tag)
     },
     handleResize () {
       this.windowWidth = window.innerWidth
@@ -544,8 +573,23 @@ export default {
         if (this.checkForm()) {
           this.loading = true
           const campaignIpfs = { ...this.campaignIpfs }
+
+          const qualis = []
+          for (let i = 0; i < this.exclusiveQualis.length; i++) {
+            qualis.push({
+              key: this.exclusiveQualis[i].code,
+              value: 1
+            })
+          }
+          for (let i = 0; i < this.inclusiveQualis.length; i++) {
+            qualis.push({
+              key: this.inclusiveQualis[i].code,
+              value: 0
+            })
+          }
+
           const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
-          const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
+          const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward, qualis)
 
           // Wait for transaction and reload campaigns
           this.successTitle = 'Campaign submitted successfully'
@@ -622,4 +666,3 @@ div.instructions-group .textarea {
   }
 }
 </style>
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

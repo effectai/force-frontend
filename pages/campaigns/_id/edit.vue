@@ -439,8 +439,26 @@ export default {
     async editCampaign () {
       this.loading = true
       try {
+        const qualis = [
+          {
+            key: 8,
+            value: 1
+          },
+          {
+            key: 9,
+            value: 1
+          },
+          {
+            key: 0,
+            value: 0
+          },
+          {
+            key: 1,
+            value: 0
+          }
+        ]
         const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
-        const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward)
+        const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward, qualis)
 
         // Wait for transaction and reload campaigns
         this.successTitle = 'Campaign submitted successfully!'
