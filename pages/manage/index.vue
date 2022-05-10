@@ -7,7 +7,7 @@
           Manage | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
         </h1>
         <p>
-          Manage your tasks, qualifications here.
+          Manage your tasks and qualifications.
         </p>
 
         <hr>
@@ -43,7 +43,6 @@
         </div>
 
         <qualification-list class="mb-5" :qualifications="myQualifications" />
-
       </div>
       <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
     </div>
@@ -52,7 +51,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import { CampaignList } from '@/components/CampaignList.vue'
+import CampaignList from '@/components/CampaignList.vue'
 import QualificationList from '@/components/QualificationList'
 import SuccessModal from '@/components/SuccessModal'
 
