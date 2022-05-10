@@ -138,6 +138,9 @@ export default {
     submissionsByBatchId (state) {
       return id => state.submissions ? state.submissions.filter(s => s.batch_id === id) : null
     },
+    submissionById (state) {
+      return id => state.submissions ? state.submissions.find(c => c.id === id) : null
+    },
     submissionsByAccountId (state) {
       return id => state.submissions ? state.submissions.filter(s => s.account_id === id) : null
     }
