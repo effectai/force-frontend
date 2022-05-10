@@ -36,7 +36,7 @@ export default {
     }
   },
   getters: {
-    qualifcationById (state) {
+    qualificationById (state) {
       return id => state.qualifications ? state.qualifications.find(c => c.id === id) : null
     }
   },
@@ -99,7 +99,7 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    async proceccQualification ({ commit, rootGetters, dispatch }, qualification) {
+    async processQualification ({ commit, rootGetters, dispatch }, qualification) {
       try {
         // field_0 represents the content type where:
         // 0: IPFS
@@ -108,10 +108,10 @@ export default {
           // Save IPFS content it in the store if its not there yet
           await dispatch('ipfs/getIpfsContent', qualification.content.field_1, { root: true })
           const info = rootGetters['ipfs/ipfsContentByHash'](qualification.content.field_1)
-          commit('SET_QUALIFICATIO_INFO', { id: qualification.id, info })
+          commit('SET_QUALIFICATION_INFO', { id: qualification.id, info })
         }
       } catch (e) {
-        commit('SET_QUALIFICATIO_INFO', { id: qualification.id, info: null })
+        commit('SET_QUALIFICATION_INFO', { id: qualification.id, info: null })
       }
     }
   },
