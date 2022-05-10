@@ -12,12 +12,15 @@
     <hr class="mt-1">
     <div class="columns is-multiline" :class="{'grid': grid}">
       <div
-        v-for="campaign in paginatedQualifications"
-        :key="campaign.id"
+        v-for="qualification in paginatedQualifications"
+        :key="qualification.id"
         class="column is-one-third-tablet"
         :class="{'is-one-fifth-desktop': grid, 'is-12-desktop': !grid}"
       >
-        <nuxt-link :to="'/campaigns/'+campaign.id" class="box p-4" :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}">
+      <ul>
+        <li>{{ qualification }}</li>
+      </ul>
+        <!-- <nuxt-link :to="'/campaigns/'+campaign.id" class="box p-4" :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}">
           <div class="columns is-vcentered is-multiline">
             <div
               class="column is-12-touch"
@@ -99,28 +102,25 @@
               </button>
             </div>
           </div>
-        </nuxt-link>
+        </nuxt-link> -->
       </div>
     </div>
     <pagination
-      v-if="campaigns"
+      v-if="qualifications"
       class="mt-2"
-      :items="campaigns.length"
+      :items="qualifications.length"
       :page="page"
       :per-page="perPage"
       @setPage="setPage"
     />
-    <div v-if="campaignsLoading" class="subtitle loading-text">
+    <div v-if="allQualificationsLoaded" class="subtitle loading-text">
       Campaigns loading
     </div>
-    <div v-else-if="!allBatchesLoaded" class="loading-text">
-      Batches loading
-    </div>
-    <div v-else-if="campaigns && !campaigns.length" class="subtitle">
+    <div v-else-if="qualifications && !qualifications.length" class="subtitle">
       No tasks
     </div>
-    <div v-else-if="!campaigns" class="subtitle has-text-danger">
-      Could not retrieve campaigns
+    <div v-else-if="!qualifcations" class="subtitle has-text-danger">
+      Could not retrieve qualifcations
     </div>
   </div>
 </template>
@@ -130,11 +130,11 @@ import { mapState, mapGetters } from 'vuex'
 import Pagination from './Pagination.vue'
 
 export default {
-  name: 'CampaignList',
+  name: 'QualificationList',
   components: {
     Pagination
   },
-  props: ['gridToggle', 'campaigns', 'qualifcations'],
+  props: ['gridToggle', 'qualifcations'],
   data () {
     return {
       page: this.$route.query.page || 1,
@@ -145,13 +145,12 @@ export default {
   },
   computed: {
     ...mapGetters({
-      batchesByCampaignId: 'campaign/batchesByCampaignId'
+      qualificationById: 'qualifation/qualificationById'
     }),
     ...mapState({
-      campaignsLoading: state => state.campaign.loading,
-      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
-      allBatchesLoaded: state => state.campaign.allBatchesLoaded,
-      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
+      getQualifications: state => state.qualification.getQualifications,
+      qualifications: state => state.qualification.qualifications
     }),
     list: {
       get () {
@@ -166,9 +165,9 @@ export default {
     },
     paginatedQualifications () {
       const start = (this.page - 1) * this.perPage
-      if (this.campaigns) {
-        const pageCampaigns = this.campaigns.slice(start, start + this.perPage)
-        return pageCampaigns
+      if (this.qualifications) {
+        const pageQualifications = this.qualifications.slice(start, start + this.perPage)
+        return pageQualifications
       }
       return []
     }
@@ -181,15 +180,8 @@ export default {
       this.page = newPage
     },
     getForceInfo () {
-      if (!this.campaigns || !this.allCampaignsLoaded) {
-        // on the requester campaign list process all campaigns
-        this.$store.dispatch('campaign/getCampaigns')
-      }
-      if (!this.allBatchesLoaded) {
-        this.$store.dispatch('campaign/getBatches')
-      }
-      if (!this.allSubmissionsLoaded) {
-        this.$store.dispatch('campaign/getSubmissions')
+      if (!this.qualifications) {
+        this.$store.dispatch('qualification/getQualifications')
       }
     }
   }
