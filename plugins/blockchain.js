@@ -80,6 +80,7 @@ export default (context, inject) => {
         context.store.dispatch('campaign/getCampaigns')
         context.store.dispatch('campaign/getBatches')
         context.store.dispatch('campaign/getSubmissions')
+        context.store.dispatch('qualification/getQualifications')
         context.store.dispatch('pendingPayout/loadPendingPayouts')
       },
       updateTemplates () {
@@ -439,11 +440,11 @@ export default (context, inject) => {
       async resumeBatch (batch) {
         return await this.sdk.force.resumeBatch(batch)
       },
-      async editCampaign (id, hash, reward) {
-        return await this.sdk.force.editCampaign(id, hash, reward)
+      async editCampaign (id, hash, reward, qualis) {
+        return await this.sdk.force.editCampaign(id, hash, reward, qualis)
       },
-      async createCampaign (hash, reward) {
-        return await this.sdk.force.createCampaign(hash, reward)
+      async createCampaign (hash, reward, qualis) {
+        return await this.sdk.force.createCampaign(hash, reward, qualis)
       },
       async payout () {
         return await this.sdk.force.payout()
@@ -486,8 +487,8 @@ export default (context, inject) => {
       async getQualification (id) {
         return await this.sdk.force.getQualification(id)
       },
-      async getAllQualifications () {
-        return await this.sdk.force.getAllQualifications()
+      async getQualifications (nextKey, limit = 50, processCampaign = true) {
+        return await this.sdk.force.getQualifications(nextKey, limit, processCampaign)
       },
       // getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
       async getUserQualifications (id) {
