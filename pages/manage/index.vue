@@ -28,8 +28,6 @@
 
         <campaign-list class="mb-5" :campaigns="myCampaigns" />
 
-        <qualification-list class="mb-5" :qualifications="myQualificaitons"></qualification-list>
-
         <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
           <h2 class="title is-4">
             Qualifiers
@@ -44,16 +42,8 @@
           </div>
         </div>
 
-        <qualification-list class="mb-5" :qualifications="myQualifications"></qualification-list>
+        <qualification-list class="mb-5" :qualifications="myQualifications" />
 
-        <hr>
-        <button class="button is-white" exact-active-class="is-active" @click="logout">
-          <span class="icon">
-            <img src="~assets/img/icons/logout.svg" style="height: 24px">
-          </span>
-          <span>Logout</span>
-        </button>
-        <br><br>
       </div>
       <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
     </div>
@@ -93,7 +83,7 @@ export default {
     }),
     ...mapState({
       campaigns: state => state.campaign.campaigns,
-      qualifications: state => state.qualifications.qualifications
+      qualifications: state => state.qualification.qualifications
     }),
     myCampaigns () {
       if (!this.campaigns) { return }
@@ -114,9 +104,12 @@ export default {
       return filteredCampaigns
     },
     myQualifications () {
-      if (!this.qualifications) { return }
-      console.log(this.qualifications)
-      const filteredQualifications = this.qualifications.filter(c => c.owner[1] === this.$auth.user.accountName).map((c) => { return { ...c } })
+      if (!this.qualifications) {
+        return
+      }
+      // .filter() this this list for elements that are controlled by this user.
+      const filteredQualifications = this.qualifications
+
       return filteredQualifications
     },
     transactions () {
@@ -130,12 +123,20 @@ export default {
       return []
     }
   },
+  created () {
+    this.getQualifications()
+  },
   mounted () {
     console.log('mounted')
-    this.$store.dispatch('pendingPayout/loadPendingPayouts')
-    // console.debug(this.$auth)
+    this.$store.dispatch('qualification/getQualifications')
+    this.$store.dispatch('campaign/getCampaigns')
   },
   methods: {
+    async getQualifications () {
+      if (!this.allQualificationsLoaded) {
+        await this.$store.dispatch('qualification/getQualifications')
+      }
+    },
     async logout () {
       await this.$auth.logout()
     },
