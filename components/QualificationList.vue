@@ -10,59 +10,97 @@
       </div>
     </div>
     <hr class="mt-1">
-    <div class="columns is-multiline" :class="{'grid': grid}">
+
+    <div class="mb-6">
+      <div class="table-container">
+        <table class="table is-narrow is-fullwidth" style="width: 100%;">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Requester</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr v-for="qualification in paginatedQualifications" :key="qualification.id">
+
+                <th>
+                  <figure class="image is-64x64 has-radius is-vcentered">
+                    <img v-if="qualification.info && qualification.info.image" :src="qualification.info.image">
+                    <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name">
+                  </figure>
+                </th>
+                <td>
+                  <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                    <span v-if="qualification.info">
+                      <span v-if="qualification.info.name">{{ qualification.info.name }}</span>
+                      <i v-else>- Untitled -</i>
+                    </span>
+                    <span v-else-if="qualification.info !== null" class="loading-text">Loading</span>
+                    <span v-else class="has-text-danger-dark">Could not load qualification info</span>
+                  </h2>
+                </td>
+                <td>
+                    <div v-if="qualification.info">
+                      <div v-if="qualification.info.description" class="is-ellipsis">
+                        {{ qualification.info.description.slice(0, 30) }}&hellip;
+                      </div>
+                      <i v-else>- no description -</i>
+                    </div>
+                    <div v-else-if="qualification.info !== null">
+                      ........
+                    </div>
+                </td>
+                <td>
+                  <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                    <nuxt-link :to="'/profile/' + qualification.account_id">
+                      <span class="is-ellipsis">{{ qualification.account_id }}</span>
+                    </nuxt-link>
+                  </h2>
+                </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- <div class="columns is-multiline" :class="{'grid': grid}">
       <div
         v-for="qualification in paginatedQualifications"
         :key="qualification.id"
         class="column is-one-third-tablet"
         :class="{'is-one-fifth-desktop': grid, 'is-12-desktop': !grid}"
       >
-      <ul>
-        <li>{{ qualification }}</li>
-      </ul>
-        <!-- <nuxt-link :to="'/campaigns/'+campaign.id" class="box p-4" :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}">
+        <nuxt-link :to="`/qualifications/${qualification.id}`" class="box p-4" :class="{'is-disabled': qualification.info === null}">
           <div class="columns is-vcentered is-multiline">
             <div
               class="column is-12-touch"
               :class="{'is-1-desktop': !grid, 'is-12-desktop': grid}"
             >
               <p class="image has-radius is-vcentered has-background-image">
-                <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
-                <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" class :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
-                <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="campaign title">
+                <img v-if="qualification.info && qualification.info.image" :src="qualification.info.image">
+                <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name">
               </p>
             </div>
             <div class="column" :class="{'is-12': grid, 'is-4-desktop is-4-widescreen is-12-touch': !grid}">
               <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                <div>
-                  <nuxt-link
-                    v-if="campaign.info && campaign.info.category"
-                    :to="'/?category=' + campaign.info.category"
-                    class="tag is-light mb-2 has-border is-capitalized"
-                    :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
-                  >
-                    {{ campaign.info.category }}
-                  </nuxt-link>
-                  <span v-else-if="campaign.info !== null" class="tag is-light mb-2">
-                    <span class="loading-text">Loading</span>
-                  </span>
-                </div>
-
-                <span v-if="campaign.info">
-                  <span v-if="campaign.info.title">{{ campaign.info.title }}</span>
+                <span v-if="qualification.info">
+                  <span v-if="qualification.info.name">{{ qualification.info.name }}</span>
                   <i v-else>- Untitled -</i>
                 </span>
-                <span v-else-if="campaign.info !== null" class="loading-text">Loading</span>
-                <span v-else class="has-text-danger-dark">Could not load campaign info</span>
+                <span v-else-if="qualification.info !== null" class="loading-text">Loading</span>
+                <span v-else class="has-text-danger-dark">Could not load qualification info</span>
               </h2>
               <div class="has-text-grey is-size-7">
-                <div v-if="campaign.info">
-                  <div v-if="campaign.info.description" class="is-ellipsis">
-                    {{ campaign.info.description }}
+                <div v-if="qualification.info">
+                  <div v-if="qualification.info.description" class="is-ellipsis">
+                    {{ qualification.info.description }}
                   </div>
                   <i v-else>- no description -</i>
                 </div>
-                <div v-else-if="campaign.info !== null">
+                <div v-else-if="qualification.info !== null">
                   ........
                 </div>
               </div>
@@ -72,39 +110,25 @@
                 Requester:
               </p>
               <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                  <span class="is-ellipsis">{{ campaign.owner[1] }}</span>
+                <nuxt-link :to="'/profile/' + qualification.account_id">
+                  <span class="is-ellipsis">{{ qualification.account_id }}</span>
                 </nuxt-link>
               </h2>
             </div>
-            <div class="column">
-              <p class="has-text-grey is-size-7">
-                Reward:
-              </p>
-              <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                {{ campaign.reward.quantity }}
-              </h2>
-            </div>
-            <div v-if="campaign.num_tasks || campaign.tasks_done" class="column">
-              <p class="has-text-grey is-size-7">
-                Tasks:
-              </p>
-              <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                <span>
-                  {{ campaign.num_tasks - campaign.tasks_done }}/{{ campaign.num_tasks }} left
-                </span>
-              </h2>
-            </div>
             <div class="column has-text-right" :class="{'is-12': grid}">
-              <button class="button is-primary has-text-weight-semibold is-fullwidth" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null,'is-wide': !grid}">
-                <span v-if="campaign.userHasReservation">Go to Task</span>
-                <span v-else>View</span>
+              <button
+              class="button is-primary has-text-weight-semibold is-fullwidth"
+              :disabled="!qualification || qualification.info === null"
+              :class="{'is-loading': typeof qualification.info === 'undefined', 'is-accent': qualification.info === null, 'is-outlined': qualification.info === null,'is-wide': !grid}"
+            >
+                <span>View</span>
               </button>
             </div>
           </div>
-        </nuxt-link> -->
+        </nuxt-link>
       </div>
-    </div>
+    </div> -->
+
     <pagination
       v-if="qualifications"
       class="mt-2"
@@ -113,13 +137,13 @@
       :per-page="perPage"
       @setPage="setPage"
     />
-    <div v-if="allQualificationsLoaded" class="subtitle loading-text">
+    <div v-if="!allQualificationsLoaded" class="subtitle loading-text">
       Campaigns loading
     </div>
     <div v-else-if="qualifications && !qualifications.length" class="subtitle">
       No tasks
     </div>
-    <div v-else-if="!qualifcations" class="subtitle has-text-danger">
+    <div v-else-if="!qualifications" class="subtitle has-text-danger">
       Could not retrieve qualifcations
     </div>
   </div>
@@ -139,8 +163,7 @@ export default {
     return {
       page: this.$route.query.page || 1,
       perPage: 30,
-      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
-      categories: ['translate', 'captions', 'socials', 'dao']
+      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode
     }
   },
   computed: {
