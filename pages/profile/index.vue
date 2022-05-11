@@ -161,7 +161,7 @@
               <span class="icon">
                 +
               </span>
-              <span>Create Qualifier</span>
+              <span>Create Qualification</span>
             </nuxt-link>
           </div>
         </div>

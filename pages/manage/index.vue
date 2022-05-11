@@ -30,14 +30,14 @@
 
         <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
           <h2 class="title is-4">
-            Qualifiers
+            Qualifications
           </h2>
           <div class="is-pulled-right no-float-mobile has-margin-bottom-mobile">
             <nuxt-link class="button is-primary" to="/qualifications/new">
               <span class="icon">
                 +
               </span>
-              <span>Create Qualifier</span>
+              <span>Create Qualification</span>
             </nuxt-link>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default {
     this.getQualifications()
   },
   mounted () {
-    console.log('mounted')
+    // console.log('mounted')
     this.$store.dispatch('qualification/getQualifications')
     this.$store.dispatch('campaign/getCampaigns')
   },
