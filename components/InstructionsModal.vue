@@ -1,5 +1,5 @@
 <template>
-  <div v-if="campaign && info" class="modal" :class="{'is-active': showModal}" :style="{position: !functional ? 'relative' : 'fixed', padding: !functional ? '10px' : 'initial', zIndex: !functional ? '1' : '40'}">
+  <div v-if="info" class="modal" :class="{'is-active': showModal}" :style="{position: !functional ? 'relative' : 'fixed', padding: !functional ? '10px' : 'initial', zIndex: !functional ? '1' : '40'}">
     <div class="modal-background" />
     <div class="modal-card">
       <header class="modal-card-head">
@@ -9,7 +9,7 @@
         <button class="delete" aria-label="close" :disabled="!functional" @click.prevent="onCancel()" />
       </header>
       <section class="modal-card-body">
-        <div v-if="campaign && info" class="content" v-html="sanitizeHtmlCustom($md.render(info.instructions))" />
+        <div v-if="info" class="content" v-html="sanitizeHtmlCustom($md.render(info.instructions))" />
         <p v-else>
           ...
         </p>
@@ -24,7 +24,7 @@
           OK
         </button>
         <template v-else>
-          <button class="button is-primary has-tooltip has-tooltip-arrow" :data-tooltip="!tac ? 'agree to the terms and\nconditions to qualify' : 'No additional\nqualifications needed'" :disabled="!tac || !campaign || !info || !functional" @click.prevent="onClick()">
+          <button class="button is-primary has-tooltip has-tooltip-arrow" :data-tooltip="!tac ? 'agree to the terms and\nconditions to qualify' : 'No additional\nqualifications needed'" :disabled="!tac || !info || !functional" @click.prevent="onClick()">
             Qualify
           </button>
           <button class="button" :disabled="!functional" @click.prevent="onCancel()">
@@ -41,11 +41,6 @@ import sanitizeHtml from 'sanitize-html'
 export default {
   name: 'InstructionsModal',
   props: {
-    campaign: {
-      type: Object,
-      required: true,
-      default () { return {} }
-    },
     info: {
       type: Object,
       required: true,

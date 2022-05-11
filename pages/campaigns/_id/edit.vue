@@ -125,37 +125,39 @@
             </div>
           </div>
 
-        <div class="field">
-          <label for="" class="label">
-            Time <strong>/</strong> Task
-            <span class="has-text-info">*</span>
-          </label>
-          <div class="field has-addons">
-            <div class="control">
-              <input v-model="campaignIpfs.estimated_time" class="input" type="number" placeholder="1" step="10">
-            </div>
-            <div class="control"><a href="" class="button is-primary">Seconds</a></div>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="" class="label">
-            EFX <strong>/</strong> Hour
-          </label>
           <div class="field">
-            <div v-if="campaignIpfs && campaignIpfs.estimated_time && campaignIpfs.reward">
-              <b>
-                <span>{{ parseFloat(estimatedEarnings.efxPerHour).toFixed(4) }} EFX</span>
-                <span>(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
-              </b>
-            </div>
-            <div v-else>
-              <b>
-                <span>...</span>
-              </b>
+            <label for="" class="label">
+              Time <strong>/</strong> Task
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="field has-addons">
+              <div class="control">
+                <input v-model="campaignIpfs.estimated_time" class="input" type="number" placeholder="1" step="10">
+              </div>
+              <div class="control">
+                <a href="" class="button is-primary">Seconds</a>
+              </div>
             </div>
           </div>
-        </div>
+
+          <div class="field">
+            <label for="" class="label">
+              EFX <strong>/</strong> Hour
+            </label>
+            <div class="field">
+              <div v-if="campaignIpfs && campaignIpfs.estimated_time && campaignIpfs.reward">
+                <b>
+                  <span>{{ parseFloat(estimatedEarnings.efxPerHour).toFixed(4) }} EFX</span>
+                  <span>(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
+                </b>
+              </div>
+              <div v-else>
+                <b>
+                  <span>...</span>
+                </b>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div v-show="formGroup === 'instructions'" class="block instructions-group">

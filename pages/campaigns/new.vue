@@ -104,7 +104,9 @@
               <div class="control">
                 <input v-model="campaignIpfs.estimated_time" class="input" type="number" placeholder="1" step="10">
               </div>
-              <div class="control"><a href="" class="button is-primary">Seconds</a></div>
+              <div class="control">
+                <a href="" class="button is-primary">Seconds</a>
+              </div>
             </div>
           </div>
           <div class="field">
@@ -134,7 +136,7 @@
                   Raw Markdown
                   <span class="has-text-info">*</span>
                 </label>
-                <div v-if="campaign && campaignIpfs" class="control">
+                <div v-if="campaignIpfs" class="control">
                   <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" required :configs="{promptURLs: true, spellChecker: false}" />
                 </div>
               </div>
@@ -143,7 +145,7 @@
               <div class="field">
                 <label class="label">Preview</label>
                 <div class="control">
-                  <instructions-modal v-if="campaign && campaignIpfs" :show="true" :functional="false" :campaign="campaign" :info="campaignIpfs" />
+                  <instructions-modal v-if="campaignIpfs" :show="true" :functional="false" :info="campaignIpfs" />
                 </div>
               </div>
             </div>
@@ -318,16 +320,13 @@ export default {
         description: '',
         instructions: '',
         // eslint-disable-next-line no-template-curly-in-string
-        template: '<h2>Placeholder example: ${placeholder} </h2>\n<input type="text" required placeholder="\'name\' attribute is required on input fields" name="test" /><input type="submit" />',
+        template: '',
         image: '',
         category: '',
         example_task: {},
         version: 1,
         reward: null,
         estimated_time: null
-      },
-      campaign: {
-        content_hash: null
       },
       formGroup: 'tasks',
       cachedFormData: null,
@@ -368,12 +367,6 @@ export default {
         newPlaceholders[placeholder] = this.campaignIpfs.example_task[placeholder] || ''
       })
       this.campaignIpfs.example_task = newPlaceholders
-    },
-    campaign: {
-      deep: true,
-      handler (campaign) {
-        window.localStorage.setItem('cached_campaign', JSON.stringify(campaign))
-      }
     },
     campaignIpfs: {
       deep: true,
@@ -474,11 +467,7 @@ export default {
     },
     cacheFormData () {
       // save this in the store instead?
-      const campaign = window.localStorage.getItem('cached_campaign')
       const campaignIpfs = window.localStorage.getItem('cached_campaignIpfs')
-      if (campaign) {
-        this.campaign = JSON.parse(campaign)
-      }
       if (campaignIpfs) {
         this.campaignIpfs = JSON.parse(campaignIpfs)
       }

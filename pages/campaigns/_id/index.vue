@@ -164,88 +164,88 @@
             </div>
 
             <div class="p-5">
-            <div class="columns ">
-              <div class="column is-half">
-                <div v-if="campaign.info" class="block">
-                  <nuxt-link
-                    v-if="campaign.info && campaign.info.category"
-                    :to="'/?category=' + campaign.info.category"
-                    class="tag is-light is-medium mb-5"
-                    :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
-                  >
-                    {{ campaign.info.category }}
-                  </nuxt-link>
-                  <span v-else class="tag is-info is-light is-medium">...</span>
-                </div>
-                <div class="block mb-6">
-                  Reward
-                  <br>
-                  <b><span>{{ campaign.reward.quantity }}</span></b>
-                  <br><br>
-                  Time <strong>/</strong> Task
-                  <br>
-                  <b>
-                    <span v-if="campaign.info && campaign.info.estimated_time">{{ campaign.info.estimated_time }} Seconds</span>
-                    <span v-else>...</span>
-                  </b>
-                  <br><br>
-                  EFX <strong>/</strong> Hour
-                  <br>
-                  <div v-if="campaign.info && campaign.info.estimated_time">
-                    <b>
-                      <span>{{ estimatedEarnings.efxPerHour }} EFX</span>
-                      <span>(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
-                    </b>
-                  </div>
-                  <div v-else>
-                    <b>
-                      <span>...</span>
-                    </b>
-                  </div>
-                </div>
-              </div>
-
-              <div class="column is-half">
-                <div class="block">
-                  Requester
-                  <br>
-                  <div class="blockchain-address">
-                    <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                      {{ campaign.owner[1] }}
+              <div class="columns ">
+                <div class="column is-half">
+                  <div v-if="campaign.info" class="block">
+                    <nuxt-link
+                      v-if="campaign.info && campaign.info.category"
+                      :to="'/?category=' + campaign.info.category"
+                      class="tag is-light is-medium mb-5"
+                      :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
+                    >
+                      {{ campaign.info.category }}
                     </nuxt-link>
+                    <span v-else class="tag is-info is-light is-medium">...</span>
                   </div>
-                </div>
-                <div class="block">
-                  IPFS
-                  <br>
-                  <div class="blockchain-address">
-                    <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
-                  </div>
-                </div>
-                <div class="block">
-                  Blockchain
-                  <br>
-                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
-                </div>
-                <div class="block">
-                  Tasks
-                  <br>
-                  <span v-if="activeBatchesByCampaignId(campaign.id) === null" class="loading-text">
-                    Loading
-                  </span>
-                  <span v-else>
-                    {{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
-                      return a + b.num_tasks
-                    },0) - activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
-                      return a + b.real_tasks_done
-                    },0) }}/{{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
-                      return a + b.num_tasks
-                    },0) }} left
+                  <div class="block mb-6">
+                    Reward
                     <br>
-                  </span>
+                    <b><span>{{ campaign.reward.quantity }}</span></b>
+                    <br><br>
+                    Time <strong>/</strong> Task
+                    <br>
+                    <b>
+                      <span v-if="campaign.info && campaign.info.estimated_time">{{ campaign.info.estimated_time }} Seconds</span>
+                      <span v-else>...</span>
+                    </b>
+                    <br><br>
+                    EFX <strong>/</strong> Hour
+                    <br>
+                    <div v-if="campaign.info && campaign.info.estimated_time">
+                      <b>
+                        <span>{{ estimatedEarnings.efxPerHour }} EFX</span>
+                        <span>(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
+                      </b>
+                    </div>
+                    <div v-else>
+                      <b>
+                        <span>...</span>
+                      </b>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column is-half">
+                  <div class="block">
+                    Requester
+                    <br>
+                    <div class="blockchain-address">
+                      <nuxt-link :to="'/profile/' + campaign.owner[1]">
+                        {{ campaign.owner[1] }}
+                      </nuxt-link>
+                    </div>
+                  </div>
+                  <div class="block">
+                    IPFS
+                    <br>
+                    <div class="blockchain-address">
+                      <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
+                    </div>
+                  </div>
+                  <div class="block">
+                    Blockchain
+                    <br>
+                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
+                  </div>
+                  <div class="block">
+                    Tasks
+                    <br>
+                    <span v-if="activeBatchesByCampaignId(campaign.id) === null" class="loading-text">
+                      Loading
+                    </span>
+                    <span v-else>
+                      {{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
+                        return a + b.num_tasks
+                      },0) - activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
+                        return a + b.real_tasks_done
+                      },0) }}/{{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
+                        return a + b.num_tasks
+                      },0) }} left
+                      <br>
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
               <div class="block is-vcentered ">
                 <div v-if="$auth.user.accountName === campaign.owner[1]">
@@ -279,9 +279,7 @@
                   </div>
                 </template>
               </div>
-
             </div>
-
           </div>
         </div>
       </div>
