@@ -2,7 +2,7 @@
   <section class="section">
     <div class="container">
       <h1 class="title mt-5">
-        Qualifications
+        All Qualifications
       </h1>
       <qualification-list class="mb-5" :qualifications="allQualifications" />
     </div>
@@ -10,11 +10,12 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import QualificationList from '~/components/QualificationList.vue'
 
 export default {
   components: { QualificationList },
+  middleware: ['auth'],
   data () {
     return {
       loading: null
@@ -23,8 +24,6 @@ export default {
   created () {
   },
   computed: {
-    ...mapGetters({
-    }),
     ...mapState({
       qualifications: state => state.qualification.qualifications
     }),
@@ -34,11 +33,6 @@ export default {
     }
   },
   methods: {
-    async getQualifications () {
-      if (!this.allQualificationsLoaded) {
-        await this.$store.dispatch('qualification/getQualifications')
-      }
-    }
   }
 }
 </script>
