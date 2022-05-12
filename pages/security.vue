@@ -6,7 +6,7 @@
           Hi there! Thanks for using Effect Network. It's important to read the
           following information before using the platform.
         </p>
-        <br/>
+        <br>
         <p class="subtitle">
           This is a <b>pre-release</b>. We're still working on ironing out the
           kinks and adding missing features. The smart contracts that are being
@@ -16,7 +16,7 @@
         <p class="subtitle">
           When completing tasks or depositing EFX the tokens are stored in your
           Effect vaccount contract. You should <b>only store small amounts of
-          funds</b> here. Frequently withdraw your contract balance to a safe
+            funds</b> here. Frequently withdraw your contract balance to a safe
           account.
         </p>
         <p class="subtitle">
@@ -28,7 +28,7 @@
           We're working hard to make Effect a safe and friendly environment to
           work in the crypto
           space. <a href="https://discord.gg/effectnetwork" target="_blank">Join our
-          Discord</a> and let us know what you think!
+            Discord</a> and let us know what you think!
         </p>
       </div>
     </div>

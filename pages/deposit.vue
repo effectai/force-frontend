@@ -29,7 +29,7 @@
         <ul>
           <li class="is-active">
             <a>
-              <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span>
+              <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS"></span>
               <span>EOS</span>
             </a>
           </li>
