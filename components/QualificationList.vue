@@ -13,7 +13,7 @@
 
     <div class="mb-6">
       <div class="table-container">
-        <table class="table is-narrow is-fullwidth" style="width: 100%;">
+        <table class="table" style="width: 100%;">
           <thead>
             <tr>
               <th></th>
@@ -27,20 +27,22 @@
             <tr v-for="qualification in paginatedQualifications" :key="qualification.id">
 
                 <th>
-                  <figure class="image is-64x64 has-radius is-vcentered">
+                  <figure class="image is-32x32 has-radius is-vcentered">
                     <img v-if="qualification.info && qualification.info.image" :src="qualification.info.image">
                     <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name">
                   </figure>
                 </th>
                 <td>
-                  <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                    <span v-if="qualification.info">
-                      <span v-if="qualification.info.name">{{ qualification.info.name }}</span>
-                      <i v-else>- Untitled -</i>
-                    </span>
-                    <span v-else-if="qualification.info !== null" class="loading-text">Loading</span>
-                    <span v-else class="has-text-danger-dark">Could not load qualification info</span>
-                  </h2>
+                  <nuxt-link :to="`/qualifications/${qualification.id}`">
+                    <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                      <span v-if="qualification.info">
+                        <span v-if="qualification.info.name">{{ qualification.info.name }}</span>
+                        <i v-else>- Untitled -</i>
+                      </span>
+                      <span v-else-if="qualification.info !== null" class="loading-text">Loading</span>
+                      <span v-else class="has-text-danger-dark">Could not load qualification info</span>
+                    </h2>
+                  </nuxt-link>
                 </td>
                 <td>
                     <div v-if="qualification.info">
@@ -138,7 +140,7 @@
       @setPage="setPage"
     />
     <div v-if="!allQualificationsLoaded" class="subtitle loading-text">
-      Campaigns loading
+      Qualifications loading
     </div>
     <div v-else-if="qualifications && !qualifications.length" class="subtitle">
       No tasks
@@ -171,9 +173,7 @@ export default {
       qualificationById: 'qualifation/qualificationById'
     }),
     ...mapState({
-      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
-      getQualifications: state => state.qualification.getQualifications,
-      qualifications: state => state.qualification.qualifications
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
     }),
     list: {
       get () {
@@ -189,7 +189,7 @@ export default {
     paginatedQualifications () {
       const start = (this.page - 1) * this.perPage
       if (this.qualifications) {
-        const pageQualifications = this.qualifications.slice(start, start + this.perPage)
+        const pageQualifications = this.qualifications.filter(el => el.account_id === this.$auth.user.vAccountRows[0].id).slice(start, start + this.perPage)
         return pageQualifications
       }
       return []

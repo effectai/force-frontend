@@ -38,6 +38,9 @@ export default {
   getters: {
     qualificationById (state) {
       return id => state.qualifications ? state.qualifications.find(c => c.id === id) : null
+    },
+    qualificationByUser (state) {
+      return id => state.qualifications ? state.qualifications.filter(qual => qual.account_id === id) : null
     }
   },
   actions: {
