@@ -21,14 +21,11 @@ export default {
     }
   },
   created () {
-    // this.getQualifications()
   },
   computed: {
     ...mapGetters({
-      // What should be here? if anything the
     }),
     ...mapState({
-      // TODO are there any other info that I need to pull into this page?
       qualifications: state => state.qualification.qualifications
     }),
     allQualifications () {

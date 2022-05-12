@@ -106,10 +106,7 @@ export default {
       if (!this.qualifications) {
         return
       }
-      // .filter() this this list for elements that are controlled by this user.
-      const filteredQualifications = this.qualifications
-
-      return filteredQualifications
+      return this.qualifications.filter(el => el.account_id === this.$auth.user.vAccountRows[0].id)
     },
     transactions () {
       return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)
