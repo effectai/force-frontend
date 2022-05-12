@@ -17,8 +17,7 @@
           <thead>
             <tr>
               <th></th>
-              <th>Title</th>
-              <th>Description</th>
+              <th>Qualification</th>
               <th>Requester</th>
             </tr>
           </thead>
@@ -42,18 +41,22 @@
                       <span v-else-if="qualification.info !== null" class="loading-text">Loading</span>
                       <span v-else class="has-text-danger-dark">Could not load qualification info</span>
                     </h2>
-                  </nuxt-link>
-                </td>
-                <td>
                     <div v-if="qualification.info">
-                      <div v-if="qualification.info.description" class="is-ellipsis">
-                        {{ qualification.info.description.slice(0, 30) }}&hellip;
+                      <div v-if="qualification.info.description" class="is-ellipsis is-clipped">
+                        <div v-if="qualification.info.description.length > 50">
+                          <span>{{ qualification.info.description.slice(0, 50) }}</span>
+                          <span>&hellip;</span>
+                        </div>
+                        <div v-else>
+                          {{ qualification.info.description }}
+                        </div>
                       </div>
                       <i v-else>- no description -</i>
                     </div>
                     <div v-else-if="qualification.info !== null">
                       ........
                     </div>
+                  </nuxt-link>
                 </td>
                 <td>
                   <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
@@ -123,10 +126,9 @@ export default {
       return !this.list && this.gridToggle
     },
     paginatedQualifications () {
-      // const start = (this.page - 1) * this.perPage
+      const start = (this.page - 1) * this.perPage
       if (this.qualifications) {
-        // const pageQualifications = this.qualifications.filter(el => el.account_id === this.$auth.user.vAccountRows[0].id).slice(start, start + this.perPage)
-        return this.qualifications
+        return this.qualifications.slice(start, start + this.perPage)
       }
       return []
     }
