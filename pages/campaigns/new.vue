@@ -64,17 +64,14 @@
             <div class="select">
               <select v-model="campaignIpfs.category">
                 <option>---</option>
-                <option value="dao">
-                  Effect DAO
+                <option value="qualifier">
+                  Qualifier
                 </option>
-                <option value="translate">
-                  Effect Translate
+                <option value="annotations">
+                  Annotations
                 </option>
                 <option value="socials">
-                  Effect Socials
-                </option>
-                <option value="captions">
-                  Effect Captions
+                  Socials
                 </option>
               </select>
             </div>

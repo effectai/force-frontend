@@ -171,7 +171,7 @@
                       v-if="campaign.info && campaign.info.category"
                       :to="'/?category=' + campaign.info.category"
                       class="tag is-light is-medium mb-5"
-                      :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
+                      :class="['is-'+campaign.info.category]"
                     >
                       {{ campaign.info.category }}
                     </nuxt-link>
