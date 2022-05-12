@@ -1,92 +1,94 @@
 <template>
-<section class="section">
-  <div class="container">
-    <div v-if="loading" class="loader-wrapper is-active">
-      <img src="~/assets/img/loading.svg">
-      <br>
-      <span class="laoding-text">Waiting for the transaction to complete. </span>
-    </div>
-    <h1 class="title">New Qualification</h1>
-    <div v-if="errors.length">
-      <div v-for="error in errors" :key="toString(error)" class="notification is-danger is-light">
-        {{ error }}
+  <section class="section">
+    <div class="container">
+      <div v-if="loading" class="loader-wrapper is-active">
+        <img src="~/assets/img/loading.svg">
+        <br>
+        <span class="laoding-text">Waiting for the transaction to complete. </span>
       </div>
-    </div>
-    <form @submit.prevent="createQualification">
-      <div class="block basic-info-group">
-
-        <div class="field">
-          <label class="label">
-            Name
-            <span class="has-text-info">*</span>
-          </label>
-          <div class="control">
-            <input v-model="qualificationIpfs.name" type="text" class="input" placeholder="Public name for your qualification" required>
-          </div>
+      <h1 class="title">New Qualification</h1>
+      <div v-if="errors.length">
+        <div v-for="error in errors" :key="toString(error)" class="notification is-danger is-light">
+          {{ error }}
         </div>
-
-        <div class="field">
-          <label class="label">
-            Description
-            <span class="has-text-info">*</span>
-          </label>
-          <div class="control">
-            <vue-simplemde
-            v-model="qualificationIpfs.description"
-            :configs="{promptUrls: true, status: false, spellChecker: false, placeholder: 'Public description for your qualification'}" />
-            <!-- <textarea class="textarea" rows="5" placeholder="Qualification Description"></textarea> -->
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">
-            Image
-            <span class="has-text-info">*</span>
-          </label>
-          <div class="control">
-            <input v-model="qualificationIpfs.image" type="text" class="input" placeholder="Image Url" required>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">
-            Qualification Type
-            <span class="has-text-info">*</span>
-          </label>
-          <div class="select is-medium">
-            <select v-model="qualificationIpfs.type" class="select" required>
-              <option :value="selectNull" selected="selectType">{{ selectType }}</option>
-              <option value="0">Required</option>
-              <option value="1">Exclude</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="field is-grouped is-grouped-right">
-          <div class="control">
-            <nuxt-link class="button is-light" to="/">Cancel</nuxt-link>
-          </div>
-          <!-- TODO add disabled property when all input fields have not been filled in yet. -->
-          <div class="control">
-            <button class="button is-primary is-wide" type="submit" :class="{ 'is-loading' : loading }" >
-              Create Qualification
-            </button>
-          </div>
-        </div>
-
       </div>
-    </form>
-  </div>
-</section>
+      <form @submit.prevent="createQualification">
+        <div class="block basic-info-group">
 
+          <div class="field">
+            <label class="label">
+              Name
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="control">
+              <input v-model="qualificationIpfs.name" type="text" class="input" placeholder="Public name for your qualification" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">
+              Description
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="control">
+              <vue-simplemde
+                v-model="qualificationIpfs.description"
+                :configs="{promptUrls: true, status: false, spellChecker: false, placeholder: 'Public description for your qualification'}"
+              />
+              <!-- <textarea class="textarea" rows="5" placeholder="Qualification Description"></textarea> -->
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">
+              Image
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="control">
+              <input v-model="qualificationIpfs.image" type="text" class="input" placeholder="Image Url" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">
+              Qualification Type
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="select is-medium">
+              <select v-model="qualificationIpfs.type" class="select" required>
+                <option :value="selectNull" selected="selectType">{{ selectType }}</option>
+                <option value="0">Required</option>
+                <option value="1">Exclude</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field is-grouped is-grouped-right">
+            <div class="control">
+              <nuxt-link class="button is-light" to="/">Cancel</nuxt-link>
+            </div>
+            <!-- TODO add disabled property when all input fields have not been filled in yet. -->
+            <div class="control">
+              <button class="button is-primary is-wide" type="submit" :class="{ 'is-loading' : loading }">
+                Create Qualification
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
+    </div>
+  </section>
 </template>
 
 <script>
 import VueSimplemde from 'vue-simplemde'
+import SuccessModal from '~/components/SuccessModal.vue'
 
 export default {
   components: {
-    VueSimplemde
+    VueSimplemde,
+    SuccessModal
   },
 
   middleware: ['auth'],
@@ -142,15 +144,20 @@ export default {
       try {
         if (this.checkForm()) {
           this.loading = true
-          const quali = { ...this.qualificationIpfs }
-          const result = await this.$blockchain.createQualification(quali.name, quali.description, quali.type, quali.image)
+          const quali = {
+            ...this.qualificationIpfs
+          }
+          const result = await this.$blockchain.createQualification(quali.name, quali.description, quali.type, quali
+            .image)
           this.successTitle = 'Qualification created Succesfully.'
           this.successMessage = 'Waiting for transaction to complete before continuing'
 
           await this.$blockchain.waitForTransaction(result)
           this.$store.dispatch('transaction/addTransaction', result)
 
-          Object.keys(this.qualificationIpfs).forEach((key) => { this.qualificationIpfs[key] = null })
+          Object.keys(this.qualificationIpfs).forEach((key) => {
+            this.qualificationIpfs[key] = null
+          })
           this.loading = false
           this.submitted = true
           this.$router.push('/profile')
@@ -190,7 +197,10 @@ export default {
     },
 
     formDataForComparison () {
-      return JSON.stringify({ qualification: this.qualification, qualificationIpfs: this.qualificationIpfs })
+      return JSON.stringify({
+        qualification: this.qualification,
+        qualificationIpfs: this.qualificationIpfs
+      })
     },
 
     checkClose (event) {
@@ -207,9 +217,7 @@ export default {
         return false
       }
     }
-
   }
-
 }
 </script>
 
