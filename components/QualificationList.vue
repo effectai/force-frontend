@@ -67,70 +67,6 @@
         </table>
       </div>
     </div>
-
-    <!-- <div class="columns is-multiline" :class="{'grid': grid}">
-      <div
-        v-for="qualification in paginatedQualifications"
-        :key="qualification.id"
-        class="column is-one-third-tablet"
-        :class="{'is-one-fifth-desktop': grid, 'is-12-desktop': !grid}"
-      >
-        <nuxt-link :to="`/qualifications/${qualification.id}`" class="box p-4" :class="{'is-disabled': qualification.info === null}">
-          <div class="columns is-vcentered is-multiline">
-            <div
-              class="column is-12-touch"
-              :class="{'is-1-desktop': !grid, 'is-12-desktop': grid}"
-            >
-              <p class="image has-radius is-vcentered has-background-image">
-                <img v-if="qualification.info && qualification.info.image" :src="qualification.info.image">
-                <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name">
-              </p>
-            </div>
-            <div class="column" :class="{'is-12': grid, 'is-4-desktop is-4-widescreen is-12-touch': !grid}">
-              <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                <span v-if="qualification.info">
-                  <span v-if="qualification.info.name">{{ qualification.info.name }}</span>
-                  <i v-else>- Untitled -</i>
-                </span>
-                <span v-else-if="qualification.info !== null" class="loading-text">Loading</span>
-                <span v-else class="has-text-danger-dark">Could not load qualification info</span>
-              </h2>
-              <div class="has-text-grey is-size-7">
-                <div v-if="qualification.info">
-                  <div v-if="qualification.info.description" class="is-ellipsis">
-                    {{ qualification.info.description }}
-                  </div>
-                  <i v-else>- no description -</i>
-                </div>
-                <div v-else-if="qualification.info !== null">
-                  ........
-                </div>
-              </div>
-            </div>
-            <div class="column is-12" :class="{'is-2-desktop': !grid}">
-              <p class="has-text-grey is-size-7">
-                Requester:
-              </p>
-              <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                <nuxt-link :to="'/profile/' + qualification.account_id">
-                  <span class="is-ellipsis">{{ qualification.account_id }}</span>
-                </nuxt-link>
-              </h2>
-            </div>
-            <div class="column has-text-right" :class="{'is-12': grid}">
-              <button
-              class="button is-primary has-text-weight-semibold is-fullwidth"
-              :disabled="!qualification || qualification.info === null"
-              :class="{'is-loading': typeof qualification.info === 'undefined', 'is-accent': qualification.info === null, 'is-outlined': qualification.info === null,'is-wide': !grid}"
-            >
-                <span>View</span>
-              </button>
-            </div>
-          </div>
-        </nuxt-link>
-      </div>
-    </div> -->
-
     <pagination
       v-if="qualifications"
       class="mt-2"
@@ -160,7 +96,7 @@ export default {
   components: {
     Pagination
   },
-  props: ['gridToggle', 'qualifcations'],
+  props: ['gridToggle', 'qualifications'],
   data () {
     return {
       page: this.$route.query.page || 1,
@@ -170,7 +106,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      qualificationById: 'qualifation/qualificationById'
+      qualificationById: 'qualification/qualificationById'
     }),
     ...mapState({
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
@@ -187,10 +123,10 @@ export default {
       return !this.list && this.gridToggle
     },
     paginatedQualifications () {
-      const start = (this.page - 1) * this.perPage
+      // const start = (this.page - 1) * this.perPage
       if (this.qualifications) {
-        const pageQualifications = this.qualifications.filter(el => el.account_id === this.$auth.user.vAccountRows[0].id).slice(start, start + this.perPage)
-        return pageQualifications
+        // const pageQualifications = this.qualifications.filter(el => el.account_id === this.$auth.user.vAccountRows[0].id).slice(start, start + this.perPage)
+        return this.qualifications
       }
       return []
     }
