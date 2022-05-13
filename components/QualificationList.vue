@@ -25,7 +25,7 @@
           <tbody>
             <tr v-for="qualification in paginatedQualifications" :key="qualification.id">
 
-                <th>
+                <th style="width: 5%;">
                   <figure class="image is-32x32 has-radius is-vcentered">
                     <img v-if="qualification.info && qualification.info.image" :src="qualification.info.image">
                     <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name">
@@ -58,10 +58,10 @@
                     </div>
                   </nuxt-link>
                 </td>
-                <td>
+                <td style="width: 5%;">
                   <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
                     <nuxt-link :to="'/profile/' + qualification.account_id">
-                      <span class="is-ellipsis">{{ qualification.account_id }}</span>
+                      <span class="is-ellipsis is-clipped">{{ qualification.account_id }}</span>
                     </nuxt-link>
                   </h2>
                 </td>
