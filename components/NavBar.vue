@@ -88,12 +88,14 @@
                         View Profile
                       </nuxt-link>
                     </li>
-                    <!-- <li>
-                      <span class="icon">
-                        <img src="~assets/img/icons/settings.svg" style="height: 22px">
-                      </span>
-                      Settings
-                    </li> -->
+                    <li>
+                      <nuxt-link to="/manage">
+                        <span class="icon">
+                          <img src="~assets/img/icons/settings.svg" style="height: 22px">
+                        </span>
+                        Manage
+                      </nuxt-link>
+                    </li>
                     <li class="logout" @click="logout">
                       <span class="icon">
                         <img src="~assets/img/icons/logout.svg" style="height: 22px">
