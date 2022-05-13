@@ -51,7 +51,7 @@
 
           <div class="field is-grouped is-grouped-right">
             <div class="control">
-              <nuxt-link class="button is-light" to="/">Cancel</nuxt-link>
+              <nuxt-link class="button is-light" to="/manage">Cancel</nuxt-link>
             </div>
             <!-- TODO add disabled property when all input fields have not been filled in yet. -->
             <div class="control">
@@ -127,6 +127,7 @@ export default {
     async createQualification () {
       // TODO redirect to created qualification when succesfull
       // let createdQualification
+      console.log('trying create quali')
       try {
         if (this.checkFormReady()) {
           this.loading = true
@@ -146,7 +147,7 @@ export default {
           })
           this.loading = false
           this.submitted = true
-          this.$router.push('/profile')
+          this.$router.push('/manage')
         }
       } catch (error) {
         console.error(error)
@@ -157,7 +158,7 @@ export default {
 
     checkFormReady () {
       this.error = []
-      if (this.qualificationIpfs.name === true) {
+      if (this.qualificationIpfs.name != null) {
         return true
       } else {
         // TODO make sure that qualification type = "" is checked

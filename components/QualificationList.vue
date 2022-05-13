@@ -82,7 +82,7 @@
       Qualifications loading
     </div>
     <div v-else-if="qualifications && !qualifications.length" class="subtitle">
-      No tasks
+      No qualifications
     </div>
     <div v-else-if="!qualifications" class="subtitle has-text-danger">
       Could not retrieve qualifcations

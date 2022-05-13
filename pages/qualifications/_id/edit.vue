@@ -5,7 +5,7 @@
     <nav class="breadcrumb" aria-label="breadcrumbs">
     <ul>
         <li>
-          <nuxt-link to="/qualifications">
+          <nuxt-link to="/manage">
             All Qualifications
           </nuxt-link>
         </li>
