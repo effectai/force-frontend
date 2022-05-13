@@ -39,18 +39,18 @@
             </p>
             <div class="title has-text-weight-bold">
               <span>#{{ id }}</span>
-              <span v-if="singleQualification.info">{{ singleQualification.info.name }}</span>
-              <span v-else-if="singleQualification.info !== null" class="loading-text">Loading</span>
+              <span v-if="singleQualification.info.name">{{ singleQualification.info.name }}</span>
+              <span v-else-if="singleQualification.info.name == null" class="loading-text">Loading</span>
+              <span v-else-if="singleQualification.info.name.length == 0">Untitled</span>
               <span v-else class="has-text-danger-dark">Could not load singleQualification info</span>
             </div>
           </div>
 
           <div class="block">
-            <p v-if="singleQualification.info">
-              {{ singleQualification.info.description }}
+            <p v-if="singleQualification.info.description" class="content" v-html="$md.render(singleQualification.info.description)">
             </p>
             <p v-else>
-              ...
+              - No description -
             </p>
           </div>
         </div>
