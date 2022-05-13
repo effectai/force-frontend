@@ -7,39 +7,66 @@
           Manage | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
         </h1>
 
-        <hr>
-
-        <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
-          <h2 class="title is-4">
-            Tasks
-          </h2>
-          <div class="is-pulled-right no-float-mobile has-margin-bottom-mobile">
-            <nuxt-link class="button is-primary" to="/campaigns/templates">
-              <span class="icon">
-                +
-              </span>
-              <span>Create Task</span>
-            </nuxt-link>
-          </div>
+        <div class="tabs is-centered is-large">
+          <ul>
+            <li
+              :class="[activeSection === 'task' ? 'is-active' : '']"
+              @click.prevent="toggleSection('task')"
+            >
+              <a>
+                <!-- <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span> -->
+                <span>Tasks</span>
+              </a>
+            </li>
+            <li>|</li>
+            <li
+              :class="[activeSection === 'qualification' ? 'is-active' : ''] "
+              @click.prevent="toggleSection('qualification')"
+            >
+              <a>
+                <span>Qualifications</span>
+                <!-- <span class="icon is-large"><img src="@/assets/img/providers/BSC-logo.svg" alt="BSC" /></span> -->
+              </a>
+            </li>
+          </ul>
         </div>
 
-        <campaign-list class="mb-5" :campaigns="myCampaigns" />
-
-        <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
-          <h2 class="title is-4">
-            Qualifications
-          </h2>
-          <div class="is-pulled-right no-float-mobile has-margin-bottom-mobile">
-            <nuxt-link class="button is-primary" to="/qualifications/new">
-              <span class="icon">
-                +
-              </span>
-              <span>Create Qualification</span>
-            </nuxt-link>
+        <div v-if="activeSection === 'task'">
+          <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
+            <h2 class="title is-4">
+              Tasks
+            </h2>
+            <div class="is-pulled-right no-float-mobile has-margin-bottom-mobile">
+              <nuxt-link class="button is-primary" to="/campaigns/templates">
+                <span class="icon">
+                  +
+                </span>
+                <span>Create Task</span>
+              </nuxt-link>
+            </div>
           </div>
+
+          <campaign-list class="mb-5" :campaigns="myCampaigns" />
         </div>
 
-        <qualification-list class="mb-5" :qualifications="myQualifications" />
+        <div v-else-if="activeSection === 'qualification'">
+          <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
+            <h2 class="title is-4">
+              Qualifications
+            </h2>
+            <div class="is-pulled-right no-float-mobile has-margin-bottom-mobile">
+              <nuxt-link class="button is-primary" to="/qualifications/new">
+                <span class="icon">
+                  +
+                </span>
+                <span>Create Qualification</span>
+              </nuxt-link>
+            </div>
+          </div>
+
+          <qualification-list class="mb-5" :qualifications="myQualifications" />
+        </div>
+
       </div>
       <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
     </div>
@@ -67,7 +94,8 @@ export default {
       pendingPayouts: [],
       showPayoutDetails: false,
       successMessage: null,
-      successTitle: null
+      successTitle: null,
+      activeSection: 'task' // 'qualification'
     }
   },
   computed: {
@@ -129,6 +157,9 @@ export default {
       if (!this.allQualificationsLoaded) {
         await this.$store.dispatch('qualification/getQualifications')
       }
+    },
+    toggleSection (activateSection) {
+      this.activeSection = activateSection
     },
     async logout () {
       await this.$auth.logout()
