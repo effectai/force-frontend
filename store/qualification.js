@@ -36,7 +36,7 @@ export default {
     }
   },
   getters: {
-    qualifcationById (state) {
+    qualificationById (state) {
       return id => state.qualifications ? state.qualifications.find(c => c.id === id) : null
     }
   },
@@ -99,7 +99,7 @@ export default {
         commit('SET_LOADING', false)
       }
     },
-    async proceccQualification ({ commit, rootGetters, dispatch }, qualification) {
+    async processQualification ({ commit, rootGetters, dispatch }, qualification) {
       try {
         // field_0 represents the content type where:
         // 0: IPFS

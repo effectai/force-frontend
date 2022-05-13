@@ -308,7 +308,7 @@
 
 <script>
 import _ from 'lodash'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import VueSimplemde from 'vue-simplemde'
 import { Template } from '@effectai/effect-js'
 import Multiselect from 'vue-multiselect'
@@ -393,6 +393,9 @@ export default {
     ...mapState({
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
     }),
+    ...mapGetters({
+      qualificationById: 'qualification/qualificationById'
+    }),
     // Compares live campaign info to stored campaign info
     hasChanged () {
       return this.campaign && !_.isEqual(this.campaignIpfs, this.campaign.info)
@@ -408,6 +411,16 @@ export default {
       }
     },
     qualificationsDropdownData () {
+      for (const quali of this.campaign.qualis) {
+        const q = this.qualificationById(quali.key)
+        if (quali.value === 1) {
+          if (this.exclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
+            this.addExclusiveQuali(q.info.name, quali.key)
+          }
+        } else if (this.inclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
+          this.addInclusiveQuali(q.info.name, quali.key)
+        }
+      }
       const qualifications = []
       for (const qualification of this.$store.state.qualification.qualifications) {
         if (qualification.info.name) {
