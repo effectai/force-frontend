@@ -28,7 +28,7 @@
           <div class="field">
             <label class="label">
               Description
-              <span class="has-text-info">*</span>
+              <span class="has-text-info"></span>
             </label>
             <div class="control">
               <vue-simplemde
@@ -42,24 +42,10 @@
           <div class="field">
             <label class="label">
               Image
-              <span class="has-text-info">*</span>
+              <span class="has-text-info"></span>
             </label>
             <div class="control">
-              <input v-model="qualificationIpfs.image" type="text" class="input" placeholder="Image Url" required>
-            </div>
-          </div>
-
-          <div class="field">
-            <label class="label">
-              Qualification Type
-              <span class="has-text-info">*</span>
-            </label>
-            <div class="select is-medium">
-              <select v-model="qualificationIpfs.type" class="select" required>
-                <option :value="selectNull" selected="selectType">{{ selectType }}</option>
-                <option value="0">Required</option>
-                <option value="1">Exclude</option>
-              </select>
+              <input v-model="qualificationIpfs.image" type="text" class="input" placeholder="Image Url" >
             </div>
           </div>
 
@@ -142,7 +128,7 @@ export default {
       // TODO redirect to created qualification when succesfull
       // let createdQualification
       try {
-        if (this.checkForm()) {
+        if (this.checkFormReady()) {
           this.loading = true
           const quali = {
             ...this.qualificationIpfs
@@ -169,14 +155,13 @@ export default {
       }
     },
 
-    checkForm () {
+    checkFormReady () {
       this.error = []
-      const keys = Object.keys(this.qualificationIpfs)
-      if (keys.every((val, indx) => val !== null)) {
+      if (this.qualificationIpfs.name === true) {
         return true
       } else {
         // TODO make sure that qualification type = "" is checked
-        this.error = keys.map((val, indx) => `${val} is required.`)
+        this.error.push('Name for qualification is required.')
         return false
       }
     },

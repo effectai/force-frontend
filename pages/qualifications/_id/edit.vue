@@ -14,11 +14,6 @@
           Qualification {{ id }}
           </nuxt-link>
         </li>
-        <li class="is-active">
-          <nuxt-link to="#">
-            Edit
-          </nuxt-link>
-        </li>
       </ul>
     </nav>
     <div v-if="qualificationLoading" class="loading-text">
@@ -46,7 +41,7 @@
         <div class="field">
           <label class="label">
             Description
-            <span class="has-text-info">*</span>
+            <span class="has-text-info"></span>
           </label>
           <div class="control">
             <vue-simplemde
@@ -59,24 +54,10 @@
         <div class="field">
           <label class="label">
             Image
-            <span class="has-text-info">*</span>
+            <span class="has-text-info"></span>
           </label>
           <div class="control">
-            <input v-model="qualificationIpfs.image" type="text" class="input" placeholder="Image Url" required>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">
-            Qualification Type
-            <span class="has-text-info">*</span>
-          </label>
-          <div class="select is-medium">
-            <select v-model="qualificationIpfs.type" class="select" required>
-              <option :value="selectNull" selected="selectType">{{ selectType }}</option>
-              <option value="0">Required</option>
-              <option value="1">Exclude</option>
-            </select>
+            <input v-model="qualificationIpfs.image" type="text" class="input" placeholder="Image Url">
           </div>
         </div>
 
@@ -99,7 +80,9 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import VueSimplemde from 'vue-simplemde'
+import { mapState } from 'vuex'
 import SuccessModal from '~/components/SuccessModal.vue'
 
 export default {
@@ -110,13 +93,98 @@ export default {
   middleware: ['auth'],
   data () {
     return {
+      loading: false,
       qualificationLoading: false,
       qualification: null,
       successMessage: null,
-      successTitle: null
+      successTitle: null,
+      error: null,
+      id: parseInt(this.$route.params.id),
+      selectNull: null,
+      selectType: 'Choose Type',
+      qualificationIpfs: {
+        name: null,
+        description: null,
+        image: null,
+        type: null
+      }
+    }
+  },
+  computed: {
+    ...mapState({
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
+      qualifications: state => state.qualification.qualifications
+    }),
+    allQualifications () {
+      if (!this.qualifications) { return }
+      return this.qualifications
+    },
+    hasChanged () {
+      return this.qualification && !_.isEqual(this.qualification, this.qualificationIpfs)
+    }
+  },
+  created () {
+    this.getQualifications()
+    // this.qualification = this.qualifications[this.id]
+    console.log(this.qualification)
+  },
 
+  beforeDestroy () {
+    window.removeEventListener('beforeunload', this.checkClose)
+  },
+
+  methods: {
+    async getQualifications () {
+      if (!this.allQualificationsLoaded) {
+        await this.$store.dispatch('qualification/getQualifications')
+      }
+    },
+    async editQualification () {
+      // this.loading = true
+      // try {
+      //   // const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
+      //   // const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward, qualis)
+
+      //   // Wait for transaction and reload campaigns
+      //   this.successTitle = 'Campaign submitted successfully!'
+      //   this.successMessage = 'Waiting for transaction to complete before continuing'
+      //   await this.$blockchain.waitForTransaction(result)
+      //   await this.$store.dispatch('campaign/getCampaign', this.id)
+
+      //   this.$store.dispatch('transaction/addTransaction', result)
+      //   this.success = true
+      //   this.loading = false
+      //   this.submitted = true
+      //   this.$router.push('/campaigns/' + this.id)
+      // } catch (error) {
+      //   this.loading = false
+      //   this.errors.push(error)
+      // }
+    },
+    checkForm () {
+      this.error = []
+      if (this.qualificationIpfs.name != null) {
+        return true
+      } else {
+        // TODO make sure that qualification type = "" is checked
+        this.error.push('Name is required.')
+        return false
+      }
+    },
+    checkClose (event) {
+      if (this.hasChanged && !this.loading && !this.success) {
+        const warningMessage = 'You have unsaved changes. Are you sure you wish to leave?'
+        if (!confirm(warningMessage)) {
+          event.preventDefault()
+          event.returnValue = warningMessage
+          return false
+        }
+        return true
+      }
+      return true
     }
   }
+
 }
 </script>
 

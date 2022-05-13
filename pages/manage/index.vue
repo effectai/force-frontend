@@ -6,9 +6,6 @@
           <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->
           Manage | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
         </h1>
-        <p>
-          Manage your tasks and qualifications.
-        </p>
 
         <hr>
 
