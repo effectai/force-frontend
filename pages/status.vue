@@ -13,7 +13,8 @@
               :href="`${$blockchain.sdk.config.eosRelayerUrl}/status`"
               target="_blank"
               rel="noopener
-              noreferrer">
+              noreferrer"
+            >
               {{ relayerOk ? 'Up' : 'Down' }}
             </a>
           </span>
@@ -24,26 +25,25 @@
 
       <div class="block mx-auto is-half-desktop">
         <ul>
+          <li>
+            <div class="subtitle mx-auto has-text-centered">
+              <a class="button is-info" href="https://eospowerup.io/auto" target="_blank" rel="noopener noreferrer">
+                Power Up Relayer
+              </a>
 
-        <li>
-          <div class="subtitle mx-auto has-text-centered">
-            <a class="button is-info" href="https://eospowerup.io/auto" target="_blank" rel="noopener noreferrer">
-              Power Up Relayer
-            </a>
+              <br>
+              <br>
 
-            <br>
-            <br>
+              <span>Relayer Contract:</span>
+              <a
+                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.eosRelayerAccount}`"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{ $blockchain.sdk.force.config.eosRelayerAccount }}
+              </a>
 
-            <span>Relayer Contract:</span>
-            <a
-              :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.eosRelayerAccount}`"
-              target="_blank"
-              rel="noopener noreferrer">
-              {{ $blockchain.sdk.force.config.eosRelayerAccount }}
-            </a>
-
-            <br>
-
+              <br>
             </div>
           </li>
 
@@ -55,28 +55,27 @@
               <br>
               {{ relayerRamUsage }} / {{ relayerRamQuota }}
             </div>
-            <progress class="progress is-warning" name="progress" :value="relayerRamUsage" :max="relayerRamQuota"></progress>
+            <progress class="progress is-warning" name="progress" :value="relayerRamUsage" :max="relayerRamQuota" />
           </li>
           <br>
           <li>
-          <div class="has-text-centered">
-            NET: <strong>{{ percentageNet }}% Used</strong>
-            <br>
-            {{ relayerNetUsage }} / {{ relayerNetQuota }}
-          </div>
-          <progress class="progress is-warning" :value="relayerNetUsage" :max="relayerNetQuota"></progress>
+            <div class="has-text-centered">
+              NET: <strong>{{ percentageNet }}% Used</strong>
+              <br>
+              {{ relayerNetUsage }} / {{ relayerNetQuota }}
+            </div>
+            <progress class="progress is-warning" :value="relayerNetUsage" :max="relayerNetQuota" />
           </li>
 
           <br>
           <li>
-          <div class="has-text-centered">
-            CPU: <strong>{{ percentageCpu }}% Used</strong>
-            <br>
-            {{ relayerCpuUsage }} / {{ relayerCpuQuota }}
-          </div>
-          <progress class="progress is-warning" :value="relayerCpuUsage" :max="relayerCpuQuota"></progress>
+            <div class="has-text-centered">
+              CPU: <strong>{{ percentageCpu }}% Used</strong>
+              <br>
+              {{ relayerCpuUsage }} / {{ relayerCpuQuota }}
+            </div>
+            <progress class="progress is-warning" :value="relayerCpuUsage" :max="relayerCpuQuota" />
           </li>
-
         </ul>
       </div>
 
@@ -114,7 +113,6 @@
       </div>
     </div>
   </section>
-
 </template>
 
 <script>
@@ -123,7 +121,7 @@ const defaultConfig = defaultConfiguration(process.env.NUXT_ENV_SDK_ENV)
 delete defaultConfig.web3
 
 export default {
-  name: 'statusPage',
+  name: 'StatusPage',
   data () {
     return {
       config: defaultConfig,
@@ -145,27 +143,6 @@ export default {
         // rmcampaign: { net: 0, cpu: 0 },
       }
     }
-  },
-  created () {
-    this.pingRelayer()
-  },
-  methods: {
-
-    async pingRelayer () {
-      const response = await fetch(`${this.$blockchain.sdk.config.eosRelayerUrl}/info`, { mode: 'cors' }).catch(console.error)
-      this.relayerOk = response.ok
-    },
-
-    /**
-     * Return the estimated amount of times a give action can be taken before resources for the relayer run out.
-     * @param tx txObject that represent an Action such as reserveTask.
-     */
-    txEstimate (tx) {
-      const cpuEstimate = (this.relayerCpuQuota - this.relayerCpuUsage) / tx.cpu
-      const netEstimate = (this.relayerNetQuota - this.relayerNetUsage) / tx.net
-      return Math.min(cpuEstimate, netEstimate).toFixed(0)
-    }
-
   },
 
   computed: {
@@ -212,6 +189,27 @@ export default {
 
     percentageCpu () {
       return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.cpu_limit.used / this.$blockchain.relayerStatus.cpu_limit.max * 100, 10) : 0
+    }
+
+  },
+  created () {
+    this.pingRelayer()
+  },
+  methods: {
+
+    async pingRelayer () {
+      const response = await fetch(`${this.$blockchain.sdk.config.eosRelayerUrl}/info`, { mode: 'cors' }).catch(console.error)
+      this.relayerOk = response.ok
+    },
+
+    /**
+     * Return the estimated amount of times a give action can be taken before resources for the relayer run out.
+     * @param tx txObject that represent an Action such as reserveTask.
+     */
+    txEstimate (tx) {
+      const cpuEstimate = (this.relayerCpuQuota - this.relayerCpuUsage) / tx.cpu
+      const netEstimate = (this.relayerNetQuota - this.relayerNetUsage) / tx.net
+      return Math.min(cpuEstimate, netEstimate).toFixed(0)
     }
 
   }
