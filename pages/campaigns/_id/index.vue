@@ -247,6 +247,28 @@
                 </div>
               </div>
 
+              <div class="block is-vcentered">
+                <div class="is-size-4 has-text-centered">
+                  Qualifications
+                </div>
+                <div v-if="allQualificationsLoaded">
+                  <ul>
+                    Required:
+                    <li v-for="quali in inclusiveQualis" :key="quali.code">
+                      <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
+                    </li>
+                    <br>
+                    Exclude:
+                    <li v-for="quali in exclusiveQualis" :key="quali.code">
+                      <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
+                    </li>
+
+                  </ul>
+                </div>
+                <div v-else class="loading-text has-text-centered">Loading</div>
+                <br>
+              </div>
+
               <div class="block is-vcentered ">
                 <div v-if="$auth.user.accountName === campaign.owner[1]">
                   <nuxt-link :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
@@ -321,17 +343,21 @@ export default {
       showBatchesPopup: false,
       waitingOnTransaction: false,
       categories: ['translate', 'captions', 'socials', 'dao'],
-      successMessage: null
+      successMessage: null,
+      inclusiveQualis: [],
+      exclusiveQualis: []
     }
   },
   computed: {
     ...mapGetters({
       batchesByCampaignId: 'campaign/batchesByCampaignId',
-      activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId'
+      activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId',
+      qualificationById: 'qualification/qualificationById'
     }),
     ...mapState({
       campaigns: state => state.campaign.campaigns,
-      batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded
+      batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded,
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
     }),
     campaignBatches () {
       return this.batchesByCampaignId(this.id)
@@ -354,6 +380,30 @@ export default {
       } else {
         return { efxPerHour: 0, dollarPerHour: 0 }
       }
+    },
+    qualificationsData () {
+      for (const quali of this.campaign.qualis) {
+        const q = this.qualificationById(quali.key)
+        if (quali.value === 1) {
+          if (this.exclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
+            this.addExclusiveQuali(q.info.name, quali.key)
+          }
+        } else if (this.inclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
+          this.addInclusiveQuali(q.info.name, quali.key)
+        }
+      }
+      const qualifications = []
+      for (const qualification of this.$store.state.qualification.qualifications) {
+        if (qualification.info.name) {
+          qualifications.push(
+            {
+              name: qualification.info.name,
+              code: qualification.id
+            }
+          )
+        }
+      }
+      return qualifications
     }
   },
   watch: {
@@ -369,6 +419,7 @@ export default {
     this.checkUserCampaign()
     this.getCampaign()
     this.getBatches()
+    this.getQualifications()
   },
   methods: {
     showCompletedPopup () {
@@ -472,6 +523,25 @@ export default {
         default:
           break
       }
+    },
+    async getQualifications () {
+      if (!this.allQualificationsLoaded) {
+        await this.$store.dispatch('qualification/getQualifications')
+      }
+    },
+    addExclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.exclusiveQualis.push(tag)
+    },
+    addInclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.inclusiveQualis.push(tag)
     }
   }
 }
