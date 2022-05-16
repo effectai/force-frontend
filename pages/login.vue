@@ -114,7 +114,7 @@ export default {
     '$blockchain.account' (account) {
       this.existingAccount = null
       if (account) {
-        console.log('account', account)
+        // console.log('account', account)
         this.accountExists()
       }
     }

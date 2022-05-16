@@ -90,7 +90,6 @@
                   <br>
                   <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=quali&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
                 </div>
-              </div>
 
               <div class="block is-vcentered ">
                 <div v-if="$auth.user.vAccountRows && $auth.user.vAccountRows[0].id === singleQualification.account_id">
@@ -99,6 +98,8 @@
                   </nuxt-link>
                 </div>
               </div>
+              </div>
+
             </div>
           </div>
         </div>

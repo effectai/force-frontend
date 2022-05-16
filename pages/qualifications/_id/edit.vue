@@ -127,8 +127,6 @@ export default {
   },
   created () {
     this.getQualifications()
-    // this.qualification = this.qualifications[this.id]
-    console.log(this.qualification)
   },
 
   beforeDestroy () {
@@ -137,9 +135,14 @@ export default {
 
   methods: {
     async getQualifications () {
+      this.qualificationLoading = true
       if (!this.allQualificationsLoaded) {
         await this.$store.dispatch('qualification/getQualifications')
+        this.qualification = this.qualifications[this.id]
+        console.log(this.qualification)
+        this.qualificationIpfs = { ...this.qualification.info }
       }
+      this.qualificationLoading = false
     },
     async editQualification () {
       // this.loading = true
