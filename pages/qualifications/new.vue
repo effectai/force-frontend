@@ -80,59 +80,27 @@ export default {
     SuccessModal
   },
 
-  beforeRouteLeave (to, from, next) {
-    if (this.checkClose()) {
-      next()
-    }
-  },
-
   middleware: ['auth'],
   data () {
     return {
-      success: false,
       loading: false,
-      preview: false,
       successTitle: null,
       successMessage: null,
       errors: [],
-      cachedFormData: null,
-      qualification: null,
       qualificationIpfs: {
         name: null,
         description: null,
-        image: null,
-        type: null
-      },
-      selectType: 'Choose Type',
-      selectNull: null
+        image: null
+      }
     }
   },
-
-  computed: {
-    hasChanged () {
-      return this.cachedFormData !== this.formDataForComparison()
-    }
-  },
-
-  created () {
-
-  },
-
-  destroyed () {
-
-  },
-
-  beforeDestroy () {
-
-  },
-
   methods: {
     async createQualification () {
       // TODO redirect to created qualification when succesfull
       // let createdQualification
       console.log('trying create quali')
       try {
-        if (this.checkFormReady()) {
+        if (this.validateForm()) {
           this.loading = true
           const quali = {
             ...this.qualificationIpfs
@@ -149,7 +117,6 @@ export default {
             this.qualificationIpfs[key] = null
           })
           this.loading = false
-          this.submitted = true
           this.$router.push('/manage')
         }
       } catch (error) {
@@ -159,50 +126,13 @@ export default {
       }
     },
 
-    checkFormReady () {
+    validateForm () {
       this.error = []
       if (this.qualificationIpfs.name != null) {
         return true
       } else {
         // TODO make sure that qualification type = "" is checked
         this.error.push('Name for qualification is required.')
-        return false
-      }
-    },
-
-    cacheFormData () {
-      const qualification = window.localStorage.getItem('cached_qualification')
-      const qualificationIpfs = window.localStorage.getItem('cached_qaulificationIpfs')
-
-      if (qualification) {
-        this.qualification = JSON.parse(qualification)
-      }
-
-      if (qualificationIpfs) {
-        this.qualificationIpfs = JSON.parse(qualificationIpfs)
-      }
-
-      window.addEventListener('beforeunload', this.checkClose)
-    },
-
-    formDataForComparison () {
-      return JSON.stringify({
-        qualification: this.qualification,
-        qualificationIpfs: this.qualificationIpfs
-      })
-    },
-
-    checkClose (event) {
-      if (this.hasChanged && !this.loading && !this.submitted) {
-        const warningMessage = 'You have unsaved changes. Are you sure you wish to leave?'
-        if (!confirm(warningMessage)) {
-          event.preventDefault()
-          event.returnValue = warningMessage
-          return false
-        } else {
-          return true
-        }
-      } else {
         return false
       }
     }
