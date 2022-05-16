@@ -2,7 +2,7 @@
   <section class="section">
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
+        <ul>
           <li>
             <nuxt-link to="/manage">
               All Qualifications
@@ -10,7 +10,7 @@
           </li>
           <li class="is-active">
             <nuxt-link :to="`/qualifications/${id}`" aria-current="page">
-            Qualification {{ id }}
+              Qualification {{ id }}
             </nuxt-link>
           </li>
         </ul>
@@ -29,13 +29,12 @@
         Qualification loading
       </div>
       <div v-else class="columns">
-
         <!-- First column with information -->
         <div class="column is-three-fifths">
           <div class="is-flex is-align-items-center mb-6">
             <p v-if="singleQualification" class="image has-radius mr-4" style="width: 52px; height: 52px">
-                <img v-if="singleQualification.info && singleQualification.info.image" :src="singleQualification.info.image" />
-                <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name" />
+              <img v-if="singleQualification.info && singleQualification.info.image" :src="singleQualification.info.image">
+              <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name">
             </p>
             <div class="title has-text-weight-bold">
               <span>#{{ id }}</span>
@@ -47,8 +46,7 @@
           </div>
 
           <div class="block">
-            <p v-if="singleQualification.info.description" class="content" v-html="$md.render(singleQualification.info.description)">
-            </p>
+            <p v-if="singleQualification.info.description" class="content" v-html="$md.render(singleQualification.info.description)" />
             <p v-else>
               - No description -
             </p>
@@ -65,35 +63,36 @@
             </div>
 
             <div class="p-5">
-            <div class="columns ">
-
-              <div class="column is-full">
-                <div class="block">
-                  Requester
-                  <br>
-                  <div class="blockchain-address">
-                    <nuxt-link :to="'/profile/' + singleQualification.account_id">
-                      {{ singleQualification.account_id }}
-                    </nuxt-link>
+              <div class="columns ">
+                <div class="column is-full">
+                  <div class="block">
+                    Requester
+                    <br>
+                    <div class="blockchain-address">
+                      <nuxt-link :to="'/profile/' + singleQualification.account_id">
+                        {{ singleQualification.account_id }}
+                      </nuxt-link>
+                    </div>
                   </div>
-                </div>
-                <div class="block">
-                  IPFS
-                  <br>
-                  <div class="blockchain-address">
-                    <a target="_blank" :href="`${ipfsExplorer}/ipfs/${singleQualification.content.field_1}`">{{ singleQualification.content.field_1 }}</a>
+                  <div class="block">
+                    IPFS
+                    <br>
+                    <div class="blockchain-address">
+                      <a target="_blank" :href="`${ipfsExplorer}/ipfs/${singleQualification.content.field_1}`">{{ singleQualification.content.field_1 }}</a>
+                    </div>
                   </div>
-                </div>
-                <div class="block">
-                  Blockchain
-                  <br>
-                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
+                  <div class="block">
+                    Blockchain
+                    <br>
+                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
+                  </div>
                 </div>
               </div>
-            </div>
 
               <div class="block is-vcentered ">
-                <nuxt-link class="button is-primary is-light is-fullwidth has-margin-bottom-mobile disabled" :to="`/qualifications/${id}/edit`">Edit</nuxt-link>
+                <nuxt-link class="button is-primary is-light is-fullwidth has-margin-bottom-mobile disabled" :to="`/qualifications/${id}/edit`">
+                  Edit
+                </nuxt-link>
 
                 <div v-if="$auth.user.accountName === singleQualification.account_id">
                   <nuxt-link :to="`/qualifications/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
@@ -108,9 +107,7 @@
                   Qualify
                 </button>
               </div>
-
             </div>
-
           </div>
         </div>
       </div>

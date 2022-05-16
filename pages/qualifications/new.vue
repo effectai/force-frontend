@@ -6,7 +6,9 @@
         <br>
         <span class="laoding-text">Waiting for the transaction to complete. </span>
       </div>
-      <h1 class="title">New Qualification</h1>
+      <h1 class="title">
+        New Qualification
+      </h1>
       <div v-if="errors.length">
         <div v-for="error in errors" :key="toString(error)" class="notification is-danger is-light">
           {{ error }}
@@ -27,7 +29,7 @@
           <div class="field">
             <label class="label">
               Description
-              <span class="has-text-info"></span>
+              <span class="has-text-info" />
             </label>
             <div class="control">
               <vue-simplemde
@@ -41,16 +43,18 @@
           <div class="field">
             <label class="label">
               Image
-              <span class="has-text-info"></span>
+              <span class="has-text-info" />
             </label>
             <div class="control">
-              <input v-model="qualificationIpfs.image" type="text" class="input" placeholder="Image Url" >
+              <input v-model="qualificationIpfs.image" type="text" class="input" placeholder="Image Url">
             </div>
           </div>
 
           <div class="field is-grouped is-grouped-right">
             <div class="control">
-              <nuxt-link class="button is-light" to="/manage">Cancel</nuxt-link>
+              <nuxt-link class="button is-light" to="/manage">
+                Cancel
+              </nuxt-link>
             </div>
             <!-- TODO add disabled property when all input fields have not been filled in yet. -->
             <div class="control">
