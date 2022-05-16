@@ -48,8 +48,8 @@
                 <div class="control has-icons-right has-icons-left">
                   <input class="input blockchain-address" :type="password_hidden ? 'password' : 'text'" :value="keypair.privateKey" readonly>
                   <span class="icon is-left" :data-tooltip="visibility_message" @click.prevent="togglePasswordVisibility()" @mouseout="visibility_message = 'Toggle visibility'">
-                    <font-awesome-icon class="p-2 is-small is-clickable has-tooltip-arrow has-tooltip-fade unselectable" v-if="password_hidden" icon="fa-solid fa-eye" />
-                    <font-awesome-icon class="p-2 is-small is-clickable has-tooltip-arrow has-tooltip-fade unselectable" v-else icon="fa-solid fa-eye-slash" />
+                    <font-awesome-icon v-if="password_hidden" class="p-2 is-small is-clickable has-tooltip-arrow has-tooltip-fade unselectable" icon="fa-solid fa-eye" />
+                    <font-awesome-icon v-else class="p-2 is-small is-clickable has-tooltip-arrow has-tooltip-fade unselectable" icon="fa-solid fa-eye-slash" />
                   </span>
                   <span class="p-2 icon is-small is-right is-clickable has-tooltip-arrow has-tooltip-fade unselectable" :data-tooltip="copy_message" @click.prevent="copyToClipboard(keypair.privateKey)" @mouseout="copy_message = 'Copy'">
                     <font-awesome-icon class="is-small" icon="fa-solid fa-copy" />

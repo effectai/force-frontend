@@ -173,7 +173,9 @@
               <div class="control">
                 <input v-model="campaignIpfs.estimated_time" class="input" type="number" placeholder="1" step="10">
               </div>
-              <div class="control"><a href="" class="button is-primary">Seconds</a></div>
+              <div class="control">
+                <a href="" class="button is-primary">Seconds</a>
+              </div>
             </div>
           </div>
 

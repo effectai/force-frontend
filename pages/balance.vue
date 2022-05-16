@@ -58,7 +58,9 @@
           </div>
           <div class="column is-4 is-flex is-justify-content-center">
             <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout != 0" :class="{'is-loading': loading === true}" class="button is-medium is-primary is-pulsing" @click.prevent="payout()">
-              <p v-if="!loading">Cash in <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span></p>
+              <p v-if="!loading">
+                Cash in <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span>
+              </p>
             </button>
             <button v-else-if="$blockchain.efxPayout == 0" disabled="disabled" class="button is-medium is-primary">
               <p>Nothing to cash in..</p>
@@ -83,10 +85,10 @@
 <script>
 import SuccessModal from '@/components/SuccessModal'
 export default {
+  name: 'Balances',
   components: {
     SuccessModal
   },
-  name: 'Balances',
   middleware: ['auth'],
   data () {
     return {

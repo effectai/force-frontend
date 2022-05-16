@@ -14,7 +14,6 @@
       </div>
       <form @submit.prevent="createQualification">
         <div class="block basic-info-group">
-
           <div class="field">
             <label class="label">
               Name
@@ -77,6 +76,12 @@ export default {
     SuccessModal
   },
 
+  beforeRouteLeave (to, from, next) {
+    if (this.checkClose()) {
+      next()
+    }
+  },
+
   middleware: ['auth'],
   data () {
     return {
@@ -115,12 +120,6 @@ export default {
 
   beforeDestroy () {
 
-  },
-
-  beforeRouteLeave (to, from, next) {
-    if (this.checkClose()) {
-      next()
-    }
   },
 
   methods: {

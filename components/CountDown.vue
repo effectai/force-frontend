@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slot :hour="hour" :min="min" :sec="sec"></slot>
+    <slot :hour="hour" :min="min" :sec="sec" />
   </div>
 </template>
 
