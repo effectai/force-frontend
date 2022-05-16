@@ -69,9 +69,9 @@
                     Requester
                     <br>
                     <div class="blockchain-address">
-                      <nuxt-link :to="'/profile/' + singleQualification.account_id">
-                        {{ singleQualification.account_id }}
-                      </nuxt-link>
+                      <!-- <nuxt-link :to="'/profile/' + singleQualification.account_id"> -->
+                      {{ singleQualification.account_id }}
+                      <!-- </nuxt-link> -->
                     </div>
                   </div>
                   <div class="block">
