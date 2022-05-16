@@ -494,7 +494,6 @@ export default (context, inject) => {
       async getUserQualifications (id) {
         return await this.sdk.force.getUserQualifications(id)
       },
-
       async recoverPublicKey () {
         const message = 'Effect Account'
         const signature = await bsc.sign(message)
