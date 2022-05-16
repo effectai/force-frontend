@@ -151,8 +151,7 @@ export default {
       campaignsLoading: state => state.campaign.loading,
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
       allBatchesLoaded: state => state.campaign.allBatchesLoaded,
-      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded,
-      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
+      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded
     }),
     list: {
       get () {
@@ -183,7 +182,7 @@ export default {
     },
     getForceInfo () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
-        // on the requester campaign list process all campaigns
+        // on the requester campaign list process all campaignss
         this.$store.dispatch('campaign/getCampaigns')
       }
       if (!this.allBatchesLoaded) {
@@ -191,9 +190,6 @@ export default {
       }
       if (!this.allSubmissionsLoaded) {
         this.$store.dispatch('campaign/getSubmissions')
-      }
-      if (!this.allQualificationsLoaded) {
-        this.$store.dispatch('qualification/getQualifications')
       }
     }
   }

@@ -28,3 +28,5 @@ npm link /path/to/effect-js/
 
 When you make changes to the SDK you should run `npm run build:cjs` in that,
 after which the force frontend will automatically reload the changes.
+
+# Node version V.16
