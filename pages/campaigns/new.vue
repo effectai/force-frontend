@@ -137,7 +137,14 @@
             </label>
             <div class="field has-addons">
               <div class="control">
-                <input v-model="campaignIpfs.estimated_time" class="input" type="number" placeholder="1" step="10">
+                <input
+                  v-model="campaignIpfs.estimated_time"
+                  class="input"
+                  type="number"
+                  placeholder="1"
+                  step="1"
+                  min="1"
+                >
               </div>
               <div class="control">
                 <a href="" class="button is-primary">Seconds</a>
