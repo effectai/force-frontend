@@ -71,10 +71,13 @@
                 <div class="block">
                   Requester
                   <br>
-                  <div class="blockchain-address">
-                    <nuxt-link :to="'/profile/' + singleQualification.account_id">
-                      {{ singleQualification.account_id }}
+                  <div v-if="this.vaccount" class="blockchain-address">
+                    <nuxt-link :to="'/profile/' + this.vaccount[0].address[1]">
+                      {{ this.vaccount[0].address[1] }}
                     </nuxt-link>
+                  </div>
+                  <div v-else>
+                    ...
                   </div>
                 </div>
                 <div class="block">
@@ -87,25 +90,22 @@
                 <div class="block">
                   Blockchain
                   <br>
-                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
+                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=quali&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
                 </div>
               </div>
             </div>
 
               <div class="block is-vcentered ">
-                <nuxt-link class="button is-primary is-light is-fullwidth has-margin-bottom-mobile disabled" :to="`/qualifications/${id}/edit`">Edit</nuxt-link>
+                <nuxt-link class="button is-primary is-light is-fullwidth has-margin-bottom-mobile is-disabled" :to="`/qualifications/${id}/edit`">Edit</nuxt-link>
 
                 <div v-if="$auth.user.accountName === singleQualification.account_id">
-                  <nuxt-link :to="`/qualifications/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
-                    Edit Task
+                  <nuxt-link :to="`/qualifications/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile is-disabled">
+                    Edit Qualification
                   </nuxt-link>
                   <br>
                 </div>
                 <button v-if="loading" class="button is-fullwidth is-primary is-loading">
                   Loading
-                </button>
-                <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="">
-                  Qualify
                 </button>
               </div>
 
@@ -127,11 +127,13 @@ export default {
     return {
       loading: false,
       id: parseInt(this.$route.params.id),
-      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode
+      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
+      vaccount: null
     }
   },
   created () {
     this.$store.dispatch('qualification/getQualifications')
+    this.getAccountById(this.id)
   },
   computed: {
     ...mapState({
@@ -143,7 +145,9 @@ export default {
     }
   },
   methods: {
-
+    async getAccountById (accountId) {
+      this.vaccount = await this.$blockchain.getVAccountById(accountId).catch(console.error)
+    }
   }
 
 }
