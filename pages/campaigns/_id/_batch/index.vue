@@ -529,29 +529,6 @@ export default {
       }
       this.loadingReservation = false
     },
-    async joinCampaign () {
-      try {
-        // function that makes the user join this campaign.
-        this.loading = true
-        this.joinCampaignPopup = false
-        const data = await this.$blockchain.joinCampaign(this.campaignId)
-        this.$store.dispatch('transaction/addTransaction', data)
-        if (data) {
-          this.loading = true
-          this.waitingOnTransaction = true
-          this.joinCampaignPopup = false
-          await this.$blockchain.waitForTransaction(data)
-          await this.checkUserCampaign()
-          if (this.userJoined) {
-            this.reserveTask()
-          }
-        }
-        this.waitingOnTransaction = false
-        this.joinCampaignPopup = false
-      } catch (e) {
-        this.$blockchain.handleError(e)
-      }
-    },
     async releaseTask (id) {
       const data = await this.$blockchain.releaseTask(id)
       await this.$blockchain.waitForTransaction(data)

@@ -401,29 +401,6 @@ export default {
     cancelBatchModal () {
       this.cancelledBatchesPopup = true
     },
-    async joinCampaign () {
-      try {
-        // function that makes the user join this campaign.
-        this.loading = true
-        this.joinCampaignPopup = false
-        const data = await this.$blockchain.joinCampaign(this.id)
-        this.$store.dispatch('transaction/addTransaction', data)
-        if (data) {
-          this.loading = true
-          this.waitingOnTransaction = true
-          await this.$blockchain.waitForTransaction(data)
-          await this.checkUserCampaign()
-          if (this.userJoined) {
-            this.reserveTask()
-          }
-        }
-        this.loading = false
-        this.waitingOnTransaction = false
-        this.joinCampaignPopup = false
-      } catch (e) {
-        this.$blockchain.handleError(e)
-      }
-    },
     async getBatches () {
       await this.$store.dispatch('campaign/getBatches')
 
