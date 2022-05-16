@@ -91,7 +91,8 @@ export default {
     },
     onClick () {
       if (this.functional) {
-        this.$parent.joinCampaign()
+        // TODO: pass this as a method, so we can call custom methods
+        this.$parent.reserveTask()
       }
     },
     sanitizeHtmlCustom (htmlSnippet) {
