@@ -43,24 +43,24 @@
       </div>
       <div class="column has-margin-bottom-mobile is-v-centered my-auto">
         <div class="field is-horizontal is-grouped-centered has-text-centered">
-              <span class="control">
-                <nuxt-link to="/deposit" class="button is-fullwidth-mobile is-responsive is-primary ">
-                  Deposit
-                </nuxt-link>
-              </span>
-              <span>&nbsp;</span>
-              <span class="control">
-                <nuxt-link to="/vtransfer" class="button is-fullwidth-mobile is-responsive is-secondary is-outlined">
-                  vTransfer
-                </nuxt-link>
-              </span>
-              <span>&nbsp;</span>
-              <span class="control">
-                <nuxt-link to="/withdraw" class="button is-fullwidth-mobile is-responsive is-primary is-outlined">
-                  Withdraw
-                </nuxt-link>
-              </span>
-          </div>
+          <span class="control">
+            <nuxt-link to="/deposit" class="button is-fullwidth-mobile is-responsive is-primary ">
+              Deposit
+            </nuxt-link>
+          </span>
+          <span>&nbsp;</span>
+          <span class="control">
+            <nuxt-link to="/vtransfer" class="button is-fullwidth-mobile is-responsive is-secondary is-outlined">
+              vTransfer
+            </nuxt-link>
+          </span>
+          <span>&nbsp;</span>
+          <span class="control">
+            <nuxt-link to="/withdraw" class="button is-fullwidth-mobile is-responsive is-primary is-outlined">
+              Withdraw
+            </nuxt-link>
+          </span>
+        </div>
       </div>
     </div>
   </div>

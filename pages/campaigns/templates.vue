@@ -37,17 +37,18 @@
           <template-media :html="previewTemplate" />
         </div>
       </div>
-    </div>
-    <div class="field is-grouped is-grouped-right">
-      <div class="control">
-        <nuxt-link class="button is-light" to="/campaigns/new">
-          Blank Template
-        </nuxt-link>
-      </div>
-      <div class="control">
-        <nuxt-link v-if="selectedTemplate" :disabled="loading" :to="`/campaigns/new?templateUrl=${selectedTemplate.url}&placeholders=${JSON.stringify(selectedTemplate.placeholders)}`" class="button is-primary is-wide">
-          Use Template
-        </nuxt-link>
+      <div class="field is-grouped is-grouped-right">
+        <a v-if="cached" class="is-size-6 has-text-danger-dark pt-2 mr-2" @click="clearCache">clear cache</a>
+        <div class="control">
+          <nuxt-link class="button is-light" to="/campaigns/new">
+            <span v-if="cached">Continue from Cache</span><span v-else>Blank Template</span>
+          </nuxt-link>
+        </div>
+        <div class="control">
+          <nuxt-link v-if="selectedTemplate" :disabled="loading" :to="`/campaigns/new?templateUrl=${selectedTemplate.url}&placeholders=${JSON.stringify(selectedTemplate.placeholders)}`" class="button is-primary is-wide">
+            Use Template
+          </nuxt-link>
+        </div>
       </div>
     </div>
   </section>
@@ -64,7 +65,9 @@ export default {
   },
   middleware: ['auth'],
   data () {
+    const cached = window.localStorage.getItem('cached_campaignIpfs')
     return {
+      cached: !!cached,
       loading: false,
       example_task: null,
       template: null,
@@ -106,6 +109,10 @@ export default {
   },
 
   methods: {
+    clearCache () {
+      window.localStorage.removeItem('cached_campaignIpfs')
+      this.cached = false
+    },
     async retrieveTemplates () {
       this.loading = true
       try {

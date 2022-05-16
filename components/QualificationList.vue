@@ -18,14 +18,14 @@
             <tr>
               <th></th>
               <th>Qualification</th>
-              <th>Requester</th>
+              <!-- <th>Requester</th> -->
             </tr>
           </thead>
 
           <tbody>
             <tr v-for="qualification in paginatedQualifications" :key="qualification.id">
 
-                <th>
+                <th style="width: 5%;">
                   <figure class="image is-32x32 has-radius is-vcentered">
                     <img v-if="qualification.info && qualification.info.image" :src="qualification.info.image">
                     <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name">
@@ -43,8 +43,8 @@
                     </h2>
                     <div v-if="qualification.info">
                       <div v-if="qualification.info.description" class="is-ellipsis is-clipped">
-                        <div v-if="qualification.info.description.length > 50">
-                          <span>{{ qualification.info.description.slice(0, 50) }}</span>
+                        <div v-if="qualification.info.description.length > 100">
+                          <span>{{ qualification.info.description.slice(0, 100) }}</span>
                           <span>&hellip;</span>
                         </div>
                         <div v-else>
@@ -58,13 +58,13 @@
                     </div>
                   </nuxt-link>
                 </td>
-                <td>
+                <!-- <td style="width: 5%;">
                   <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                    <nuxt-link :to="'/profile/' + qualification.account_id">
-                      <span class="is-ellipsis">{{ qualification.account_id }}</span>
+                    <nuxt-link :to="'/profile/' + getAccountById(qualification.account_id)[0].address[1]">
+                      <span class="is-ellipsis is-clipped">{{ getAccountById(qualification.account_id)[0].address[1] }}</span>
                     </nuxt-link>
                   </h2>
-                </td>
+                </td> -->
             </tr>
           </tbody>
         </table>
@@ -144,6 +144,9 @@ export default {
       if (!this.qualifications) {
         this.$store.dispatch('qualification/getQualifications')
       }
+    },
+    async getAccountById (accountId) {
+      this.vaccount = await this.$blockchain.getVAccountById(accountId).catch(console.error)
     }
   }
 

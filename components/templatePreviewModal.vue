@@ -5,7 +5,9 @@
       <h2 class="subtitle mt-5">
         Task Preview
       </h2>
-      <h3 class="subtitle has-text-white is-5 has-text-centered">{{ messageTitle }}</h3>
+      <h3 class="subtitle has-text-white is-5 has-text-centered">
+        {{ messageTitle }}
+      </h3>
       <p>{{ messageContent }}</p>
       <template-media
         :html="renderTemplate(
@@ -13,7 +15,7 @@
           campaignIpfs.example_task || {})"
         @submit="showSubmission"
       />
-      <button class="button modal-close is-large" aria-label="close" @click="$emit('close')"/>
+      <button class="button modal-close is-large" aria-label="close" @click="$emit('close')" />
       <br>
       <div class="mt-5">
         <h2 class="subtitle">
@@ -22,7 +24,9 @@
         <pre v-if="answer">{{ answer }}</pre>
       </div>
       <div class="has-text-centered">
-        <button class="button" @click="$emit('close')">OK</button>
+        <button class="button" @click="$emit('close')">
+          OK
+        </button>
       </div>
     </div>
   </div>

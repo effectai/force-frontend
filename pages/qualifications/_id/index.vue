@@ -2,15 +2,15 @@
   <section class="section">
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
+        <ul>
           <li>
-            <nuxt-link to="/qualifications">
+            <nuxt-link to="/manage">
               All Qualifications
             </nuxt-link>
           </li>
           <li class="is-active">
             <nuxt-link :to="`/qualifications/${id}`" aria-current="page">
-            Qualification {{ id }}
+              Qualification {{ id }}
             </nuxt-link>
           </li>
         </ul>
@@ -29,28 +29,26 @@
         Qualification loading
       </div>
       <div v-else class="columns">
-
         <!-- First column with information -->
         <div class="column is-three-fifths">
           <div class="is-flex is-align-items-center mb-6">
             <p v-if="singleQualification" class="image has-radius mr-4" style="width: 52px; height: 52px">
-                <img v-if="singleQualification.info && singleQualification.info.image" :src="singleQualification.info.image" />
-                <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name" />
+              <img v-if="singleQualification.info && singleQualification.info.image" :src="singleQualification.info.image">
+              <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name">
             </p>
             <div class="title has-text-weight-bold">
               <span>#{{ id }}</span>
-              <span v-if="singleQualification.info">{{ singleQualification.info.name }}</span>
-              <span v-else-if="singleQualification.info !== null" class="loading-text">Loading</span>
+              <span v-if="singleQualification.info.name">{{ singleQualification.info.name }}</span>
+              <span v-else-if="singleQualification.info.name == null" class="loading-text">Loading</span>
+              <span v-else-if="singleQualification.info.name.length == 0">Untitled</span>
               <span v-else class="has-text-danger-dark">Could not load singleQualification info</span>
             </div>
           </div>
 
           <div class="block">
-            <p v-if="singleQualification.info">
-              {{ singleQualification.info.description }}
-            </p>
+            <p v-if="singleQualification.info.description" class="content" v-html="$md.render(singleQualification.info.description)" />
             <p v-else>
-              ...
+              - No description -
             </p>
           </div>
         </div>
@@ -71,10 +69,13 @@
                 <div class="block">
                   Requester
                   <br>
-                  <div class="blockchain-address">
-                    <nuxt-link :to="'/profile/' + singleQualification.account_id">
-                      {{ singleQualification.account_id }}
+                  <div v-if="this.vaccount" class="blockchain-address">
+                    <nuxt-link :to="'/profile/' + this.vaccount[0].address[1]">
+                      {{ this.vaccount[0].address[1] }}
                     </nuxt-link>
+                  </div>
+                  <div v-else>
+                    ...
                   </div>
                 </div>
                 <div class="block">
@@ -87,33 +88,23 @@
                 <div class="block">
                   Blockchain
                   <br>
-                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
+                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=quali&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
                 </div>
-              </div>
-            </div>
 
               <div class="block is-vcentered ">
-                <nuxt-link class="button is-primary is-light is-fullwidth has-margin-bottom-mobile disabled" :to="`/qualifications/${id}/edit`">Edit</nuxt-link>
-
-                <div v-if="$auth.user.accountName === singleQualification.account_id">
+                <div v-if="$auth.user.vAccountRows && $auth.user.vAccountRows[0].id === singleQualification.account_id">
                   <nuxt-link :to="`/qualifications/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
-                    Edit Task
+                    Edit
                   </nuxt-link>
-                  <br>
                 </div>
-                <button v-if="loading" class="button is-fullwidth is-primary is-loading">
-                  Loading
-                </button>
-                <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="">
-                  Qualify
-                </button>
+              </div>
               </div>
 
             </div>
-
           </div>
         </div>
       </div>
+    </div>
     </div>
   </section>
 </template>
@@ -127,11 +118,9 @@ export default {
     return {
       loading: false,
       id: parseInt(this.$route.params.id),
-      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode
+      ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
+      vaccount: null
     }
-  },
-  created () {
-    this.$store.dispatch('qualification/getQualifications')
   },
   computed: {
     ...mapState({
@@ -142,21 +131,20 @@ export default {
       return this.qualifications.find(el => el.id === this.id)
     }
   },
+  created () {
+    this.$store.dispatch('qualification/getQualifications')
+    this.getAccountById(this.id)
+  },
   methods: {
-
+    async getAccountById (accountId) {
+      this.vaccount = await this.$blockchain.getVAccountById(accountId).catch(console.error)
+    }
   }
 
 }
 </script>
 
 <style lang="scss" scoped>
-.box-title {
-  text-align: center;
-  border-bottom: 2px solid #cdd4e6;
-  padding-bottom: 31px;
-  margin: 10px 0 15px 0;
-}
-
 .information-block {
   border: 1px solid #E8EEFF;
   border-radius: 8px;

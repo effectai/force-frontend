@@ -372,7 +372,7 @@ export default (context, inject) => {
           await context.store.dispatch('campaign/getBatchTasks', batches[i])
           try {
             reservation = await this.reserveOrClaimTask(batches[i], batches[i].tasks)
-            context.app.router.push('/campaigns/' + batches[i].campaign_id + '/' + batches[i].batch_id + '/' + reservation.task_index + '?submissionId=' + reservation.id)
+            context.app.router.push('/campaigns/' + batches[i].campaign_id + '/' + batches[i].batch_id + '/' + reservation.id)
             return
           } catch (error) {
             if (i === batches.length - 1) {
