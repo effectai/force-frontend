@@ -182,7 +182,7 @@ export default {
     },
     getForceInfo () {
       if (!this.campaigns || !this.allCampaignsLoaded) {
-        // on the requester campaign list process all campaigns
+        // on the requester campaign list process all campaignss
         this.$store.dispatch('campaign/getCampaigns')
       }
       if (!this.allBatchesLoaded) {

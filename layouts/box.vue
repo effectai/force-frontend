@@ -12,7 +12,7 @@
             <nuxt class="p-5" />
           </div>
           <div class="has-text-grey-light is-size-7 pl-2">
-            © 2021 Effect.AI B.V.
+            © {{ (new Date()).getUTCFullYear() }} Effect.AI B.V.
           </div>
         </div>
       </div>

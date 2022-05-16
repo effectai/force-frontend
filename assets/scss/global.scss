@@ -4,6 +4,7 @@
 @import '../../node_modules/@creativebulma/bulma-tooltip';
 @import './drawer';
 @import '../../node_modules/bulma-switch/dist/css/bulma-switch.min.css';
+@import '../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
 
 a {
   outline: 0;
@@ -417,3 +418,22 @@ a.box {
     text-shadow:
       .25em 0 0 $text,
       .5em 0 0 $text;}}
+
+
+/* Multiselect */
+.multiselect {
+  border-radius: 6px;
+  border-color: #dbdbdb;
+  border: 2px;
+  &__tag, &__option--highlight {
+    background-color: $primary !important;
+  }
+  &__tag-icon {
+    &:after {
+      color: #fff;
+    }
+    &:hover {
+      background-color: rgba(255,255,255,0.15);
+    }
+  }
+}

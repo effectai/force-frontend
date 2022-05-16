@@ -101,6 +101,45 @@
             </div>
           </div>
 
+          <hr>
+          <div class="field">
+            <label class="label">
+              Worker must have qualifications
+            </label>
+            <multiselect
+              v-if="allQualificationsLoaded"
+              v-model="inclusiveQualis"
+              tag-placeholder="Add"
+              placeholder="Select Qualifications"
+              label="name"
+              track-by="code"
+              :options="qualificationsDropdownData"
+              :multiple="true"
+              :taggable="true"
+              :show-labels="false"
+              @tag="addInclusiveQuali"
+            />
+          </div>
+          <div class="field">
+            <label class="label">
+              Deny workers with qualification
+            </label>
+            <multiselect
+              v-if="allQualificationsLoaded"
+              v-model="exclusiveQualis"
+              tag-placeholder="Add"
+              placeholder="Select Qualifications"
+              label="name"
+              track-by="code"
+              :options="qualificationsDropdownData"
+              :multiple="true"
+              :taggable="true"
+              :show-labels="false"
+              @tag="addExclusiveQuali"
+            />
+          </div>
+          <hr>
+
           <div class="field">
             <label class="label">
               EFX <strong>/</strong> Task
@@ -271,8 +310,10 @@
 
 <script>
 import _ from 'lodash'
+import { mapState } from 'vuex'
 import VueSimplemde from 'vue-simplemde'
 import { Template } from '@effectai/effect-js'
+import Multiselect from 'vue-multiselect'
 import InstructionsModal from '@/components/InstructionsModal'
 import TemplateMedia from '@/components/Template'
 import SuccessModal from '@/components/SuccessModal'
@@ -292,7 +333,8 @@ export default {
     VueSimplemde,
     TemplateMedia,
     InstructionsModal,
-    SuccessModal
+    SuccessModal,
+    Multiselect
   },
 
   filters: {
@@ -343,10 +385,16 @@ export default {
       successMessage: null,
       successTitle: null,
       campaignLoading: null,
-      answer: null
+      answer: null,
+      inclusiveQualis: [],
+      exclusiveQualis: [],
+      options: []
     }
   },
   computed: {
+    ...mapState({
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
+    }),
     // Compares live campaign info to stored campaign info
     hasChanged () {
       return this.campaign && !_.isEqual(this.campaignIpfs, this.campaign.info)
@@ -360,6 +408,20 @@ export default {
       } else {
         return { efxPerHour: 0, dollarPerHour: 0 }
       }
+    },
+    qualificationsDropdownData () {
+      const qualifications = []
+      for (const qualification of this.$store.state.qualification.qualifications) {
+        if (qualification.info.name) {
+          qualifications.push(
+            {
+              name: qualification.info.name,
+              code: qualification.id
+            }
+          )
+        }
+      }
+      return qualifications
     }
   },
   watch: {
@@ -383,6 +445,7 @@ export default {
   },
 
   created () {
+    this.getQualifications()
     this.getCampaign()
   },
 
@@ -391,6 +454,25 @@ export default {
   },
 
   methods: {
+    async getQualifications () {
+      if (!this.allQualificationsLoaded) {
+        await this.$store.dispatch('qualification/getQualifications')
+      }
+    },
+    addExclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.exclusiveQualis.push(tag)
+    },
+    addInclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.inclusiveQualis.push(tag)
+    },
     showSubmission (values) {
       this.answer = values
     },
@@ -441,8 +523,21 @@ export default {
     async editCampaign () {
       this.loading = true
       try {
+        const qualis = []
+        for (let i = 0; i < this.exclusiveQualis.length; i++) {
+          qualis.push({
+            key: this.exclusiveQualis[i].code,
+            value: 1
+          })
+        }
+        for (let i = 0; i < this.inclusiveQualis.length; i++) {
+          qualis.push({
+            key: this.inclusiveQualis[i].code,
+            value: 0
+          })
+        }
         const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
-        const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward)
+        const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward, qualis)
 
         // Wait for transaction and reload campaigns
         this.successTitle = 'Campaign submitted successfully!'

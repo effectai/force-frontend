@@ -76,6 +76,44 @@
               </select>
             </div>
           </div>
+          <hr>
+          <div class="field">
+            <label class="label">
+              Worker must have qualifications
+            </label>
+            <multiselect
+              v-if="allQualificationsLoaded"
+              v-model="inclusiveQualis"
+              tag-placeholder="Add"
+              placeholder="Select Qualifications"
+              label="name"
+              track-by="code"
+              :options="qualificationsDropdownData"
+              :multiple="true"
+              :taggable="true"
+              :show-labels="false"
+              @tag="addInclusiveQuali"
+            />
+          </div>
+          <div class="field">
+            <label class="label">
+              Deny workers with qualification
+            </label>
+            <multiselect
+              v-if="allQualificationsLoaded"
+              v-model="exclusiveQualis"
+              tag-placeholder="Add"
+              placeholder="Select Qualifications"
+              label="name"
+              track-by="code"
+              :options="qualificationsDropdownData"
+              :multiple="true"
+              :taggable="true"
+              :show-labels="false"
+              @tag="addExclusiveQuali"
+            />
+          </div>
+          <hr>
           <div class="field">
             <label class="label">
               EFX <strong>/</strong> Task
@@ -245,8 +283,10 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import VueSimplemde from 'vue-simplemde'
 import { Template } from '@effectai/effect-js'
+import Multiselect from 'vue-multiselect'
 import { codemirror } from 'vue-codemirror'
 import { Splitpanes, Pane } from 'splitpanes'
 import InstructionsModal from '@/components/InstructionsModal'
@@ -278,20 +318,8 @@ export default {
     InstructionsModal,
     SuccessModal,
     Splitpanes,
-    Pane
-  },
-
-  filters: {
-    formatBytes (bytes, decimals = 2) {
-      if (bytes === 0) {
-        return '0 Bytes'
-      }
-      const k = 1024
-      const dm = decimals < 0 ? 0 : decimals
-      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      const i = Math.floor(Math.log(bytes) / Math.log(k))
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
-    }
+    Pane,
+    Multiselect
   },
   beforeRouteLeave (to, from, next) {
     if (this.checkClose()) {
@@ -334,10 +362,16 @@ export default {
       successMessage: null,
       successTitle: null,
       answer: null,
-      windowWidth: 0
+      windowWidth: 0,
+      inclusiveQualis: [],
+      exclusiveQualis: [],
+      options: []
     }
   },
   computed: {
+    ...mapState({
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
+    }),
     // Compares cached user data to live data
     hasChanged () {
       return this.cachedFormData !== this.formDataForComparison()
@@ -351,6 +385,20 @@ export default {
       } else {
         return { efxPerHour: 0, dollarPerHour: 0 }
       }
+    },
+    qualificationsDropdownData () {
+      const qualifications = []
+      for (const qualification of this.$store.state.qualification.qualifications) {
+        if (qualification.info.name) {
+          qualifications.push(
+            {
+              name: qualification.info.name,
+              code: qualification.id
+            }
+          )
+        }
+      }
+      return qualifications
     }
   },
   watch: {
@@ -374,6 +422,7 @@ export default {
   },
 
   created () {
+    this.getQualifications()
     this.cacheFormData()
     // eslint-disable-next-line nuxt/no-globals-in-created
     window.addEventListener('resize', this.handleResize)
@@ -388,6 +437,25 @@ export default {
   },
 
   methods: {
+    async getQualifications () {
+      if (!this.allQualificationsLoaded) {
+        await this.$store.dispatch('qualification/getQualifications')
+      }
+    },
+    addExclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.exclusiveQualis.push(tag)
+    },
+    addInclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.inclusiveQualis.push(tag)
+    },
     handleResize () {
       this.windowWidth = window.innerWidth
     },
@@ -478,8 +546,23 @@ export default {
         if (this.checkForm()) {
           this.loading = true
           const campaignIpfs = { ...this.campaignIpfs }
+
+          const qualis = []
+          for (let i = 0; i < this.exclusiveQualis.length; i++) {
+            qualis.push({
+              key: this.exclusiveQualis[i].code,
+              value: 1
+            })
+          }
+          for (let i = 0; i < this.inclusiveQualis.length; i++) {
+            qualis.push({
+              key: this.inclusiveQualis[i].code,
+              value: 0
+            })
+          }
+
           const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
-          const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
+          const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward, qualis)
 
           // Wait for transaction and reload campaigns
           this.successTitle = 'Campaign submitted successfully'
