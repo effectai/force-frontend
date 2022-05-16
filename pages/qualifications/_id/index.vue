@@ -90,22 +90,11 @@
               </div>
 
               <div class="block is-vcentered ">
-                <nuxt-link class="button is-primary is-light is-fullwidth has-margin-bottom-mobile disabled" :to="`/qualifications/${id}/edit`">
-                  Edit
-                </nuxt-link>
-
-                <div v-if="$auth.user.accountName === singleQualification.account_id">
+                <div v-if="$auth.user.vAccountRows && $auth.user.vAccountRows[0].id === singleQualification.account_id">
                   <nuxt-link :to="`/qualifications/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
-                    Edit Task
+                    Edit
                   </nuxt-link>
-                  <br>
                 </div>
-                <button v-if="loading" class="button is-fullwidth is-primary is-loading">
-                  Loading
-                </button>
-                <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="">
-                  Qualify
-                </button>
               </div>
             </div>
           </div>
@@ -127,9 +116,7 @@ export default {
       ipfsExplorer: this.$blockchain.sdk.config.ipfsNode
     }
   },
-  created () {
-    this.$store.dispatch('qualification/getQualifications')
-  },
+
   computed: {
     ...mapState({
       qualifications: state => state.qualification.qualifications
@@ -139,6 +126,9 @@ export default {
       return this.qualifications.find(el => el.id === this.id)
     }
   },
+  created () {
+    this.$store.dispatch('qualification/getQualifications')
+  },
   methods: {
 
   }
@@ -147,13 +137,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.box-title {
-  text-align: center;
-  border-bottom: 2px solid #cdd4e6;
-  padding-bottom: 31px;
-  margin: 10px 0 15px 0;
-}
-
 .information-block {
   border: 1px solid #E8EEFF;
   border-radius: 8px;
