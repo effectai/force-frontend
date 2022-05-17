@@ -404,8 +404,8 @@ export default (context, inject) => {
       async getSubmissions (nextKey, limit = 50) {
         return await this.sdk.force.getSubmissions(nextKey, limit)
       },
-      async getCampaignJoins (campaignId) {
-        return await this.sdk.force.getCampaignJoins(campaignId)
+      async getBatchJoins (batchId) {
+        return await this.sdk.force.getBatchJoins(batchId)
       },
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)

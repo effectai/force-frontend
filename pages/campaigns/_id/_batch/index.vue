@@ -370,7 +370,7 @@
                 <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
                   Loading
                 </button>
-                <button v-else-if="!userJoined" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
+                <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                   Qualify
                 </button>
                 <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
@@ -542,11 +542,11 @@ export default {
     async checkUserCampaign () {
       this.loading = true
       try {
-        // checks if the user joined this campaign.
-        const data = await this.$blockchain.getCampaignJoins(this.campaignId)
-        this.userJoined = (data.rows.length > 0)
+        // // checks if the user joined this campaign.
+        // const data = await this.$blockchain.getBatchJoins(this.campaignId)
+        // this.userJoined = (data.rows.length > 0)
       } catch (e) {
-        this.$blockchain.handleError(e)
+        await this.$blockchain.handleError(e)
       }
       this.loading = false
     },

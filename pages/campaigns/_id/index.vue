@@ -423,11 +423,11 @@ export default {
     async checkUserCampaign () {
       this.loading = true
       try {
-        // checks if the user joined this campaign.
-        const data = await this.$blockchain.getCampaignJoins(this.id)
-        this.userJoined = (data.rows.length > 0)
+        // // checks if the user joined this campaign.
+        // const data = await this.$blockchain.getBatchJoins(this.id)
+        // this.userJoined = (data.rows.length > 0)
       } catch (e) {
-        this.$blockchain.handleError(e)
+        await this.$blockchain.handleError(e)
       }
       this.loading = false
     },
