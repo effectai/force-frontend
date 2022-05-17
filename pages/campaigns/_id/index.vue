@@ -252,18 +252,25 @@
                   Qualifications
                 </div>
                 <div v-if="allQualificationsLoaded">
-                  <ul>
-                    Required:
-                    <li v-for="quali in inclusiveQualis" :key="quali.code">
+                    <div>Required</div>
+                  <div v-if="inclQuali.length > 0" class="tags">
+                    <span v-for="quali in inclQuali" :key="quali.code" class="tag is-light is-success" >
                       <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
-                    </li>
-                    <br>
-                    Exclude:
-                    <li v-for="quali in exclusiveQualis" :key="quali.code">
+                    </span>
+                  </div>
+                  <div v-else>
+                    None
+                  </div>
+                  <br>
+                  <div>Exclude:</div>
+                  <div v-if="exclQuali.length > 0" class="tags">
+                    <span v-for="quali in exclQuali" :key="quali.code" class="tag is-light is-danger">
                       <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
-                    </li>
-
-                  </ul>
+                    </span>
+                  </div>
+                  <div v-else class="has-text-centered">
+                    No exlusive qualifcations needed.
+                  </div>
                 </div>
                 <div v-else class="loading-text has-text-centered">Loading</div>
                 <br>
@@ -404,8 +411,38 @@ export default {
         }
       }
       return qualifications
+    },
+
+    inclQuali () {
+      const qual = []
+
+      for (const quali of this.campaign.qualis) {
+        const q = this.qualificationById(quali.key)
+        if (quali.value === 0) {
+          if (this.inclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
+            qual.push({ name: q.info.name, code: quali.key })
+          }
+        }
+      }
+
+      return qual
+    },
+
+    exclQuali () {
+      const qual = []
+
+      for (const quali of this.campaign.qualis) {
+        const q = this.qualificationById(quali.key)
+        if (quali.value === 1) {
+          if (this.exclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
+            qual.push({ name: q.info.name, code: quali.key })
+          }
+        }
+      }
+      return qual
     }
   },
+
   watch: {
     '$route.query.completed' (completed) {
       this.completed = parseInt(completed)
@@ -528,24 +565,11 @@ export default {
       if (!this.allQualificationsLoaded) {
         await this.$store.dispatch('qualification/getQualifications')
       }
-    },
-    addExclusiveQuali (quali, id) {
-      const tag = {
-        name: quali,
-        code: id
-      }
-      this.exclusiveQualis.push(tag)
-    },
-    addInclusiveQuali (quali, id) {
-      const tag = {
-        name: quali,
-        code: id
-      }
-      this.inclusiveQualis.push(tag)
     }
   }
 }
 </script>
+
 <style lang="scss" scoped>
 .box-title {
   text-align: center;
