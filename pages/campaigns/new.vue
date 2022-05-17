@@ -62,7 +62,7 @@
               <span class="has-text-info">*</span>
             </label>
             <div class="select">
-              <select v-model="campaignIpfs.category">
+              <select v-model="campaignIpfs.category" required>
                 <option>---</option>
                 <option value="qualifier">
                   Qualifier
