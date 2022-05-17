@@ -13,13 +13,46 @@
         <p v-else>
           ...
         </p>
+        <hr>
+
+        <!-- Qualifications for modal -->
+        <div class="block is-vcentered">
+          <div class="is-size-4 has-text-centered">
+            Qualifications
+          </div>
+          <div v-if="allQualificationsLoaded">
+            <div>Required</div>
+            <div v-if="inclQuali.length > 0" class="tags">
+              <span v-for="quali in inclQuali" :key="quali.code" class="tag is-light is-success" >
+                <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
+              </span>
+            </div>
+            <div v-else>
+              None
+            </div>
+            <br>
+            <div>Exclude:</div>
+            <div v-if="exclQuali.length > 0" class="tags">
+              <span v-for="quali in exclQuali" :key="quali.code" class="tag is-light is-danger">
+                <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
+              </span>
+            </div>
+            <div v-else>
+              None
+            </div>
+          </div>
+          <div v-else class="loading-text has-text-centered">Loading</div>
+          <br>
+        </div>
+
+        <hr>
         <label class="checkbox">
           <input v-if="readonly" checked type="checkbox" disabled>
           <input v-else v-model="tac" type="checkbox">
           I agree to the <a href="/download/tac.pdf" target="_blank">terms and conditions</a>
         </label>
       </section>
-      <footer class="modal-card-foot">
+      <footer class="modal-card-foot has-text-centered">
         <button v-if="readonly" class="button is-primary" :disabled="!functional" @click.prevent="onCancel()">
           OK
         </button>
@@ -36,6 +69,7 @@
   </div>
 </template>
 <script>
+import { mapGetters, mapState } from 'vuex'
 import sanitizeHtml from 'sanitize-html'
 
 export default {
@@ -64,10 +98,26 @@ export default {
   },
   data () {
     return {
-      tac: false
+      tac: false,
+      id: parseInt(this.$route.params.id),
+      campaign: null,
+      userQuali: [],
+      accountId: this.$auth.user.vAccountRows[0].id
     }
   },
+  created () {
+    this.campaign = this.campaignById(this.id)
+    this.userQuali = this.qualificationByUser(this.accountId)
+  },
   computed: {
+    ...mapGetters({
+      campaignById: 'campaign/campaignById',
+      qualificationById: 'qualification/qualificationById',
+      qualificationByUser: 'qualification/qualificationByUser'
+    }),
+    ...mapState({
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
+    }),
     showModal: {
       get () {
         return this.show
@@ -75,6 +125,28 @@ export default {
       set (val) {
         this.$emit('clicked', val)
       }
+    },
+
+    inclQuali () {
+      const quals = []
+      for (const quali of this.campaign.qualis) {
+        const q = this.qualificationById(quali.key)
+        if (quali.value === 0) {
+          quals.push({ name: q.info.name, code: quali.key })
+        }
+      }
+      return quals
+    },
+
+    exclQuali () {
+      const quals = []
+      for (const quali of this.campaign.qualis) {
+        const q = this.qualificationById(quali.key)
+        if (quali.value === 1) {
+          quals.push({ name: q.info.name, code: quali.key })
+        }
+      }
+      return quals
     }
   },
   methods: {
