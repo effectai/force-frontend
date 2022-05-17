@@ -16,7 +16,7 @@
         <table class="table" style="width: 100%;">
           <thead>
             <tr>
-              <th></th>
+              <th />
               <th>Qualification</th>
               <!-- <th>Requester</th> -->
             </tr>
@@ -24,41 +24,40 @@
 
           <tbody>
             <tr v-for="qualification in paginatedQualifications" :key="qualification.id">
-
-                <th style="width: 5%;">
-                  <figure class="image is-32x32 has-radius is-vcentered">
-                    <img v-if="qualification.info && qualification.info.image" :src="qualification.info.image">
-                    <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name">
-                  </figure>
-                </th>
-                <td>
-                  <nuxt-link :to="`/qualifications/${qualification.id}`">
-                    <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
-                      <span v-if="qualification.info">
-                        <span v-if="qualification.info.name">{{ qualification.info.name }}</span>
-                        <i v-else>- Untitled -</i>
-                      </span>
-                      <span v-else-if="qualification.info !== null" class="loading-text">Loading</span>
-                      <span v-else class="has-text-danger-dark">Could not load qualification info</span>
-                    </h2>
-                    <div v-if="qualification.info">
-                      <div v-if="qualification.info.description" class="is-ellipsis is-clipped">
-                        <div v-if="qualification.info.description.length > 100">
-                          <span>{{ qualification.info.description.slice(0, 100) }}</span>
-                          <span>&hellip;</span>
-                        </div>
-                        <div v-else>
-                          {{ qualification.info.description }}
-                        </div>
+              <th style="width: 5%;">
+                <figure class="image is-32x32 has-radius is-vcentered">
+                  <img v-if="qualification.info && qualification.info.image" :src="qualification.info.image">
+                  <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name">
+                </figure>
+              </th>
+              <td>
+                <nuxt-link :to="`/qualifications/${qualification.id}`">
+                  <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
+                    <span v-if="qualification.info">
+                      <span v-if="qualification.info.name">{{ qualification.info.name }}</span>
+                      <i v-else>- Untitled -</i>
+                    </span>
+                    <span v-else-if="qualification.info !== null" class="loading-text">Loading</span>
+                    <span v-else class="has-text-danger-dark">Could not load qualification info</span>
+                  </h2>
+                  <div v-if="qualification.info">
+                    <div v-if="qualification.info.description" class="is-ellipsis is-clipped">
+                      <div v-if="qualification.info.description.length > 100">
+                        <span>{{ qualification.info.description.slice(0, 100) }}</span>
+                        <span>&hellip;</span>
                       </div>
-                      <i v-else>- no description -</i>
+                      <div v-else>
+                        {{ qualification.info.description }}
+                      </div>
                     </div>
-                    <div v-else-if="qualification.info !== null">
-                      ........
-                    </div>
-                  </nuxt-link>
-                </td>
-                <!-- <td style="width: 5%;">
+                    <i v-else>- no description -</i>
+                  </div>
+                  <div v-else-if="qualification.info !== null">
+                    ........
+                  </div>
+                </nuxt-link>
+              </td>
+              <!-- <td style="width: 5%;">
                   <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
                     <nuxt-link :to="'/profile/' + getAccountById(qualification.account_id)[0].address[1]">
                       <span class="is-ellipsis is-clipped">{{ getAccountById(qualification.account_id)[0].address[1] }}</span>

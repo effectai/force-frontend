@@ -66,7 +66,6 @@
 
           <qualification-list class="mb-5" :qualifications="myQualifications" />
         </div>
-
       </div>
       <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
     </div>

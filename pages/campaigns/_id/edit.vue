@@ -85,17 +85,14 @@
             <div class="select">
               <select v-model="campaignIpfs.category" required>
                 <option>---</option>
-                <option value="dao">
-                  Effect DAO
+                <option value="qualifier">
+                  Qualifier
                 </option>
-                <option value="translate">
-                  Effect Translate
+                <option value="annotations">
+                  Annotations
                 </option>
                 <option value="socials">
-                  Effect Socials
-                </option>
-                <option value="captions">
-                  Effect Captions
+                  Socials
                 </option>
               </select>
             </div>
@@ -171,7 +168,14 @@
             </label>
             <div class="field has-addons">
               <div class="control">
-                <input v-model="campaignIpfs.estimated_time" class="input" type="number" placeholder="1" step="10">
+                <input
+                  v-model="campaignIpfs.estimated_time"
+                  class="input"
+                  type="number"
+                  placeholder="1"
+                  step="1"
+                  min="1"
+                >
               </div>
               <div class="control">
                 <a href="" class="button is-primary">Seconds</a>

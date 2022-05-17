@@ -341,7 +341,7 @@ export default {
       id: parseInt(this.$route.params.id),
       accountId: this.$auth.user.vAccountRows[0].id,
       body: 'description',
-      userJoined: null,
+      userJoined: false,
       loading: false,
       joinCampaignPopup: false,
       userReservation: null,
@@ -362,6 +362,7 @@ export default {
       qualificationById: 'qualification/qualificationById'
     }),
     ...mapState({
+      joinedCampaigns: state => state.campaign.joinedCampaigns,
       campaigns: state => state.campaign.campaigns,
       batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded,
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
@@ -462,6 +463,7 @@ export default {
       }
     },
     async reserveTask () {
+      this.$store.commit('view/ADD_JOINED_CAMPAIGN', this.campaign.id)
       this.loadingReservation = true
       const availableBatches = []
       for (const batch of this.campaignBatches) {
@@ -484,29 +486,6 @@ export default {
     },
     cancelBatchModal () {
       this.cancelledBatchesPopup = true
-    },
-    async joinCampaign () {
-      try {
-        // function that makes the user join this campaign.
-        this.loading = true
-        this.joinCampaignPopup = false
-        const data = await this.$blockchain.joinCampaign(this.id)
-        this.$store.dispatch('transaction/addTransaction', data)
-        if (data) {
-          this.loading = true
-          this.waitingOnTransaction = true
-          await this.$blockchain.waitForTransaction(data)
-          await this.checkUserCampaign()
-          if (this.userJoined) {
-            this.reserveTask()
-          }
-        }
-        this.loading = false
-        this.waitingOnTransaction = false
-        this.joinCampaignPopup = false
-      } catch (e) {
-        this.$blockchain.handleError(e)
-      }
     },
     async getBatches () {
       await this.$store.dispatch('campaign/getBatches')
@@ -531,10 +510,9 @@ export default {
       this.loading = true
       try {
         // checks if the user joined this campaign.
-        const data = await this.$blockchain.getCampaignJoins(this.id)
-        this.userJoined = (data.rows.length > 0)
+        this.userJoined = this.$store.state.view.joinedCampaigns.includes(this.id)
       } catch (e) {
-        this.$blockchain.handleError(e)
+        await this.$blockchain.handleError(e)
       }
       this.loading = false
     },

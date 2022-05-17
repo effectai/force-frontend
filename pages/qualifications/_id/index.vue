@@ -63,48 +63,46 @@
             </div>
 
             <div class="p-5">
-            <div class="columns ">
+              <div class="columns ">
+                <div class="column is-full">
+                  <div class="block">
+                    Requester
+                    <br>
+                    <div v-if="vaccount" class="blockchain-address">
+                      <nuxt-link :to="'/profile/' + vaccount[0].address[1]">
+                        {{ vaccount[0].address[1] }}
+                      </nuxt-link>
+                    </div>
+                    <div v-else>
+                      ...
+                    </div>
+                  </div>
+                  <div class="block">
+                    IPFS
+                    <br>
+                    <div class="blockchain-address">
+                      <a target="_blank" :href="`${ipfsExplorer}/ipfs/${singleQualification.content.field_1}`">{{ singleQualification.content.field_1 }}</a>
+                    </div>
+                  </div>
+                  <div class="block">
+                    Blockchain
+                    <br>
+                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=quali&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
+                  </div>
 
-              <div class="column is-full">
-                <div class="block">
-                  Requester
-                  <br>
-                  <div v-if="this.vaccount" class="blockchain-address">
-                    <nuxt-link :to="'/profile/' + this.vaccount[0].address[1]">
-                      {{ this.vaccount[0].address[1] }}
-                    </nuxt-link>
+                  <div class="block is-vcentered ">
+                    <div v-if="$auth.user.vAccountRows && $auth.user.vAccountRows[0].id === singleQualification.account_id">
+                      <nuxt-link :to="`/qualifications/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
+                        Edit
+                      </nuxt-link>
+                    </div>
                   </div>
-                  <div v-else>
-                    ...
-                  </div>
-                </div>
-                <div class="block">
-                  IPFS
-                  <br>
-                  <div class="blockchain-address">
-                    <a target="_blank" :href="`${ipfsExplorer}/ipfs/${singleQualification.content.field_1}`">{{ singleQualification.content.field_1 }}</a>
-                  </div>
-                </div>
-                <div class="block">
-                  Blockchain
-                  <br>
-                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=quali&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
-                </div>
-
-              <div class="block is-vcentered ">
-                <div v-if="$auth.user.vAccountRows && $auth.user.vAccountRows[0].id === singleQualification.account_id">
-                  <nuxt-link :to="`/qualifications/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
-                    Edit
-                  </nuxt-link>
                 </div>
               </div>
-              </div>
-
             </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   </section>
 </template>

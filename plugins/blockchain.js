@@ -404,11 +404,8 @@ export default (context, inject) => {
       async getSubmissions (nextKey, limit = 50) {
         return await this.sdk.force.getSubmissions(nextKey, limit)
       },
-      async getCampaignJoins (campaignId) {
-        return await this.sdk.force.getCampaignJoins(campaignId)
-      },
-      async joinCampaign (campaignId) {
-        return await this.sdk.force.joinCampaign(campaignId)
+      async getBatchJoins (batchId) {
+        return await this.sdk.force.getBatchJoins(batchId)
       },
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)
@@ -471,9 +468,6 @@ export default (context, inject) => {
       },
       async waitForTransaction (transactionResult) {
         return await this.sdk.force.waitTransaction(transactionResult)
-      },
-      async joinCampaignAndReserveTask (id, batchId, tasksDone, tasks) {
-        return await this.sdk.force.joinCampaignAndReserveTask(id, batchId, tasksDone, tasks)
       },
       // createQualification = async (name: string, description: string, type: number, image?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
       async createQualification (name, description, type, image) {
