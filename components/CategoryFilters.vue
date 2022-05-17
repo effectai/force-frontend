@@ -17,7 +17,7 @@
             @click.prevent="onClick(dapp)"
           >
             <div class="has-text-centered">
-              <h4 class="is-size-5"><b>{{ dapp }}</b></h4>
+              <h4 class="is-size-5"><b>{{ dapp }}<span v-if="dapp === 'qualifier'">s</span></b></h4>
             </div>
           </a>
         </slide>
@@ -46,7 +46,7 @@ export default {
   props: ['filter'],
   data () {
     return {
-      effect_dapps: ['qualifiers', 'annotations', 'socials']
+      effect_dapps: ['qualifier', 'annotations', 'socials']
     }
   },
   methods: {
@@ -59,8 +59,8 @@ export default {
 <style lang="scss" scoped>
   a.box:hover, a.box.is-active {
     color: $text !important;
-    &.dapp-qualifiers {
-      background: $qualifiers-color;
+    &.dapp-qualifier {
+      background: $qualifier-color;
     }
     &.dapp-socials {
       background:$socials-color;
@@ -72,8 +72,8 @@ export default {
   a.box {
     transition: 0.2s;
     text-transform: capitalize;
-    &.dapp-qualifiers {
-      color: $qualifiers-color;
+    &.dapp-qualifier {
+      color: $qualifier-color;
     }
     &.dapp-socials {
       color:$socials-color;
