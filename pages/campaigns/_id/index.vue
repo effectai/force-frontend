@@ -268,8 +268,8 @@
                       <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
                     </span>
                   </div>
-                  <div v-else class="has-text-centered">
-                    No exlusive qualifcations needed.
+                  <div v-else>
+                    None
                   </div>
                 </div>
                 <div v-else class="loading-text has-text-centered">Loading</div>
@@ -414,32 +414,28 @@ export default {
     },
 
     inclQuali () {
-      const qual = []
+      const quals = []
 
       for (const quali of this.campaign.qualis) {
         const q = this.qualificationById(quali.key)
         if (quali.value === 0) {
-          if (this.inclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
-            qual.push({ name: q.info.name, code: quali.key })
-          }
+          quals.push({ name: q.info.name, code: quali.key })
         }
       }
 
-      return qual
+      return quals
     },
 
     exclQuali () {
-      const qual = []
+      const quals = []
 
       for (const quali of this.campaign.qualis) {
         const q = this.qualificationById(quali.key)
         if (quali.value === 1) {
-          if (this.exclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
-            qual.push({ name: q.info.name, code: quali.key })
-          }
+          quals.push({ name: q.info.name, code: quali.key })
         }
       }
-      return qual
+      return quals
     }
   },
 
