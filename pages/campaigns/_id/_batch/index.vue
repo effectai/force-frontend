@@ -493,7 +493,6 @@ export default {
     }
   },
   created () {
-    this.checkUserCampaign()
     this.getBatch()
     this.getCampaign()
   },
@@ -521,6 +520,7 @@ export default {
       }
     },
     async reserveTask () {
+      this.$store.commit('view/ADD_JOINED_CAMPAIGN', this.campaign.id)
       this.loadingReservation = true
       try {
         await this.$blockchain.makeReservation(this.batch)
@@ -542,9 +542,8 @@ export default {
     async checkUserCampaign () {
       this.loading = true
       try {
-        // // checks if the user joined this campaign.
-        // const data = await this.$blockchain.getBatchJoins(this.campaignId)
-        // this.userJoined = (data.rows.length > 0)
+        // checks if the user joined this campaign.
+        this.userJoined = this.$store.state.view.joinedCampaigns.includes(this.campaign.id)
       } catch (e) {
         await this.$blockchain.handleError(e)
       }
@@ -598,6 +597,7 @@ export default {
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
+      await this.checkUserCampaign()
     },
     generateRandomNumber (maxNum) {
       return Math.ceil(Math.random() * maxNum)

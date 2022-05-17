@@ -312,7 +312,7 @@ export default {
       id: parseInt(this.$route.params.id),
       accountId: this.$auth.user.vAccountRows[0].id,
       body: 'description',
-      userJoined: null,
+      userJoined: false,
       loading: false,
       joinCampaignPopup: false,
       userReservation: null,
@@ -330,6 +330,7 @@ export default {
       activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId'
     }),
     ...mapState({
+      joinedCampaigns: state => state.campaign.joinedCampaigns,
       campaigns: state => state.campaign.campaigns,
       batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded
     }),
@@ -378,6 +379,7 @@ export default {
       }
     },
     async reserveTask () {
+      this.$store.commit('view/ADD_JOINED_CAMPAIGN', this.campaign.id)
       this.loadingReservation = true
       const availableBatches = []
       for (const batch of this.campaignBatches) {
@@ -423,9 +425,8 @@ export default {
     async checkUserCampaign () {
       this.loading = true
       try {
-        // // checks if the user joined this campaign.
-        // const data = await this.$blockchain.getBatchJoins(this.id)
-        // this.userJoined = (data.rows.length > 0)
+        // checks if the user joined this campaign.
+        this.userJoined = this.$store.state.view.joinedCampaigns.includes(this.id)
       } catch (e) {
         await this.$blockchain.handleError(e)
       }
