@@ -22,7 +22,7 @@ export default {
   },
   state: () => {
     return {
-      grid: false,
+      grid: true,
       joinedCampaigns: []
     }
   }
