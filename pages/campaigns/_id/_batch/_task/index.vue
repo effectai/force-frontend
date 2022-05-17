@@ -120,7 +120,6 @@ export default {
   },
   created () {
     this.getBatch()
-    this.getTask()
     this.getCampaign()
   },
   methods: {
@@ -142,6 +141,7 @@ export default {
     async getBatch () {
       await this.$store.dispatch('campaign/getBatch', { batchId: this.batchId })
       this.batch = this.batches.find(b => b.batch_id === this.batchId)
+      await this.getTask()
     },
     async getTask () {
       this.reservation = this.submissionById(this.submissionId)
