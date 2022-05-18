@@ -21,14 +21,14 @@
             Qualifications
           </div>
           <div v-if="allQualificationsLoaded">
-            <div>Required</div>
+            <div>Required <i>(Having these qualifications is required)</i></div>
             <div v-if="inclQuali.length > 0" class="tags has-addons">
               <span
                 v-for="quali in inclQuali"
                 :key="quali.code"
                 class="tag"
                 :class="quali.userHasQuali ? 'is-light is-success' : 'is-danger is-light'"
-                :data-tooltip="quali.userHasQuali ? 'Ok' : 'Qualification needed'"
+                :data-tooltip="quali.userHasQuali ? 'Found: Ok' : 'Not Found: Required'"
               >
                 <span v-if="quali.userHasQuali">🗸</span>
                 <span v-else>🗴</span>
@@ -40,17 +40,17 @@
               None
             </div>
             <br>
-            <div>Exclude:</div>
+            <div>Exclude <i>(Having these qualifications will exclude you from this task)</i></div>
             <div v-if="exclQuali.length > 0" class="tags">
               <span
                 v-for="quali in exclQuali"
                 :key="quali.code"
                 class="tag"
-                :class="quali.userHasQuali ? 'is-light is-success' : 'is-danger is-light'"
-                :data-tooltip="quali.userHasQuali ? 'Ok' : 'Qualification Needed'"
+                :class="quali.userHasQuali ? 'is-light is-danger' : 'is-warning is-light'"
+                :data-tooltip="quali.userHasQuali ? 'Found: Excluded' : 'Not found: Ok'"
               >
-                <span v-if="quali.userHasQuali">🗸</span>
-                <span v-else>🗴</span>
+                <span v-if="quali.userHasQuali">🗴</span>
+                <span v-else>🗸</span>
                 &nbsp;
                 <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
               </span>
@@ -137,7 +137,6 @@ export default {
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
     }),
     showModal: {
-
       get () {
         return this.show
       },
