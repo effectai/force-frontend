@@ -252,9 +252,18 @@
                   Qualifications
                 </div>
                 <div v-if="allQualificationsLoaded">
-                    <div>Required</div>
-                  <div v-if="inclQuali.length > 0" class="tags">
-                    <span v-for="quali in inclQuali" :key="quali.code" class="tag is-light is-info" >
+                  <div>Required <i>(Having these qualifications is required)</i></div>
+                  <div v-if="inclQuali.length > 0" class="tags has-addons">
+                    <span
+                      v-for="quali in inclQuali"
+                      :key="quali.code"
+                      class="tag"
+                      :class="quali.userHasQuali ? 'is-light is-success' : 'is-danger is-light'"
+                      :data-tooltip="quali.userHasQuali ? 'Found: Ok' : 'Not Found: Required'"
+                    >
+                      <span v-if="quali.userHasQuali">🗸</span>
+                      <span v-else>🗴</span>
+                      &nbsp;
                       <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
                     </span>
                   </div>
@@ -262,9 +271,18 @@
                     None
                   </div>
                   <br>
-                  <div>Exclude:</div>
+                  <div>Exclude <i>(Having these qualifications will exclude you from this task)</i></div>
                   <div v-if="exclQuali.length > 0" class="tags">
-                    <span v-for="quali in exclQuali" :key="quali.code" class="tag is-light is-info">
+                    <span
+                      v-for="quali in exclQuali"
+                      :key="quali.code"
+                      class="tag"
+                      :class="quali.userHasQuali ? 'is-light is-danger' : 'is-warning is-light'"
+                      :data-tooltip="quali.userHasQuali ? 'Found: Excluded' : 'Not found: Ok'"
+                    >
+                      <span v-if="quali.userHasQuali">🗴</span>
+                      <span v-else>🗸</span>
+                      &nbsp;
                       <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
                     </span>
                   </div>
@@ -359,7 +377,8 @@ export default {
     ...mapGetters({
       batchesByCampaignId: 'campaign/batchesByCampaignId',
       activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId',
-      qualificationById: 'qualification/qualificationById'
+      qualificationById: 'qualification/qualificationById',
+      qualificationByUser: 'qualification/qualificationByUser'
     }),
     ...mapState({
       joinedCampaigns: state => state.campaign.joinedCampaigns,
@@ -389,55 +408,33 @@ export default {
         return { efxPerHour: 0, dollarPerHour: 0 }
       }
     },
-    qualificationsData () {
-      for (const quali of this.campaign.qualis) {
-        const q = this.qualificationById(quali.key)
-        if (quali.value === 1) {
-          if (this.exclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
-            this.addExclusiveQuali(q.info.name, quali.key)
-          }
-        } else if (this.inclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
-          this.addInclusiveQuali(q.info.name, quali.key)
-        }
-      }
-      const qualifications = []
-      for (const qualification of this.$store.state.qualification.qualifications) {
-        if (qualification.info.name) {
-          qualifications.push(
-            {
-              name: qualification.info.name,
-              code: qualification.id
-            }
-          )
-        }
-      }
-      return qualifications
-    },
 
     inclQuali () {
       const quals = []
-
+      const userQualis = this.qualificationByUser(this.accountId)
       for (const quali of this.campaign.qualis) {
         const q = this.qualificationById(quali.key)
+        const userHasQuali = userQualis.some(uq => uq.id === quali.key)
         if (quali.value === 0) {
-          quals.push({ name: q.info.name, code: quali.key })
+          quals.push({ name: q.info.name, code: quali.key, userHasQuali })
         }
       }
-
       return quals
     },
 
     exclQuali () {
       const quals = []
-
+      const userQualis = this.qualificationByUser(this.accountId)
       for (const quali of this.campaign.qualis) {
         const q = this.qualificationById(quali.key)
+        const userHasQuali = userQualis.some(uq => uq.id === quali.key)
         if (quali.value === 1) {
-          quals.push({ name: q.info.name, code: quali.key })
+          quals.push({ name: q.info.name, code: quali.key, userHasQuali })
         }
       }
       return quals
     }
+
   },
 
   watch: {
