@@ -254,7 +254,7 @@
                 <div v-if="allQualificationsLoaded">
                     <div>Required</div>
                   <div v-if="inclQuali.length > 0" class="tags">
-                    <span v-for="quali in inclQuali" :key="quali.code" class="tag is-light is-success" >
+                    <span v-for="quali in inclQuali" :key="quali.code" class="tag is-light is-info" >
                       <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
                     </span>
                   </div>
@@ -264,7 +264,7 @@
                   <br>
                   <div>Exclude:</div>
                   <div v-if="exclQuali.length > 0" class="tags">
-                    <span v-for="quali in exclQuali" :key="quali.code" class="tag is-light is-danger">
+                    <span v-for="quali in exclQuali" :key="quali.code" class="tag is-light is-info">
                       <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
                     </span>
                   </div>
