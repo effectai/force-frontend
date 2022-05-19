@@ -162,96 +162,122 @@
                 <b>Information</b>
               </h4>
             </div>
-            <div class="columns p-5">
-              <div class="column is-half">
-                <div v-if="campaign.info" class="block">
-                  <nuxt-link
-                    v-if="campaign.info && campaign.info.category"
-                    :to="'/?category=' + campaign.info.category"
-                    class="tag is-light is-medium mb-5"
-                    :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
-                  >
-                    {{ campaign.info.category }}
-                  </nuxt-link>
-                  <span v-else class="tag is-info is-light is-medium">...</span>
-                </div>
-                <div class="block mb-6">
-                  Reward
-                  <br>
-                  <b><span>{{ campaign.reward.quantity }}</span></b>
-                </div>
-                <div class="block">
-                  <div v-if="$auth.user.accountName === campaign.owner[1]">
-                    <nuxt-link :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
-                      Edit Task
+
+            <div class="p-5">
+              <div class="columns ">
+                <div class="column is-half">
+                  <div v-if="campaign.info" class="block">
+                    <nuxt-link
+                      v-if="campaign.info && campaign.info.category"
+                      :to="'/?category=' + campaign.info.category"
+                      class="tag is-light is-medium mb-5"
+                      :class="['is-'+campaign.info.category]"
+                    >
+                      {{ campaign.info.category }}
                     </nuxt-link>
-                    <br>
+                    <span v-else class="tag is-info is-light is-medium">...</span>
                   </div>
-                  <button v-if="loading || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
-                    Loading
-                  </button>
-                  <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="joinCampaignPopup = true">
-                    Qualify
-                  </button>
-                  <button
-                    v-else-if="activeCampaignBatches.reduce((a,b) => a + b.num_tasks, 0) - activeCampaignBatches.reduce((a,b) => a + b.real_tasks_done, 0) > 0 && !userReservation"
-                    class="button is-fullwidth is-primary"
-                    @click.prevent="reserveTask"
-                  >
-                    Make Task Reservation
-                  </button>
-                  <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
-                    Go To Task
-                  </button>
-                  <template v-else>
-                    <button v-if="userJoined" class="button is-fullwidth is-primary" :disabled="true">
-                      Qualified for Task
-                    </button>
-                    <div class="has-text-centered">
-                      <i>No active tasks currently</i>
+                  <div class="block mb-6">
+                    Reward
+                    <br>
+                    <b><span>{{ campaign.reward.quantity }}</span></b>
+                    <br><br>
+                    Time <strong>/</strong> Task
+                    <br>
+                    <b>
+                      <span v-if="campaign.info && campaign.info.estimated_time">{{ campaign.info.estimated_time }} Seconds</span>
+                      <span v-else>...</span>
+                    </b>
+                    <br><br>
+                    EFX <strong>/</strong> Hour
+                    <br>
+                    <div v-if="campaign.info && campaign.info.estimated_time">
+                      <b>
+                        <span>{{ estimatedEarnings.efxPerHour }} EFX</span>
+                        <span>(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
+                      </b>
                     </div>
-                  </template>
+                    <div v-else>
+                      <b>
+                        <span>...</span>
+                      </b>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column is-half">
+                  <div class="block">
+                    Requester
+                    <br>
+                    <div class="blockchain-address">
+                      <nuxt-link :to="'/profile/' + campaign.owner[1]">
+                        {{ campaign.owner[1] }}
+                      </nuxt-link>
+                    </div>
+                  </div>
+                  <div class="block">
+                    IPFS
+                    <br>
+                    <div class="blockchain-address">
+                      <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
+                    </div>
+                  </div>
+                  <div class="block">
+                    Blockchain
+                    <br>
+                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
+                  </div>
+                  <div class="block">
+                    Tasks
+                    <br>
+                    <span v-if="activeBatchesByCampaignId(campaign.id) === null" class="loading-text">
+                      Loading
+                    </span>
+                    <span v-else>
+                      {{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
+                        return a + b.num_tasks
+                      },0) - activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
+                        return a + b.real_tasks_done
+                      },0) }}/{{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
+                        return a + b.num_tasks
+                      },0) }} left
+                      <br>
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div class="column is-half">
-                <div class="block">
-                  Requester
+
+              <div class="block is-vcentered ">
+                <div v-if="$auth.user.accountName === campaign.owner[1]">
+                  <nuxt-link :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
+                    Edit Task
+                  </nuxt-link>
                   <br>
-                  <div class="blockchain-address">
-                    <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                      {{ campaign.owner[1] }}
-                    </nuxt-link>
+                </div>
+                <button v-if="loading || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
+                  Loading
+                </button>
+                <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="joinCampaignPopup = true">
+                  Qualify
+                </button>
+                <button
+                  v-else-if="activeCampaignBatches.reduce((a,b) => a + b.num_tasks, 0) - activeCampaignBatches.reduce((a,b) => a + b.real_tasks_done, 0) > 0 && !userReservation"
+                  class="button is-fullwidth is-primary"
+                  @click.prevent="reserveTask"
+                >
+                  Make Task Reservation
+                </button>
+                <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
+                  Go To Task
+                </button>
+                <template v-else>
+                  <button v-if="userJoined" class="button is-fullwidth is-primary" :disabled="true">
+                    Qualified for Task
+                  </button>
+                  <div class="has-text-centered">
+                    <i>No active tasks currently</i>
                   </div>
-                </div>
-                <div class="block">
-                  IPFS
-                  <br>
-                  <div class="blockchain-address">
-                    <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
-                  </div>
-                </div>
-                <div class="block">
-                  Blockchain
-                  <br>
-                  <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
-                </div>
-                <div class="block">
-                  Tasks
-                  <br>
-                  <span v-if="activeBatchesByCampaignId(campaign.id) === null" class="loading-text">
-                    Loading
-                  </span>
-                  <span v-else>
-                    {{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
-                      return a + b.num_tasks
-                    },0) - activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
-                      return a + b.real_tasks_done
-                    },0) }}/{{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
-                      return a + b.num_tasks
-                    },0) }} left
-                    <br>
-                  </span>
-                </div>
+                </template>
               </div>
             </div>
           </div>
@@ -286,7 +312,7 @@ export default {
       id: parseInt(this.$route.params.id),
       accountId: this.$auth.user.vAccountRows[0].id,
       body: 'description',
-      userJoined: null,
+      userJoined: false,
       loading: false,
       joinCampaignPopup: false,
       userReservation: null,
@@ -304,6 +330,7 @@ export default {
       activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId'
     }),
     ...mapState({
+      joinedCampaigns: state => state.campaign.joinedCampaigns,
       campaigns: state => state.campaign.campaigns,
       batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded
     }),
@@ -318,6 +345,16 @@ export default {
         return this.campaigns.find(c => c.id === this.id)
       }
       return undefined
+    },
+    estimatedEarnings () {
+      const hourInSec = 3600
+      if (this.campaign && this.campaign.info.estimated_time && this.campaign.info.reward) {
+        const efxPerHour = hourInSec / this.campaign.info.estimated_time * this.campaign.info.reward
+        const dollarPerHour = efxPerHour * this.$blockchain.efxPrice
+        return { efxPerHour, dollarPerHour }
+      } else {
+        return { efxPerHour: 0, dollarPerHour: 0 }
+      }
     }
   },
   watch: {
@@ -342,6 +379,7 @@ export default {
       }
     },
     async reserveTask () {
+      this.$store.commit('view/ADD_JOINED_CAMPAIGN', this.campaign.id)
       this.loadingReservation = true
       const availableBatches = []
       for (const batch of this.campaignBatches) {
@@ -364,29 +402,6 @@ export default {
     },
     cancelBatchModal () {
       this.cancelledBatchesPopup = true
-    },
-    async joinCampaign () {
-      try {
-        // function that makes the user join this campaign.
-        this.loading = true
-        this.joinCampaignPopup = false
-        const data = await this.$blockchain.joinCampaign(this.id)
-        this.$store.dispatch('transaction/addTransaction', data)
-        if (data) {
-          this.loading = true
-          this.waitingOnTransaction = true
-          await this.$blockchain.waitForTransaction(data)
-          await this.checkUserCampaign()
-          if (this.userJoined) {
-            this.reserveTask()
-          }
-        }
-        this.loading = false
-        this.waitingOnTransaction = false
-        this.joinCampaignPopup = false
-      } catch (e) {
-        this.$blockchain.handleError(e)
-      }
     },
     async getBatches () {
       await this.$store.dispatch('campaign/getBatches')
@@ -411,10 +426,9 @@ export default {
       this.loading = true
       try {
         // checks if the user joined this campaign.
-        const data = await this.$blockchain.getCampaignJoins(this.id)
-        this.userJoined = (data.rows.length > 0)
+        this.userJoined = this.$store.state.view.joinedCampaigns.includes(this.id)
       } catch (e) {
-        this.$blockchain.handleError(e)
+        await this.$blockchain.handleError(e)
       }
       this.loading = false
     },

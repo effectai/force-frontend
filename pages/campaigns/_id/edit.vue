@@ -77,53 +77,132 @@
               <input v-model="campaignIpfs.image" class="input" type="text" placeholder="Image URL">
             </div>
           </div>
-          <label class="label">
-            Reward per task
-            <span class="has-text-info">*</span>
-          </label>
-          <div class="field has-addons">
-            <div class="control">
-              <input
-                v-model="campaignIpfs.reward"
-                required
-                class="input"
-                type="number"
-                placeholder="Reward per task"
-                step="0.0001"
-              >
-            </div>
-            <div class="control">
-              <a class="button is-primary">
-                EFX
-              </a>
+          <div class="field">
+            <label class="label">
+              Category
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="select">
+              <select v-model="campaignIpfs.category" required>
+                <option>---</option>
+                <option value="qualifier">
+                  Qualifier
+                </option>
+                <option value="annotations">
+                  Annotations
+                </option>
+                <option value="socials">
+                  Socials
+                </option>
+              </select>
             </div>
           </div>
-          <div class="control">
+
+          <hr>
+          <div class="field">
+            <label class="label">
+              Worker must have qualifications
+            </label>
+            <multiselect
+              v-if="allQualificationsLoaded"
+              v-model="inclusiveQualis"
+              tag-placeholder="Add"
+              placeholder="Select Qualifications"
+              label="name"
+              track-by="code"
+              :options="qualificationsDropdownData"
+              :multiple="true"
+              :taggable="true"
+              :show-labels="false"
+              @tag="addInclusiveQuali"
+            />
+          </div>
+          <div class="field">
+            <label class="label">
+              Deny workers with qualification
+            </label>
+            <multiselect
+              v-if="allQualificationsLoaded"
+              v-model="exclusiveQualis"
+              tag-placeholder="Add"
+              placeholder="Select Qualifications"
+              label="name"
+              track-by="code"
+              :options="qualificationsDropdownData"
+              :multiple="true"
+              :taggable="true"
+              :show-labels="false"
+              @tag="addExclusiveQuali"
+            />
+          </div>
+          <hr>
+
+          <div class="field">
+            <label class="label">
+              EFX <strong>/</strong> Task
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="field has-addons">
+              <div class="control">
+                <input
+                  v-model="campaignIpfs.reward"
+                  required
+                  class="input"
+                  type="number"
+                  placeholder="Reward per task"
+                  step="0.0001"
+                >
+              </div>
+              <div class="control">
+                <a class="button is-primary">
+                  EFX
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="" class="label">
+              Time <strong>/</strong> Task
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="field has-addons">
+              <div class="control">
+                <input
+                  v-model="campaignIpfs.estimated_time"
+                  class="input"
+                  type="number"
+                  placeholder="1"
+                  step="1"
+                  min="1"
+                >
+              </div>
+              <div class="control">
+                <a href="" class="button is-primary">Seconds</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="" class="label">
+              EFX <strong>/</strong> Hour
+            </label>
             <div class="field">
-              <label class="label">
-                Category
-                <span class="has-text-info">*</span>
-              </label>
-              <div class="select">
-                <select v-model="campaignIpfs.category" required>
-                  <option>---</option>
-                  <option value="dao">
-                    Effect DAO
-                  </option>
-                  <option value="translate">
-                    Effect Translate
-                  </option>
-                  <option value="socials">
-                    Effect Socials
-                  </option>
-                  <option value="captions">
-                    Effect Captions
-                  </option>
-                </select>
+              <div v-if="campaignIpfs && campaignIpfs.estimated_time && campaignIpfs.reward">
+                <b>
+                  <span>{{ parseFloat(estimatedEarnings.efxPerHour).toFixed(4) }} EFX</span>
+                  <span>(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
+                </b>
+              </div>
+              <div v-else>
+                <b>
+                  <span>...</span>
+                </b>
               </div>
             </div>
           </div>
         </div>
+
         <div v-show="formGroup === 'instructions'" class="block instructions-group">
           <div class="columns">
             <div class="column is-two-fifths">
@@ -235,8 +314,10 @@
 
 <script>
 import _ from 'lodash'
+import { mapState, mapGetters } from 'vuex'
 import VueSimplemde from 'vue-simplemde'
 import { Template } from '@effectai/effect-js'
+import Multiselect from 'vue-multiselect'
 import InstructionsModal from '@/components/InstructionsModal'
 import TemplateMedia from '@/components/Template'
 import SuccessModal from '@/components/SuccessModal'
@@ -256,7 +337,8 @@ export default {
     VueSimplemde,
     TemplateMedia,
     InstructionsModal,
-    SuccessModal
+    SuccessModal,
+    Multiselect
   },
 
   filters: {
@@ -294,7 +376,8 @@ export default {
         category: '',
         example_task: {},
         version: 1,
-        reward: null
+        reward: null,
+        estimated_time: null
       },
       campaign: null,
       formGroup: 'basic-info',
@@ -306,13 +389,56 @@ export default {
       successMessage: null,
       successTitle: null,
       campaignLoading: null,
-      answer: null
+      answer: null,
+      inclusiveQualis: [],
+      exclusiveQualis: [],
+      options: []
     }
   },
   computed: {
+    ...mapState({
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
+    }),
+    ...mapGetters({
+      qualificationById: 'qualification/qualificationById'
+    }),
     // Compares live campaign info to stored campaign info
     hasChanged () {
       return this.campaign && !_.isEqual(this.campaignIpfs, this.campaign.info)
+    },
+    estimatedEarnings () {
+      const hourInSec = 3600
+      if (this.campaignIpfs && this.campaignIpfs.estimated_time && this.campaignIpfs.reward) {
+        const efxPerHour = (hourInSec / this.campaignIpfs.estimated_time) * this.campaignIpfs.reward
+        const dollarPerHour = efxPerHour * this.$blockchain.efxPrice
+        return { efxPerHour, dollarPerHour }
+      } else {
+        return { efxPerHour: 0, dollarPerHour: 0 }
+      }
+    },
+    qualificationsDropdownData () {
+      for (const quali of this.campaign.qualis) {
+        const q = this.qualificationById(quali.key)
+        if (quali.value === 1) {
+          if (this.exclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
+            this.addExclusiveQuali(q.info.name, quali.key)
+          }
+        } else if (this.inclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
+          this.addInclusiveQuali(q.info.name, quali.key)
+        }
+      }
+      const qualifications = []
+      for (const qualification of this.$store.state.qualification.qualifications) {
+        if (qualification.info.name) {
+          qualifications.push(
+            {
+              name: qualification.info.name,
+              code: qualification.id
+            }
+          )
+        }
+      }
+      return qualifications
     }
   },
   watch: {
@@ -336,6 +462,7 @@ export default {
   },
 
   created () {
+    this.getQualifications()
     this.getCampaign()
   },
 
@@ -344,6 +471,25 @@ export default {
   },
 
   methods: {
+    async getQualifications () {
+      if (!this.allQualificationsLoaded) {
+        await this.$store.dispatch('qualification/getQualifications')
+      }
+    },
+    addExclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.exclusiveQualis.push(tag)
+    },
+    addInclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.inclusiveQualis.push(tag)
+    },
     showSubmission (values) {
       this.answer = values
     },
@@ -362,7 +508,7 @@ export default {
       const blob = new Blob([JSON.stringify(this.campaignIpfs)], { type: 'application/json' })
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      link.download = 'campaign'
+      link.download = `effect-${this.campaign.info.title}.json`
       link.click()
       URL.revokeObjectURL(link.href)
     },
@@ -394,8 +540,21 @@ export default {
     async editCampaign () {
       this.loading = true
       try {
+        const qualis = []
+        for (let i = 0; i < this.exclusiveQualis.length; i++) {
+          qualis.push({
+            key: this.exclusiveQualis[i].code,
+            value: 1
+          })
+        }
+        for (let i = 0; i < this.inclusiveQualis.length; i++) {
+          qualis.push({
+            key: this.inclusiveQualis[i].code,
+            value: 0
+          })
+        }
         const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
-        const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward)
+        const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward, qualis)
 
         // Wait for transaction and reload campaigns
         this.successTitle = 'Campaign submitted successfully!'

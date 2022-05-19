@@ -45,34 +45,38 @@ $button-padding-horizontal: 1.7em;
 
 $network-color: #5158fa;
 $translate-color: #00c165;
+$annotations-color: #00c165;
 $force-color: #057cff;
 $socials-color: #06c6c6;
-$pieces-color: #999999;
+$qualifier-color: #999999;
 $dao-color: #d7ac00;
 $captions-color: #e06375;
 $balance-box-color: #F7FBFF;
 
 $network-color-invert: findColorInvert($network-color);
 $translate-color-invert: findColorInvert($translate-color);
+$annotations-color-invert: findColorInvert($annotations-color);
 $force-color-invert: findColorInvert($force-color);
 $socials-color-invert: findColorInvert($socials-color);
-$pieces-color-invert: findColorInvert($pieces-color);
+$qualifier-color-invert: findColorInvert($qualifier-color);
 $dao-color-invert: findColorInvert($dao-color);
 $captions-color-invert: findColorInvert($captions-color);
 
 $network-color-light: findLightColor($network-color);
 $translate-color-light: findLightColor($translate-color);
+$annotations-color-light: findLightColor($annotations-color);
 $force-color-light: findLightColor($force-color);
 $socials-color-light: findLightColor($socials-color);
-$pieces-color-light: findLightColor($pieces-color);
+$qualifier-color-light: findLightColor($qualifier-color);
 $dao-color-light: findLightColor($dao-color);
 $captions-color-light: findLightColor($captions-color);
 
 $network-color-dark: findDarkColor($network-color);
 $translate-color-dark: findDarkColor($translate-color);
+$annotations-color-dark: findDarkColor($annotations-color);
 $force-color-dark: findDarkColor($force-color);
 $socials-color-dark: findDarkColor($socials-color);
-$pieces-color-dark: findDarkColor($pieces-color);
+$qualifier-color-dark: findDarkColor($qualifier-color);
 $dao-color-dark: findDarkColor($dao-color);
 $captions-color-dark: findDarkColor($captions-color);
 
@@ -99,9 +103,10 @@ $control-border-width: 2px;
 $effectColors: (
   "dao": ($dao-color, $dao-color-invert, $dao-color-light, $dao-color-dark),
   "translate": ($translate-color, $translate-color-invert, $translate-color-light, $translate-color-dark),
+  "annotations": ($annotations-color, $annotations-color-invert, $annotations-color-light, $annotations-color-dark),
   "force": ($force-color, $force-color-invert, $force-color-light, $force-color-dark),
   "socials": ($socials-color, $socials-color-invert, $socials-color-light, $socials-color-dark),
-  "pieces": ($pieces-color, $pieces-color-invert, $pieces-color-light, $pieces-color-dark),
+  "qualifier": ($qualifier-color, $qualifier-color-invert, $qualifier-color-light, $qualifier-color-dark),
   "captions": ($captions-color, $captions-color-invert, $captions-color-light, $captions-color-dark),
   "network": ($network-color, $network-color-invert, $network-color-light, $network-color-dark)
 );

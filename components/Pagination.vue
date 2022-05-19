@@ -25,19 +25,14 @@
         <span class="pagination-ellipsis">&hellip;</span>
       </li>
       <li v-if="page > 1">
-        <a class="pagination-link" @click="$emit('setPage', page - 1)">{{
-          page - 1
-        }}</a>
+        <a class="pagination-link" @click="$emit('setPage', page - 1)">{{ page - 1 }}</a>
       </li>
       <li>
-        <a class="pagination-link is-current" aria-current="page">{{
-          page
-        }}</a>
+        <a class="pagination-link is-current" aria-current="page">{{ page }}</a>
       </li>
       <li v-if="page < maxPage">
-        <a class="pagination-link" @click="$emit('setPage', page + 1)">{{
-          page + 1
-        }}</a>
+        <a class="pagination-link" @click="$emit('setPage', page + 1)">
+          {{ page + 1 }}</a>
       </li>
       <li v-if="maxPage > page + 2">
         <span class="pagination-ellipsis">&hellip;</span>

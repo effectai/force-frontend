@@ -56,42 +56,116 @@
               <input v-model="campaignIpfs.image" class="input" type="text" placeholder="Image URL">
             </div>
           </div>
-          <label class="label">
-            Reward per task
-            <span class="has-text-info">*</span>
-          </label>
-          <div class="field has-addons">
-            <div class="control">
-              <input v-model="campaignIpfs.reward" class="input" type="number" placeholder="Reward per task" step="0.0001">
-            </div>
-            <div class="control">
-              <a class="button is-primary">
-                EFX
-              </a>
+          <div class="field">
+            <label class="label">
+              Category
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="select">
+              <select v-model="campaignIpfs.category" required>
+                <option>---</option>
+                <option value="qualifier">
+                  Qualifier
+                </option>
+                <option value="annotations">
+                  Annotations
+                </option>
+                <option value="socials">
+                  Socials
+                </option>
+              </select>
             </div>
           </div>
-          <div class="control">
+          <hr>
+          <div class="field">
+            <label class="label">
+              Worker must have qualifications
+            </label>
+            <multiselect
+              v-if="allQualificationsLoaded"
+              v-model="inclusiveQualis"
+              tag-placeholder="Add"
+              placeholder="Select Qualifications"
+              label="name"
+              track-by="code"
+              :options="qualificationsDropdownData"
+              :multiple="true"
+              :taggable="true"
+              :show-labels="false"
+              @tag="addInclusiveQuali"
+            />
+          </div>
+          <div class="field">
+            <label class="label">
+              Deny workers with qualification
+            </label>
+            <multiselect
+              v-if="allQualificationsLoaded"
+              v-model="exclusiveQualis"
+              tag-placeholder="Add"
+              placeholder="Select Qualifications"
+              label="name"
+              track-by="code"
+              :options="qualificationsDropdownData"
+              :multiple="true"
+              :taggable="true"
+              :show-labels="false"
+              @tag="addExclusiveQuali"
+            />
+          </div>
+          <hr>
+          <div class="field">
+            <label class="label">
+              EFX <strong>/</strong> Task
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="field has-addons">
+              <div class="control">
+                <input v-model="campaignIpfs.reward" class="input" type="number" placeholder="Reward per task" step="0.0001">
+              </div>
+              <div class="control">
+                <a class="button is-primary">
+                  EFX
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="" class="label">
+              Time <strong>/</strong> Task
+              <span class="has-text-info">*</span>
+            </label>
+            <div class="field has-addons">
+              <div class="control">
+                <input
+                  v-model="campaignIpfs.estimated_time"
+                  class="input"
+                  type="number"
+                  placeholder="1"
+                  step="1"
+                  min="1"
+                >
+              </div>
+              <div class="control">
+                <a href="" class="button is-primary">Seconds</a>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="" class="label">
+              EFX <strong>/</strong> Hour
+            </label>
             <div class="field">
-              <label class="label">
-                Category
-                <span class="has-text-info">*</span>
-              </label>
-              <div class="select">
-                <select v-model="campaignIpfs.category">
-                  <option>---</option>
-                  <option value="dao">
-                    Effect DAO
-                  </option>
-                  <option value="translate">
-                    Effect Translate
-                  </option>
-                  <option value="socials">
-                    Effect Socials
-                  </option>
-                  <option value="captions">
-                    Effect Captions
-                  </option>
-                </select>
+              <div v-if="campaignIpfs && campaignIpfs.estimated_time && campaignIpfs.reward">
+                <b>
+                  <span>{{ parseFloat(estimatedEarnings.efxPerHour).toFixed(4) }} EFX</span>
+                  <span>(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
+                </b>
+              </div>
+              <div v-else>
+                <b>
+                  <span>...</span>
+                </b>
               </div>
             </div>
           </div>
@@ -104,7 +178,7 @@
                   Raw Markdown
                   <span class="has-text-info">*</span>
                 </label>
-                <div v-if="campaign && campaignIpfs" class="control">
+                <div v-if="campaignIpfs" class="control">
                   <vue-simplemde ref="markdownEditor" v-model="campaignIpfs.instructions" required :configs="{promptURLs: true, spellChecker: false}" />
                 </div>
               </div>
@@ -113,7 +187,7 @@
               <div class="field">
                 <label class="label">Preview</label>
                 <div class="control">
-                  <instructions-modal v-if="campaign && campaignIpfs" :show="true" :functional="false" :campaign="campaign" :info="campaignIpfs" />
+                  <instructions-modal v-if="campaignIpfs" :show="true" :functional="false" :info="campaignIpfs" />
                 </div>
               </div>
             </div>
@@ -216,8 +290,10 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import VueSimplemde from 'vue-simplemde'
 import { Template } from '@effectai/effect-js'
+import Multiselect from 'vue-multiselect'
 import { codemirror } from 'vue-codemirror'
 import { Splitpanes, Pane } from 'splitpanes'
 import InstructionsModal from '@/components/InstructionsModal'
@@ -249,20 +325,8 @@ export default {
     InstructionsModal,
     SuccessModal,
     Splitpanes,
-    Pane
-  },
-
-  filters: {
-    formatBytes (bytes, decimals = 2) {
-      if (bytes === 0) {
-        return '0 Bytes'
-      }
-      const k = 1024
-      const dm = decimals < 0 ? 0 : decimals
-      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      const i = Math.floor(Math.log(bytes) / Math.log(k))
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
-    }
+    Pane,
+    Multiselect
   },
   beforeRouteLeave (to, from, next) {
     if (this.checkClose()) {
@@ -288,15 +352,13 @@ export default {
         description: '',
         instructions: '',
         // eslint-disable-next-line no-template-curly-in-string
-        template: '<h2>Placeholder example: ${placeholder} </h2>\n<input type="text" required placeholder="\'name\' attribute is required on input fields" name="test" /><input type="submit" />',
+        template: '',
         image: '',
         category: '',
         example_task: {},
         version: 1,
-        reward: null
-      },
-      campaign: {
-        content_hash: null
+        reward: null,
+        estimated_time: null
       },
       formGroup: 'tasks',
       cachedFormData: null,
@@ -307,13 +369,43 @@ export default {
       successMessage: null,
       successTitle: null,
       answer: null,
-      windowWidth: 0
+      windowWidth: 0,
+      inclusiveQualis: [],
+      exclusiveQualis: [],
+      options: []
     }
   },
   computed: {
+    ...mapState({
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
+    }),
     // Compares cached user data to live data
     hasChanged () {
       return this.cachedFormData !== this.formDataForComparison()
+    },
+    estimatedEarnings () {
+      const hourInSec = 3600
+      if (this.campaignIpfs && this.campaignIpfs.estimated_time && this.campaignIpfs.reward) {
+        const efxPerHour = hourInSec / this.campaignIpfs.estimated_time * this.campaignIpfs.reward
+        const dollarPerHour = efxPerHour * this.$blockchain.efxPrice
+        return { efxPerHour, dollarPerHour }
+      } else {
+        return { efxPerHour: 0, dollarPerHour: 0 }
+      }
+    },
+    qualificationsDropdownData () {
+      const qualifications = []
+      for (const qualification of this.$store.state.qualification.qualifications) {
+        if (qualification.info.name) {
+          qualifications.push(
+            {
+              name: qualification.info.name,
+              code: qualification.id
+            }
+          )
+        }
+      }
+      return qualifications
     }
   },
   watch: {
@@ -328,12 +420,6 @@ export default {
       })
       this.campaignIpfs.example_task = newPlaceholders
     },
-    campaign: {
-      deep: true,
-      handler (campaign) {
-        window.localStorage.setItem('cached_campaign', JSON.stringify(campaign))
-      }
-    },
     campaignIpfs: {
       deep: true,
       handler (campaignIpfs) {
@@ -343,6 +429,7 @@ export default {
   },
 
   created () {
+    this.getQualifications()
     this.cacheFormData()
     // eslint-disable-next-line nuxt/no-globals-in-created
     window.addEventListener('resize', this.handleResize)
@@ -357,6 +444,25 @@ export default {
   },
 
   methods: {
+    async getQualifications () {
+      if (!this.allQualificationsLoaded) {
+        await this.$store.dispatch('qualification/getQualifications')
+      }
+    },
+    addExclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.exclusiveQualis.push(tag)
+    },
+    addInclusiveQuali (quali, id) {
+      const tag = {
+        name: quali,
+        code: id
+      }
+      this.inclusiveQualis.push(tag)
+    },
     handleResize () {
       this.windowWidth = window.innerWidth
     },
@@ -391,7 +497,7 @@ export default {
       const blob = new Blob([JSON.stringify(this.campaignIpfs)], { type: 'application/json' })
       const link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
-      link.download = 'campaign'
+      link.download = this.campaignIpfs.length === 0 ? `effect_${this.campaignIpfs.title}.json` : 'effect_untitled_campaign.json'
       link.click()
       URL.revokeObjectURL(link.href)
     },
@@ -403,7 +509,8 @@ export default {
       if (
         this.campaignIpfs.title && this.campaignIpfs.description &&
         this.campaignIpfs.reward && this.campaignIpfs.category &&
-        this.campaignIpfs.instructions && this.campaignIpfs.template
+        this.campaignIpfs.instructions && this.campaignIpfs.template &&
+        this.campaignIpfs.estimated_time
       ) {
         return true
       }
@@ -425,15 +532,14 @@ export default {
       if (!this.campaignIpfs.template) {
         this.errors.push('Template is required.')
       }
+      if (!this.campaignIpfs.estimated_time) {
+        this.errors.push('Estimated time is required.')
+      }
       return false
     },
     cacheFormData () {
       // save this in the store instead?
-      const campaign = window.localStorage.getItem('cached_campaign')
       const campaignIpfs = window.localStorage.getItem('cached_campaignIpfs')
-      if (campaign) {
-        this.campaign = JSON.parse(campaign)
-      }
       if (campaignIpfs) {
         this.campaignIpfs = JSON.parse(campaignIpfs)
       }
@@ -447,8 +553,23 @@ export default {
         if (this.checkForm()) {
           this.loading = true
           const campaignIpfs = { ...this.campaignIpfs }
+
+          const qualis = []
+          for (let i = 0; i < this.exclusiveQualis.length; i++) {
+            qualis.push({
+              key: this.exclusiveQualis[i].code,
+              value: 1
+            })
+          }
+          for (let i = 0; i < this.inclusiveQualis.length; i++) {
+            qualis.push({
+              key: this.inclusiveQualis[i].code,
+              value: 0
+            })
+          }
+
           const hash = await this.$blockchain.uploadCampaign(campaignIpfs)
-          const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward)
+          const result = await this.$blockchain.createCampaign(hash, this.campaignIpfs.reward, qualis)
 
           // Wait for transaction and reload campaigns
           this.successTitle = 'Campaign submitted successfully'
@@ -469,7 +590,8 @@ export default {
             category: '',
             example_task: {},
             version: 1,
-            reward: null
+            reward: null,
+            estimated_time: null
           }
           this.loading = false
           this.submitted = true

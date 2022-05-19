@@ -146,20 +146,6 @@
           </div>
         </div>
 
-        <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
-          <h2 class="title is-4">
-            My Tasks
-          </h2>
-          <nuxt-link class="button is-primary is-pulled-right no-float-mobile has-margin-bottom-mobile" to="/campaigns/templates">
-            <span class="icon">
-              +
-            </span>
-            <span>Create Task</span>
-          </nuxt-link>
-        </div>
-
-        <campaign-list class="mb-5" :campaigns="myCampaigns" />
-
         <div class="mb-6">
           <h2 class="title is-4 mt-6 is-spaced">
             Transactions
@@ -223,21 +209,12 @@ import { mapGetters, mapState } from 'vuex'
 import VueCountdown from '@chenfengyuan/vue-countdown/dist/vue-countdown.common'
 import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
-import CampaignList from '@/components/CampaignList'
 import KeyModal from '@/components/KeyModal.vue'
 import SuccessModal from '@/components/SuccessModal'
 
 export default {
-  components: { Balance, CampaignList, Pagination, KeyModal, VueCountdown, SuccessModal },
-  filters: {
-    hide (value, show) {
-      if (show) {
-        return value
-      } else {
-        return value.toString().split('').map(() => '•').join('')
-      }
-    }
-  },
+  components: { Balance, Pagination, KeyModal, VueCountdown, SuccessModal },
+  filters: {},
   middleware: ['auth'],
   data () {
     return {

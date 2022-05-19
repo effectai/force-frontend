@@ -8,11 +8,22 @@ export default {
       } else {
         state.grid = value
       }
+    },
+    ADD_JOINED_CAMPAIGN (state, campaignId) {
+      if (state.batches) {
+        const index = state.joinedCampaigns.findIndex(c => c === campaignId)
+        if (index === -1) {
+          state.batches.push(campaignId)
+        }
+      } else {
+        state.joinedCampaigns = [campaignId]
+      }
     }
   },
   state: () => {
     return {
-      grid: false
+      grid: true,
+      joinedCampaigns: []
     }
   }
 }

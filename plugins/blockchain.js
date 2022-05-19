@@ -80,6 +80,7 @@ export default (context, inject) => {
         context.store.dispatch('campaign/getCampaigns')
         context.store.dispatch('campaign/getBatches')
         context.store.dispatch('campaign/getSubmissions')
+        context.store.dispatch('qualification/getQualifications')
         context.store.dispatch('pendingPayout/loadPendingPayouts')
       },
       updateTemplates () {
@@ -109,6 +110,14 @@ export default (context, inject) => {
               return data.tickers[0].converted_last[currency]
             }
           })
+      },
+      async estimateMinPricePerTask (efx, currency = 'usd') {
+        const price = await this.getEfxPrice(currency).catch(console.error)
+        if (price) {
+          const res = this.sdk.config.taskEstimatedTime < efx * price
+          console.log('Minimum price efx', res)
+          return res
+        }
       },
       async getBlockchainInfo () {
         let eosInfo
@@ -363,7 +372,7 @@ export default (context, inject) => {
           await context.store.dispatch('campaign/getBatchTasks', batches[i])
           try {
             reservation = await this.reserveOrClaimTask(batches[i], batches[i].tasks)
-            context.app.router.push('/campaigns/' + batches[i].campaign_id + '/' + batches[i].batch_id + '/' + reservation.task_index + '?submissionId=' + reservation.id)
+            context.app.router.push('/campaigns/' + batches[i].campaign_id + '/' + batches[i].batch_id + '/' + reservation.id)
             return
           } catch (error) {
             if (i === batches.length - 1) {
@@ -395,11 +404,8 @@ export default (context, inject) => {
       async getSubmissions (nextKey, limit = 50) {
         return await this.sdk.force.getSubmissions(nextKey, limit)
       },
-      async getCampaignJoins (campaignId) {
-        return await this.sdk.force.getCampaignJoins(campaignId)
-      },
-      async joinCampaign (campaignId) {
-        return await this.sdk.force.joinCampaign(campaignId)
+      async getBatchJoins (batchId) {
+        return await this.sdk.force.getBatchJoins(batchId)
       },
       async uploadCampaign (content) {
         return await this.sdk.force.uploadCampaign(content)
@@ -431,11 +437,11 @@ export default (context, inject) => {
       async resumeBatch (batch) {
         return await this.sdk.force.resumeBatch(batch)
       },
-      async editCampaign (id, hash, reward) {
-        return await this.sdk.force.editCampaign(id, hash, reward)
+      async editCampaign (id, hash, reward, qualis) {
+        return await this.sdk.force.editCampaign(id, hash, reward, qualis)
       },
-      async createCampaign (hash, reward) {
-        return await this.sdk.force.createCampaign(hash, reward)
+      async createCampaign (hash, reward, qualis) {
+        return await this.sdk.force.createCampaign(hash, reward, qualis)
       },
       async payout () {
         return await this.sdk.force.payout()
@@ -463,10 +469,25 @@ export default (context, inject) => {
       async waitForTransaction (transactionResult) {
         return await this.sdk.force.waitTransaction(transactionResult)
       },
-      async joinCampaignAndReserveTask (id, batchId, tasksDone, tasks) {
-        return await this.sdk.force.joinCampaignAndReserveTask(id, batchId, tasksDone, tasks)
+      // createQualification = async (name: string, description: string, type: number, image?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+      async createQualification (name, description, type, image) {
+        return await this.sdk.force.createQualification(name, description, type, image)
       },
-
+      // assignQualification = async (qualificationId: number, campaignId: number, hash: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+      async assignQualification (qualificationId, campaignId, hash) {
+        return await this.sdk.force.assignQualification(qualificationId, campaignId, hash)
+      },
+      // getQualification = async (id: number): Promise<Qualification> => {
+      async getQualification (id) {
+        return await this.sdk.force.getQualification(id)
+      },
+      async getQualifications (nextKey, limit = 50, processCampaign = true) {
+        return await this.sdk.force.getQualifications(nextKey, limit, processCampaign)
+      },
+      // getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
+      async getUserQualifications (id) {
+        return await this.sdk.force.getUserQualifications(id)
+      },
       async recoverPublicKey () {
         const message = 'Effect Account'
         const signature = await bsc.sign(message)

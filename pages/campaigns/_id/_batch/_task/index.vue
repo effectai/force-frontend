@@ -77,7 +77,7 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import InstructionsModal from '@/components/InstructionsModal'
@@ -94,8 +94,7 @@ export default {
     return {
       campaignId: parseInt(this.$route.params.id),
       batchId: parseInt(this.$route.params.batch),
-      taskIndex: parseInt(this.$route.params.task),
-      submissionId: parseInt(this.$route.query.submissionId),
+      submissionId: parseInt(this.$route.params.task),
       campaign: undefined,
       batch: undefined,
       task: undefined,
@@ -103,10 +102,15 @@ export default {
       loadingReservation: false,
       showInstructionsModal: false,
       showSubmittedTaskModal: false,
-      reserveInBatch: null
+      reserveInBatch: null,
+      reservation: null,
+      taskIndex: null
     }
   },
   computed: {
+    ...mapGetters({
+      submissionById: 'campaign/submissionById'
+    }),
     ...mapState({
       batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
@@ -137,6 +141,28 @@ export default {
     async getBatch () {
       await this.$store.dispatch('campaign/getBatch', { batchId: this.batchId })
       this.batch = this.batches.find(b => b.batch_id === this.batchId)
+      await this.getTask()
+    },
+    async getTask () {
+      this.reservation = this.submissionById(this.submissionId)
+      // it could be that there are no submissions in the store, e.g when the user refresh the page.
+      // if that is the case get the submissions before trying to get the single submission
+      // can we save the submissions persistent?
+      if (!this.reservation) {
+        await this.$store.dispatch('campaign/getSubmissions')
+        this.reservation = this.submissionById(this.submissionId)
+      }
+
+      // if the submission can't be found, or is not from the current user, throw error and redirect
+      if (!this.reservation || this.reservation.account_id !== this.$auth.user.vAccountRows[0].id) {
+        this.$blockchain.handleError('Reservation not found')
+        this.$router.push('/campaigns/' + this.campaignId)
+      } else if (this.reservation.data) {
+        this.$blockchain.handleError('Task already submitted by you')
+        this.showSubmittedTaskModal = true
+        return
+      }
+      this.taskIndex = await this.$blockchain.getTaskIndexFromLeaf(this.batch.campaign_id, this.batch.id, this.reservation.leaf_hash, this.batch.tasks)
       this.task = this.batch.tasks[this.taskIndex]
     },
     async getCampaign () {

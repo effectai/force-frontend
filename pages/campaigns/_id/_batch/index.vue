@@ -307,7 +307,7 @@
                       v-if="campaign && campaign.info"
                       :to="'/?category=' + campaign.info.category"
                       class="tag is-info is-light is-medium"
-                      :class="{'is-dao': campaign.info.category === 'dao', 'is-dao': campaign.info.category === 'dao', 'is-socials': campaign.info.category === 'socials', 'is-translate': campaign.info.category === 'translate', 'is-captions': campaign.info.category === 'captions'}"
+                      :class="['is-'+campaign.info.category]"
                     >
                       {{ campaign.info.category }}
                     </nuxt-link>
@@ -323,7 +323,13 @@
                     Reward
                     <br>
                     <span v-if="campaign"><b>{{ campaign.reward.quantity }}</b></span>
-                    <span v-else>.....</span>
+                    <span v-else>...</span>
+                  </div>
+                  <div class="block">
+                    Repititions
+                    <br>
+                    <span v-if="batch"><b>{{ batch.repetitions }}</b></span>
+                    <span v-else>...</span>
                   </div>
                 </div>
                 <div class="column is-half">
@@ -364,7 +370,7 @@
                 <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
                   Loading
                 </button>
-                <button v-else-if="!userJoined" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
+                <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
                   Qualify
                 </button>
                 <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
@@ -487,7 +493,6 @@ export default {
     }
   },
   created () {
-    this.checkUserCampaign()
     this.getBatch()
     this.getCampaign()
   },
@@ -515,6 +520,7 @@ export default {
       }
     },
     async reserveTask () {
+      this.$store.commit('view/ADD_JOINED_CAMPAIGN', this.campaign.id)
       this.loadingReservation = true
       try {
         await this.$blockchain.makeReservation(this.batch)
@@ -522,29 +528,6 @@ export default {
         this.$blockchain.handleError(error)
       }
       this.loadingReservation = false
-    },
-    async joinCampaign () {
-      try {
-        // function that makes the user join this campaign.
-        this.loading = true
-        this.joinCampaignPopup = false
-        const data = await this.$blockchain.joinCampaign(this.campaignId)
-        this.$store.dispatch('transaction/addTransaction', data)
-        if (data) {
-          this.loading = true
-          this.waitingOnTransaction = true
-          this.joinCampaignPopup = false
-          await this.$blockchain.waitForTransaction(data)
-          await this.checkUserCampaign()
-          if (this.userJoined) {
-            this.reserveTask()
-          }
-        }
-        this.waitingOnTransaction = false
-        this.joinCampaignPopup = false
-      } catch (e) {
-        this.$blockchain.handleError(e)
-      }
     },
     async releaseTask (id) {
       const data = await this.$blockchain.releaseTask(id)
@@ -560,10 +543,9 @@ export default {
       this.loading = true
       try {
         // checks if the user joined this campaign.
-        const data = await this.$blockchain.getCampaignJoins(this.campaignId)
-        this.userJoined = (data.rows.length > 0)
+        this.userJoined = this.$store.state.view.joinedCampaigns.includes(this.campaign.id)
       } catch (e) {
-        this.$blockchain.handleError(e)
+        await this.$blockchain.handleError(e)
       }
       this.loading = false
     },
@@ -615,6 +597,7 @@ export default {
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.campaignId)
       this.campaign = this.campaigns.find(c => c.id === this.campaignId)
+      await this.checkUserCampaign()
     },
     generateRandomNumber (maxNum) {
       return Math.ceil(Math.random() * maxNum)

@@ -40,7 +40,7 @@
             </li>
           </ul>
         </div>
-        <form>
+        <div>
           <div class="field">
             <div class="box">
               <div v-if="!tasks.length" class="has-text-centered mb-4">
@@ -121,20 +121,20 @@
                     Upload tasks
                   </h2>
                   <div class="file is-boxed mt-3">
-                    <label class="file-label">
+                    <label class="file-label" style="width: 100%">
                       <input class="file-input" type="file" name="csvtasks" @change="uploadFile">
                       <span class="file-cta" @dragover="dragover" @dragleave="dragleave" @drop="drop">
-                        <span class="file-label has-text-grey is-size-7">
-                          Drag and drop or browse to choose a CSV file
+                        <span class="file-icon">
+                          <font-awesome-icon class="is-small" icon="fa-solid fa-upload" />
                         </span>
-                        <button class="button is-light mt-2">
-                          Choose a .csv file
-                        </button>
+                        <span class="file-label has-text-grey is-size-7">
+                          Drag and drop or browse<br>to choose a CSV file
+                        </span>
                       </span>
                     </label>
                   </div>
                   <div>
-                    <a ref="csvfiledownload" class="is-size-7" href="" :download="'tasks_example'+campaignId+'.csv'">Download example CSV</a>
+                    <a ref="csvfiledownload" class="is-size-7" href="" :download="`example-${campaignTitle}.csv`">Download example CSV</a>
                   </div>
                   <p v-if="file.name" class="has-text-success mt-2">
                     Imported file: {{ file.name }}
@@ -181,7 +181,7 @@
               </div>
             </div>
           </div>
-        </form>
+        </div>
         <form @submit.prevent="uploadBatch">
           <div class="field is-grouped is-justify-content-center mt-6">
             <div class="control">
@@ -277,6 +277,9 @@ export default {
         return this.tasks.slice(start, start + this.perPage)
       }
       return []
+    },
+    campaignTitle () {
+      return this.campaign?.info.title.toString() ?? 'Effect-Force-Campaign'
     }
   },
   mounted () {

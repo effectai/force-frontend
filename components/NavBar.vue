@@ -88,12 +88,14 @@
                         View Profile
                       </nuxt-link>
                     </li>
-                    <!-- <li>
-                      <span class="icon">
-                        <img src="~assets/img/icons/settings.svg" style="height: 22px">
-                      </span>
-                      Settings
-                    </li> -->
+                    <li>
+                      <nuxt-link to="/manage">
+                        <span class="icon">
+                          <img src="~assets/img/icons/settings.svg" style="height: 22px">
+                        </span>
+                        Manage
+                      </nuxt-link>
+                    </li>
                     <li class="logout" @click="logout">
                       <span class="icon">
                         <img src="~assets/img/icons/logout.svg" style="height: 22px">
@@ -176,12 +178,12 @@
                 </button>
               </div>
               <div class="column is-4" @click="showBalanceModal = false">
-                <nuxt-link to="/deposit"  class="button is-primary is-wide">
+                <nuxt-link to="/deposit" class="button is-primary is-wide">
                   Deposit
                 </nuxt-link>
               </div>
               <div class="column is-4" @click="showBalanceModal = false">
-                <nuxt-link to="/withdraw"  class="button is-wide is-primary is-outlined">
+                <nuxt-link to="/withdraw" class="button is-wide is-primary is-outlined">
                   Withdraw
                 </nuxt-link>
               </div>

@@ -12,7 +12,7 @@
             @click.prevent="toggleDestination('eos')"
           >
             <a>
-              <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span>
+              <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS"></span>
               <span>EOS</span>
             </a>
           </li>
@@ -23,7 +23,7 @@
           >
             <a>
               <span>BSC</span>
-              <span class="icon is-large"><img src="@/assets/img/providers/BSC-logo.svg" alt="BSC" /></span>
+              <span class="icon is-large"><img src="@/assets/img/providers/BSC-logo.svg" alt="BSC"></span>
             </a>
           </li>
         </ul>
@@ -57,7 +57,6 @@
       </div>
 
       <form class="box has-limited-width is-horizontal-centered" accept-charset="UTF-8" @submit.prevent="validateWithdrawForm">
-
         <div class="field">
           <label class="label">Destination {{ destinationBlockchain === 'eos' ? 'EOS' : 'BSC' }} Account</label>
           <div class="control">
@@ -91,7 +90,7 @@
         <div v-if="destinationBlockchain === 'eos'" class="field">
           <label for="" class="label">Memo (optional)</label>
           <div class="control">
-            <input v-model="memo" class="input" type="text" >
+            <input v-model="memo" class="input" type="text">
           </div>
         </div>
 
@@ -108,7 +107,6 @@
           </div>
         </div>
       </form>
-
     </div>
   </section>
 </template>
