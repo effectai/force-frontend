@@ -148,11 +148,13 @@ export default {
     inclQuali () {
       const quals = []
       const userQualis = this.qualificationByUser(this.accountId)
-      for (const quali of this.campaign.qualis) {
-        const q = this.qualificationById(quali.key)
-        const userHasQuali = userQualis.some(uq => uq.id === quali.key)
-        if (quali.value === 0) {
-          quals.push({ name: q.info.name, code: quali.key, userHasQuali })
+      if (this.campaign) {
+        for (const quali of this.campaign.qualis) {
+          const q = this.qualificationById(quali.key)
+          const userHasQuali = userQualis.some(uq => uq.id === quali.key)
+          if (quali.value === 0) {
+            quals.push({ name: q.info.name, code: quali.key, userHasQuali })
+          }
         }
       }
       return quals
@@ -161,11 +163,13 @@ export default {
     exclQuali () {
       const quals = []
       const userQualis = this.qualificationByUser(this.accountId)
-      for (const quali of this.campaign.qualis) {
-        const q = this.qualificationById(quali.key)
-        const userHasQuali = userQualis.some(uq => uq.id === quali.key)
-        if (quali.value === 1) {
-          quals.push({ name: q.info.name, code: quali.key, userHasQuali })
+      if (this.campaign) {
+        for (const quali of this.campaign.qualis) {
+          const q = this.qualificationById(quali.key)
+          const userHasQuali = userQualis.some(uq => uq.id === quali.key)
+          if (quali.value === 1) {
+            quals.push({ name: q.info.name, code: quali.key, userHasQuali })
+          }
         }
       }
       return quals

@@ -451,6 +451,7 @@ export default {
     this.getCampaign()
     this.getBatches()
     this.getQualifications()
+    this.getUserQuali()
   },
   methods: {
     showCompletedPopup () {
@@ -536,6 +537,10 @@ export default {
       if (!this.allQualificationsLoaded) {
         await this.$store.dispatch('qualification/getQualifications')
       }
+    },
+    async getUserQuali () {
+      const res = await this.$blockchain.getUserQualifications().catch(console.error)
+      console.log(`getUserQuali::${res}`)
     }
   }
 }
