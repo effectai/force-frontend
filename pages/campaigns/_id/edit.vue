@@ -417,16 +417,6 @@ export default {
       }
     },
     qualificationsDropdownData () {
-      for (const quali of this.campaign.qualis) {
-        const q = this.qualificationById(quali.key)
-        if (quali.value === 1) {
-          if (this.exclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
-            this.addExclusiveQuali(q.info.name, quali.key)
-          }
-        } else if (this.inclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
-          this.addInclusiveQuali(q.info.name, quali.key)
-        }
-      }
       const qualifications = []
       for (const qualification of this.$store.state.qualification.qualifications) {
         if (qualification.info.name) {
@@ -521,6 +511,16 @@ export default {
         const campaign = await this.$blockchain.getCampaign(+this.id)
         if (this.checkCampaignOwner(campaign)) {
           this.campaign = campaign
+          for (const quali of this.campaign.qualis) {
+            const q = this.qualificationById(quali.key)
+            if (quali.value === 1) {
+              if (this.exclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
+                this.addExclusiveQuali(q.info.name, quali.key)
+              }
+            } else if (this.inclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
+              this.addInclusiveQuali(q.info.name, quali.key)
+            }
+          }
           this.campaignIpfs = { ...this.campaign.info }
           window.addEventListener('beforeunload', this.checkClose)
         } else {

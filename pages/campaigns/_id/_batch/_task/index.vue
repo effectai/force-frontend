@@ -144,14 +144,8 @@ export default {
       await this.getTask()
     },
     async getTask () {
+      await this.$store.dispatch('campaign/getSubmissions')
       this.reservation = this.submissionById(this.submissionId)
-      // it could be that there are no submissions in the store, e.g when the user refresh the page.
-      // if that is the case get the submissions before trying to get the single submission
-      // can we save the submissions persistent?
-      if (!this.reservation) {
-        await this.$store.dispatch('campaign/getSubmissions')
-        this.reservation = this.submissionById(this.submissionId)
-      }
 
       // if the submission can't be found, or is not from the current user, throw error and redirect
       if (!this.reservation || this.reservation.account_id !== this.$auth.user.vAccountRows[0].id) {
