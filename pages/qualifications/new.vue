@@ -101,6 +101,7 @@ export default {
       console.log('trying create quali')
       try {
         if (this.validateForm()) {
+          this.errors = []
           this.loading = true
           const quali = {
             ...this.qualificationIpfs
