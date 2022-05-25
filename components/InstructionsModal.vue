@@ -120,12 +120,14 @@ export default {
       id: parseInt(this.$route.params.id),
       campaign: null,
       userQuali: [],
-      accountId: this.$auth.user.vAccountRows[0].id
+      accountId: this.$auth.user.vAccountRows[0].id,
+      assignedQuali: []
     }
   },
   created () {
     this.campaign = this.campaignById(this.id)
     this.userQuali = this.qualificationByUser(this.accountId)
+    this.getAssignedQuali()
   },
   computed: {
     ...mapGetters({
@@ -146,36 +148,37 @@ export default {
     },
 
     inclQuali () {
+      return this.userAssignedQuali(0)
+    },
+
+    exclQuali () {
+      return this.userAssignedQuali(1)
+    }
+  },
+  methods: {
+    userAssignedQuali (inclusive0orExclusive1) {
       const quals = []
-      const userQualis = this.qualificationByUser(this.accountId)
-      if (this.campaign) {
-        for (const quali of this.campaign.qualis) {
-          const q = this.qualificationById(quali.key)
-          const userHasQuali = userQualis.some(uq => uq.id === quali.key)
-          if (quali.value === 0) {
-            quals.push({ name: q.info.name, code: quali.key, userHasQuali })
-          }
+
+      if (this.assignedQuali.length === 0) {
+        return []
+      }
+
+      console.log(`inclsive: ${JSON.stringify(this.assignedQuali)}`)
+
+      // const userQualis = this.qualificationByUser(this.accountId)
+      for (const quali of this.campaign.qualis) {
+        const campaignQuali = this.qualificationById(quali.key)
+        const userHasQuali = this.assignedQuali.some((uq) => {
+          console.log('checking in some', uq, quali.key)
+          return uq.quali_id === quali.key
+        })
+        console.log(`UserHasQualiInclusive: ${quali}`)
+        if (quali.value === inclusive0orExclusive1) {
+          quals.push({ name: campaignQuali.info.name, code: quali.key, userHasQuali })
         }
       }
       return quals
     },
-
-    exclQuali () {
-      const quals = []
-      const userQualis = this.qualificationByUser(this.accountId)
-      if (this.campaign) {
-        for (const quali of this.campaign.qualis) {
-          const q = this.qualificationById(quali.key)
-          const userHasQuali = userQualis.some(uq => uq.id === quali.key)
-          if (quali.value === 1) {
-            quals.push({ name: q.info.name, code: quali.key, userHasQuali })
-          }
-        }
-      }
-      return quals
-    }
-  },
-  methods: {
     onCancel () {
       // check if modal should be functional.
       if (this.functional) {
@@ -200,6 +203,12 @@ export default {
           '*': ['style']
         }
       })
+    },
+    async getAssignedQuali () {
+      console.log(`Getting assigned qualifications for user: ${this.accountId}`)
+      const assignedRes = await this.$blockchain.getAssignedQualifications(this.accountId).catch(console.error)
+      this.assignedQuali = [...assignedRes]
+      console.log(`assignedQuali: ${JSON.stringify(assignedRes)}`)
     }
   }
 }

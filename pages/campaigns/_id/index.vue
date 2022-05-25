@@ -301,10 +301,15 @@
                   </nuxt-link>
                   <br>
                 </div>
-                <button v-if="loading || campaignBatches === null" class="button is-fullwidth is-primary is-loading">
+                <button v-if="loading || campaignBatches === null || !allQualificationsLoaded" class="button is-fullwidth is-primary is-loading">
                   Loading
                 </button>
-                <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" @click.prevent="joinCampaignPopup = true">
+                <button
+                  v-else-if="userJoined === false"
+                  class="button is-fullwidth is-primary"
+                  @click.prevent="joinCampaignPopup = true"
+                  :disabled="!userQualifies"
+                >
                   Qualify
                 </button>
                 <button
@@ -370,7 +375,8 @@ export default {
       categories: ['translate', 'captions', 'socials', 'dao'],
       successMessage: null,
       inclusiveQualis: [],
-      exclusiveQualis: []
+      exclusiveQualis: [],
+      assignedQuali: []
     }
   },
   computed: {
@@ -410,31 +416,24 @@ export default {
     },
 
     inclQuali () {
-      const quals = []
-      const userQualis = this.qualificationByUser(this.accountId)
-      for (const quali of this.campaign.qualis) {
-        const q = this.qualificationById(quali.key)
-        const userHasQuali = userQualis.some(uq => uq.id === quali.key)
-        if (quali.value === 0) {
-          quals.push({ name: q.info.name, code: quali.key, userHasQuali })
-        }
-      }
-      return quals
+      return this.userAssignedQuali(0)
     },
 
     exclQuali () {
-      const quals = []
-      const userQualis = this.qualificationByUser(this.accountId)
-      for (const quali of this.campaign.qualis) {
-        const q = this.qualificationById(quali.key)
-        const userHasQuali = userQualis.some(uq => uq.id === quali.key)
-        if (quali.value === 1) {
-          quals.push({ name: q.info.name, code: quali.key, userHasQuali })
-        }
-      }
-      return quals
-    }
+      return this.userAssignedQuali(1)
+    },
 
+    userQualifies () {
+      if (this.inclQuali && this.exclQuali) {
+        if (this.inclQuali.length > 0 || this.exclQuali.length > 0) {
+          return this.inclQuali.every(q => q.userHasQuali) && this.exclQuali.some(q => q.userHasQuali)
+        } else {
+          return false
+        }
+      } else {
+        return false
+      }
+    }
   },
 
   watch: {
@@ -451,7 +450,7 @@ export default {
     this.getCampaign()
     this.getBatches()
     this.getQualifications()
-    this.getUserQuali()
+    this.getAssignedQuali()
   },
   methods: {
     showCompletedPopup () {
@@ -459,6 +458,25 @@ export default {
         this.successTitle = 'No more tasks available for you in this campaign'
         this.successMessage = 'This could either mean that all the available tasks are already reserved, or you already completed the still available tasks.'
       }
+    },
+    userAssignedQuali (inclusive0orExclusive1) {
+      const quals = []
+
+      if (this.assignedQuali.length === 0 || !this.allQualificationsLoaded) {
+        return []
+      }
+
+      // const userQualis = this.qualificationByUser(this.accountId)
+      for (const quali of this.campaign.qualis) {
+        const campaignQuali = this.qualificationById(quali.key)
+        const userHasQuali = this.assignedQuali.some((uq) => {
+          return uq.quali_id === quali.key
+        })
+        if (quali.value === inclusive0orExclusive1) {
+          quals.push({ name: campaignQuali.info.name, code: quali.key, userHasQuali })
+        }
+      }
+      return quals
     },
     async reserveTask () {
       this.$store.commit('view/ADD_JOINED_CAMPAIGN', this.campaign.id)
@@ -538,9 +556,9 @@ export default {
         await this.$store.dispatch('qualification/getQualifications')
       }
     },
-    async getUserQuali () {
-      const res = await this.$blockchain.getUserQualifications().catch(console.error)
-      console.log(`getUserQuali::${res}`)
+    async getAssignedQuali () {
+      const assignedRes = await this.$blockchain.getAssignedQualifications(this.accountId).catch(console.error)
+      this.assignedQuali = [...assignedRes]
     }
   }
 }
