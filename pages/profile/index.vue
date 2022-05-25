@@ -148,6 +148,13 @@
 
         <div class="mb-6">
           <h2 class="title is-4 mt-6 is-spaced">
+            Qualifications
+          </h2>
+          <qualification-list class="mb-5" :qualifications="myQualifications" />
+        </div>
+
+        <div class="mb-6">
+          <h2 class="title is-4 mt-6 is-spaced">
             Transactions
           </h2>
           <div v-if="transactions" class="table-container">
@@ -211,9 +218,10 @@ import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import KeyModal from '@/components/KeyModal.vue'
 import SuccessModal from '@/components/SuccessModal'
+import QualificationList from '~/components/QualificationList.vue'
 
 export default {
-  components: { Balance, Pagination, KeyModal, VueCountdown, SuccessModal },
+  components: { Balance, Pagination, KeyModal, VueCountdown, SuccessModal, QualificationList },
   filters: {},
   middleware: ['auth'],
   data () {
@@ -237,7 +245,7 @@ export default {
       activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId'
     }),
     ...mapState({
-      campaigns: state => state.campaign.campaigns
+      qualifications: state => state.qualification.qualifications
     }),
     myCampaigns () {
       if (!this.campaigns) { return }
@@ -269,11 +277,18 @@ export default {
     },
     pendingPayoutsStore () {
       return this.getPendingPayouts ?? null
+    },
+    myQualifications () {
+      if (!this.qualifications) {
+        return
+      }
+      return this.qualifications.filter(el => el.account_id === this.$auth.user.vAccountRows[0].id)
     }
   },
   mounted () {
     console.log('mounted')
     this.$store.dispatch('pendingPayout/loadPendingPayouts')
+    this.$store.dispatch('qualification/getQualifications')
     // console.debug(this.$auth)
   },
   methods: {
