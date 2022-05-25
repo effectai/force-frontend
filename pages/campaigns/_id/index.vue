@@ -426,10 +426,24 @@ export default {
     userQualifies () {
       if (this.inclQuali && this.exclQuali) {
         if (this.inclQuali.length > 0 || this.exclQuali.length > 0) {
-          return this.inclQuali.every(q => q.userHasQuali) && this.exclQuali.some(q => q.userHasQuali)
+          return this.inclQuali.every(q => q.userHasQuali) && !this.exclQuali.some(q => q.userHasQuali)
         } else {
           return false
         }
+      } else {
+        return false
+      }
+    },
+    everyInclusive () {
+      if (this.inclQuali) {
+        return this.inclQuali.every(q => q.userHasQuali)
+      } else {
+        return false
+      }
+    },
+    someExclusive () {
+      if (this.exclQuali) {
+        return !this.exclQuali.some(q => q.userHasQuali)
       } else {
         return false
       }
