@@ -146,14 +146,28 @@
           </div>
         </div>
 
-        <div class="mb-6">
+        <!-- Qualifications -->
+        <div class="py-2">
           <h2 class="title is-4 mt-6 is-spaced">
             Qualifications
           </h2>
-          <qualification-list class="mb-5" :qualifications="myQualifications" />
+          <div v-if="qualifications" class="columns is-mobile is-multiline is-max-widescreen">
+            <div
+              v-for="q in qualifications"
+              :key="q.id"
+              class="is-1-desktop column is-one-quarter-mobile quali"
+              :data-tooltip="q.info.name"
+            >
+              <nuxt-link :to="`/qualifications/${q.id}`">
+                <img :src="q.info.image" v-if="q.info.image">
+                <img :src="require(`~/assets/img/dapps/effect-force-icon.png`)" v-else>
+              </nuxt-link>
+            </div>
+          </div>
+          <span v-else>No qualifications found</span>
         </div>
 
-        <div class="mb-6">
+        <div class="py-2">
           <h2 class="title is-4 mt-6 is-spaced">
             Transactions
           </h2>
@@ -218,10 +232,9 @@ import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import KeyModal from '@/components/KeyModal.vue'
 import SuccessModal from '@/components/SuccessModal'
-import QualificationList from '~/components/QualificationList.vue'
 
 export default {
-  components: { Balance, Pagination, KeyModal, VueCountdown, SuccessModal, QualificationList },
+  components: { Balance, Pagination, KeyModal, VueCountdown, SuccessModal },
   filters: {},
   middleware: ['auth'],
   data () {
@@ -292,6 +305,10 @@ export default {
     // console.debug(this.$auth)
   },
   methods: {
+    async getUserQuali () {
+      const res = await this.$blockchain.getUserQualifications().catch(console.error)
+      console.log('getUserQuali,', res)
+    },
     async logout () {
       await this.$auth.logout()
     },
@@ -362,6 +379,14 @@ button.button.is-small.is-info {
   .is-pulled-right {
     float: none !important;
     margin-bottom: 25px;
+  }
+}
+.quali {
+  img {
+    height: 80px;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
   }
 }
 </style>
