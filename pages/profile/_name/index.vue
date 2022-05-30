@@ -84,19 +84,6 @@ export default {
     myCampaigns () {
       if (!this.campaigns) { return }
       const filteredCampaigns = this.campaigns.filter(c => c.owner[1] === this.name).map((c) => { return { ...c } })
-
-      for (const i in filteredCampaigns) {
-        const batches = this.activeBatchesByCampaignId(filteredCampaigns[i].id)
-        filteredCampaigns[i].batches = batches
-        if (batches) {
-          filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
-            return a + b.num_tasks
-          }, 0)
-          filteredCampaigns[i].tasks_done = batches.reduce(function (a, b) {
-            return a + b.real_tasks_done
-          }, 0)
-        }
-      }
       return filteredCampaigns
     }
   },
