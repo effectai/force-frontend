@@ -156,9 +156,8 @@
               v-for="q in qualifications"
               :key="q.id"
               class="is-1-desktop column is-one-quarter-mobile quali"
-              :data-tooltip="q.info.name"
             >
-              <nuxt-link :to="`/qualifications/${q.id}`">
+              <nuxt-link :to="`/qualifications/${q.id}`" :data-tooltip="q.info.name">
                 <img :src="q.info.image" v-if="q.info.image">
                 <img :src="require(`~/assets/img/dapps/effect-force-icon.png`)" v-else>
               </nuxt-link>
@@ -226,7 +225,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import VueCountdown from '@chenfengyuan/vue-countdown/dist/vue-countdown.common'
 import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
@@ -247,7 +246,8 @@ export default {
       pendingPayouts: [],
       showPayoutDetails: false,
       successMessage: null,
-      successTitle: null
+      successTitle: null,
+      qualifications: []
     }
   },
   computed: {
@@ -256,9 +256,6 @@ export default {
       getPendingPayouts: 'pendingPayout/getPendingPayouts',
       campaignById: 'campaign/campaignById',
       activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId'
-    }),
-    ...mapState({
-      qualifications: state => state.qualification.qualifications
     }),
     myCampaigns () {
       if (!this.campaigns) { return }
@@ -290,24 +287,18 @@ export default {
     },
     pendingPayoutsStore () {
       return this.getPendingPayouts ?? null
-    },
-    myQualifications () {
-      if (!this.qualifications) {
-        return
-      }
-      return this.qualifications.filter(el => el.account_id === this.$auth.user.vAccountRows[0].id)
     }
   },
   mounted () {
     console.log('mounted')
     this.$store.dispatch('pendingPayout/loadPendingPayouts')
-    this.$store.dispatch('qualification/getQualifications')
+    this.getUserQuali()
     // console.debug(this.$auth)
   },
   methods: {
     async getUserQuali () {
-      const res = await this.$blockchain.getUserQualifications().catch(console.error)
-      console.log('getUserQuali,', res)
+      const res = await this.$blockchain.getAssignedQualifications(this.$auth.user.vAccountRows[0].id)
+      this.qualifications = res
     },
     async logout () {
       await this.$auth.logout()
