@@ -151,7 +151,7 @@
           <h2 class="title is-4 mt-6 is-spaced">
             Qualifications
           </h2>
-          <div v-if="qualifications" class="columns is-mobile is-multiline is-max-widescreen">
+          <div v-if="qualifications.length > 0" class="columns is-mobile is-multiline is-max-widescreen">
             <div
               v-for="q in qualifications"
               :key="q.id"
