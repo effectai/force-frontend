@@ -22,10 +22,10 @@
           </div>
           <div v-if="allQualificationsLoaded">
             <div>Required <i>(Having these qualifications is required)</i></div>
-            <div v-if="inclQuali.length > 0" class="tags has-addons">
+            <div v-if="inclusiveQualifications.length > 0" class="tags has-addons">
               <span
-                v-for="quali in inclQuali"
-                :key="quali.code"
+                v-for="quali in inclusiveQualifications"
+                :key="quali.id"
                 class="tag"
                 :class="quali.userHasQuali ? 'is-light is-success' : 'is-danger is-light'"
                 :data-tooltip="quali.userHasQuali ? 'Found: Ok' : 'Not Found: Required'"
@@ -33,7 +33,7 @@
                 <span v-if="quali.userHasQuali">🗸</span>
                 <span v-else>🗴</span>
                 &nbsp;
-                <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
+                <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
               </span>
             </div>
             <div v-else>
@@ -41,9 +41,9 @@
             </div>
             <br>
             <div>Exclude <i>(Having these qualifications will exclude you from this task)</i></div>
-            <div v-if="exclQuali.length > 0" class="tags">
+            <div v-if="exclusiveQualifications.length > 0" class="tags">
               <span
-                v-for="quali in exclQuali"
+                v-for="quali in exclusiveQualifications"
                 :key="quali.code"
                 class="tag"
                 :class="quali.userHasQuali ? 'is-light is-danger' : 'is-warning is-light'"
@@ -52,7 +52,7 @@
                 <span v-if="quali.userHasQuali">🗴</span>
                 <span v-else>🗸</span>
                 &nbsp;
-                <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
+                <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
               </span>
             </div>
             <div v-else>
@@ -112,6 +112,20 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    inclusiveQualifications: {
+      type: Array,
+      required: false,
+      default () {
+        return []
+      }
+    },
+    exclusiveQualifications: {
+      type: Array,
+      required: false,
+      default () {
+        return []
+      }
     }
   },
   data () {
@@ -120,20 +134,13 @@ export default {
       id: parseInt(this.$route.params.id),
       campaign: null,
       userQuali: [],
-      accountId: this.$auth.user.vAccountRows[0].id,
-      assignedQuali: []
+      accountId: this.$auth.user.vAccountRows[0].id
     }
-  },
-  created () {
-    this.campaign = this.campaignById(this.id)
-    this.userQuali = this.qualificationByUser(this.accountId)
-    this.getAssignedQuali()
   },
   computed: {
     ...mapGetters({
       campaignById: 'campaign/campaignById',
-      qualificationById: 'qualification/qualificationById',
-      qualificationByUser: 'qualification/qualificationByUser'
+      qualificationById: 'qualification/qualificationById'
     }),
     ...mapState({
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
@@ -145,15 +152,10 @@ export default {
       set (val) {
         this.$emit('clicked', val)
       }
-    },
-
-    inclQuali () {
-      return this.userAssignedQuali(0)
-    },
-
-    exclQuali () {
-      return this.userAssignedQuali(1)
     }
+  },
+  created () {
+    this.campaign = this.campaignById(this.id)
   },
   methods: {
     userAssignedQuali (inclusive0orExclusive1) {
@@ -203,12 +205,6 @@ export default {
           '*': ['style']
         }
       })
-    },
-    async getAssignedQuali () {
-      console.log(`Getting assigned qualifications for user: ${this.accountId}`)
-      const assignedRes = await this.$blockchain.getAssignedQualifications(this.accountId).catch(console.error)
-      this.assignedQuali = [...assignedRes]
-      console.log(`assignedQuali: ${JSON.stringify(assignedRes)}`)
     }
   }
 }

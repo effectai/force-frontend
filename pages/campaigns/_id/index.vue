@@ -1,7 +1,15 @@
 <template>
   <section class="section is-max-widescreen">
     <!-- Instructions modal -->
-    <instructions-modal v-if="campaign && campaign.info" :show="joinCampaignPopup" :campaign="campaign" :info="campaign.info" @clicked="campaignModalChange" />
+    <instructions-modal
+      v-if="campaign && campaign.info"
+      :show="joinCampaignPopup"
+      :inclusive-qualifications="inclusiveQualifications"
+      :exclusive-qualifications="exclusiveQualifications"
+      :campaign="campaign"
+      :info="campaign.info"
+      @clicked="campaignModalChange"
+    />
     <!-- Batch modal -->
     <batch-modal v-if="campaign && campaignBatches" :show="$auth.user.accountName === campaign.owner[1] && showBatchesPopup && !cancelledBatchesPopup" @cancelled="cancelBatchModal" />
     <div v-if="loadingReservation" class="loader-wrapper is-active">
@@ -253,10 +261,10 @@
                 </div>
                 <div v-if="allQualificationsLoaded">
                   <div>Required <i>(Having these qualifications is required)</i></div>
-                  <div v-if="inclQuali.length > 0" class="tags has-addons">
+                  <div v-if="inclusiveQualifications.length > 0" class="tags has-addons">
                     <span
-                      v-for="quali in inclQuali"
-                      :key="quali.code"
+                      v-for="quali in inclusiveQualifications"
+                      :key="quali.id"
                       class="tag"
                       :class="quali.userHasQuali ? 'is-light is-success' : 'is-danger is-light'"
                       :data-tooltip="quali.userHasQuali ? 'Found: Ok' : 'Not Found: Required'"
@@ -264,7 +272,7 @@
                       <span v-if="quali.userHasQuali">🗸</span>
                       <span v-else>🗴</span>
                       &nbsp;
-                      <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
+                      <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
                     </span>
                   </div>
                   <div v-else>
@@ -272,10 +280,10 @@
                   </div>
                   <br>
                   <div>Exclude <i>(Having these qualifications will exclude you from this task)</i></div>
-                  <div v-if="exclQuali.length > 0" class="tags">
+                  <div v-if="exclusiveQualifications.length > 0" class="tags">
                     <span
-                      v-for="quali in exclQuali"
-                      :key="quali.code"
+                      v-for="quali in exclusiveQualifications"
+                      :key="quali.id"
                       class="tag"
                       :class="quali.userHasQuali ? 'is-light is-danger' : 'is-warning is-light'"
                       :data-tooltip="quali.userHasQuali ? 'Found: Excluded' : 'Not found: Ok'"
@@ -283,7 +291,7 @@
                       <span v-if="quali.userHasQuali">🗴</span>
                       <span v-else>🗸</span>
                       &nbsp;
-                      <nuxt-link :to="`/qualifications/${quali.code}`">{{ quali.name }}</nuxt-link>
+                      <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
                     </span>
                   </div>
                   <div v-else>
@@ -307,14 +315,15 @@
                 <button
                   v-else-if="userJoined === false"
                   class="button is-fullwidth is-primary"
+                  :disabled="!canUserQualify"
                   @click.prevent="joinCampaignPopup = true"
-                  :disabled="!userQualifies"
                 >
                   Qualify
                 </button>
                 <button
                   v-else-if="activeCampaignBatches.reduce((a,b) => a + b.num_tasks, 0) - activeCampaignBatches.reduce((a,b) => a + b.real_tasks_done, 0) > 0 && !userReservation"
                   class="button is-fullwidth is-primary"
+                  :disabled="!canUserQualify"
                   @click.prevent="reserveTask"
                 >
                   Make Task Reservation
@@ -374,17 +383,18 @@ export default {
       waitingOnTransaction: false,
       categories: ['translate', 'captions', 'socials', 'dao'],
       successMessage: null,
-      inclusiveQualis: [],
-      exclusiveQualis: [],
-      assignedQuali: []
+      userQualis: [],
+      canUserQualify: false,
+      campaignQualis: [],
+      inclusiveQualifications: [],
+      exclusiveQualifications: []
     }
   },
   computed: {
     ...mapGetters({
       batchesByCampaignId: 'campaign/batchesByCampaignId',
       activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId',
-      qualificationById: 'qualification/qualificationById',
-      qualificationByUser: 'qualification/qualificationByUser'
+      qualificationById: 'qualification/qualificationById'
     }),
     ...mapState({
       joinedCampaigns: state => state.campaign.joinedCampaigns,
@@ -413,40 +423,6 @@ export default {
       } else {
         return { efxPerHour: 0, dollarPerHour: 0 }
       }
-    },
-
-    inclQuali () {
-      return this.userAssignedQuali(0)
-    },
-
-    exclQuali () {
-      return this.userAssignedQuali(1)
-    },
-
-    userQualifies () {
-      if (this.inclQuali && this.exclQuali) {
-        if (this.inclQuali.length > 0 || this.exclQuali.length > 0) {
-          return this.inclQuali.every(q => q.userHasQuali) && !this.exclQuali.some(q => q.userHasQuali)
-        } else {
-          return false
-        }
-      } else {
-        return false
-      }
-    },
-    everyInclusive () {
-      if (this.inclQuali) {
-        return this.inclQuali.every(q => q.userHasQuali)
-      } else {
-        return false
-      }
-    },
-    someExclusive () {
-      if (this.exclQuali) {
-        return !this.exclQuali.some(q => q.userHasQuali)
-      } else {
-        return false
-      }
     }
   },
 
@@ -464,7 +440,6 @@ export default {
     this.getCampaign()
     this.getBatches()
     this.getQualifications()
-    this.getAssignedQuali()
   },
   methods: {
     showCompletedPopup () {
@@ -472,25 +447,6 @@ export default {
         this.successTitle = 'No more tasks available for you in this campaign'
         this.successMessage = 'This could either mean that all the available tasks are already reserved, or you already completed the still available tasks.'
       }
-    },
-    userAssignedQuali (inclusive0orExclusive1) {
-      const quals = []
-
-      if (this.assignedQuali.length === 0 || !this.allQualificationsLoaded) {
-        return []
-      }
-
-      // const userQualis = this.qualificationByUser(this.accountId)
-      for (const quali of this.campaign.qualis) {
-        const campaignQuali = this.qualificationById(quali.key)
-        const userHasQuali = this.assignedQuali.some((uq) => {
-          return uq.quali_id === quali.key
-        })
-        if (quali.value === inclusive0orExclusive1) {
-          quals.push({ name: campaignQuali.info.name, code: quali.key, userHasQuali })
-        }
-      }
-      return quals
     },
     async reserveTask () {
       this.$store.commit('view/ADD_JOINED_CAMPAIGN', this.campaign.id)
@@ -551,7 +507,6 @@ export default {
     },
     async getCampaign () {
       await this.$store.dispatch('campaign/getCampaign', this.id)
-      // this.campaign = this.campaigns.find(c => c.id === this.id)
     },
     getProgressBatch (batch) {
       switch (batch?.status) {
@@ -569,10 +524,36 @@ export default {
       if (!this.allQualificationsLoaded) {
         await this.$store.dispatch('qualification/getQualifications')
       }
+      this.userQualis = await this.$blockchain.getAssignedQualifications(this.accountId)
+
+      for (const quali of this.campaign.qualis) {
+        const q = this.qualificationById(quali.key)
+        this.campaignQualis.push(q)
+
+        // check if user has the qualification
+        q.userHasQuali = (this.userQualis.some(uq => uq.id === quali.key))
+
+        // put it in inclusive or exclusive array for display
+        if (quali.value === 0) {
+          this.inclusiveQualifications.push(q)
+        } else if (quali.value === 1) {
+          this.exclusiveQualifications.push(q)
+        }
+      }
+      this.canUserQualify = this.checkUserQualify()
     },
-    async getAssignedQuali () {
-      const assignedRes = await this.$blockchain.getAssignedQualifications(this.accountId).catch(console.error)
-      this.assignedQuali = [...assignedRes]
+    checkUserQualify () {
+      if (this.campaign.qualis.length > 0) {
+        for (const quali of this.campaign.qualis) {
+          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
+            // user doesnt have qualification that is required or user has qualification that is not allowed
+            return false
+          }
+        }
+      } else {
+        return true
+      }
+      return true
     }
   }
 }
