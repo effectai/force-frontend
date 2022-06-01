@@ -154,7 +154,27 @@
           </div>
         </div>
 
-        <div class="mb-6">
+        <!-- Qualifications -->
+        <div class="py-2">
+          <h2 class="title is-4 mt-6 is-spaced">
+            Qualifications
+          </h2>
+          <div v-if="qualifications.length > 0" class="columns is-mobile is-multiline is-max-widescreen">
+            <div
+              v-for="q in qualifications"
+              :key="q.id"
+              class="is-1-desktop column is-one-quarter-mobile quali"
+            >
+              <nuxt-link :to="`/qualifications/${q.id}`" :data-tooltip="q.info.name">
+                <img :src="q.info.image" v-if="q.info.image">
+                <img :src="require(`~/assets/img/dapps/effect-force-icon.png`)" v-else>
+              </nuxt-link>
+            </div>
+          </div>
+          <span v-else>No qualifications found</span>
+        </div>
+
+        <div class="py-2">
           <h2 class="title is-4 mt-6 is-spaced">
             Transactions
           </h2>
@@ -213,7 +233,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import VueCountdown from '@chenfengyuan/vue-countdown/dist/vue-countdown.common'
 import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
@@ -234,7 +254,8 @@ export default {
       pendingPayouts: [],
       showPayoutDetails: false,
       successMessage: null,
-      successTitle: null
+      successTitle: null,
+      qualifications: []
     }
   },
   computed: {
@@ -243,9 +264,6 @@ export default {
       getPendingPayouts: 'pendingPayout/getPendingPayouts',
       campaignById: 'campaign/campaignById',
       activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId'
-    }),
-    ...mapState({
-      campaigns: state => state.campaign.campaigns
     }),
     myCampaigns () {
       if (!this.campaigns) { return }
@@ -282,9 +300,14 @@ export default {
   mounted () {
     console.log('mounted')
     this.$store.dispatch('pendingPayout/loadPendingPayouts')
+    this.getUserQuali()
     // console.debug(this.$auth)
   },
   methods: {
+    async getUserQuali () {
+      const res = await this.$blockchain.getAssignedQualifications(this.$auth.user.vAccountRows[0].id)
+      this.qualifications = res
+    },
     async logout () {
       await this.$auth.logout()
     },
@@ -355,6 +378,14 @@ button.button.is-small.is-info {
   .is-pulled-right {
     float: none !important;
     margin-bottom: 25px;
+  }
+}
+.quali {
+  img {
+    height: 80px;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
   }
 }
 </style>

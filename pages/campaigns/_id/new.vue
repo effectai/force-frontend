@@ -148,7 +148,7 @@
                   <div class="field">
                     <label class="label">Repetitions</label>
                     <div class="control">
-                      <input v-model="repetitions" class="input" type="number" min="0" required>
+                      <input v-model="repetitions" class="input" type="number" min="1" required>
                     </div>
                   </div>
                 </div>
@@ -157,7 +157,7 @@
                   <div class="column is-one-third">
                     <div class="box">
                       <h2>Total Cost</h2>
-                      <strong :class="{'has-text-danger': (campaign.info.reward * tasks.length * repetitions) > efxAvailable}">{{ campaign.info.reward * tasks.length * repetitions }} EFX</strong>
+                      <strong :class="{'has-text-danger': (campaign.info.reward * tasks.length * repetitions) > efxAvailable}">{{ parseFloat(campaign.info.reward * tasks.length * repetitions).toFixed(4) }} EFX</strong>
                     </div>
                   </div>
                   <div class="column is-one-third">
@@ -269,7 +269,7 @@ export default {
       return this.$blockchain.vefxAvailable
     },
     maxAmountTask () {
-      return Math.floor(this.$blockchain.vefxAvailable / this.campaign.info.reward / this.repetitions)
+      return Math.floor(this.$blockchain.vefxAvailable / Number(this.campaign.info.reward) / Number(this.repetitions))
     },
     paginatedTasks () {
       const start = (this.page - 1) * this.perPage
@@ -372,7 +372,7 @@ export default {
         const content = {
           tasks: this.tasks
         }
-        const result = await this.$blockchain.createBatch(this.campaignId, content, this.repetitions)
+        const result = await this.$blockchain.createBatch(this.campaignId, content, Number(this.repetitions))
         this.$store.dispatch('transaction/addTransaction', result)
         this.$router.push('/campaigns/' + this.campaignId)
       } catch (e) {
