@@ -56,6 +56,14 @@
               {{ $auth.user.vAccountRows[0].id }}
             </div>
           </div>
+          <div class="column">
+            <div class="block">
+              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
+                Manage
+              </div>
+              <nuxt-link to="/manage">Tasks & Qualifications</nuxt-link>
+            </div>
+          </div>
         </div>
         <hr>
         <div v-if="$blockchain.efxPending !== 0" class="py-4">
