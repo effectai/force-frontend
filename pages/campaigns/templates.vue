@@ -88,7 +88,7 @@ export default {
       try {
         // const response = await this.$axios.get(sTemplate.url)
         const response = await (await fetch(sTemplate.url, { mode: 'cors' })).text()
-        // console.log(await response.text())
+        // console.debug(response)
         if (typeof sTemplate.placeholders === 'string') {
           try {
             // const response2 = await this.$axios.get(sTemplate.placeholders)

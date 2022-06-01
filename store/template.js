@@ -22,10 +22,10 @@ export default {
     },
     async getTemplates ({ dispatch, commit, state }) {
       try {
-        const response = await fetch('https://api.github.com/repos/effectai/effect-force-templates/git/trees/master', { mode: 'no-cors' })
+        const response = await fetch('https://api.github.com/repos/effectai/effect-force-templates/git/trees/master', { mode: 'cors' })
         const templatesTree = (await response.json()).tree.find(t => t.path === 'templates')
         if (templatesTree) {
-          const response2 = await fetch(templatesTree.url, { mode: 'no-cors' })
+          const response2 = await fetch(templatesTree.url, { mode: 'cors' })
           const templatesTrees = (await response2.json()).tree
           templatesTrees.forEach((template) => {
             dispatch('addTemplate', {
