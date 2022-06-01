@@ -86,17 +86,29 @@ export default {
       const sTemplate = { ...template }
       this.loading = true
       try {
-        const response = await this.$axios.get(sTemplate.url)
+        // const response = await this.$axios.get(sTemplate.url)
+        const response = await (await fetch(sTemplate.url, { mode: 'cors' })).text()
+        // console.log(await response.text())
         if (typeof sTemplate.placeholders === 'string') {
           try {
-            const response2 = await this.$axios.get(sTemplate.placeholders)
-            sTemplate.placeholders = response2.data
+            // const response2 = await this.$axios.get(sTemplate.placeholders)
+            const response2 = await fetch(sTemplate.placeholders)
+            // console.log(response2)
+
+            const buffer = await response2.arrayBuffer()
+            // console.log(buffer)
+
+            const decoder = new TextDecoder('utf-8')
+            const decoded = decoder.decode(buffer)
+            // console.log(decoded)
+
+            sTemplate.placeholders = JSON.parse(decoded)
           } catch (e) {
             sTemplate.placeholders = {}
             console.error('could not retrieve example task', e)
           }
         }
-        this.previewTemplate = this.renderTemplate(response.data, sTemplate.placeholders)
+        this.previewTemplate = this.renderTemplate(response, sTemplate.placeholders)
       } catch (e) {
         console.error(e)
       }
