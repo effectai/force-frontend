@@ -122,6 +122,17 @@ object-assign
 
 
 /*!
+ * vue-countdown v1.1.5
+ * https://fengyuanchen.github.io/vue-countdown
+ *
+ * Copyright 2018-present Chen Fengyuan
+ * Released under the MIT license
+ *
+ * Date: 2020-02-25T01:19:32.769Z
+ */
+
+
+/*!
   * vue-router v3.5.3
   * (c) 2021 Evan You
   * @license MIT
@@ -144,17 +155,6 @@ object-assign
  * vuex v3.6.2
  * (c) 2021 Evan You
  * @license MIT
- */
-
-
-/*!
- * vue-countdown v1.1.5
- * https://fengyuanchen.github.io/vue-countdown
- *
- * Copyright 2018-present Chen Fengyuan
- * Released under the MIT license
- *
- * Date: 2020-02-25T01:19:32.769Z
  */
 
 
