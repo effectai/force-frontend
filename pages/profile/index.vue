@@ -64,6 +64,14 @@
               <nuxt-link to="/manage">Tasks & Qualifications</nuxt-link>
             </div>
           </div>
+          <div class="column">
+            <div class="block">
+              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
+                Transactions
+              </div>
+              <nuxt-link to="/profile/transactions">View Transactions</nuxt-link>
+            </div>
+          </div>
         </div>
         <hr>
         <div v-if="$blockchain.efxPending !== 0" class="py-4">
@@ -174,48 +182,6 @@
           <span v-else>No qualifications found</span>
         </div>
 
-        <div class="py-2">
-          <h2 class="title is-4 mt-6 is-spaced">
-            Transactions
-          </h2>
-          <div v-if="transactions" class="table-container">
-            <table class="table" style="width: 100%">
-              <thead>
-                <tr>
-                  <th>Transaction ID</th>
-                  <th>Type</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="transaction in paginatedTransactions"
-                  :key="transaction.transaction_id"
-                >
-                  <td>
-                    <a
-                      :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
-                      target="_blank"
-                    >{{ transaction.transaction_id.substr(0, 30) }}&hellip;</a>
-                  </td>
-                  <td><span v-if="transaction.processed && transaction.processed.action_traces">{{ transaction.processed.action_traces[0].act.name }}</span></td>
-                  <td><span v-if="transaction.processed">{{ new Date(transaction.processed.block_time).toLocaleString() }}</span></td>
-                  <td><span v-if="transaction.processed && transaction.processed.receipt">{{ transaction.processed.receipt.status }}</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <span v-else>No transactions found</span>
-          <pagination
-            v-if="transactions"
-            :items="transactions.length"
-            :page="page"
-            :per-page="perPage"
-            @setPage="setPage"
-          />
-        </div>
         <hr>
         <button class="button is-white" exact-active-class="is-active" @click="logout">
           <span class="icon">
@@ -235,32 +201,27 @@
 <script>
 import { mapGetters } from 'vuex'
 import VueCountdown from '@chenfengyuan/vue-countdown/dist/vue-countdown.common'
-import Pagination from '@/components/Pagination.vue'
 import Balance from '@/components/Balance'
 import KeyModal from '@/components/KeyModal.vue'
 import SuccessModal from '@/components/SuccessModal'
 
 export default {
-  components: { Balance, Pagination, KeyModal, VueCountdown, SuccessModal },
+  components: { Balance, KeyModal, VueCountdown, SuccessModal },
   filters: {},
   middleware: ['auth'],
   data () {
     return {
       loading: null,
-      page: 1,
-      perPage: 10,
-      showPK: false,
-      pages: [],
       pendingPayouts: [],
       showPayoutDetails: false,
       successMessage: null,
       successTitle: null,
-      qualifications: []
+      qualifications: [],
+      showPK: false
     }
   },
   computed: {
     ...mapGetters({
-      transactionsByUser: 'transaction/transactionsByUser',
       getPendingPayouts: 'pendingPayout/getPendingPayouts',
       campaignById: 'campaign/campaignById',
       activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId'
@@ -282,16 +243,6 @@ export default {
         }
       }
       return filteredCampaigns
-    },
-    transactions () {
-      return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)
-    },
-    paginatedTransactions () {
-      const start = (this.page - 1) * this.perPage
-      if (this.transactions) {
-        return this.transactions.slice(start, start + this.perPage)
-      }
-      return []
     },
     pendingPayoutsStore () {
       return this.getPendingPayouts ?? null
