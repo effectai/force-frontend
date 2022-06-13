@@ -471,12 +471,8 @@ export default {
       if (params.templateUrl) {
         this.campaignIpfs.template = 'Retrieving campaign template..'
         // const response = await this.$axios.get(params.templateUrl)
-        const response = await fetch(params.templateUrl, { mode: 'cors' })
-        console.debug('response', params.templateUrl, response)
-        const buffer = await response.arrayBuffer()
-        const decodedResponse = decoder.decode(buffer)
-        console.debug(decodedResponse)
-        this.campaignIpfs.template = decodedResponse
+        const response = await (await fetch(params.templateUrl, { mode: 'cors' })).json()
+        this.campaignIpfs.template = response.template
       } else if (params.template) {
         this.campaignIpfs.template = decodeURI(params.template)
       }
