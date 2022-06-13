@@ -80,6 +80,11 @@ export default {
       }
       return []
     }
+  },
+  methods: {
+    setPage (newPage) {
+      this.page = newPage
+    }
   }
 }
 </script>

@@ -262,9 +262,6 @@ export default {
     async logout () {
       await this.$auth.logout()
     },
-    setPage (newPage) {
-      this.page = newPage
-    },
     calculatePendingTime (submissionTime) {
       // Here we take the submission  time, add 1 hour, substract time since.
       // Retrieve the submission time in UTC and convert to milliseconds
