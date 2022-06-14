@@ -134,8 +134,9 @@ export default {
     this.getAccountById(this.id)
   },
   methods: {
-    async getAccountById (accountId) {
-      this.vaccount = await this.$blockchain.getVAccountById(accountId).catch(console.error)
+    async getAccountById (id) {
+      const quali = await this.$blockchain.getQualification(id)
+      this.vaccount = await this.$blockchain.getVAccountById(quali.account_id).catch(console.error)
     }
   }
 
