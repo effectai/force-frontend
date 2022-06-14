@@ -9,6 +9,13 @@ export default {
         state.grid = value
       }
     },
+    SET_MANAGE_VIEW (state, value) {
+      if (typeof value === 'undefined') {
+        state.manage = 'tasks'
+      } else {
+        state.manage = value
+      }
+    },
     ADD_JOINED_CAMPAIGN (state, campaignId) {
       if (state.batches) {
         const index = state.joinedCampaigns.findIndex(c => c === campaignId)
@@ -23,6 +30,7 @@ export default {
   state: () => {
     return {
       grid: true,
+      manage: 'tasks',
       joinedCampaigns: []
     }
   }

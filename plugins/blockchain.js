@@ -485,8 +485,8 @@ export default (context, inject) => {
         return await this.sdk.force.getQualifications(nextKey, limit, processCampaign)
       },
       // getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
-      async getUserQualifications (id) {
-        return await this.sdk.force.getUserQualifications(id)
+      async getAssignedQualifications (id) {
+        return await this.sdk.force.getAssignedQualifications(id)
       },
       async recoverPublicKey () {
         const message = 'Effect Account'

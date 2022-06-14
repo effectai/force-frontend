@@ -10,8 +10,8 @@
         <div class="tabs is-centered is-large">
           <ul>
             <li
-              :class="[activeSection === 'task' ? 'is-active' : '']"
-              @click.prevent="toggleSection('task')"
+              :class="[taskSectionActive === 'tasks' ? 'is-active' : '']"
+              @click.prevent="toggleSection('tasks')"
             >
               <a>
                 <!-- <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span> -->
@@ -20,8 +20,8 @@
             </li>
             <li>|</li>
             <li
-              :class="[activeSection === 'qualification' ? 'is-active' : ''] "
-              @click.prevent="toggleSection('qualification')"
+              :class="[taskSectionActive === 'qualifications' ? 'is-active' : '']"
+              @click.prevent="toggleSection('qualifications')"
             >
               <a>
                 <span>Qualifications</span>
@@ -31,7 +31,7 @@
           </ul>
         </div>
 
-        <div v-if="activeSection === 'task'">
+        <div v-if="taskSectionActive === 'tasks'">
           <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
             <h2 class="title is-4">
               Tasks
@@ -49,7 +49,7 @@
           <campaign-list class="mb-5" :campaigns="myCampaigns" />
         </div>
 
-        <div v-else-if="activeSection === 'qualification'">
+        <div v-else>
           <div class="is-flex is-justify-content-space-between mt-6 is-align-items-center">
             <h2 class="title is-4">
               Qualifications
@@ -93,8 +93,7 @@ export default {
       pendingPayouts: [],
       showPayoutDetails: false,
       successMessage: null,
-      successTitle: null,
-      activeSection: 'task' // 'qualification'
+      successTitle: null
     }
   },
   computed: {
@@ -106,7 +105,8 @@ export default {
     }),
     ...mapState({
       campaigns: state => state.campaign.campaigns,
-      qualifications: state => state.qualification.qualifications
+      qualifications: state => state.qualification.qualifications,
+      manage: state => state.view.manage
     }),
     myCampaigns () {
       if (!this.campaigns) { return }
@@ -132,15 +132,13 @@ export default {
       }
       return this.qualifications.filter(el => el.account_id === this.$auth.user.vAccountRows[0].id)
     },
-    transactions () {
-      return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)
-    },
-    paginatedTransactions () {
-      const start = (this.page - 1) * this.perPage
-      if (this.transactions) {
-        return this.transactions.slice(start, start + this.perPage)
+    taskSectionActive: {
+      get () {
+        return this.$store.state.view.manage
+      },
+      set (value) {
+        this.$store.commit('view/SET_MANAGE_VIEW', value)
       }
-      return []
     }
   },
   created () {
@@ -157,8 +155,8 @@ export default {
         await this.$store.dispatch('qualification/getQualifications')
       }
     },
-    toggleSection (activateSection) {
-      this.activeSection = activateSection
+    toggleSection (value) {
+      this.taskSectionActive = value
     },
     async logout () {
       await this.$auth.logout()

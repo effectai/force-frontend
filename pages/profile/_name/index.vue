@@ -79,6 +79,7 @@ export default {
       transactionsByUser: 'transaction/transactionsByUser',
       getPendingPayouts: 'pendingPayout/getPendingPayouts',
       campaignById: 'campaign/campaignById',
+      activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId',
       batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     myCampaigns () {

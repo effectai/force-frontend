@@ -1,23 +1,12 @@
 <template>
   <div>
-    <div class="is-flex is-justify-content-space-between">
-      <div />
-      <div v-if="gridToggle" class="is-hidden-touch">
-        <div class="switch-button mb-1">
-          <input v-model="list" class="switch-button-checkbox" type="checkbox">
-          <label class="switch-button-label" for=""><span class="switch-button-label-span"><img height="28px" src="@/assets/img/icons/border-all.svg"></span></label>
-        </div>
-      </div>
-    </div>
-    <hr class="mt-1">
-
     <div class="mb-6">
       <div class="table-container">
         <table class="table" style="width: 100%;">
           <thead>
             <tr>
               <th />
-              <th>Qualification</th>
+              <th></th>
               <!-- <th>Requester</th> -->
             </tr>
           </thead>
@@ -113,17 +102,6 @@ export default {
     ...mapState({
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
     }),
-    list: {
-      get () {
-        return this.$store.state.view.grid
-      },
-      set (value) {
-        this.$store.commit('view/SET_GRID_LIST', value)
-      }
-    },
-    grid () {
-      return !this.list && this.gridToggle
-    },
     paginatedQualifications () {
       const start = (this.page - 1) * this.perPage
       if (this.qualifications) {
