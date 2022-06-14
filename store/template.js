@@ -30,7 +30,7 @@ export default {
           templatesTrees.forEach((template) => {
             dispatch('addTemplate', {
               name: template.path,
-              url: `https://raw.githubusercontent.com/effectai/effect-force-templates/master/templates/${template.path}/template.html`,
+              url: `https://raw.githubusercontent.com/effectai/effect-force-templates/master/templates/${template.path}/template.json`,
               placeholders: `https://raw.githubusercontent.com/effectai/effect-force-templates/master/templates/${template.path}/example_task.json`
             })
           })
