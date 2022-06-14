@@ -469,9 +469,9 @@ export default (context, inject) => {
       async waitForTransaction (transactionResult) {
         return await this.sdk.force.waitTransaction(transactionResult)
       },
-      // createQualification = async (name: string, description: string, type: number, image?: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
-      async createQualification (name, description, type, image) {
-        return await this.sdk.force.createQualification(name, description, type, image)
+      // createQualification = async (name: string, description: string, type: number, image?: string,  ishidden?; string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+      async createQualification (name, description, type, image, ishidden) {
+        return await this.sdk.force.createQualification(name, description, type, image, ishidden)
       },
       // assignQualification = async (qualificationId: number, campaignId: number, hash: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
       async assignQualification (qualificationId, campaignId, hash) {
@@ -485,8 +485,8 @@ export default (context, inject) => {
         return await this.sdk.force.getQualifications(nextKey, limit, processCampaign)
       },
       // getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
-      async getUserQualifications (id) {
-        return await this.sdk.force.getUserQualifications(id)
+      async getAssignedQualifications (id) {
+        return await this.sdk.force.getAssignedQualifications(id)
       },
       async recoverPublicKey () {
         const message = 'Effect Account'

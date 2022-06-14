@@ -16,6 +16,8 @@ const networkHost = {
   chainId: config.eosChainId
 }
 
+const eosNodeUrl = `${networkHost.protocol}://${networkHost.host}:${networkHost.port}`
+
 const appName = 'therealforce'
 const accessContext = initAccessContext({
   appName,
@@ -98,12 +100,12 @@ const eos = {
   },
 
   async getEosInfo () {
-    const rpc = new JsonRpc(config.eosNodeUrl)
+    const rpc = new JsonRpc(eosNodeUrl)
     return await rpc.get_info()
   },
 
   async getRelayerStatus () {
-    const rpc = new JsonRpc(config.eosNodeUrl)
+    const rpc = new JsonRpc(eosNodeUrl)
     return await rpc.get_account(config.eosRelayerAccount)
   }
 

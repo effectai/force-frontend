@@ -45,9 +45,9 @@
           </nuxt-link>
         </div>
         <div class="control">
-          <nuxt-link v-if="selectedTemplate" :disabled="loading" :to="`/campaigns/new?templateUrl=${selectedTemplate.url}&placeholders=${JSON.stringify(selectedTemplate.placeholders)}`" class="button is-primary is-wide">
+          <button v-if="selectedTemplate" @click="useSelectedTemplate" :disabled="loading" class="button is-primary is-wide">
             Use Template
-          </nuxt-link>
+          </button>
         </div>
       </div>
     </div>
@@ -73,7 +73,8 @@ export default {
       template: null,
       selectedTemplate: null,
       previewTemplate: null,
-      templates: null
+      templates: null,
+      useTemplate: false
     }
   },
   computed: {
@@ -86,17 +87,30 @@ export default {
       const sTemplate = { ...template }
       this.loading = true
       try {
-        const response = await this.$axios.get(sTemplate.url)
+        // const response = await this.$axios.get(sTemplate.url)
+        const response = await (await fetch(sTemplate.url, { mode: 'cors' })).json()
+        // console.debug(response)
         if (typeof sTemplate.placeholders === 'string') {
           try {
-            const response2 = await this.$axios.get(sTemplate.placeholders)
-            sTemplate.placeholders = response2.data
+            // const response2 = await this.$axios.get(sTemplate.placeholders)
+            const response2 = await fetch(sTemplate.placeholders)
+            // console.log(response2)
+
+            const buffer = await response2.arrayBuffer()
+            // console.log(buffer)
+
+            const decoder = new TextDecoder('utf-8')
+            const decoded = decoder.decode(buffer)
+            // console.log(decoded)
+
+            sTemplate.placeholders = JSON.parse(decoded)
           } catch (e) {
             sTemplate.placeholders = {}
             console.error('could not retrieve example task', e)
           }
         }
-        this.previewTemplate = this.renderTemplate(response.data, sTemplate.placeholders)
+        this.useTemplate = JSON.stringify(response)
+        this.previewTemplate = this.renderTemplate(response.template, sTemplate.placeholders)
       } catch (e) {
         console.error(e)
       }
@@ -109,6 +123,10 @@ export default {
   },
 
   methods: {
+    useSelectedTemplate () {
+      window.localStorage.setItem('cached_campaignIpfs', this.useTemplate)
+      this.$router.push('/campaigns/new')
+    },
     clearCache () {
       window.localStorage.removeItem('cached_campaignIpfs')
       this.cached = false

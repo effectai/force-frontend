@@ -467,16 +467,22 @@ export default {
       this.windowWidth = window.innerWidth
     },
     async retrieveTemplate (params) {
+      const decoder = new TextDecoder('utf-8')
       if (params.templateUrl) {
         this.campaignIpfs.template = 'Retrieving campaign template..'
-        const response = await this.$axios.get(params.templateUrl)
-        this.campaignIpfs.template = response.data
+        // const response = await this.$axios.get(params.templateUrl)
+        const response = await (await fetch(params.templateUrl, { mode: 'cors' })).json()
+        this.campaignIpfs.template = response.template
       } else if (params.template) {
         this.campaignIpfs.template = decodeURI(params.template)
       }
       if (params.placeholders) {
-        const response = await this.$axios.get(params.placeholders.replaceAll('"', ''))
-        this.campaignIpfs.example_task = response.data
+        // const response = await this.$axios.get(params.placeholders.replaceAll('"', ''))
+        const response = await fetch(params.placeholders.replaceAll('"', ''))
+        const buffer = await response.arrayBuffer()
+        const decodedResponse = decoder.decode(buffer)
+        console.debug(decodedResponse)
+        this.campaignIpfs.example_task = JSON.parse(decodedResponse)
       }
     },
     showSubmission (values) {
