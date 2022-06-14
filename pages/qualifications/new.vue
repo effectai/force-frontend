@@ -50,6 +50,16 @@
             </div>
           </div>
 
+          <div class="field">
+            <label for="" class="label">
+              Hidden
+            </label>
+            <label class="checkbox">
+              <input v-model="qualificationIpfs.ishidden" type="checkbox" class="checkbox">
+              Check if this qualifications needs to be hidden from the user.
+            </label>
+          </div>
+
           <div class="field is-grouped is-grouped-right">
             <div class="control">
               <nuxt-link class="button is-light" to="/manage">
@@ -90,7 +100,8 @@ export default {
       qualificationIpfs: {
         name: null,
         description: null,
-        image: null
+        image: null,
+        ishidden: false
       }
     }
   },
@@ -106,8 +117,7 @@ export default {
           const quali = {
             ...this.qualificationIpfs
           }
-          const result = await this.$blockchain.createQualification(quali.name, quali.description, quali.type, quali
-            .image)
+          const result = await this.$blockchain.createQualification(quali.name, quali.description, quali.type, quali.image, quali.ishidden)
           this.successTitle = 'Qualification created Succesfully.'
           this.successMessage = 'Waiting for transaction to complete before continuing'
 
