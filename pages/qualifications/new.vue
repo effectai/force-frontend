@@ -117,7 +117,7 @@ export default {
           const quali = {
             ...this.qualificationIpfs
           }
-          const result = await this.$blockchain.createQualification(quali.name, quali.description, quali.type, quali.image)
+          const result = await this.$blockchain.createQualification(quali.name, quali.description, quali.type, quali.image, quali.ishidden)
           this.successTitle = 'Qualification created Succesfully.'
           this.successMessage = 'Waiting for transaction to complete before continuing'
 
