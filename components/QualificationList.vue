@@ -105,7 +105,7 @@ export default {
     paginatedQualifications () {
       const start = (this.page - 1) * this.perPage
       if (this.qualifications) {
-        return this.qualifications.slice(start, start + this.perPage)
+        return this.qualifications.filter(q => !q.info.ishidden || q.account_id === this.$auth.user.vAccountRows[0].id).slice(start, start + this.perPage)
       }
       return []
     }
