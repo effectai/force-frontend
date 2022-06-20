@@ -41,9 +41,9 @@
             </div>
             <br>
             <div>Exclude <i>(Having these qualifications will exclude you from this task)</i></div>
-            <div v-if="exclusiveQualifications.length > 0" class="tags">
+            <div v-if="exclQualis.length > 0" class="tags">
               <span
-                v-for="quali in exclusiveQualifications"
+                v-for="quali in exclQualis"
                 :key="quali.code"
                 class="tag"
                 :class="quali.userHasQuali ? 'is-light is-danger' : 'is-warning is-light'"
@@ -145,6 +145,9 @@ export default {
     ...mapState({
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
     }),
+    exclQualis () {
+      return this.exclusiveQualifications.filter(q => !q.ishidden)
+    },
     showModal: {
       get () {
         return this.show
