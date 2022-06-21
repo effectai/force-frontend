@@ -31,12 +31,6 @@
                 Scatter
               </div>
             </div>
-            <div class="column is-half">
-              <div class="provider has-radius is-mobile" @click="selectWallet(providers.tokenpocket)">
-                <img src="@/assets/img/providers/tokenpocket.png">
-                Token Pocket
-              </div>
-            </div>
           </div>
         </section>
       </div>
@@ -55,6 +49,17 @@ export default {
   computed: {
     providers () {
       return this.$blockchain.eos.providers
+    }
+  },
+  mounted () {
+    if (navigator.userAgent.toLowerCase().includes('tokenpocket')) {
+      // if TokenPocket is already loaded, initialize transit
+      if (window.scatter) {
+        this.selectWallet(this.providers.tokenpocket)
+      } else {
+        // otherwise wait for TokenPocket to load
+        window.addEventListener('scatterLoaded', () => this.selectWallet(this.providers.tokenpocket))
+      }
     }
   },
   methods: {
