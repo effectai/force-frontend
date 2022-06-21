@@ -32,12 +32,6 @@
               </div>
             </div>
             <div class="column is-half">
-              <div class="provider has-radius is-mobile" @click="selectWallet(providers.lynx)">
-                <img src="@/assets/img/providers/lynx.svg">
-                Lynx
-              </div>
-            </div>
-            <div class="column is-half">
               <div class="provider has-radius is-mobile" @click="selectWallet(providers.tokenpocket)">
                 <img src="@/assets/img/providers/tokenpocket.png">
                 Token Pocket
