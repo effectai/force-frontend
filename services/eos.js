@@ -2,7 +2,6 @@ import { initAccessContext } from 'eos-transit'
 import scatter from 'eos-transit-scatter-provider'
 import anchor from 'eos-transit-anchorlink-provider'
 import tp from 'eos-transit-tokenpocket-provider'
-import lynx from 'eos-transit-lynx-provider'
 import { JsonRpc } from 'eosjs'
 import { defaultConfiguration } from '@effectai/effect-js'
 
@@ -25,8 +24,7 @@ const accessContext = initAccessContext({
   walletProviders: [
     scatter(),
     anchor(appName, { verifyProofs: true }),
-    tp(),
-    lynx()
+    tp()
   ]
 })
 
@@ -35,8 +33,7 @@ const eos = {
   providers: {
     scatter: 'scatter',
     anchor: 'anchor-link',
-    tokenpocket: 'TokenPocket',
-    lynx: 'EOS Lynx'
+    tokenpocket: 'TokenPocket'
   },
   wallet: null,
   connect: async (provider, accountName, permission) => {
