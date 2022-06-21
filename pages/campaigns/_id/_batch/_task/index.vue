@@ -136,7 +136,8 @@ export default {
       this.showInstructionsModal = val
     },
     renderTemplate (template, placeholders = {}, options = {}) {
-      return new Template(template, placeholders, options).render()
+      return new Template(template, placeholders, options,
+        { accountId: this.$auth.user.vAccountRows[0].id, campaignId: this.campaignId, batchId: this.batchId, submissionId: this.submissionId }).render()
     },
     async getBatch () {
       await this.$store.dispatch('campaign/getBatch', { batchId: this.batchId })
