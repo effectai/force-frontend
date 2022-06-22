@@ -1,29 +1,43 @@
 <template>
   <section class="section">
     <div class="container">
+      <h1 class="title">
+        Migrate your Qualifications
+      </h1>
+      <h2 class="subtitle">
+        Migrate your qualifications from the old Force to the new Force
+      </h2>
+      <p>By connecting your old effect force account,<br>you can migrate over your old qualification to this new Force account.</p>
+      <div class="notification is-warning">
+        <b>ATTENTION!</b> You can only migrate your old qualifications once, so make sure to do it to your correct account.
+      </div>
       <div v-if="user">
-        <h2 class="title">
+        <p>Old Effect Force Account:</p>
+        <h2 class="title is-4">
           {{ user.name }}
         </h2>
-        <h4 class="subtitle">
+        <h4 class="subtitle is-5">
           {{ user.email }}
         </h4>
         <div>
-          <button class="button is-primary" @click="migrate(user.token)">
+          <p /><b>Are you sure you want to migrate over your qualifications from this account?</b></p>
+          <button class="button is-primary" :disabled="loading" :class="{'is-loading': loading}" @click="migrate(user.token)">
             Migrate
           </button>
         </div>
         <div class="mt-4">
-          <button class="button is-danger" @click="globalLogout(user.token)">
-            Logout
-          </button>
+          <a class=" has-text-danger" @click.prevent="globalLogout(user.token)">
+            switch account
+          </a>
         </div>
       </div>
       <h3 v-else-if="ssoToken">
         Logging in..
       </h3>
       <h3 v-else>
-        Redirecting to authorization server..
+        <button class="button is-primary" @click="login">
+          Connect to old Force account
+        </button>
       </h3>
     </div>
   </section>
@@ -52,15 +66,14 @@ export default {
   data () {
     return {
       user: null,
-      ssoToken: this.$route.query.ssoToken
+      ssoToken: this.$route.query.ssoToken,
+      loading: false
     }
   },
   created () {
     if (process.client) {
       if (this.ssoToken) {
         this.getToken(this.ssoToken)
-      } else {
-        this.login()
       }
     }
   },
@@ -71,8 +84,14 @@ export default {
     },
     async migrate (token) {
       // TODO: show error and success messages
-      const response = await axios.post(`${process.env.NUXT_ENV_BACKEND_URL}/user/migrate-qualifications`, this.$auth.user.vAccountRows[0].id, { headers: { Authorization: 'Bearer ' + token } })
-      console.log(response.data)
+      try {
+        this.loading = true
+        await axios.get(`${process.env.NUXT_ENV_BACKEND_URL}/user/migrate-qualifications`, this.$auth.user.vAccountRows[0].id, { headers: { Authorization: 'Bearer ' + token } })
+        this.$router.push('/profile')
+      } catch (error) {
+        this.$blockchain.handleError(error)
+      }
+      this.loading = false
     },
     async getToken (ssoToken) {
       let token
@@ -102,7 +121,7 @@ export default {
           config.headers = { Authorization: 'Bearer ' + token }
         }
         await axios.get(`${process.env.NUXT_ENV_AUTH_SERVER}/logout`, config)
-        this.login()
+        this.user = null
         return true
       } catch (e) {
         console.error(e)
