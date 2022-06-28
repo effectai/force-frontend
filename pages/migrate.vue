@@ -86,7 +86,7 @@ export default {
       // TODO: show error and success messages
       try {
         this.loading = true
-        await axios.get(`${process.env.NUXT_ENV_BACKEND_URL}/user/migrate-qualifications`, this.$auth.user.vAccountRows[0].id, { headers: { Authorization: 'Bearer ' + token } })
+        await axios.post(`${process.env.NUXT_ENV_BACKEND_URL}/user/migrate-qualifications`, this.$auth.user.vAccountRows[0].id, { headers: { Authorization: 'Bearer ' + token } })
         this.$router.push('/profile')
       } catch (error) {
         this.$blockchain.handleError(error)
