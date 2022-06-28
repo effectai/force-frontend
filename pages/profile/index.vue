@@ -173,7 +173,7 @@
               :key="q.id"
               class="is-1-desktop column is-one-quarter-mobile quali"
             >
-              <nuxt-link v-if="q => !q.info.ishidden || q.account_id === this.$auth.user.vAccountRows[0].id" :to="`/qualifications/${q.id}`" :data-tooltip="q.info.name">
+              <nuxt-link v-if="!q.info.ishidden || q.account_id === $auth.user.vAccountRows[0].id" :to="`/qualifications/${q.id}`" :data-tooltip="q.info.name">
                 <img :src="q.info.image" v-if="q.info.image">
                 <img :src="require(`~/assets/img/dapps/effect-force-icon.png`)" v-else>
               </nuxt-link>
