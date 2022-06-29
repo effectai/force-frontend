@@ -9,6 +9,11 @@
         This is a pre-release that's still undergoing security audits - use at your own risk »
       </nuxt-link>
     </div>
+    <div class="burnerWalletBanner is-size-6">
+      📣 <nuxt-link to="/migrate">
+        Announcement: Migration from the old Force is now open »
+      </nuxt-link>
+    </div>
     <nav-bar />
     <!-- <div v-if="provider === 'burner-wallet'" class="burnerWalletBanner">
       Connected with a burner wallet.
