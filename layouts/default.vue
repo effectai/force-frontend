@@ -73,10 +73,12 @@ export default {
       this.loading = true
       const migrateQuali = 117
       const qualis = await this.$blockchain.getAssignedQualifications(this.$auth.user.vAccountRows[0].id)
-      // console.log(qualis)
+
+      // if not present will return false.
       const bool = qualis.some(q => migrateQuali === q.id)
-      // console.log(bool)
-      this.migrationNeeded = bool
+
+      // So if not present, migration is needed.
+      this.migrationNeeded = !bool
       this.loading = false
     }
   }
