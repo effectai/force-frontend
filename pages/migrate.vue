@@ -17,7 +17,7 @@
       <br>
       <p>By connecting your old effect force account, you can migrate over your old qualification to this new Force account.</p>
       <hr>
-      <div>
+      <div v-if="migrationNeeded">
         <div v-if="user" class="container">
           <div class="notification is-warning">
             <b>ATTENTION!</b> You can only migrate your old qualifications <strong>ONCE</strong>, so make sure to do it with your correct account.
@@ -72,6 +72,11 @@
             Connect to old Force account
           </button>
         </h3>
+      </div>
+      <div v-else>
+        <h1 class="title is-5">
+          You have already migrated an old account to this account.
+        </h1>
       </div>
     </div>
   </section>
