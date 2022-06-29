@@ -4,6 +4,14 @@
       <h1 class="title">
         Migrate your Qualifications
       </h1>
+      <p>
+        With great pleasure we would like to announce that it will finally be possible for you to migrate your old qualifications to the new Effect Force.
+        This means that we will soon be sunsetting the old Effect Force on the <strong>1st of September</strong>.
+        In order to keep your old qualifications please migrate them before this date.
+        You will not be able to migrate your old qualifications after this date anymore.
+        Ofcourse you will be able to earn them again by doing a qualifier.
+      </p>
+      <hr>
       <h2 class="subtitle">
         Migrate your qualifications from the old Force to the new Force
       </h2>
@@ -11,7 +19,7 @@
       <div class="notification is-warning">
         <b>ATTENTION!</b> You can only migrate your old qualifications once, so make sure to do it to your correct account.
       </div>
-      <div v-if="user">
+      <div v-if="user && userMigrated">
         <p>Old Effect Force Account:</p>
         <h2 class="title is-4">
           {{ user.name }}
@@ -67,7 +75,8 @@ export default {
     return {
       user: null,
       ssoToken: this.$route.query.ssoToken,
-      loading: false
+      loading: false,
+      userMigrated: false
     }
   },
   created () {
@@ -76,6 +85,7 @@ export default {
         this.getToken(this.ssoToken)
       }
     }
+    this.checkUserMigrated()
   },
   methods: {
     login () {
@@ -91,6 +101,17 @@ export default {
       } catch (error) {
         this.$blockchain.handleError(error)
       }
+      this.loading = false
+    },
+    async checkUserMigrated () {
+      // Check if user has already migrated their qualifications from their old account to this account.
+      // 117 Users are assigned this quali if they have migrated their account.
+      this.loading = true
+      const migrateQuali = 117
+      const qualis = await this.$blockchain.getAssignedQualifications(this.$auth.user.vAccountRows[0].id)
+      const bool = qualis.filter(q => migrateQuali === q.id)
+      console.log(bool)
+      this.userMigrated = bool
       this.loading = false
     },
     async getToken (ssoToken) {
