@@ -9,7 +9,7 @@
         This is a pre-release that's still undergoing security audits - use at your own risk »
       </nuxt-link>
     </div>
-    <div class="burnerWalletBanner is-size-6">
+    <div v-if="migrationNeeded" class="burnerWalletBanner is-size-6">
       📣 <nuxt-link to="/migrate">
         Announcement: Migration from the old Force is now open »
       </nuxt-link>
@@ -47,6 +47,8 @@ export default {
   },
   data () {
     return {
+      loading: false,
+      migrationNeeded: false // assuming the default state is that the user has not migrated their qualis.
     }
   },
   head () {
@@ -62,6 +64,21 @@ export default {
     }
   },
   created () {
+    this.checkMigrationNeeded()
+  },
+  methods: {
+    async checkMigrationNeeded () {
+      // Check if user has already migrated their qualifications from their old account to this account.
+      // 117 Users are assigned this quali if they have migrated their account.
+      this.loading = true
+      const migrateQuali = 117
+      const qualis = await this.$blockchain.getAssignedQualifications(this.$auth.user.vAccountRows[0].id)
+      console.log(qualis)
+      const bool = qualis.filter(q => migrateQuali === q.id)
+      console.log(bool)
+      this.migrationNeeded = bool
+      this.loading = false
+    }
   }
 }
 </script>
