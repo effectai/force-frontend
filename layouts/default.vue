@@ -4,15 +4,17 @@
     <eos-wallet />
     <error-modal />
     <chain-status v-if="$auth && $auth.loggedIn" />
-    <div class="burnerWalletBanner is-size-6">
-      ⚠️ <nuxt-link to="/security">
-        This is a pre-release that's still undergoing security audits - use at your own risk »
-      </nuxt-link>
-    </div>
-    <div v-if="migrationNeeded" class="burnerWalletBanner is-size-6">
-      📣 <nuxt-link to="/migrate">
-        Announcement: Migration from the old Force is now open »
-      </nuxt-link>
+    <div class="notif-banner is-size-6">
+      <div class="container">
+        <div class="columns">
+          <nuxt-link v-if="!migrationNeeded" to="/migrate" class="column notif-quali is-half has-text-centered">
+            📣 <b>Migrate your old qualifications »</b>
+          </nuxt-link>
+          <nuxt-link to="/security" class="column is-half has-text-centered warning">
+            ⚠️ This is a beta release, know the risks »
+          </nuxt-link>
+        </div>
+      </div>
     </div>
     <nav-bar />
     <!-- <div v-if="provider === 'burner-wallet'" class="burnerWalletBanner">
@@ -85,15 +87,10 @@ export default {
 }
 </script>
 <style lang="scss">
-
-.burnerWalletBanner {
-  background: $yellow;
-  text-align: center;
-  @media screen and (max-width: $tablet), print {
-    padding: 0.5rem;
-  }
+.notif-banner {
+  background-color: $yellow;
+  padding: 0.4rem 0;
 }
-
 </style>
 <style lang="scss" scoped>
 #app {
