@@ -99,3 +99,4 @@ OneSignalSDK*
 
 # Default force stylesheet
 static/force-defaults.css
+.env.development

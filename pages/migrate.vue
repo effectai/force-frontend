@@ -5,17 +5,16 @@
         Qualification migration
       </h1>
       <h2 class="subtitle">
-        Migrate your qualifications from the old Force to the new Force
+        Migrate your qualifications from the old Effect Force to the new Effect Network Platform
       </h2>
       <p>
-        With great pleasure we would like to announce that it will finally be possible for you to migrate your old qualifications to the new Effect Force.
-        This means that we will soon be sunsetting the old Effect Force on the <strong>1st of September</strong>.
-        In order to keep your old qualifications please migrate them before this date.
-        You will not be able to migrate your old qualifications after this date anymore.
-        Ofcourse you will be able to earn them again by doing a qualifier.
+        With great pleasure we would like to announce the migration tool is live!
+        With the release of this tool, it also means the announcement that we will be sunsetting the old Effect Force on the 1st of September.
+        In order to keep your earned qualifications, please migrate them before this date.
+        After this date, qualifications cannot be migrated, but it's not a huge deal, as you'll be able to re-take the qualifiers.
       </p>
       <br>
-      <p>By connecting your old effect force account, you can migrate over your old qualification to this new Force account.</p>
+      <p>By connecting your old Effect Force account, you can migrate over your old qualifications to this new platform.</p>
       <hr>
       <div v-if="migrationNeeded || succesMessage">
         <div v-if="user" class="container">
@@ -138,7 +137,7 @@ export default {
           this.loading = true
           await axios.post(`${process.env.NUXT_ENV_BACKEND_URL}/user/migrate-qualifications`, this.$auth.user.vAccountRows[0].id, { headers: { Authorization: 'Bearer ' + token } })
           this.successTitle = 'Migration complete!'
-          this.successMessage = 'Congratulations! You have successfully migrated your earned qualifications to the new Effect Network. Check your profile page to see your limited edition qualification.'
+          this.successMessage = 'Congratulations! You have successfully migrated your earned qualifications to the new Effect Network platform. Check your profile page to see your limited edition qualification!'
           // this.$router.push('/profile')
         } catch (error) {
           this.$blockchain.handleError(error)
