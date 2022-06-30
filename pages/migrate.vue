@@ -138,7 +138,7 @@ export default {
           this.loading = true
           await axios.post(`${process.env.NUXT_ENV_BACKEND_URL}/user/migrate-qualifications`, this.$auth.user.vAccountRows[0].id, { headers: { Authorization: 'Bearer ' + token } })
           this.successTitle = 'Migration complete!'
-          this.successMessage = 'Congratulations, you have succesfully migrated your qualifications to the new Effect Force. Check your profile page to see your new rare qualification.'
+          this.successMessage = 'Congratulations! You have successfully migrated your earned qualifications to the new Effect Network. Check your profile page to see your limited edition qualification.'
           // this.$router.push('/profile')
         } catch (error) {
           this.$blockchain.handleError(error)
