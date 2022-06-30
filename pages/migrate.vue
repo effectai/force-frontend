@@ -17,7 +17,7 @@
       <br>
       <p>By connecting your old effect force account, you can migrate over your old qualification to this new Force account.</p>
       <hr>
-      <div v-if="migrationNeeded">
+      <div v-if="migrationNeeded || succesMessage">
         <div v-if="user" class="container">
           <div class="notification is-warning">
             <b>ATTENTION!</b> You can only migrate your old qualifications <strong>ONCE</strong>, so make sure to do it with your correct account.
@@ -55,11 +55,11 @@
           </div>
           <div class="container">
             <div class="buttons is-centered">
+              <button class="button has-text-danger" :disabled="loading" @click.prevent="globalLogout(user.token)">
+                Switch old account
+              </button>
               <button class="button is-primary" :disabled="loading" :class="{'is-loading': loading}" @click="migrate(user.token)">
                 Migrate
-              </button>
-              <button class="button has-text-danger" @click.prevent="globalLogout(user.token)">
-                Switch old account
               </button>
             </div>
           </div>
@@ -79,11 +79,14 @@
         </h1>
       </div>
     </div>
+    <!-- SuccessModal -->
+    <success-modal v-if="successMessage" :message="successMessage" :title="successTitle" />
   </section>
 </template>
 
 <script>
 import axios from 'axios'
+import SuccessModal from '@/components/SuccessModal'
 const jwt = require('jsonwebtoken')
 
 const verifyJwtToken = token =>
@@ -102,12 +105,17 @@ const verifyJwtToken = token =>
 export default {
   name: 'Migrate',
   middleware: ['auth'],
+  components: {
+    SuccessModal
+  },
   data () {
     return {
       user: null,
       ssoToken: this.$route.query.ssoToken,
       loading: false,
-      migrationNeeded: true
+      migrationNeeded: true,
+      successMessage: '',
+      successTitle: ''
     }
   },
   created () {
@@ -129,7 +137,9 @@ export default {
         try {
           this.loading = true
           await axios.post(`${process.env.NUXT_ENV_BACKEND_URL}/user/migrate-qualifications`, this.$auth.user.vAccountRows[0].id, { headers: { Authorization: 'Bearer ' + token } })
-          this.$router.push('/profile')
+          this.successTitle = 'Migration complete!'
+          this.successMessage = 'Congratulations, you have succesfully migrated your qualifications to the new Effect Force. Check your profile page to see your new rare qualification.'
+          // this.$router.push('/profile')
         } catch (error) {
           this.$blockchain.handleError(error)
         }
