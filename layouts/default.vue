@@ -7,7 +7,7 @@
     <div class="notif-banner is-size-6">
       <div class="container">
         <div class="columns">
-          <nuxt-link v-if="!migrationNeeded" to="/migrate" class="column notif-quali is-half has-text-centered">
+          <nuxt-link v-if="migrationNeeded" to="/migrate" class="column notif-quali is-half has-text-centered">
             📣 <b>Migrate your old qualifications »</b>
           </nuxt-link>
           <nuxt-link to="/security" class="column is-half has-text-centered warning">
