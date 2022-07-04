@@ -469,13 +469,17 @@ export default (context, inject) => {
       async waitForTransaction (transactionResult) {
         return await this.sdk.force.waitTransaction(transactionResult)
       },
-      // createQualification = async (name: string, description: string, type: number, image?: string,  ishidden?; string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
       async createQualification (name, description, type, image, ishidden) {
         return await this.sdk.force.createQualification(name, description, type, image, ishidden)
       },
-      // assignQualification = async (qualificationId: number, campaignId: number, hash: string): Promise<ReadOnlyTransactResult | TransactResult | PushTransactionArgs> => {
+      async editQualification (id, name, description, type, image, ishidden) {
+        return await this.sdk.force.editQualification(id, name, description, type, image, ishidden)
+      },
       async assignQualification (qualificationId, campaignId, hash) {
         return await this.sdk.force.assignQualification(qualificationId, campaignId, hash)
+      },
+      async unAssignQualification (qualificationId, campaignId) {
+        return await this.sdk.force.unAssignQualification(qualificationId, campaignId)
       },
       // getQualification = async (id: number): Promise<Qualification> => {
       async getQualification (id) {
