@@ -339,6 +339,9 @@
                     <i>No active tasks currently</i>
                   </div>
                 </template>
+                <p v-if="!canUserQualify" class="mt-1 is-size-7 has-text-centered">
+                  You are not qualified to participate in this task
+                </p>
               </div>
             </div>
           </div>
