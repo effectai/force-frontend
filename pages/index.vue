@@ -36,6 +36,7 @@
         </div>
       </div>
       <category-filters :filter="categoryFilter" @categoryFilter="onCategoryFilter" />
+      <joinable-filters @joinableFilter="onJoinableFilter" :campaigns="filteredCampaigns" />
       <campaign-list :campaigns="filteredCampaigns" :grid-toggle="true" />
     </div>
   </section>
@@ -45,13 +46,15 @@
 import { mapGetters } from 'vuex'
 import _ from 'lodash'
 import CategoryFilters from '@/components/CategoryFilters'
+import JoinableFilters from '@/components/JoinableFilters'
 import approvedCampaigns from '@/approvedCampaigns.json'
 import CampaignList from '@/components/CampaignList'
 
 export default {
   components: {
     CampaignList,
-    CategoryFilters
+    CategoryFilters,
+    JoinableFilters
   },
   data () {
     return {
@@ -127,6 +130,9 @@ export default {
         this.$router.replace('/?category=' + category)
       }
       this.categoryFilter = category
+    },
+    onJoinableFilter (list) {
+      console.log('joinable list?', list)
     }
   }
 }
