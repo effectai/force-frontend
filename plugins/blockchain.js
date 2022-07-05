@@ -482,8 +482,8 @@ export default (context, inject) => {
         return await this.sdk.force.unAssignQualification(qualificationId, campaignId)
       },
       // getQualification = async (id: number): Promise<Qualification> => {
-      async getQualification (id) {
-        return await this.sdk.force.getQualification(id)
+      async getQualification (id, processQualification = true) {
+        return await this.sdk.force.getQualification(id, processQualification)
       },
       async getQualifications (nextKey, limit = 50, processCampaign = true) {
         return await this.sdk.force.getQualifications(nextKey, limit, processCampaign)
