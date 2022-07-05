@@ -60,7 +60,9 @@ export default {
     return {
       approvedCampaigns,
       unmoderated: false,
-      categoryFilter: this.$route.query.category
+      categoryFilter: this.$route.query.category,
+      userQualis: [],
+      joinableFilter: null
     }
   },
   computed: {
@@ -103,6 +105,11 @@ export default {
             }, 0)
           }
         }
+
+        if (this.joinableFilter) {
+          filteredCampaigns = this.getJoinableCampaigns(filteredCampaigns, this.joinableFilter)
+        }
+
         // filter active campaigns
         filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0 || c.userHasReservation)
         // show the campaigns where the user has a resevation first
@@ -121,8 +128,12 @@ export default {
     if (!this.$auth || !this.$auth.loggedIn) {
       this.$router.push('/welcome')
     }
+    this.getUserQualis()
   },
   methods: {
+    async getUserQualis () {
+      this.userQualis = await this.$blockchain.getAssignedQualifications(this.$auth.user.vAccountRows[0].id)
+    },
     onCategoryFilter (category) {
       if (!category) {
         this.$router.replace('/')
@@ -131,8 +142,34 @@ export default {
       }
       this.categoryFilter = category
     },
-    onJoinableFilter (list) {
-      console.log('joinable list?', list)
+    onJoinableFilter (option) {
+      this.joinableFilter = option
+    },
+    checkUserQualify (campaign) {
+      if (campaign.qualis.length > 0) {
+        for (const quali of campaign.qualis) {
+          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
+            // user doesnt have qualification that is required or user has qualification that is not allowed
+            return false
+          }
+        }
+      } else {
+        return true
+      }
+      return true
+    },
+    getJoinableCampaigns (campaigns, option) {
+      const joinableCampaigns = []
+      const unjoinableCampaigns = []
+      for (const c of campaigns) {
+        const joinable = this.checkUserQualify(c)
+        if (joinable) {
+          joinableCampaigns.push(c)
+        } else {
+          unjoinableCampaigns.push(c)
+        }
+      }
+      return option === 'joinable' ? joinableCampaigns : unjoinableCampaigns
     }
   }
 }
