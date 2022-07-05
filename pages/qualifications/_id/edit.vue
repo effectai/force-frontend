@@ -1,5 +1,4 @@
 <template>
-  <!-- TODO FIX this to actually edit quali's -->
   <section class="section">
     <div class="container">
       <nav class="breadcrumb" aria-label="breadcrumbs">
@@ -25,7 +24,7 @@
       <h1 class="title mt-5">
         Edit Qualification
       </h1>
-      <form @submit.prevent="createQualification">
+      <form @submit.prevent="editQualification">
         <div class="block basic-info-group">
           <div class="field">
             <label class="label">
@@ -61,16 +60,26 @@
             </div>
           </div>
 
+          <div class="field">
+            <label for="" class="label">
+              Hidden
+            </label>
+            <label class="checkbox">
+              <input v-model="qualificationIpfs.ishidden" type="checkbox" class="checkbox">
+              Check if this qualifications needs to be hidden from the user.
+            </label>
+          </div>
+
           <div class="field is-grouped is-grouped-right">
             <div class="control">
-              <nuxt-link class="button is-light" to="/">
+              <nuxt-link class="button is-light" :to="/qualifications/ + id">
                 Cancel
               </nuxt-link>
             </div>
             <!-- TODO add disabled property when all input fields have not been filled in yet. -->
             <div class="control">
-              <button class="button is-primary is-wide" type="submit" :class="{ 'is-loading' : loading }">
-                Create Qualification
+              <button class="button is-primary is-wide" type="submit" :disabled="!hasChanged" :class="{ 'is-loading' : loading }">
+                Save Qualification
               </button>
             </div>
           </div>
@@ -84,7 +93,7 @@
 <script>
 import _ from 'lodash'
 import VueSimplemde from 'vue-simplemde'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import SuccessModal from '~/components/SuccessModal.vue'
 
 export default {
@@ -104,6 +113,7 @@ export default {
       id: parseInt(this.$route.params.id),
       selectNull: null,
       selectType: 'Choose Type',
+      errors: [],
       qualificationIpfs: {
         name: null,
         description: null,
@@ -117,16 +127,20 @@ export default {
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
       qualifications: state => state.qualification.qualifications
     }),
+    ...mapGetters({
+      qualificationById: 'qualification/qualificationById'
+    }),
     allQualifications () {
       if (!this.qualifications) { return }
       return this.qualifications
     },
     hasChanged () {
-      return this.qualification && !_.isEqual(this.qualification, this.qualificationIpfs)
+      return this.qualification && !_.isEqual(this.qualification.info, this.qualificationIpfs)
     }
   },
   created () {
-    this.getQualifications()
+    this.getQualification()
+    // this.qualificationById(this.id)
   },
 
   beforeDestroy () {
@@ -134,37 +148,42 @@ export default {
   },
 
   methods: {
-    async getQualifications () {
+    async getQualification () {
       this.qualificationLoading = true
-      if (!this.allQualificationsLoaded) {
-        await this.$store.dispatch('qualification/getQualifications')
-        this.qualification = this.qualifications[this.id]
-        console.log(this.qualification)
+      try {
+        this.qualification = await this.$blockchain.getQualification(this.id)
         this.qualificationIpfs = { ...this.qualification.info }
+      } catch (error) {
+        console.error(error)
+        this.$blockchain.handleError(error)
       }
       this.qualificationLoading = false
     },
     async editQualification () {
-      // this.loading = true
-      // try {
-      //   // const hash = await this.$blockchain.uploadCampaign(this.campaignIpfs)
-      //   // const result = await this.$blockchain.editCampaign(this.id, hash, this.campaignIpfs.reward, qualis)
+      this.loading = true
+      try {
+        console.log(this.qualificationIpfs)
+        const { name, description, image, ishidden } = this.qualificationIpfs
+        const result = await this.$blockchain.editQualification(this.id, name, description, 0, image, ishidden)
 
-      //   // Wait for transaction and reload campaigns
-      //   this.successTitle = 'Campaign submitted successfully!'
-      //   this.successMessage = 'Waiting for transaction to complete before continuing'
-      //   await this.$blockchain.waitForTransaction(result)
-      //   await this.$store.dispatch('campaign/getCampaign', this.id)
+        // Wait for transaction and reload campaigns
+        await this.$blockchain.waitForTransaction(result)
 
-      //   this.$store.dispatch('transaction/addTransaction', result)
-      //   this.success = true
-      //   this.loading = false
-      //   this.submitted = true
-      //   this.$router.push('/campaigns/' + this.id)
-      // } catch (error) {
-      //   this.loading = false
-      //   this.errors.push(error)
-      // }
+        this.successTitle = 'Qualification submitted successfully!'
+        this.successMessage = 'Waiting for transaction to complete before continuing'
+        this.getQualification(this.id)
+
+        this.$store.dispatch('transaction/addTransaction', result)
+        this.success = true
+        this.loading = false
+        this.submitted = true
+        this.$router.push('/qualifications/' + this.id)
+      } catch (error) {
+        this.loading = false
+        console.error(error)
+        this.errors.push(error)
+        this.$blockchain.handleError(error)
+      }
     },
     checkForm () {
       this.error = []
