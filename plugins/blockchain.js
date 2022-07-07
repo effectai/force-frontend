@@ -81,7 +81,6 @@ export default (context, inject) => {
         context.store.dispatch('campaign/getBatches')
         context.store.dispatch('campaign/getSubmissions')
         context.store.dispatch('qualification/getQualifications')
-        context.store.dispatch('qualification/getAssignedQualifications')
         context.store.dispatch('pendingPayout/loadPendingPayouts')
       },
       updateTemplates () {
@@ -485,7 +484,7 @@ export default (context, inject) => {
       async getQualifications (nextKey, limit = 50, processQualification = true) {
         return await this.sdk.force.getQualifications(nextKey, limit, processQualification)
       },
-      async getAssignedQualifications (nextKey, limit = 50, processQualification = true) {
+      async getAssignedQualifications (nextKey, limit = 50, processQualification = false) {
         return await this.sdk.force.getAssignedQualifications(nextKey, limit, processQualification, context.$auth.user.vAccountRows[0].id)
       },
       async recoverPublicKey () {

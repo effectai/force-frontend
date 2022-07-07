@@ -121,6 +121,9 @@ export default {
           // No more Qualifications, we are done
           commit('SET_ALL_QUALIFICATION_LOADED', true)
           commit('SET_LOADING', false)
+
+          // now that all qualifications are loaded, get the assigned qualifications for the user
+          await dispatch('getAssignedQualifications')
         }
       } catch (error) {
         this.$blockchain.handleError(error)
@@ -134,14 +137,20 @@ export default {
       }
       commit('SET_LOADING', true)
       try {
-        const data = await this.$blockchain.getAssignedQualifications(nextKey, 200, true)
+        const data = await this.$blockchain.getAssignedQualifications(nextKey, 200, false)
+
+        // get assigned qualification info from store
+        const assignedQualis = []
+        for (const aq of data) {
+          const qualiInfo = state.qualifications.find(q => q.id === aq.quali_id)
+          assignedQualis.push(qualiInfo)
+        }
 
         if (!state.allAssignedQualificationsLoaded) {
-          commit('UPSERT_ASSIGNED_QUALIFICATIONS', data)
+          commit('UPSERT_ASSIGNED_QUALIFICATIONS', assignedQualis)
         }
-        const qualifications = data
         setTimeout(() => {
-          commit('UPSERT_ASSIGNED_QUALIFICATIONS', qualifications)
+          commit('UPSERT_ASSIGNED_QUALIFICATIONS', assignedQualis)
         }, 0)
 
         if (data.more) {
