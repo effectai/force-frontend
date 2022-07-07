@@ -79,8 +79,8 @@ export default {
       // Check if user has already migrated their qualifications from their old account to this account.
       // 117 Users are assigned this quali if they have migrated their account.
       this.loading = true
+      await this.$store.dispatch('qualification/getQualifications')
       const migrateQuali = 117
-      await this.$store.dispatch('qualification/getAssignedQualifications')
       const qualis = [...this.assignedQualifications]
 
       // if not present will return false.
