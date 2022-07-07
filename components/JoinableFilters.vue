@@ -3,6 +3,10 @@
     <!-- Filter category -->
     <div class="column">
       <span>Joinable/Unjoinable</span><br>
+      <div class="switch-button mt-1 ml-3" :class="{'unmoderated': unmoderated}">
+        <input v-model="unmoderated" class="switch-button-checkbox" type="checkbox">
+        <label class="switch-button-label" for=""><span class="switch-button-label-span">Joinable</span></label>
+      </div>
       <div class="select is-normal">
         <select @change="onFilter">
           <option value="" selected>
@@ -28,11 +32,7 @@ export default {
   props: ['filter', 'campaigns'],
   data () {
     return {
-      effect_dapps: ['qualifier', 'annotations', 'socials'],
-      userCampaignQualified: [],
-      userQualis: [],
-      joinableCampaigns: [],
-      unjoinableCampaigns: []
+      unmoderated: false
     }
   },
   methods: {
