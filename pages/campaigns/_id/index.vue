@@ -406,7 +406,8 @@ export default {
       joinedCampaigns: state => state.campaign.joinedCampaigns,
       campaigns: state => state.campaign.campaigns,
       batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded,
-      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
+      assignedQualifications: state => state.qualification.assignedQualifications
     }),
     campaignBatches () {
       return this.batchesByCampaignId(this.id)
@@ -530,7 +531,7 @@ export default {
       if (!this.allQualificationsLoaded) {
         await this.$store.dispatch('qualification/getQualifications')
       }
-      this.userQualis = await this.$blockchain.getAssignedQualifications(this.accountId)
+      this.userQualis = [...this.assignedQualifications]
 
       for (const quali of this.campaign.qualis) {
         const q = this.qualificationById(quali.key)

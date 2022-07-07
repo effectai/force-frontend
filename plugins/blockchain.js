@@ -481,12 +481,11 @@ export default (context, inject) => {
       async getQualification (id) {
         return await this.sdk.force.getQualification(id)
       },
-      async getQualifications (nextKey, limit = 50, processCampaign = true) {
-        return await this.sdk.force.getQualifications(nextKey, limit, processCampaign)
+      async getQualifications (nextKey, limit = 50, processQualification = true) {
+        return await this.sdk.force.getQualifications(nextKey, limit, processQualification)
       },
-      // getUserQualifications = async (id: number): Promise<Array<Qualification>> => {
-      async getAssignedQualifications (id) {
-        return await this.sdk.force.getAssignedQualifications(id)
+      async getAssignedQualifications (nextKey, limit = 50, processQualification = false) {
+        return await this.sdk.force.getAssignedQualifications(nextKey, limit, processQualification, context.$auth.user.vAccountRows[0].id)
       },
       async recoverPublicKey () {
         const message = 'Effect Account'
