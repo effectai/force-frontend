@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import BscWallet from '@/components/BscWallet'
 import EosWallet from '@/components/EosWallet'
 import NavBar from '@/components/NavBar'
@@ -63,18 +64,24 @@ export default {
   computed: {
     provider () {
       return this.$auth.user && this.$auth.user.provider
-    }
+    },
+    ...mapState({
+      assignedQualifications: state => state.qualification.assignedQualifications
+    })
   },
   created () {
-    this.checkMigrationNeeded()
+    if (this.$auth.user) {
+      this.checkMigrationNeeded()
+    }
   },
   methods: {
     async checkMigrationNeeded () {
       // Check if user has already migrated their qualifications from their old account to this account.
       // 117 Users are assigned this quali if they have migrated their account.
       this.loading = true
+      await this.$store.dispatch('qualification/getQualifications')
       const migrateQuali = 117
-      const qualis = await this.$blockchain.getAssignedQualifications(this.$auth.user.vAccountRows[0].id)
+      const qualis = [...this.assignedQualifications]
 
       // if not present will return false.
       const bool = qualis.some(q => migrateQuali === q.id)
