@@ -167,9 +167,9 @@
           <h2 class="title is-4 mt-6 is-spaced">
             Qualifications
           </h2>
-          <div v-if="qualifications.length > 0" class="columns is-mobile is-multiline is-max-widescreen">
+          <div v-if="assignedQualifications && assignedQualifications.length > 0" class="columns is-mobile is-multiline is-max-widescreen">
             <div
-              v-for="q in qualifications"
+              v-for="q in assignedQualifications"
               :key="q.id"
               class="is-1-desktop column is-one-quarter-mobile quali"
             >
@@ -179,7 +179,7 @@
               </nuxt-link>
             </div>
           </div>
-          <span v-else>No qualifications found</span>
+          <!-- <span v-else>No qualifications found</span> -->
         </div>
 
         <hr>
@@ -199,7 +199,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import VueCountdown from '@chenfengyuan/vue-countdown/dist/vue-countdown.common'
 import Balance from '@/components/Balance'
 import KeyModal from '@/components/KeyModal.vue'
@@ -216,7 +216,6 @@ export default {
       showPayoutDetails: false,
       successMessage: null,
       successTitle: null,
-      qualifications: [],
       showPK: false
     }
   },
@@ -225,6 +224,9 @@ export default {
       getPendingPayouts: 'pendingPayout/getPendingPayouts',
       campaignById: 'campaign/campaignById',
       activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId'
+    }),
+    ...mapState({
+      assignedQualifications: state => state.qualification.assignedQualifications
     }),
     myCampaigns () {
       if (!this.campaigns) { return }
@@ -251,14 +253,9 @@ export default {
   mounted () {
     console.log('mounted')
     this.$store.dispatch('pendingPayout/loadPendingPayouts')
-    this.getUserQuali()
     // console.debug(this.$auth)
   },
   methods: {
-    async getUserQuali () {
-      const res = await this.$blockchain.getAssignedQualifications(this.$auth.user.vAccountRows[0].id)
-      this.qualifications = res
-    },
     async logout () {
       await this.$auth.logout()
     },

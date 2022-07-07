@@ -33,6 +33,31 @@ export default {
     },
     SET_ALL_QUALIFICATION_LOADED (state, allQualificationsLoaded) {
       state.allQualificationsLoaded = allQualificationsLoaded
+    },
+    UPSERT_ASSIGNED_QUALIFICATIONS (state, assignedQualifications) {
+      if (!state.assignedQualifications) {
+        // We have no qualifications yet
+        state.assignedQualifications = assignedQualifications
+      } else {
+        const updatedQualifications = state.assignedQualifications.map((c) => { return { ...c } })
+        for (let i = 0; i < assignedQualifications.length; i++) {
+          const index = state.assignedQualifications.findIndex(c => c.id === assignedQualifications[i].id)
+          if (index !== -1) {
+            if (assignedQualifications[i].content.field_1 === state.assignedQualifications[index].content.field_1) {
+              assignedQualifications[i].info = state.assignedQualifications[index].info
+            }
+            // Update existing Qualification
+            updatedQualifications[index] = assignedQualifications[i]
+          } else {
+            // Insert new Qualification
+            updatedQualifications.push(assignedQualifications[i])
+          }
+        }
+        state.assignedQualifications = updatedQualifications
+      }
+    },
+    SET_ALL_ASSIGNED_QUALIFICATION_LOADED (state, allAssignedQualificationsLoaded) {
+      state.allAssignedQualificationsLoaded = allAssignedQualificationsLoaded
     }
   },
   getters: {
@@ -102,6 +127,37 @@ export default {
         commit('SET_LOADING', false)
       }
     },
+    async getAssignedQualifications ({ dispatch, rootGetters, commit, state }, nextKey) {
+      if (!nextKey && state.loading) {
+        console.log('Already retrieving assigned qualifications somewhere else, aborting..')
+        return
+      }
+      commit('SET_LOADING', true)
+      try {
+        const data = await this.$blockchain.getAssignedQualifications(nextKey, 200, true)
+
+        if (!state.allAssignedQualificationsLoaded) {
+          commit('UPSERT_ASSIGNED_QUALIFICATIONS', data)
+        }
+        const qualifications = data
+        setTimeout(() => {
+          commit('UPSERT_ASSIGNED_QUALIFICATIONS', qualifications)
+        }, 0)
+
+        if (data.more) {
+          console.log('retrieving more assigned qualifications..')
+          await sleep(100)
+          await dispatch('getAssignedQualifications', data.next_key)
+        } else {
+          // No more Qualifications, we are done
+          commit('SET_ALL_ASSIGNED_QUALIFICATION_LOADED', true)
+          commit('SET_LOADING', false)
+        }
+      } catch (error) {
+        this.$blockchain.handleError(error)
+        commit('SET_LOADING', false)
+      }
+    },
     async processQualification ({ commit, rootGetters, dispatch }, qualification) {
       try {
         // field_0 represents the content type where:
@@ -121,8 +177,10 @@ export default {
   state: () => {
     return {
       qualifications: null,
+      assignedQualifications: null,
       loading: false,
-      allQualificationsLoaded: false
+      allQualificationsLoaded: false,
+      allAssignedQualificationsLoaded: false
     }
   }
 }

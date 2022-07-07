@@ -85,6 +85,7 @@
 
 <script>
 import axios from 'axios'
+import { mapState } from 'vuex'
 import SuccessModal from '@/components/SuccessModal'
 const jwt = require('jsonwebtoken')
 
@@ -117,13 +118,21 @@ export default {
       successTitle: ''
     }
   },
+  computed: {
+    ...mapState({
+      allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded,
+      assignedQualifications: state => state.qualification.assignedQualifications
+    })
+  },
   created () {
     if (process.client) {
       if (this.ssoToken) {
         this.getToken(this.ssoToken)
       }
     }
-    this.checkMigrationNeeded()
+    if (this.$auth.user) {
+      this.checkMigrationNeeded()
+    }
   },
   methods: {
     login () {
@@ -145,12 +154,12 @@ export default {
         this.loading = false
       }
     },
-    async checkMigrationNeeded () {
+    checkMigrationNeeded () {
       // Check if user has already migrated their qualifications from their old account to this account.
       // 117 Users are assigned this quali if they have migrated their account.
       this.loading = true
       const migrateQuali = 117
-      const qualis = await this.$blockchain.getAssignedQualifications(this.$auth.user.vAccountRows[0].id)
+      const qualis = [...this.assignedQualifications]
 
       // if not present will return false.
       const bool = qualis.some(q => migrateQuali === q.id)
