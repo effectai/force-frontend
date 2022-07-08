@@ -45,6 +45,7 @@
               Image
               <span class="has-text-info" />
             </label>
+            <upload-to-ipfs @upload="selectImage" />
             <div class="control">
               <input v-model="qualificationIpfs.image" type="text" class="input" placeholder="Image Url">
             </div>
@@ -83,11 +84,13 @@
 <script>
 import VueSimplemde from 'vue-simplemde'
 import SuccessModal from '~/components/SuccessModal.vue'
+import UploadToIpfs from '@/components/UploadToIpfs'
 
 export default {
   components: {
     VueSimplemde,
-    SuccessModal
+    SuccessModal,
+    UploadToIpfs
   },
 
   middleware: ['auth'],
@@ -106,6 +109,9 @@ export default {
     }
   },
   methods: {
+    selectImage (file) {
+      this.qualificationIpfs.image = file
+    },
     async createQualification () {
       // TODO redirect to created qualification when succesfull
       // let createdQualification
