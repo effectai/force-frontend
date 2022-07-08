@@ -52,6 +52,7 @@
           </div>
           <div class="field">
             <label class="label">Image</label>
+            <upload-to-ipfs @upload="selectImage" />
             <div class="control">
               <input v-model="campaignIpfs.image" class="input" type="text" placeholder="Image URL">
             </div>
@@ -300,6 +301,7 @@ import InstructionsModal from '@/components/InstructionsModal'
 import TemplateMedia from '@/components/Template'
 import SuccessModal from '@/components/SuccessModal'
 import 'splitpanes/dist/splitpanes.css'
+import UploadToIpfs from '@/components/UploadToIpfs'
 
 // require component
 // require styles
@@ -326,7 +328,8 @@ export default {
     SuccessModal,
     Splitpanes,
     Pane,
-    Multiselect
+    Multiselect,
+    UploadToIpfs
   },
   beforeRouteLeave (to, from, next) {
     if (this.checkClose()) {
@@ -445,6 +448,9 @@ export default {
   },
 
   methods: {
+    selectImage (file) {
+      this.campaignIpfs.image = file
+    },
     async getQualifications () {
       if (!this.allQualificationsLoaded) {
         await this.$store.dispatch('qualification/getQualifications')
