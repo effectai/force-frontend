@@ -16,32 +16,26 @@
         </ul>
       </nav>
 
-      <!-- Loading Transaction Modal -->
-      <div v-if="loading" class="loader-wrapper is-active">
-        <img src="~assets/img/loading.svg">
-        <br>
-        <span v-if="waitingOnTransaction" class="loading-text subtitle">Waiting for the transaction to complete</span>
-        <span v-else class="loading-text subtitle">Please sign the transaction</span>
-      </div>
-
       <!-- Loading Qualification Message -->
-      <div v-if="!singleQualification" class="loading-text">
+      <div v-if="loading" class="loading-text">
         Qualification loading
+      </div>
+      <div v-else-if="!singleQualification" class="notification is-danger">
+        Could not find qualification
       </div>
       <div v-else class="columns">
         <!-- First column with information -->
         <div class="column is-three-fifths">
           <div class="is-flex is-align-items-center mb-6">
-            <p v-if="singleQualification" class="image has-radius mr-4" style="width: 52px; height: 52px">
+            <p class="image has-radius mr-4" style="width: 52px; height: 52px">
               <img v-if="singleQualification.info && singleQualification.info.image" :src="singleQualification.info.image">
               <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)" alt="qualification name">
             </p>
             <div class="title has-text-weight-bold">
               <span>#{{ id }}</span>
-              <span v-if="singleQualification.info.name">{{ singleQualification.info.name }}</span>
-              <span v-else-if="singleQualification.info.name == null" class="loading-text">Loading</span>
-              <span v-else-if="singleQualification.info.name.length == 0">Untitled</span>
-              <span v-else class="has-text-danger-dark">Could not load singleQualification info</span>
+              <span v-if="!singleQualification.info" class="loading-text">Loading</span>
+              <span v-else-if="!singleQualification.info.name || singleQualification.info.name.length == 0">Untitled</span>
+              <span v-else>{{ singleQualification.info.name }}</span>
             </div>
           </div>
 
@@ -73,9 +67,7 @@
                         {{ vaccount[0].address[1] }}
                       </nuxt-link>
                     </div>
-                    <div v-else>
-                      ...
-                    </div>
+                    <div v-else class="loading-text" />
                   </div>
                   <div class="block">
                     IPFS
@@ -114,7 +106,6 @@ export default {
   middleware: ['auth'],
   data () {
     return {
-      loading: false,
       id: parseInt(this.$route.params.id),
       ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
       vaccount: null
@@ -122,37 +113,33 @@ export default {
   },
   computed: {
     ...mapState({
-      qualifications: state => state.qualification.qualifications
+      qualifications: state => state.qualification.qualifications,
+      loading: state => !state.qualification.allQualificationsLoaded
     }),
     singleQualification () {
       if (!this.qualifications) { return }
       return this.qualifications.find(el => el.id === this.id)
     }
   },
+  watch: {
+    singleQualification (qual) {
+      if (qual) {
+        this.getAccountById(qual.account_id)
+      }
+    }
+  },
   created () {
-    this.$store.dispatch('qualification/getQualifications')
-    this.getAccountById(this.id)
+    if (this.singleQualification) {
+      this.getAccountById(this.singleQualification.account_id)
+    }
   },
   methods: {
-    async getAccountById (id) {
-      const quali = await this.$blockchain.getQualification(id)
-      this.vaccount = await this.$blockchain.getVAccountById(quali.account_id).catch(console.error)
+    async getAccountById (accountId) {
+      this.vaccount = await this.$blockchain.getVAccountById(accountId).catch(console.error)
     }
   }
-
 }
 </script>
 
 <style lang="scss" scoped>
-.information-block {
-  border: 1px solid #E8EEFF;
-  border-radius: 8px;
-  .block {
-    margin-bottom: 10px
-  }
-
-  .information-header {
-    background: #F7FBFF;
-  }
-}
 </style>
