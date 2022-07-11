@@ -55,7 +55,8 @@ export default {
   },
   data () {
     return {
-      approvedCampaigns,
+      approvedCampaigns: approvedCampaigns.campaigns,
+      approvedRequesters: approvedCampaigns.requesters,
       unmoderated: false,
       categoryFilter: this.$route.query.category
     }
@@ -80,9 +81,9 @@ export default {
       if (campaigns) {
         filteredCampaigns = campaigns.map((c) => { return { ...c } })
         if (!this.unmoderated) {
-          filteredCampaigns = filteredCampaigns.filter(c => this.approvedCampaigns.includes(c.id))
+          filteredCampaigns = filteredCampaigns.filter(c => this.approvedCampaigns.includes(c.id) || this.approvedRequesters.includes(c.owner[1]))
         } else {
-          filteredCampaigns = filteredCampaigns.filter(c => !this.approvedCampaigns.includes(c.id))
+          filteredCampaigns = filteredCampaigns.filter(c => !this.approvedCampaigns.includes(c.id) && !this.approvedRequesters.includes(c.owner[1]))
         }
         for (const i in filteredCampaigns) {
           const batches = this.activeBatchesByCampaignId(filteredCampaigns[i].id)
