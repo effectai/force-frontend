@@ -17,7 +17,7 @@
         class="column is-one-third-tablet"
         :class="{'is-one-fifth-desktop': grid, 'is-12-desktop': !grid}"
       >
-        <nuxt-link :to="'/campaigns/'+campaign.id" class="box p-4" :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation}">
+        <nuxt-link :to="'/campaigns/'+campaign.id" class="box p-4" :class="{'is-disabled': campaign.info === null, 'has-reservation': campaign.userHasReservation, 'is-disabled': campaign.joinable === false}">
           <div class="columns is-vcentered is-multiline">
             <div
               class="column is-12-touch"

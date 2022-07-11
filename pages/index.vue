@@ -35,8 +35,8 @@
           </div>
         </div>
       </div>
-      <joinable-filters :filter="joinableFilter" @joinableFilter="onJoinableFilter" :campaigns="filteredCampaigns" />
-      <category-filters :filter="categoryFilter" @categoryFilter="onCategoryFilter" class="category-filters"/>
+      <joinable-filters :filter="joinableFilter" :campaigns="filteredCampaigns" @joinableFilter="onJoinableFilter" />
+      <category-filters :filter="categoryFilter" class="category-filters" @categoryFilter="onCategoryFilter" />
       <campaign-list :campaigns="filteredCampaigns" :grid-toggle="true" />
     </div>
   </section>
@@ -110,6 +110,7 @@ export default {
               return a + b.real_tasks_done
             }, 0)
           }
+          filteredCampaigns[i].joinable = this.checkUserQualify(filteredCampaigns[i])
         }
 
         if (this.joinableFilter && this.joinableFilter !== 'qualifier') {
@@ -164,8 +165,7 @@ export default {
       const joinableCampaigns = []
       const unjoinableCampaigns = []
       for (const c of campaigns) {
-        const joinable = this.checkUserQualify(c)
-        if (joinable) {
+        if (c.joinable) {
           joinableCampaigns.push(c)
         } else {
           unjoinableCampaigns.push(c)
