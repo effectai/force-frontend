@@ -240,7 +240,7 @@ export default {
   },
   created () {
     if (this.$auth.loggedIn) {
-      this.countNewNotifications()
+      // this.countNewNotifications()
     }
   },
   methods: {
