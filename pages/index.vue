@@ -138,9 +138,9 @@ export default {
   },
   methods: {
     onCategoryFilter (category) {
-      if (!category) {
+      if (!category && this.$route.query.category) {
         this.$router.replace('/')
-      } else {
+      } else if (category !== this.$route.query.category) {
         this.$router.replace('/?category=' + category)
       }
       this.categoryFilter = category

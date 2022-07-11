@@ -34,7 +34,7 @@
                 <div>
                   <nuxt-link
                     v-if="campaign.info && campaign.info.category"
-                    :to="'/?category=' + campaign.info.category"
+                    :to="{path: '/', query: { category: campaign.info.category}}"
                     class="tag is-light mb-2 has-border is-capitalized"
                     :class="['is-'+campaign.info.category]"
                   >
