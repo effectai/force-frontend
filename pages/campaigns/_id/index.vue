@@ -298,7 +298,9 @@
                     None
                   </div>
                 </div>
-                <div v-else class="loading-text has-text-centered">Loading</div>
+                <div v-else class="loading-text has-text-centered">
+                  Loading
+                </div>
                 <br>
               </div>
 
@@ -591,17 +593,6 @@ export default {
         font-weight: 600;
       }
     }
-  }
-}
-.information-block {
-  border: 1px solid #E8EEFF;
-  border-radius: 8px;
-  .block {
-    margin-bottom: 10px
-  }
-
-  .information-header {
-    background: #F7FBFF;
   }
 }
 </style>

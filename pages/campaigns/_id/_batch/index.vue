@@ -716,17 +716,6 @@ export default {
     }
   }
 }
-.information-block {
-  border: 1px solid #E8EEFF;
-  border-radius: 8px;
-  .block {
-    margin-bottom: 10px
-  }
-
-  .information-header {
-    background: #F7FBFF;
-  }
-}
 .task-tab div.box {
   // background: $balance-box-color;
   padding: 1rem;
