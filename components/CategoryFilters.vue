@@ -1,12 +1,12 @@
 <template>
   <div class="column is-flex pl-0 is-align-items-center">
     <div class="select is-normal">
-      <select v-model="activeFilter" @change="onFilter" class="px-4">
+      <select :value="filter" @change="onFilter">
         <option value="" selected>
           All Categories
         </option>
         <option v-for="dapp in effect_dapps" :key="dapp" :value="dapp" class="column">
-          {{dapp}}<span v-if="dapp === 'qualifier'">s</span>
+          {{ dapp }}<span v-if="dapp === 'qualifier'">s</span>
         </option>
       </select>
     </div>
@@ -29,7 +29,6 @@ export default {
   props: ['filter'],
   data () {
     return {
-      activeFilter: this.filter,
       effect_dapps: ['annotations', 'socials']
     }
   },
