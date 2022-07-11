@@ -17,18 +17,46 @@
           {{ error }}
         </div>
       </div>
-      <div class="tabs">
-        <ul>
-          <li :class="{'is-active': formGroup === 'tasks'}">
-            <a @click.prevent="formGroup = 'tasks'">Design Tasks</a>
-          </li>
-          <li :class="{'is-active': formGroup === 'basic-info'}">
-            <a @click.prevent="formGroup = 'basic-info'">Basic Information</a>
-          </li>
-          <li :class="{'is-active': formGroup === 'instructions'}">
-            <a @click.prevent="formGroup = 'instructions'">Instructions</a>
-          </li>
-        </ul>
+      <div class="columns">
+        <div class="column">
+          <div class="tabs">
+            <ul>
+              <li :class="{'is-active': formGroup === 'tasks'}">
+                <a @click.prevent="formGroup = 'tasks'">Design Tasks <span class="has-text-danger">*</span></a>
+              </li>
+              <li :class="{'is-active': formGroup === 'basic-info'}">
+                <a @click.prevent="formGroup = 'basic-info'">Basic Information <span class="has-text-danger">*</span></a>
+              </li>
+              <li :class="{'is-active': formGroup === 'instructions'}">
+                <a @click.prevent="formGroup = 'instructions'">Instructions <span class="has-text-danger">*</span></a>
+              </li>
+              <li :class="{'is-active': formGroup === 'advanced'}">
+                <a @click.prevent="formGroup = 'advanced'">Advanced</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="column is-narrow">
+          <div class="field is-grouped is-grouped-right mt-4">
+            <div class="control has-margin-bottom-mobile">
+              <button class="button is-secondary is-outlined is-small" @click.prevent="$refs.fileInput.click()">
+                Import
+              </button>
+              <input
+                ref="fileInput"
+                type="file"
+                style="display: none"
+                accept="application/json"
+                @change="importCampaign($event)"
+              >
+            </div>
+            <div class="control">
+              <button class="button is-secondary is-outlined is-small" @click.prevent="exportCampaign">
+                Export
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
       <form @submit.prevent="createCampaign">
         <div v-show="formGroup === 'basic-info'" class="block basic-info-group">
@@ -54,7 +82,7 @@
             <label class="label">Image</label>
             <upload-to-ipfs @upload="selectImage" />
             <div class="control">
-              <input v-model="campaignIpfs.image" class="input" type="text" placeholder="Image URL">
+              <input v-model="campaignIpfs.image" class="input" type="url" placeholder="Image URL">
             </div>
           </div>
           <div class="field">
@@ -252,23 +280,14 @@
             </splitpanes>
           </div>
         </div>
-        <div class="field is-grouped is-grouped-right mt-4">
-          <div class="control has-margin-bottom-mobile">
-            <button class="button is-secondary is-outlined is-small" @click.prevent="$refs.fileInput.click()">
-              Import
-            </button>
-            <input
-              ref="fileInput"
-              type="file"
-              style="display: none"
-              accept="application/json"
-              @change="importCampaign($event)"
-            >
-          </div>
-          <div class="control">
-            <button class="button is-secondary is-outlined is-small" @click.prevent="exportCampaign">
-              Export
-            </button>
+        <div v-show="formGroup === 'advanced'" class="block basic-info-group">
+          <div class="field">
+            <label class="label">
+              Webhook URL for submissions
+            </label>
+            <div class="control">
+              <input v-model="campaignIpfs.webhook" class="input" type="url" placeholder="webhook url..">
+            </div>
           </div>
         </div>
         <div class="field is-grouped is-grouped-right">
@@ -359,7 +378,8 @@ export default {
         image: '',
         category: '',
         example_task: {},
-        version: 1,
+        version: 1.1,
+        webhook: null,
         reward: null,
         estimated_time: null
       },

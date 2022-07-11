@@ -188,6 +188,33 @@ export default {
 
         const result = await this.$blockchain.submitTask(this.batch.batch_id, this.submissionId, JSON.stringify(values))
         await this.$blockchain.waitForTransaction(result)
+        try {
+          if (this.campaign && this.campaign.info && this.campaign.info.webhook && this.campaign.info.webhook.length > 0) {
+            fetch(this.campaign.info.webhook, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                campaignId: this.campaign.id,
+                batchId: this.batch.batch_id,
+                batchNumber: this.batch.id,
+                submissionId: this.submissionId,
+                userId: this.$auth.user.vAccountRows[0].id,
+                submission: values
+              })
+            })
+              .then(response => response.json())
+              .then((data) => {
+                console.log('webhook success:', data)
+              })
+              .catch((e) => {
+                console.error('webhook fail', e)
+              })
+          }
+        } catch (e) {
+          console.error('webhook fail', e)
+        }
         this.$store.dispatch('transaction/addTransaction', result)
         this.loading = false
         this.showSubmittedTaskModal = true
