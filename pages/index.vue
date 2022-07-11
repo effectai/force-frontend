@@ -35,8 +35,8 @@
           </div>
         </div>
       </div>
-      <category-filters :filter="categoryFilter" @categoryFilter="onCategoryFilter" />
-      <joinable-filters @joinableFilter="onJoinableFilter" :campaigns="filteredCampaigns" />
+      <joinable-filters :filter="joinableFilter" @joinableFilter="onJoinableFilter" :campaigns="filteredCampaigns" />
+      <category-filters :filter="categoryFilter" @categoryFilter="onCategoryFilter" style="margin-bottom: -50px;"/>
       <campaign-list :campaigns="filteredCampaigns" :grid-toggle="true" />
     </div>
   </section>
@@ -82,7 +82,10 @@ export default {
       return userReservations
     },
     filteredCampaigns () {
-      const campaigns = this.campaignsByCategory(this.categoryFilter)
+      let campaigns = this.campaignsByCategory(this.categoryFilter)
+      if (this.joinableFilter === 'qualifier') {
+        campaigns = this.campaignsByCategory(this.joinableFilter)
+      }
       let filteredCampaigns
       if (campaigns) {
         filteredCampaigns = campaigns.map((c) => { return { ...c } })
@@ -108,7 +111,7 @@ export default {
           }
         }
 
-        if (this.joinableFilter) {
+        if (this.joinableFilter && this.joinableFilter !== 'qualifier') {
           filteredCampaigns = this.getJoinableCampaigns(filteredCampaigns, this.joinableFilter)
         }
 
