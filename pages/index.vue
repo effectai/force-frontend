@@ -36,7 +36,7 @@
         </div>
       </div>
       <joinable-filters :filter="joinableFilter" @joinableFilter="onJoinableFilter" :campaigns="filteredCampaigns" />
-      <category-filters :filter="categoryFilter" @categoryFilter="onCategoryFilter" style="margin-bottom: -50px;"/>
+      <category-filters :filter="categoryFilter" @categoryFilter="onCategoryFilter" class="category-filters"/>
       <campaign-list :campaigns="filteredCampaigns" :grid-toggle="true" />
     </div>
   </section>
@@ -290,6 +290,13 @@ export default {
         position: relative;
       }
     }
+  }
+}
+
+.category-filters {
+  margin-bottom: -50px;
+  @media screen and (max-width: $tablet) {
+    margin-bottom: 0;
   }
 }
 </style>
