@@ -151,6 +151,9 @@ export default {
     checkUserQualify (campaign) {
       if (campaign.qualis.length > 0) {
         for (const quali of campaign.qualis) {
+          if (this.assignedQualifications === null) {
+            return null
+          }
           if ((quali.value === 0 && !this.assignedQualifications.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.assignedQualifications.find(uq => uq.id === quali.key))) {
             // user doesnt have qualification that is required or user has qualification that is not allowed
             return false
