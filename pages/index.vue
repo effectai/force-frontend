@@ -35,30 +35,34 @@
           </div>
         </div>
       </div>
-      <category-filters :filter="categoryFilter" @categoryFilter="onCategoryFilter" />
+      <joinable-filters :filter="joinableFilter" :campaigns="filteredCampaigns" @joinableFilter="onJoinableFilter" />
+      <category-filters :filter="categoryFilter" class="category-filters" @categoryFilter="onCategoryFilter" />
       <campaign-list :campaigns="filteredCampaigns" :grid-toggle="true" />
     </div>
   </section>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import _ from 'lodash'
 import CategoryFilters from '@/components/CategoryFilters'
+import JoinableFilters from '@/components/JoinableFilters'
 import approvedCampaigns from '@/approvedCampaigns.json'
 import CampaignList from '@/components/CampaignList'
 
 export default {
   components: {
     CampaignList,
-    CategoryFilters
+    CategoryFilters,
+    JoinableFilters
   },
   data () {
     return {
       approvedCampaigns: approvedCampaigns.campaigns,
       approvedRequesters: approvedCampaigns.requesters,
       unmoderated: false,
-      categoryFilter: this.$route.query.category
+      categoryFilter: this.$route.query.category,
+      joinableFilter: null
     }
   },
   computed: {
@@ -66,6 +70,9 @@ export default {
       activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId',
       campaignsByCategory: 'campaign/campaignsByCategory',
       reservationsByAccountId: 'campaign/reservationsByAccountId'
+    }),
+    ...mapState({
+      assignedQualifications: state => state.qualification.assignedQualifications
     }),
     reservations () {
       if (!this.$auth || !this.$auth.user || !this.$auth.user.vAccountRows) { return }
@@ -76,7 +83,10 @@ export default {
       return userReservations
     },
     filteredCampaigns () {
-      const campaigns = this.campaignsByCategory(this.categoryFilter)
+      let campaigns = this.campaignsByCategory(this.categoryFilter)
+      if (this.joinableFilter === 'qualifier') {
+        campaigns = this.campaignsByCategory(this.joinableFilter)
+      }
       let filteredCampaigns
       if (campaigns) {
         filteredCampaigns = campaigns.map((c) => { return { ...c } })
@@ -100,7 +110,13 @@ export default {
               return a + b.real_tasks_done
             }, 0)
           }
+          filteredCampaigns[i].joinable = this.checkUserQualify(filteredCampaigns[i])
         }
+
+        if (this.joinableFilter && this.joinableFilter !== 'qualifier') {
+          filteredCampaigns = this.getJoinableCampaigns(filteredCampaigns, this.joinableFilter)
+        }
+
         // filter active campaigns
         filteredCampaigns = filteredCampaigns.filter(c => c.num_tasks - c.tasks_done > 0 || c.userHasReservation)
         // show the campaigns where the user has a resevation first
@@ -128,6 +144,37 @@ export default {
         this.$router.replace('/?category=' + category)
       }
       this.categoryFilter = category
+    },
+    onJoinableFilter (option) {
+      this.joinableFilter = option
+    },
+    checkUserQualify (campaign) {
+      if (campaign.qualis.length > 0) {
+        for (const quali of campaign.qualis) {
+          if (this.assignedQualifications === null) {
+            return null
+          }
+          if ((quali.value === 0 && !this.assignedQualifications.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.assignedQualifications.find(uq => uq.id === quali.key))) {
+            // user doesnt have qualification that is required or user has qualification that is not allowed
+            return false
+          }
+        }
+      } else {
+        return true
+      }
+      return true
+    },
+    getJoinableCampaigns (campaigns, option) {
+      const joinableCampaigns = []
+      const unjoinableCampaigns = []
+      for (const c of campaigns) {
+        if (c.joinable) {
+          joinableCampaigns.push(c)
+        } else {
+          unjoinableCampaigns.push(c)
+        }
+      }
+      return option === 'joinable' ? joinableCampaigns : unjoinableCampaigns
     }
   }
 }
@@ -247,6 +294,13 @@ export default {
         position: relative;
       }
     }
+  }
+}
+
+.category-filters {
+  margin-bottom: -50px;
+  @media screen and (max-width: $tablet) {
+    margin-bottom: 0;
   }
 }
 </style>
