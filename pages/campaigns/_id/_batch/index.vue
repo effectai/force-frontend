@@ -370,13 +370,29 @@
                 <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
                   Loading
                 </button>
-                <button v-else-if="userJoined === false" class="button is-fullwidth is-primary" :class="{'is-loading': loading === true}" @click.prevent="joinCampaignPopup = true">
+                <button
+                  v-else-if="userJoined === false"
+                  class="button is-fullwidth is-primary"
+                  :class="{'is-loading': loading === true}"
+                  :disabled="!canUserQualify"
+                  @click.prevent="joinCampaignPopup = true"
+                >
                   Qualify
                 </button>
-                <button v-else-if="userReservation && batch.status === 'Active'" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
+                <button
+                  v-else-if="userReservation && batch.status === 'Active'"
+                  class="button is-fullwidth is-accent has-text-weight-semibold"
+                  :disabled="!canUserQualify"
+                  @click.prevent="reserveTask"
+                >
                   Resume Task
                 </button>
-                <button v-else-if="batch.status === 'Active' && batch.num_tasks - batch.real_tasks_done !== 0 && !userReservation || releasedReservations.length > 0" class="button is-fullwidth is-primary" @click.prevent="reserveTask">
+                <button
+                  v-else-if="batch.status === 'Active' && batch.num_tasks - batch.real_tasks_done !== 0 && !userReservation || releasedReservations.length > 0"
+                  class="button is-fullwidth is-primary"
+                  :disabled="!canUserQualify"
+                  @click.prevent="reserveTask"
+                >
                   Make Task Reservation
                 </button>
                 <template v-else>
@@ -387,6 +403,9 @@
                     <i>No active tasks currently</i>
                   </div>
                 </template>
+                <p v-if="!canUserQualify" class="mt-1 is-size-7 has-text-centered">
+                  You are not qualified to participate in this task
+                </p>
               </div>
             </div>
           </div>
@@ -454,7 +473,8 @@ export default {
       releasedReservations: null,
       waitingOnTransaction: false,
       categories: ['translate', 'captions', 'socials', 'dao'],
-      taskTab: 'allTasks'
+      taskTab: 'allTasks',
+      canUserQualify: false
     }
   },
   computed: {
@@ -685,6 +705,41 @@ export default {
         default:
           break
       }
+    },
+    async getQualifications () {
+      if (!this.allQualificationsLoaded) {
+        await this.$store.dispatch('qualification/getQualifications')
+      }
+      this.userQualis = [...this.assignedQualifications]
+
+      for (const quali of this.campaign.qualis) {
+        const q = this.qualificationById(quali.key)
+        this.campaignQualis.push(q)
+
+        // check if user has the qualification
+        q.userHasQuali = (this.userQualis.some(uq => uq.id === quali.key))
+
+        // put it in inclusive or exclusive array for display
+        if (quali.value === 0) {
+          this.inclusiveQualifications.push(q)
+        } else if (quali.value === 1) {
+          this.exclusiveQualifications.push(q)
+        }
+      }
+      this.canUserQualify = this.checkUserQualify()
+    },
+    checkUserQualify () {
+      if (this.campaign.qualis.length > 0) {
+        for (const quali of this.campaign.qualis) {
+          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
+            // user doesnt have qualification that is required or user has qualification that is not allowed
+            return false
+          }
+        }
+      } else {
+        return true
+      }
+      return true
     }
   }
 }
