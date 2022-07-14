@@ -32,6 +32,9 @@
               </div>
             </div>
           </div>
+          <p class="mt-1 is-size-7 has-text-centered">
+            <a href="https://www.tokenpocket.pro/en" target="_blank" rel="noopener noreferrer">Token Pocket also available on mobile.</a>
+          </p>
         </section>
       </div>
     </div>
