@@ -9,7 +9,7 @@
       ref="mediaFrame"
       :srcdoc="html"
       name="mediaFrame"
-      sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-pointer-lock allow-same-origin"
+      sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-same-origin"
       allow="geolocation; microphone; camera; autoplay; fullscreen"
       allowFullScreen
       @load="mediaFrameLoaded"
