@@ -35,7 +35,7 @@ export default {
   methods: {
     checkRelayerError (errorString) {
       if (errorString) {
-        return errorString.split(' ').includes(ela => this.relayerErrorArr.includes(elb => ela === elb))
+        return errorString.toString().split(' ').includes(ela => this.relayerErrorArr.includes(elb => ela === elb))
       } else {
         return false
       }

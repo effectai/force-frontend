@@ -120,9 +120,13 @@ export default {
   },
   computed: {
     ...mapState({
+      qualifications: state => state.qualification.qualifications,
       allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded,
       assignedQualifications: state => state.qualification.assignedQualifications
-    })
+    }),
+    allQualifications () {
+      return this.qualifications ? this.qualifications : null
+    }
   },
   created () {
     if (process.client) {
@@ -157,16 +161,30 @@ export default {
     checkMigrationNeeded () {
       // Check if user has already migrated their qualifications from their old account to this account.
       // 117 Users are assigned this quali if they have migrated their account.
-      this.loading = true
-      const migrateQuali = 117
-      const qualis = [...this.assignedQualifications]
 
-      // if not present will return false.
-      const bool = qualis.some(q => migrateQuali === q.id)
+      if (!this.allAssignedQualificationsLoaded) {
+        setTimeout(() => {
+          this.checkMigrationNeeded()
+        }, 1000)
+      } else {
+        try {
+          this.loading = true
+          const migrateQuali = 117
+          // console.log('assignedQualifications', this.assignedQualifications)
+          const qualis = [...this.assignedQualifications]
 
-      // So if not present, migration is needed.
-      this.migrationNeeded = !bool
-      this.loading = false
+          // console.log('qualis', qualis)
+
+          // if not present will return false.
+          const bool = qualis.some(q => migrateQuali === q.id)
+
+          // So if not present, migration is needed.
+          this.migrationNeeded = !bool
+          this.loading = false
+        } catch (error) {
+          this.$blockchain.handleError(error)
+        }
+      }
     },
     async getToken (ssoToken) {
       let token
