@@ -328,7 +328,7 @@
                   :disabled="!canUserQualify"
                   @click.prevent="reserveTask"
                 >
-                  Make Task Reservation
+                  Start Task
                 </button>
                 <button v-else-if="userReservation" class="button is-fullwidth is-accent has-text-weight-semibold" @click.prevent="reserveTask">
                   Go To Task
