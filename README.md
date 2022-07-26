@@ -2,6 +2,13 @@
 
 # Force Frontend
 
+# Production Deploy
+
+Add remote: `git remote add prd git@github.com:effectai/force-frontend-prd.git`  
+Switch to branch mainnet-config `git checkout mainnet-config`  
+make sure to switch default remote for this branch to prd: `git push -u prd mainnet-config`  (you might have to do a `git pull prd mainnet-config` first)  
+now whenever you push mainnet-config to the remote prd, it will be deployed to production. (for example, you want to deploy the latest change on main branch), you swith to mainnet-config `git checkout mainnet-config` , pull the changes from main origin (`git pull origin main`) and then a `git push`  (which will push to prd remote)  
+
 ## Build Setup
 
 ```bash
