@@ -42,7 +42,18 @@
       </div>
       <div v-else class="columns">
         <div class="column is-three-fifths">
-          <div class="is-flex is-align-items-center mb-6">
+          <div v-if="campaign.info">
+            <nuxt-link
+              v-if="campaign.info && campaign.info.category"
+              :to="'/?category=' + campaign.info.category"
+              class="tag is-light is-medium mb-5"
+              :class="['is-'+campaign.info.category]"
+            >
+              {{ campaign.info.category }}
+            </nuxt-link>
+            <span v-else class="tag is-info is-light is-medium">...</span>
+          </div>
+          <div class="is-flex is-align-items-center mb-4">
             <p v-if="campaign" class="image has-radius mr-4" style="width: 52px; height: 52px">
               <img v-if="campaign.info && campaign.info.image" :src="campaign.info.image.Hash ? ipfsExplorer + '/ipfs/'+ campaign.info.image.Hash : campaign.info.image">
               <img v-else-if="campaign.info && campaign.info.category && categories.includes(campaign.info.category)" :src="require(`~/assets/img/dapps/effect-${campaign.info.category}-icon.png`)">
@@ -57,25 +68,19 @@
           </div>
           <div class="tabs campaign-tabs">
             <ul>
-              <li :class="{'is-active': body === 'description'}">
-                <a @click.prevent="body = 'description'">Tasks</a>
-              </li>
               <li :class="{'is-active': body === 'instruction'}">
                 <a @click.prevent="body = 'instruction'">Instructions</a>
               </li>
               <li :class="{'is-active': body === 'preview'}">
                 <a @click.prevent="body = 'preview'">Preview</a>
               </li>
+              <li :class="{'is-active': body === 'description'}">
+                <a @click.prevent="body = 'description'">Batches</a>
+              </li>
             </ul>
           </div>
 
           <div v-if="body === 'description'" class="block">
-            <p v-if="campaign.info">
-              {{ campaign.info.description }}
-            </p>
-            <p v-else>
-              ...
-            </p>
             <div class="mt-5">
               <div class="is-flex is-justify-content-space-between is-align-items-center">
                 <h4 class="is-size-6 mb-0 has-text-weight-bold">
@@ -148,6 +153,14 @@
             </div>
           </div>
           <div v-if="body === 'instruction'" class="block">
+            <p v-if="campaign.info">
+              <b>Description</b><br>
+              {{ campaign.info.description }}
+            </p>
+            <p v-else>
+              ...
+            </p>
+            <b v-if="campaign && campaign.info"><br>Instructions</b><br>
             <div v-if="campaign && campaign.info" class="content" v-html="$md.render(campaign.info.instructions)" />
             <p v-else>
               ...
@@ -174,29 +187,38 @@
             <div class="p-5">
               <div class="columns ">
                 <div class="column is-half">
-                  <div v-if="campaign.info" class="block">
-                    <nuxt-link
-                      v-if="campaign.info && campaign.info.category"
-                      :to="'/?category=' + campaign.info.category"
-                      class="tag is-light is-medium mb-5"
-                      :class="['is-'+campaign.info.category]"
-                    >
-                      {{ campaign.info.category }}
-                    </nuxt-link>
-                    <span v-else class="tag is-info is-light is-medium">...</span>
-                  </div>
-                  <div class="block mb-6">
+                  <div class="block">
                     Reward
                     <br>
                     <b><span>{{ campaign.reward.quantity }}</span></b>
-                    <br><br>
-                    Time <strong>/</strong> Task
-                    <br>
+                  </div>
+                  <div class="block">
+                    Time <strong>/</strong> Task<br>
                     <b>
                       <span v-if="campaign.info && campaign.info.estimated_time">{{ campaign.info.estimated_time }} Seconds</span>
                       <span v-else>...</span>
                     </b>
-                    <br><br>
+                  </div>
+                </div>
+
+                <div class="column is-half">
+                  <div class="block">
+                    Tasks
+                    <br>
+                    <span v-if="activeBatchesByCampaignId(campaign.id) === null" class="loading-text">
+                      Loading
+                    </span>
+                    <span v-else>
+                      <b>{{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
+                        return a + b.num_tasks
+                      },0) - activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
+                        return a + b.real_tasks_done
+                      },0) }}/{{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
+                        return a + b.num_tasks
+                      },0) }} left</b>
+                    </span>
+                  </div>
+                  <div class="block">
                     EFX <strong>/</strong> Hour
                     <br>
                     <div v-if="campaign.info && campaign.info.estimated_time">
@@ -210,47 +232,6 @@
                         <span>...</span>
                       </b>
                     </div>
-                  </div>
-                </div>
-
-                <div class="column is-half">
-                  <div class="block">
-                    Requester
-                    <br>
-                    <div class="blockchain-address">
-                      <nuxt-link :to="'/profile/' + campaign.owner[1]">
-                        {{ campaign.owner[1] }}
-                      </nuxt-link>
-                    </div>
-                  </div>
-                  <div class="block">
-                    IPFS
-                    <br>
-                    <div class="blockchain-address">
-                      <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
-                    </div>
-                  </div>
-                  <div class="block">
-                    Blockchain
-                    <br>
-                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
-                  </div>
-                  <div class="block">
-                    Tasks
-                    <br>
-                    <span v-if="activeBatchesByCampaignId(campaign.id) === null" class="loading-text">
-                      Loading
-                    </span>
-                    <span v-else>
-                      {{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
-                        return a + b.num_tasks
-                      },0) - activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
-                        return a + b.real_tasks_done
-                      },0) }}/{{ activeBatchesByCampaignId(campaign.id).reduce(function(a,b){
-                        return a + b.num_tasks
-                      },0) }} left
-                      <br>
-                    </span>
                   </div>
                 </div>
               </div>
@@ -377,7 +358,7 @@ export default {
       ipfsExplorer: this.$blockchain.sdk.config.ipfsNode,
       id: parseInt(this.$route.params.id),
       accountId: this.$auth.user.vAccountRows[0].id,
-      body: 'description',
+      body: 'instruction',
       userJoined: false,
       loading: false,
       joinCampaignPopup: false,
