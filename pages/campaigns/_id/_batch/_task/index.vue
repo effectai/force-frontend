@@ -109,14 +109,18 @@ export default {
   },
   computed: {
     ...mapGetters({
-      submissionById: 'campaign/submissionById'
+      submissionById: 'campaign/submissionById',
+      batchesByCampaignId: 'campaign/batchesByCampaignId'
     }),
     ...mapState({
       batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading,
       batchLoading: state => state.campaign.loadingBatch
-    })
+    }),
+    campaignBatches () {
+      return this.batchesByCampaignId(this.campaignId)
+    }
   },
   created () {
     this.getBatch()
@@ -125,8 +129,15 @@ export default {
   methods: {
     async reserveNextTask () {
       this.loadingReservation = true
+      const availableBatches = []
+      await this.$store.dispatch('campaign/getBatches')
+      for (const batch of this.campaignBatches) {
+        if (batch.num_tasks * batch.repetitions > batch.tasks_done) {
+          availableBatches.push(batch)
+        }
+      }
       try {
-        await this.$blockchain.makeReservation(this.batch)
+        await this.$blockchain.makeReservation(availableBatches)
       } catch (error) {
         this.$blockchain.handleError(error)
       }
