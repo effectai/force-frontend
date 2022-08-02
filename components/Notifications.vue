@@ -117,7 +117,7 @@ export default {
       return this.$moment(date).fromNow()
     },
     getNotifications () {
-      alert('Notifications coming soon!')
+      // alert('Notifications coming soon!')
 
       // try {
       //   this.loading = true
