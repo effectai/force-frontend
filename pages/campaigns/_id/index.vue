@@ -250,8 +250,8 @@
                       :class="quali.userHasQuali ? 'is-light is-success' : 'is-danger is-light'"
                       :data-tooltip="quali.userHasQuali ? 'Found: Ok' : 'Not Found: Required'"
                     >
-                      <span v-if="quali.userHasQuali">🗸</span>
-                      <span v-else>🗴</span>
+                      <span v-if="quali.userHasQuali">✅</span>
+                      <span v-else>❌</span>
                       &nbsp;
                       <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
                     </span>
@@ -269,8 +269,8 @@
                       :class="quali.userHasQuali ? 'is-light is-danger' : 'is-warning is-light'"
                       :data-tooltip="quali.userHasQuali ? 'Found: Excluded' : 'Not found: Ok'"
                     >
-                      <span v-if="quali.userHasQuali">🗴</span>
-                      <span v-else>🗸</span>
+                      <span v-if="quali.userHasQuali">❌</span>
+                      <span v-else>✅</span>
                       &nbsp;
                       <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
                     </span>
@@ -337,7 +337,7 @@
   </section>
 </template>
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import SuccessModal from '@/components/SuccessModal'
@@ -388,9 +388,11 @@ export default {
     ...mapState({
       joinedCampaigns: state => state.campaign.joinedCampaigns,
       campaigns: state => state.campaign.campaigns,
+      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
       batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded,
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
-      assignedQualifications: state => state.qualification.assignedQualifications
+      assignedQualifications: state => state.qualification.assignedQualifications,
+      allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded
     }),
     campaignBatches () {
       return this.batchesByCampaignId(this.id)
@@ -424,14 +426,25 @@ export default {
   },
   mounted () {
     this.showCompletedPopup()
+    this.bootup()
   },
   created () {
-    this.checkUserCampaign()
-    this.getCampaign()
-    this.getBatches()
-    this.getQualifications()
+    // this.checkUserCampaign()
+    // this.getCampaign()
+    // this.getBatches()
+    // this.getQualifications()
   },
   methods: {
+    ...mapActions({
+      getAssignedQualifications: 'qualification/getAssignedQualifications'
+    }),
+    async bootup () {
+      await this.getAssignedQualifications()
+      await this.checkUserCampaign()
+      await this.getCampaign()
+      await this.getBatches()
+      await this.getQualifications()
+    },
     showCompletedPopup () {
       if (this.completed) {
         this.successTitle = 'No more tasks available for you in this campaign'
@@ -511,9 +524,11 @@ export default {
       }
     },
     async getQualifications () {
+      console.debug('getQualifications', this.campaign.qualis, 'qualificationsLoaded', this.allQualificationsLoaded, 'assignedQualificationsLoaded', this.allAssignedQualificationsLoaded)
       if (!this.allQualificationsLoaded) {
         await this.$store.dispatch('qualification/getQualifications')
       }
+      console.debug('assignedQualis', this.assignedQualifications)
       this.userQualis = [...this.assignedQualifications]
 
       for (const quali of this.campaign.qualis) {
