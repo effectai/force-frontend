@@ -10,6 +10,13 @@ export default (context, inject) => {
     computed: {
     },
     methods: {
+      /**
+       * Global logout method
+       */
+      async logout () {
+        context.store.dispatch('qualification/clearAssignedQualifications')
+        await context.$auth.logout()
+      }
     }
   })
 

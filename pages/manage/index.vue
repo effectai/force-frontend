@@ -159,7 +159,7 @@ export default {
       this.taskSectionActive = value
     },
     async logout () {
-      await this.$auth.logout()
+      await this.$utils.logout()
     },
     setPage (newPage) {
       this.page = newPage
