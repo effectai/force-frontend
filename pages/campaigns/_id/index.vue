@@ -371,9 +371,7 @@ export default {
       successMessage: null,
       userQualis: [],
       canUserQualify: false,
-      campaignQualis: [],
-      inclusiveQualifications: [],
-      exclusiveQualifications: []
+      campaignQualis: []
     }
   },
   computed: {
@@ -415,6 +413,40 @@ export default {
       } else {
         return { efxPerHour: 0, dollarPerHour: 0 }
       }
+    },
+    inclusiveQualifications () {
+      if (this.allAssignedQualificationsLoaded && this.campaign) {
+        if (this.campaign.qualis) {
+          return this.campaign.qualis
+            .filter(q => q.value === 0) // only inclusive qualifications
+            .map((q) => {
+              const quali = this.qualificationById(q.key)
+              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              return quali
+            })
+        } else {
+          return []
+        }
+      } else {
+        return []
+      }
+    },
+    exclusiveQualifications () {
+      if (this.allAssignedQualificationsLoaded && this.campaign) {
+        if (this.campaign.qualis) {
+          return this.campaign.qualis
+            .filter(q => q.value === 1) // only exclusive qualifications
+            .map((q) => {
+              const quali = this.qualificationById(q.key)
+              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              return quali
+            })
+        } else {
+          return []
+        }
+      } else {
+        return []
+      }
     }
   },
 
@@ -424,15 +456,11 @@ export default {
       this.showCompletedPopup()
     }
   },
-  mounted () {
+  mounted () { // Used to load data before template render
     this.showCompletedPopup()
     this.bootup()
   },
-  created () {
-    // this.checkUserCampaign()
-    // this.getCampaign()
-    // this.getBatches()
-    // this.getQualifications()
+  created () { // Used after template has been rendered
   },
   methods: {
     ...mapActions({
@@ -443,7 +471,6 @@ export default {
       await this.checkUserCampaign()
       await this.getCampaign()
       await this.getBatches()
-      await this.getQualifications()
     },
     showCompletedPopup () {
       if (this.completed) {
@@ -522,30 +549,6 @@ export default {
         default:
           break
       }
-    },
-    async getQualifications () {
-      console.debug('getQualifications', this.campaign.qualis, 'qualificationsLoaded', this.allQualificationsLoaded, 'assignedQualificationsLoaded', this.allAssignedQualificationsLoaded)
-      if (!this.allQualificationsLoaded) {
-        await this.$store.dispatch('qualification/getQualifications')
-      }
-      console.debug('assignedQualis', this.assignedQualifications)
-      this.userQualis = [...this.assignedQualifications]
-
-      for (const quali of this.campaign.qualis) {
-        const q = this.qualificationById(quali.key)
-        this.campaignQualis.push(q)
-
-        // check if user has the qualification
-        q.userHasQuali = (this.userQualis.some(uq => uq.id === quali.key))
-
-        // put it in inclusive or exclusive array for display
-        if (quali.value === 0) {
-          this.inclusiveQualifications.push(q)
-        } else if (quali.value === 1) {
-          this.exclusiveQualifications.push(q)
-        }
-      }
-      this.canUserQualify = this.checkUserQualify()
     },
     checkUserQualify () {
       if (this.campaign.qualis.length > 0) {
