@@ -58,6 +58,9 @@ export default {
     },
     SET_ALL_ASSIGNED_QUALIFICATION_LOADED (state, allAssignedQualificationsLoaded) {
       state.allAssignedQualificationsLoaded = allAssignedQualificationsLoaded
+    },
+    CLEAR_ALL_ASSIGNED_QUALIFICATIONS (state) {
+      state.assignedQualifications = []
     }
   },
   getters: {
@@ -181,6 +184,9 @@ export default {
       } catch (e) {
         commit('SET_QUALIFICATION_INFO', { id: qualification.id, info: null })
       }
+    },
+    clearAssignedQualifications ({ commit }) {
+      commit('CLEAR_ALL_ASSIGNED_QUALIFICATIONS')
     }
   },
   state: () => {
