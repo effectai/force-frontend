@@ -8,7 +8,7 @@
     </div>
     <div v-if="notifications" class="notification-list">
       <div
-        v-for="(notification, index) in notifications"
+        v-for="(notification, index) in notifications.slice().reverse()"
         :key="index"
         class="notification-card"
         :class="{'clickable': notification.submission_id}"
