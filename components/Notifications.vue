@@ -123,6 +123,7 @@ export default {
     createNotification (type, message, requesterName, taskGroupName, qualificationId, qualificationType, qualificationName, qualificationImage) {
       // this.addNotification({
       //   type,
+      //   statusType
       //   message,
       //   requesterName,
       //   taskGroupName,
@@ -136,6 +137,7 @@ export default {
       this.addNotification({
         type: 'TASK_GROUP_ACCEPTED',
         message: 'You have been accepted to the task group',
+        statusType: 'is-success',
         requesterName: 'John Doe',
         taskGroupName: 'Task Group Name',
         qualificationId: 'qualificationId',

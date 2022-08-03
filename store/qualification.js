@@ -1,3 +1,4 @@
+import { toast } from 'bulma-toast'
 
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -51,6 +52,10 @@ export default {
           } else {
             // Insert new Qualification
             updatedQualifications.push(assignedQualifications[i])
+            toast({
+              message: `Qualification ${assignedQualifications[i].content.field_1} assigned to you.`,
+              type: 'is-success'
+            })
           }
         }
         state.assignedQualifications = updatedQualifications
@@ -60,7 +65,7 @@ export default {
       state.allAssignedQualificationsLoaded = allAssignedQualificationsLoaded
     },
     CLEAR_ALL_ASSIGNED_QUALIFICATIONS (state) {
-      state.assignedQualifications = []
+      state.assignedQualifications = null
     }
   },
   getters: {
