@@ -1,6 +1,12 @@
 <template>
   <div ref="notifications" class="drawer-body">
-    <div class="notification-list">
+    <br>
+    <div class="buttons is-centered">
+      <button class="button is-fullwidth is-primary mx-3 px-3" @click="createNotification">
+        Add notification
+      </button>
+    </div>
+    <div v-if="notifications" class="notification-list">
       <div
         v-for="(notification, index) in notifications"
         :key="index"
@@ -8,6 +14,7 @@
         :class="{'clickable': notification.submission_id}"
         @click="notificationAction(notification)"
       >
+        <!-- <div>{{ index }}{{ notification }}</div> -->
         <div class="notification-type" :class="'notification-type-' + getNotificationTypeName(notification.type)">
           <span class="notification-icon" />
           <span v-if="notification.type === 'WORK_MESSAGE'">Comment on Task</span>
@@ -62,19 +69,23 @@
         </div>
       </div>
     </div>
-    <div v-if="loading" class="p-2 has-text-centered loading-text">
-      Loading
+    <div v-else class="p-2 has-text-centered">
+      Could not load notifications.
     </div>
-    <div v-else-if="!notifications" class="p-2 has-text-centered">
-      Could not retrieve notifications
-    </div>
-    <div v-if="allNotificationsLoaded" class="has-text-centered p-2">
-      No more notifications
-    </div>
+    <!-- <div v-if="loading" class="p-2 has-text-centered loading-text"> -->
+      <!-- Loading -->
+    <!-- </div> -->
+    <!-- <div v-else-if="!notifications" class="p-2 has-text-centered"> -->
+      <!-- Could not retrieve notifications -->
+    <!-- </div> -->
+    <!-- <div v-if="allNotificationsLoaded" class="has-text-centered p-2"> -->
+      <!-- No more notifications -->
+    <!-- </div> -->
   </div>
 </template>
 
 <script>
+import { mapState, mapActions, mapGetters } from 'vuex'
 import kebabCase from 'lodash/kebabCase'
 
 export default {
@@ -82,11 +93,19 @@ export default {
   components: {},
   data () {
     return {
-      notifications: null,
+      // notifications: null,
       loading: false,
       page: 0,
       allNotificationsLoaded: false
     }
+  },
+  computed: {
+    ...mapState({
+      notifications: state => state.notification.notifications
+    }),
+    ...mapGetters({
+      getAllNotifications: 'notification/getAllNotifications'
+    })
   },
   created () {
     this.getNotifications()
@@ -98,6 +117,34 @@ export default {
     this.$refs.notifications.removeEventListener('scroll', this.handleScroll)
   },
   methods: {
+    ...mapActions({
+      addNotification: 'notification/addNotification'
+    }),
+    createNotification (type, message, requesterName, taskGroupName, qualificationId, qualificationType, qualificationName, qualificationImage) {
+      // this.addNotification({
+      //   type,
+      //   message,
+      //   requesterName,
+      //   taskGroupName,
+      //   qualificationId,
+      //   qualificationType,
+      //   qualificationName,
+      //   qualificationImage,
+      //   createdAt: new Date()
+      // })
+
+      this.addNotification({
+        type: 'TASK_GROUP_ACCEPTED',
+        message: 'You have been accepted to the task group',
+        requesterName: 'John Doe',
+        taskGroupName: 'Task Group Name',
+        qualificationId: 'qualificationId',
+        qualificationType: 'qualificationType',
+        qualificationName: 'qualificationName',
+        qualificationImage: 'qualificationImage',
+        createdAt: new Date()
+      })
+    },
     notificationAction (notification) {
       if (notification && notification.submission_id) {
         this.$router.push({
