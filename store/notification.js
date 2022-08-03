@@ -1,3 +1,5 @@
+import { toast } from 'bulma-toast'
+
 export default {
   namespaced: true,
   modules: {},
@@ -18,6 +20,13 @@ export default {
     addNotification ({ commit }, notification) {
       if (notification) {
         commit('ADD_NOTIFICATION', notification)
+        toast({
+          message: notification.message,
+          type: notification.type,
+          dismissible: true,
+          animate: { in: 'fadeIn', out: 'fadeOut' },
+          position: 'top-center'
+        })
       }
     }
   },
