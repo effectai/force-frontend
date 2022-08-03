@@ -3,7 +3,7 @@ export default ({ $axios, $auth, app }) => {
     const code = parseInt(error.response && error.response.status)
     if ([401, 403].includes(code) && error.response.data.message.includes('jwt expired')) {
       console.log('refresh token')
-      app.$auth.logout()
+      app.$utils.logout()
     }
 
     return Promise.reject(error)
