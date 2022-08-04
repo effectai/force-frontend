@@ -77,7 +77,7 @@
       </div>
     </div>
     <div v-else class="p-2 has-text-centered">
-      Could not load notifications.
+      No notifications ✔
     </div>
     <!-- <div v-if="loading" class="p-2 has-text-centered loading-text"> -->
       <!-- Loading -->
