@@ -1,11 +1,11 @@
 <template>
   <div ref="notifications" class="drawer-body">
-    <br>
-    <div class="buttons is-centered">
-      <button class="button is-fullwidth is-primary mx-3 px-3" @click="createNotification">
-        Add notification
-      </button>
-    </div>
+
+    <!-- <div class="buttons is-centered"> -->
+      <!-- <button class="button is-fullwidth is-primary mx-3 px-3" @click="createNotification"> -->
+        <!-- Add notification -->
+      <!-- </button> -->
+    <!-- </div> -->
     <div v-if="notifications" class="notification-list">
       <div
         v-for="(notification, index) in notifications.slice().reverse()"
@@ -18,8 +18,8 @@
         <div class="notification-type" :class="'notification-type-' + getNotificationTypeName(notification.type)">
           <span class="notification-icon" />
           <span v-if="notification.type === 'WORK_MESSAGE'">Comment on Task</span>
-          <span v-else-if="notification.type === 'TASK_GROUP_ACCEPTED'">Accepted</span>
-          <span v-else-if="notification.type === 'TASK_GROUP_REJECTED'">Rejected</span>
+          <span v-else-if="notification.type === 'QUALIFICATION_ACCEPTED'">Accepted</span>
+          <span v-else-if="notification.type === 'QUALIFICATION_REJECTED'">Rejected</span>
           <span v-else-if="notification.type === 'PUBLIC_SKILL_ASSIGNED'">Qualification received</span>
           <span v-else-if="notification.type === 'PUBLIC_QUALIFICATION_ASSIGNED'">Badge received</span>
           <span v-else>Notification</span>
@@ -28,9 +28,11 @@
           {{ getTimeAgo(notification.createdAt) }}
         </div>
         <span class="is-clearfix" />
-        <div v-if="notification.requesterName" class="notification-requester is-size-7">
+        <div v-if="notification.account_id" class="notification-requester is-size-7">
           <span>&nbsp;by</span>
-          {{ notification.requesterName }}
+          <nuxt-link :to="`/profile/${notification.account_id}`">
+            {{ notification.account_id }}
+          </nuxt-link>
         </div>
         <div v-if="notification.taskGroupName" class="notification-campaign is-size-7">
           <span>for</span>
@@ -41,14 +43,14 @@
           class="notification-qualification"
         >
           <img
-            v-if="notification.qualificationImage"
-            :src="notification.qualificationImage"
+            v-if="notification.qualification_image"
+            :src="notification.qualification_image"
             class="badge-icon"
-            onerror="this.onerror=null;this.src='/static/badges/default.svg'"
+            onerror="this.onerror=null;this.src='@/assets/img/icons/info.svg'"
           >
           <img
             v-else
-            src="/static/badges/default.svg"
+            :src="require(`~/assets/img/dapps/effect-force-icon.png`)"
             class="badge-icon"
           >
         </div>
@@ -67,6 +69,11 @@
         <div v-if="notification.message" class="notification-message">
           {{ notification.message }}
         </div>
+      </div>
+      <div class="buttons is-centered">
+        <button class="button is-fullwidth is-danger m-3 p-3" @click="clearNotifications">
+          Clear
+        </button>
       </div>
     </div>
     <div v-else class="p-2 has-text-centered">
@@ -118,42 +125,37 @@ export default {
   },
   methods: {
     ...mapActions({
-      addNotification: 'notification/addNotification'
+      addNotification: 'notification/addNotification',
+      clearNotifications: 'notification/clearNotifications'
     }),
-    createNotification (type, message, requesterName, taskGroupName, qualificationId, qualificationType, qualificationName, qualificationImage) {
-      // this.addNotification({
-      //   type,
-      //   statusType
-      //   message,
-      //   requesterName,
-      //   taskGroupName,
-      //   qualificationId,
-      //   qualificationType,
-      //   qualificationName,
-      //   qualificationImage,
-      //   createdAt: new Date()
-      // })
-
-      this.addNotification({
-        type: 'TASK_GROUP_ACCEPTED',
-        message: 'You have been accepted to the task group',
-        statusType: 'is-success',
-        requesterName: 'John Doe',
+    createNotification () {
+      // TODO Test method for creating notifications, to be removed later
+      const notification = {
+        type: 'QUALIFICATION_ACCEPTED',
+        message: 'You QUALIFICATIONe been accepted to the task group',
         taskGroupName: 'Task Group Name',
-        qualificationId: 'qualificationId',
-        qualificationType: 'qualificationType',
-        qualificationName: 'qualificationName',
-        qualificationImage: 'qualificationImage',
-        createdAt: new Date()
-      })
+        account_id: 'Requester Name',
+        requesterId: 'Requester Id',
+        taskGroupId: 'Task Group Id',
+        submissionId: 'Submission Id'
+      }
+      this.$utils.addNotificationToastNewQualification(notification)
     },
-    notificationAction (notification) {
+    async notificationAction (notification) {
       if (notification && notification.submission_id) {
         this.$router.push({
           name: 'submission-page',
           params: { campaignId: notification.task_group_id, submissionId: notification.submission_id }
         })
         this.$parent.showNotifications = false
+      } else if (notification && notification.account_id) {
+        const vaccount = await this.$blockchain.getVAccountById(notification.account_id).catch((err) => {
+          console.error(err)
+        })
+        console.log(vaccount)
+        this.$router.push({
+          path: `/profile/${vaccount[0].address[1]}`
+        })
       }
     },
     getNotificationTypeName (type) {
