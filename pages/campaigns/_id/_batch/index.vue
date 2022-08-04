@@ -473,8 +473,7 @@ export default {
       releasedReservations: null,
       waitingOnTransaction: false,
       categories: ['translate', 'captions', 'socials', 'dao'],
-      taskTab: 'allTasks',
-      canUserQualify: false
+      taskTab: 'allTasks'
     }
   },
   computed: {
@@ -504,6 +503,53 @@ export default {
         return this.batch.tasks.slice(start, start + this.perPage)
       }
       return []
+    },
+    inclusiveQualifications () {
+      if (this.allAssignedQualificationsLoaded && this.campaign) {
+        if (this.campaign.qualis) {
+          return this.campaign.qualis
+            .filter(q => q.value === 0) // only inclusive qualifications
+            .map((q) => {
+              const quali = this.qualificationById(q.key)
+              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              return quali
+            })
+        } else {
+          return []
+        }
+      } else {
+        return []
+      }
+    },
+    exclusiveQualifications () {
+      if (this.allAssignedQualificationsLoaded && this.campaign) {
+        if (this.campaign.qualis) {
+          return this.campaign.qualis
+            .filter(q => q.value === 1) // only exclusive qualifications
+            .map((q) => {
+              const quali = this.qualificationById(q.key)
+              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              return quali
+            })
+        } else {
+          return []
+        }
+      } else {
+        return []
+      }
+    },
+    canUserQualify () {
+      if (this.campaign.qualis.length > 0) {
+        for (const quali of this.campaign.qualis) {
+          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
+            // user doesnt have qualification that is required or user has qualification that is not allowed
+            return false
+          }
+        }
+      } else {
+        return true
+      }
+      return true
     }
   },
   mounted () {
@@ -727,19 +773,6 @@ export default {
         }
       }
       this.canUserQualify = this.checkUserQualify()
-    },
-    checkUserQualify () {
-      if (this.campaign.qualis.length > 0) {
-        for (const quali of this.campaign.qualis) {
-          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
-            // user doesnt have qualification that is required or user has qualification that is not allowed
-            return false
-          }
-        }
-      } else {
-        return true
-      }
-      return true
     }
   }
 }
