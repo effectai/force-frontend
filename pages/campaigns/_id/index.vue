@@ -370,7 +370,7 @@ export default {
       categories: ['translate', 'captions', 'socials', 'dao'],
       successMessage: null,
       userQualis: [],
-      canUserQualify: false,
+      // canUserQualify: false,
       campaignQualis: []
     }
   },
@@ -447,6 +447,19 @@ export default {
       } else {
         return []
       }
+    },
+    canUserQualify () {
+      if (this.campaign.qualis.length > 0) {
+        for (const quali of this.campaign.qualis) {
+          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
+            // user doesnt have qualification that is required or user has qualification that is not allowed
+            return false
+          }
+        }
+      } else {
+        return true
+      }
+      return true
     }
   },
 
@@ -549,19 +562,6 @@ export default {
         default:
           break
       }
-    },
-    checkUserQualify () {
-      if (this.campaign.qualis.length > 0) {
-        for (const quali of this.campaign.qualis) {
-          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
-            // user doesnt have qualification that is required or user has qualification that is not allowed
-            return false
-          }
-        }
-      } else {
-        return true
-      }
-      return true
     }
   }
 }
