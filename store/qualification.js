@@ -1,5 +1,3 @@
-import { toast } from 'bulma-toast'
-
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -51,11 +49,9 @@ export default {
             updatedQualifications[index] = assignedQualifications[i]
           } else {
             // Insert new Qualification
-            updatedQualifications.push(assignedQualifications[i])
-            toast({
-              message: `Qualification ${assignedQualifications[i].content.field_1} assigned to you.`,
-              type: 'is-success'
-            })
+            const quali = assignedQualifications[i]
+            updatedQualifications.push(quali)
+            this.$utils.addNotificationToastNewQualification(quali)
           }
         }
         state.assignedQualifications = updatedQualifications
