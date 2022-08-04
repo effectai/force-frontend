@@ -41,6 +41,27 @@ export default (context, inject) => {
           pauseOnHover: true,
           duration: 5000
         })
+
+        if (!('Notification' in window)) {
+          // alert('This browser does not support desktop notification')
+        } else if (Notification.permission === 'granted') {
+          // eslint-disable-next-line no-new
+          new Notification(`Qualification ${quali.info.name} assigned to you.`, {
+            body: `Qualification ${quali.info.name} assigned to you.`,
+            icon: quali.info.image
+
+          })
+        } else if (Notification.permission !== 'denied') {
+          Notification.requestPermission(function (permission) {
+            if (permission === 'granted') {
+              // eslint-disable-next-line no-new
+              new Notification(`Qualification ${quali.info.name} assigned to you.`, {
+                body: 'You can now start working on campaigns that require the qualification.',
+                icon: quali.info.image
+              })
+            }
+          })
+        }
       }
     }
   })
