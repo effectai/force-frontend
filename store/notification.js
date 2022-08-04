@@ -1,5 +1,3 @@
-import { toast } from 'bulma-toast'
-
 export default {
   namespaced: true,
   modules: {},
@@ -9,6 +7,9 @@ export default {
       if (notification) {
         state.notifications.push(notification)
       }
+    },
+    CLEAR_NOTIFICATIONS (state) {
+      state.notifications = null
     }
   },
   getters: {
@@ -20,18 +21,10 @@ export default {
     addNotification ({ commit }, notification) {
       if (notification) {
         commit('ADD_NOTIFICATION', notification)
-
-        toast({
-          message: notification.message,
-          type: 'is-success',
-          // dismissible: true,
-          // animate: { in: 'fadeIn', out: 'fadeOut' },
-          position: 'bottom-center',
-          closeOnClick: true,
-          pauseOnHover: true,
-          duration: 5000
-        })
       }
+    },
+    clearNotifications ({ commit }) {
+      commit('CLEAR_NOTIFICATIONS')
     }
   },
   state: () => {
@@ -44,8 +37,14 @@ export default {
 /**
  * Global method to add notifications.
  * Notificaitons should have this structure:
- * @param {String} title - The title of the notification.
- * @param {String} message - The message of the notification.
- * @param {String} type - The type of the notification Bulma colors:
- * ['primary', 'link', 'info', 'warning', 'danger'].
+ * type: 'TASK_GROUP_ACCEPTED',
+ * message: 'You have been accepted to the task group',
+ * statusType: 'is-success', // ['is-primary', 'is-link', 'is-info', 'is-warning', 'is-danger'].
+ * requesterName: 'John Doe',
+ * taskGroupName: 'Task Group Name',
+ * qualificationId: 'qualificationId',
+ * qualificationType: 'qualificationType',
+ * qualificationName: 'qualificationName',
+ * qualificationImage: 'qualificationImage',
+ * createdAt: new Date()
  */
