@@ -217,7 +217,7 @@ export default (context, inject) => {
         provider.on('disconnect', () => {
           console.log('disconnecting provider') // eslint-disable-line no-console
           this.logout()
-          context.$auth.logout()
+          context.$utils.logout()
         })
 
         // Inform user of account change, only one account can be selected
@@ -226,14 +226,14 @@ export default (context, inject) => {
           if (newWallet.length) {
             if (context.$auth.loggedIn) {
               if (newWallet[0].toLowerCase() !== context.$auth.user.accountName.toLowerCase()) {
-                context.$auth.logout()
+                context.$utils.logout()
               }
             } else {
               this.waitForSignatureFrom = newWallet[0]
             }
           } else {
             this.logout()
-            context.$auth.logout()
+            context.$utils.logout()
           }
         })
 
@@ -246,7 +246,7 @@ export default (context, inject) => {
             alert(`Please switch to the correct chain:\n${this.sdk.config.bscChainName}, Mainnet, chainId: ${this.sdk.config.bscNetworkId}\n\nCurrently on: ${this.bsc.web3.utils.hexToNumberString(_chainId)}\n\nLogging out.`)
             // It is recommended to reload the entire window, or to logout the user to make sure the user doesn't do any txs.
             this.logout()
-            context.$auth.logout() // Logout
+            context.$utils.logout() // Logout
             // window.location.reload() // reload window aswell?
           }
         })
