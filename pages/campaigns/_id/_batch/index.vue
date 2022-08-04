@@ -427,7 +427,7 @@
   </section>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import InstructionsModal from '@/components/InstructionsModal'
@@ -478,10 +478,15 @@ export default {
   },
   computed: {
     ...mapState({
+      assignedQualifications: state => state.qualification.assignedQualifications,
+      allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded,
       batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading && !state.campaign.allCampaignsLoaded,
       batchLoading: state => state.campaign.loadingBatch
+    }),
+    ...mapGetters({
+      campaignById: 'campaign/campaignById'
     }),
     paginatedSubmissions () {
       const start = (this.page - 1) * this.perPage
@@ -539,7 +544,7 @@ export default {
       }
     },
     canUserQualify () {
-      if (this.campaign.qualis.length > 0) {
+      if (this.campaign?.qualis.length > 0) {
         for (const quali of this.campaign.qualis) {
           if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
             // user doesnt have qualification that is required or user has qualification that is not allowed
