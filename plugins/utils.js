@@ -47,9 +47,8 @@ export default (context, inject) => {
         } else if (Notification.permission === 'granted') {
           // eslint-disable-next-line no-new
           new Notification(`Qualification ${quali.info.name} assigned to you.`, {
-            body: `Qualification ${quali.info.name} assigned to you.`,
+            body: 'You can now start working on campaigns that require the qualification.',
             icon: quali.info.image
-
           })
         } else if (Notification.permission !== 'denied') {
           Notification.requestPermission(function (permission) {
