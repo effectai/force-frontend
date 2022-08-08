@@ -17,6 +17,7 @@ export default (context, inject) => {
       // Global logout method
       async logout () {
         context.store.dispatch('qualification/clearAssignedQualifications')
+        context.store.dispatch('notification/clearNotifications')
         await context.$auth.logout()
       },
       addNotificationToastNewQualification (quali) {
