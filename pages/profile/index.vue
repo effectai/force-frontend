@@ -257,7 +257,7 @@ export default {
   },
   methods: {
     async logout () {
-      await this.$auth.logout()
+      await this.$utils.logout()
     },
     calculatePendingTime (submissionTime) {
       // Here we take the submission  time, add 1 hour, substract time since.

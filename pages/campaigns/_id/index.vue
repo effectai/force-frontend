@@ -250,8 +250,8 @@
                       :class="quali.userHasQuali ? 'is-light is-success' : 'is-danger is-light'"
                       :data-tooltip="quali.userHasQuali ? 'Found: Ok' : 'Not Found: Required'"
                     >
-                      <span v-if="quali.userHasQuali">🗸</span>
-                      <span v-else>🗴</span>
+                      <span v-if="quali.userHasQuali">✅</span>
+                      <span v-else>❌</span>
                       &nbsp;
                       <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
                     </span>
@@ -269,8 +269,8 @@
                       :class="quali.userHasQuali ? 'is-light is-danger' : 'is-success is-light'"
                       :data-tooltip="quali.userHasQuali ? 'Found: Excluded' : 'Not found: Ok'"
                     >
-                      <span v-if="quali.userHasQuali">✅</span>
-                      <span v-else>❌</span>
+                      <span v-if="quali.userHasQuali">❌</span>
+                      <span v-else>✅</span>
                       &nbsp;
                       <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
                     </span>
@@ -337,7 +337,7 @@
   </section>
 </template>
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import SuccessModal from '@/components/SuccessModal'
@@ -370,10 +370,8 @@ export default {
       categories: ['translate', 'captions', 'socials', 'dao'],
       successMessage: null,
       userQualis: [],
-      canUserQualify: false,
-      campaignQualis: [],
-      inclusiveQualifications: [],
-      exclusiveQualifications: []
+      // canUserQualify: false,
+      campaignQualis: []
     }
   },
   computed: {
@@ -388,9 +386,11 @@ export default {
     ...mapState({
       joinedCampaigns: state => state.campaign.joinedCampaigns,
       campaigns: state => state.campaign.campaigns,
+      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
       batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded,
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
-      assignedQualifications: state => state.qualification.assignedQualifications
+      assignedQualifications: state => state.qualification.assignedQualifications,
+      allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded
     }),
     campaignBatches () {
       return this.batchesByCampaignId(this.id)
@@ -413,6 +413,53 @@ export default {
       } else {
         return { efxPerHour: 0, dollarPerHour: 0 }
       }
+    },
+    inclusiveQualifications () {
+      if (this.allAssignedQualificationsLoaded && this.campaign) {
+        if (this.campaign.qualis) {
+          return this.campaign.qualis
+            .filter(q => q.value === 0) // only inclusive qualifications
+            .map((q) => {
+              const quali = this.qualificationById(q.key)
+              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              return quali
+            })
+        } else {
+          return []
+        }
+      } else {
+        return []
+      }
+    },
+    exclusiveQualifications () {
+      if (this.allAssignedQualificationsLoaded && this.campaign) {
+        if (this.campaign.qualis) {
+          return this.campaign.qualis
+            .filter(q => q.value === 1) // only exclusive qualifications
+            .map((q) => {
+              const quali = this.qualificationById(q.key)
+              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              return quali
+            })
+        } else {
+          return []
+        }
+      } else {
+        return []
+      }
+    },
+    canUserQualify () {
+      if (this.campaign.qualis.length > 0) {
+        for (const quali of this.campaign.qualis) {
+          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
+            // user doesnt have qualification that is required or user has qualification that is not allowed
+            return false
+          }
+        }
+      } else {
+        return true
+      }
+      return true
     }
   },
 
@@ -422,16 +469,22 @@ export default {
       this.showCompletedPopup()
     }
   },
-  mounted () {
+  mounted () { // Used to load data before template render
     this.showCompletedPopup()
+    this.bootup()
   },
-  created () {
-    this.checkUserCampaign()
-    this.getCampaign()
-    this.getBatches()
-    this.getQualifications()
+  created () { // Used after template has been rendered
   },
   methods: {
+    ...mapActions({
+      getAssignedQualifications: 'qualification/getAssignedQualifications'
+    }),
+    async bootup () {
+      await this.getAssignedQualifications()
+      await this.checkUserCampaign()
+      await this.getCampaign()
+      await this.getBatches()
+    },
     showCompletedPopup () {
       if (this.completed) {
         this.successTitle = 'No more tasks available for you in this campaign'
@@ -509,41 +562,6 @@ export default {
         default:
           break
       }
-    },
-    async getQualifications () {
-      if (!this.allQualificationsLoaded) {
-        await this.$store.dispatch('qualification/getQualifications')
-      }
-      this.userQualis = [...this.assignedQualifications]
-
-      for (const quali of this.campaign.qualis) {
-        const q = this.qualificationById(quali.key)
-        this.campaignQualis.push(q)
-
-        // check if user has the qualification
-        q.userHasQuali = (this.userQualis.some(uq => uq.id === quali.key))
-
-        // put it in inclusive or exclusive array for display
-        if (quali.value === 0) {
-          this.inclusiveQualifications.push(q)
-        } else if (quali.value === 1) {
-          this.exclusiveQualifications.push(q)
-        }
-      }
-      this.canUserQualify = this.checkUserQualify()
-    },
-    checkUserQualify () {
-      if (this.campaign.qualis.length > 0) {
-        for (const quali of this.campaign.qualis) {
-          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
-            // user doesnt have qualification that is required or user has qualification that is not allowed
-            return false
-          }
-        }
-      } else {
-        return true
-      }
-      return true
     }
   }
 }

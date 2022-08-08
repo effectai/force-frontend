@@ -245,7 +245,7 @@ export default {
   },
   methods: {
     async logout () {
-      await this.$auth.logout()
+      await this.$utils.logout()
     },
     async countNewNotifications () {
       try {

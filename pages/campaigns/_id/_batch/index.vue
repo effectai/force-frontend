@@ -427,7 +427,7 @@
   </section>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import { Template } from '@effectai/effect-js'
 import TemplateMedia from '@/components/Template'
 import InstructionsModal from '@/components/InstructionsModal'
@@ -473,16 +473,20 @@ export default {
       releasedReservations: null,
       waitingOnTransaction: false,
       categories: ['translate', 'captions', 'socials', 'dao'],
-      taskTab: 'allTasks',
-      canUserQualify: false
+      taskTab: 'allTasks'
     }
   },
   computed: {
     ...mapState({
+      assignedQualifications: state => state.qualification.assignedQualifications,
+      allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded,
       batches: state => state.campaign.batches,
       campaigns: state => state.campaign.campaigns,
       campaignLoading: state => state.campaign.loading && !state.campaign.allCampaignsLoaded,
       batchLoading: state => state.campaign.loadingBatch
+    }),
+    ...mapGetters({
+      campaignById: 'campaign/campaignById'
     }),
     paginatedSubmissions () {
       const start = (this.page - 1) * this.perPage
@@ -504,6 +508,53 @@ export default {
         return this.batch.tasks.slice(start, start + this.perPage)
       }
       return []
+    },
+    inclusiveQualifications () {
+      if (this.allAssignedQualificationsLoaded && this.campaign) {
+        if (this.campaign.qualis) {
+          return this.campaign.qualis
+            .filter(q => q.value === 0) // only inclusive qualifications
+            .map((q) => {
+              const quali = this.qualificationById(q.key)
+              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              return quali
+            })
+        } else {
+          return []
+        }
+      } else {
+        return []
+      }
+    },
+    exclusiveQualifications () {
+      if (this.allAssignedQualificationsLoaded && this.campaign) {
+        if (this.campaign.qualis) {
+          return this.campaign.qualis
+            .filter(q => q.value === 1) // only exclusive qualifications
+            .map((q) => {
+              const quali = this.qualificationById(q.key)
+              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              return quali
+            })
+        } else {
+          return []
+        }
+      } else {
+        return []
+      }
+    },
+    canUserQualify () {
+      if (this.campaign?.qualis.length > 0) {
+        for (const quali of this.campaign.qualis) {
+          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
+            // user doesnt have qualification that is required or user has qualification that is not allowed
+            return false
+          }
+        }
+      } else {
+        return true
+      }
+      return true
     }
   },
   mounted () {
@@ -705,41 +756,6 @@ export default {
         default:
           break
       }
-    },
-    async getQualifications () {
-      if (!this.allQualificationsLoaded) {
-        await this.$store.dispatch('qualification/getQualifications')
-      }
-      this.userQualis = [...this.assignedQualifications]
-
-      for (const quali of this.campaign.qualis) {
-        const q = this.qualificationById(quali.key)
-        this.campaignQualis.push(q)
-
-        // check if user has the qualification
-        q.userHasQuali = (this.userQualis.some(uq => uq.id === quali.key))
-
-        // put it in inclusive or exclusive array for display
-        if (quali.value === 0) {
-          this.inclusiveQualifications.push(q)
-        } else if (quali.value === 1) {
-          this.exclusiveQualifications.push(q)
-        }
-      }
-      this.canUserQualify = this.checkUserQualify()
-    },
-    checkUserQualify () {
-      if (this.campaign.qualis.length > 0) {
-        for (const quali of this.campaign.qualis) {
-          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
-            // user doesnt have qualification that is required or user has qualification that is not allowed
-            return false
-          }
-        }
-      } else {
-        return true
-      }
-      return true
     }
   }
 }

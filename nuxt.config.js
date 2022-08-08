@@ -128,7 +128,8 @@ export default {
     },
     plugins: [
       { src: '~/plugins/axios.js' },
-      { src: '~/plugins/blockchain.js', mode: 'client' }
+      { src: '~/plugins/blockchain.js', mode: 'client' },
+      { src: '~/plugins/utils.js', mode: 'client' }
     ]
   },
 
