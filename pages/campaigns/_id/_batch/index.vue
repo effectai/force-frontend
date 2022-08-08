@@ -756,28 +756,6 @@ export default {
         default:
           break
       }
-    },
-    async getQualifications () {
-      if (!this.allQualificationsLoaded) {
-        await this.$store.dispatch('qualification/getQualifications')
-      }
-      this.userQualis = [...this.assignedQualifications]
-
-      for (const quali of this.campaign.qualis) {
-        const q = this.qualificationById(quali.key)
-        this.campaignQualis.push(q)
-
-        // check if user has the qualification
-        q.userHasQuali = (this.userQualis.some(uq => uq.id === quali.key))
-
-        // put it in inclusive or exclusive array for display
-        if (quali.value === 0) {
-          this.inclusiveQualifications.push(q)
-        } else if (quali.value === 1) {
-          this.exclusiveQualifications.push(q)
-        }
-      }
-      this.canUserQualify = this.checkUserQualify()
     }
   }
 }
