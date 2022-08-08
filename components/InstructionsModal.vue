@@ -30,8 +30,8 @@
                 :class="quali.userHasQuali ? 'is-light is-success' : 'is-danger is-light'"
                 :data-tooltip="quali.userHasQuali ? 'Found: Ok' : 'Not Found: Required'"
               >
-                <span v-if="quali.userHasQuali">🗸</span>
-                <span v-else>🗴</span>
+                <span v-if="quali.userHasQuali">✅</span>
+                <span v-else>❌</span>
                 &nbsp;
                 <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
               </span>
@@ -49,8 +49,8 @@
                 :class="quali.userHasQuali ? 'is-light is-danger' : 'is-warning is-light'"
                 :data-tooltip="quali.userHasQuali ? 'Found: Excluded' : 'Not found: Ok'"
               >
-                <span v-if="quali.userHasQuali">🗴</span>
-                <span v-else>🗸</span>
+                <span v-if="quali.userHasQuali">❌</span>
+                <span v-else>✅</span>
                 &nbsp;
                 <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
               </span>
@@ -168,7 +168,7 @@ export default {
         return []
       }
 
-      console.log(`inclsive: ${JSON.stringify(this.assignedQuali)}`)
+      // console.log(`inclsive: ${JSON.stringify(this.assignedQuali)}`)
 
       // const userQualis = this.qualificationByUser(this.accountId)
       for (const quali of this.campaign.qualis) {
