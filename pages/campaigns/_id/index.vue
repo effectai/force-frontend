@@ -242,7 +242,7 @@
                 </div>
                 <div v-if="allQualificationsLoaded">
                   <div>Required <i>(Having these qualifications is required)</i></div>
-                  <div v-if="inclusiveQualifications.length > 0" class="tags has-addons">
+                  <div v-if="inclusiveQualifications.length > 0" class="tags">
                     <span
                       v-for="quali in inclusiveQualifications"
                       :key="quali.id"
@@ -266,11 +266,11 @@
                       v-for="quali in exclQualis"
                       :key="quali.id"
                       class="tag"
-                      :class="quali.userHasQuali ? 'is-light is-danger' : 'is-warning is-light'"
+                      :class="quali.userHasQuali ? 'is-light is-danger' : 'is-success is-light'"
                       :data-tooltip="quali.userHasQuali ? 'Found: Excluded' : 'Not found: Ok'"
                     >
-                      <span v-if="quali.userHasQuali">🗴</span>
-                      <span v-else>🗸</span>
+                      <span v-if="quali.userHasQuali">✅</span>
+                      <span v-else>❌</span>
                       &nbsp;
                       <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
                     </span>

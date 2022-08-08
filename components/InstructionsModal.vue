@@ -22,11 +22,11 @@
           </div>
           <div v-if="allQualificationsLoaded">
             <div>Required <i>(Having these qualifications is required)</i></div>
-            <div v-if="inclusiveQualifications.length > 0" class="tags has-addons">
+            <div v-if="inclusiveQualifications.length > 0" class="tags">
               <span
                 v-for="quali in inclusiveQualifications"
                 :key="quali.id"
-                class="tag"
+                class="tag p-3 m-3"
                 :class="quali.userHasQuali ? 'is-light is-success' : 'is-danger is-light'"
                 :data-tooltip="quali.userHasQuali ? 'Found: Ok' : 'Not Found: Required'"
               >
@@ -45,7 +45,7 @@
               <span
                 v-for="quali in exclQualis"
                 :key="quali.code"
-                class="tag"
+                class="tag p-3 m-3"
                 :class="quali.userHasQuali ? 'is-light is-danger' : 'is-warning is-light'"
                 :data-tooltip="quali.userHasQuali ? 'Found: Excluded' : 'Not found: Ok'"
               >
