@@ -1,4 +1,3 @@
-
 function sleep (ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -50,7 +49,9 @@ export default {
             updatedQualifications[index] = assignedQualifications[i]
           } else {
             // Insert new Qualification
-            updatedQualifications.push(assignedQualifications[i])
+            const quali = assignedQualifications[i]
+            updatedQualifications.push(quali)
+            this.$utils.addNotificationToastNewQualification(quali)
           }
         }
         state.assignedQualifications = updatedQualifications
@@ -60,7 +61,7 @@ export default {
       state.allAssignedQualificationsLoaded = allAssignedQualificationsLoaded
     },
     CLEAR_ALL_ASSIGNED_QUALIFICATIONS (state) {
-      state.assignedQualifications = []
+      state.assignedQualifications = null
     }
   },
   getters: {

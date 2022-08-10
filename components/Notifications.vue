@@ -1,18 +1,25 @@
 <template>
   <div ref="notifications" class="drawer-body">
-    <div class="notification-list">
+
+    <!-- <div class="buttons is-centered"> -->
+      <!-- <button class="button is-fullwidth is-primary mx-3 px-3" @click="createNotification"> -->
+        <!-- Add notification -->
+      <!-- </button> -->
+    <!-- </div> -->
+    <div v-if="notifications" class="notification-list">
       <div
-        v-for="(notification, index) in notifications"
+        v-for="(notification, index) in notifications.slice().reverse()"
         :key="index"
         class="notification-card"
         :class="{'clickable': notification.submission_id}"
         @click="notificationAction(notification)"
       >
+        <!-- <div>{{ index }}{{ notification }}</div> -->
         <div class="notification-type" :class="'notification-type-' + getNotificationTypeName(notification.type)">
           <span class="notification-icon" />
           <span v-if="notification.type === 'WORK_MESSAGE'">Comment on Task</span>
-          <span v-else-if="notification.type === 'TASK_GROUP_ACCEPTED'">Accepted</span>
-          <span v-else-if="notification.type === 'TASK_GROUP_REJECTED'">Rejected</span>
+          <span v-else-if="notification.type === 'QUALIFICATION_ACCEPTED'">Accepted</span>
+          <span v-else-if="notification.type === 'QUALIFICATION_REJECTED'">Rejected</span>
           <span v-else-if="notification.type === 'PUBLIC_SKILL_ASSIGNED'">Qualification received</span>
           <span v-else-if="notification.type === 'PUBLIC_QUALIFICATION_ASSIGNED'">Badge received</span>
           <span v-else>Notification</span>
@@ -21,9 +28,11 @@
           {{ getTimeAgo(notification.createdAt) }}
         </div>
         <span class="is-clearfix" />
-        <div v-if="notification.requesterName" class="notification-requester is-size-7">
+        <div v-if="notification.account_id" class="notification-requester is-size-7">
           <span>&nbsp;by</span>
-          {{ notification.requesterName }}
+          <nuxt-link :to="`/profile/${notification.account_id}`">
+            {{ notification.account_id }}
+          </nuxt-link>
         </div>
         <div v-if="notification.taskGroupName" class="notification-campaign is-size-7">
           <span>for</span>
@@ -34,14 +43,14 @@
           class="notification-qualification"
         >
           <img
-            v-if="notification.qualificationImage"
-            :src="notification.qualificationImage"
+            v-if="notification.qualification_image"
+            :src="notification.qualification_image"
             class="badge-icon"
-            onerror="this.onerror=null;this.src='/static/badges/default.svg'"
+            onerror="this.onerror=null;this.src='@/assets/img/icons/info.svg'"
           >
           <img
             v-else
-            src="/static/badges/default.svg"
+            :src="require(`~/assets/img/dapps/effect-force-icon.png`)"
             class="badge-icon"
           >
         </div>
@@ -61,20 +70,29 @@
           {{ notification.message }}
         </div>
       </div>
+      <div class="buttons is-centered">
+        <button class="button is-fullwidth is-danger m-3 p-3" @click="clearNotifications">
+          Clear
+        </button>
+      </div>
     </div>
-    <div v-if="loading" class="p-2 has-text-centered loading-text">
-      Loading
+    <div v-else class="p-2 has-text-centered">
+      No notifications ✔
     </div>
-    <div v-else-if="!notifications" class="p-2 has-text-centered">
-      Could not retrieve notifications
-    </div>
-    <div v-if="allNotificationsLoaded" class="has-text-centered p-2">
-      No more notifications
-    </div>
+    <!-- <div v-if="loading" class="p-2 has-text-centered loading-text"> -->
+      <!-- Loading -->
+    <!-- </div> -->
+    <!-- <div v-else-if="!notifications" class="p-2 has-text-centered"> -->
+      <!-- Could not retrieve notifications -->
+    <!-- </div> -->
+    <!-- <div v-if="allNotificationsLoaded" class="has-text-centered p-2"> -->
+      <!-- No more notifications -->
+    <!-- </div> -->
   </div>
 </template>
 
 <script>
+import { mapState, mapActions, mapGetters } from 'vuex'
 import kebabCase from 'lodash/kebabCase'
 
 export default {
@@ -82,11 +100,19 @@ export default {
   components: {},
   data () {
     return {
-      notifications: null,
+      // notifications: null,
       loading: false,
       page: 0,
       allNotificationsLoaded: false
     }
+  },
+  computed: {
+    ...mapState({
+      notifications: state => state.notification.notifications
+    }),
+    ...mapGetters({
+      getAllNotifications: 'notification/getAllNotifications'
+    })
   },
   created () {
     this.getNotifications()
@@ -98,13 +124,38 @@ export default {
     this.$refs.notifications.removeEventListener('scroll', this.handleScroll)
   },
   methods: {
-    notificationAction (notification) {
+    ...mapActions({
+      addNotification: 'notification/addNotification',
+      clearNotifications: 'notification/clearNotifications'
+    }),
+    createNotification () {
+      // TODO Test method for creating notifications, to be removed later
+      const notification = {
+        type: 'QUALIFICATION_ACCEPTED',
+        message: 'You QUALIFICATIONe been accepted to the task group',
+        taskGroupName: 'Task Group Name',
+        account_id: 'Requester Name',
+        requesterId: 'Requester Id',
+        taskGroupId: 'Task Group Id',
+        submissionId: 'Submission Id'
+      }
+      this.$utils.addNotificationToastNewQualification(notification)
+    },
+    async notificationAction (notification) {
       if (notification && notification.submission_id) {
         this.$router.push({
           name: 'submission-page',
           params: { campaignId: notification.task_group_id, submissionId: notification.submission_id }
         })
         this.$parent.showNotifications = false
+      } else if (notification && notification.account_id) {
+        const vaccount = await this.$blockchain.getVAccountById(notification.account_id).catch((err) => {
+          console.error(err)
+        })
+        console.log(vaccount)
+        this.$router.push({
+          path: `/profile/${vaccount[0].address[1]}`
+        })
       }
     },
     getNotificationTypeName (type) {
@@ -117,7 +168,7 @@ export default {
       return this.$moment(date).fromNow()
     },
     getNotifications () {
-      alert('Notifications coming soon!')
+      // alert('Notifications coming soon!')
 
       // try {
       //   this.loading = true

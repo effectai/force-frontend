@@ -208,6 +208,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Notifications from '@/components/Notifications'
 import SuccessModal from '@/components/SuccessModal'
 export default {
@@ -219,7 +220,6 @@ export default {
   data () {
     return {
       mobileMenu: false,
-      newNotifications: null,
       showNotifications: false,
       showBalanceModal: false,
       showUserModal: false,
@@ -232,7 +232,18 @@ export default {
       errors: []
     }
   },
-
+  computed: {
+    ...mapState({
+      notifications: state => state.notification.notifications
+    }),
+    newNotifications () {
+      if (this.notifications) {
+        return this.notifications.length
+      } else {
+        return 0
+      }
+    }
+  },
   watch: {
     $route () {
       this.showUserModal = false
