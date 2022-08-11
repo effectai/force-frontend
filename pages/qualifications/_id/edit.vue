@@ -80,7 +80,7 @@
               Qualifier Task
             </label>
             <v-select
-              :value="qualificationIpfs.campaignId"
+              v-model="qualificationIpfs.campaignId"
               :options="userCampaigns"
               label="name"
               autocomplete="on"
