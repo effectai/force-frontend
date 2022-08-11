@@ -96,6 +96,14 @@
             </div>
           </div>
 
+          <!-- TODO: Use ipfs upload for images. -->
+          <!-- <div class="field"> -->
+            <!-- <label for="" class="label">Ipfs Image</label> -->
+            <!-- <div class="control"> -->
+              <!-- <upload-to-ipfs v-model="qualificationIpfs.image" /> -->
+            <!-- </div> -->
+          <!-- </div> -->
+
           <div class="field">
             <label class="label">
               Image
@@ -142,12 +150,14 @@ import vSelect from 'vue-select'
 import VueSimplemde from 'vue-simplemde'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import SuccessModal from '~/components/SuccessModal.vue'
+import UploadToIpfs from '~/components/UploadToIpfs.vue'
 
 export default {
   components: {
     VueSimplemde,
     SuccessModal,
-    vSelect
+    vSelect,
+    UploadToIpfs
   },
   middleware: ['auth'],
   data () {
