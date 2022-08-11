@@ -79,7 +79,14 @@
             <label for="" class="label">
               Qualifier Task
             </label>
-            <v-select label="name" :options="userCampaigns" />
+            <v-select
+              :value="qualificationIpfs.campaignId"
+              :options="userCampaigns"
+              label="name"
+              autocomplete="on"
+              :loading="!allCampaignsLoaded"
+              placeholder="Your qualifier"
+            />
           </div>
 
           <div class="field">
@@ -150,14 +157,14 @@ import vSelect from 'vue-select'
 import VueSimplemde from 'vue-simplemde'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import SuccessModal from '~/components/SuccessModal.vue'
-import UploadToIpfs from '~/components/UploadToIpfs.vue'
+// import UploadToIpfs from '~/components/UploadToIpfs.vue'
 
 export default {
   components: {
     VueSimplemde,
     SuccessModal,
-    vSelect,
-    UploadToIpfs
+    // UploadToIpfs,
+    vSelect
   },
   middleware: ['auth'],
   data () {
@@ -189,8 +196,7 @@ export default {
       campaigns: state => state.campaign.campaigns
     }),
     ...mapGetters({
-      qualificationById: 'qualification/qualificationById',
-      campaignsByOwner: 'campaign/campaignsByOwner'
+      qualificationById: 'qualification/qualificationById'
     }),
     allQualifications () {
       if (!this.qualifications) { return }
@@ -210,6 +216,7 @@ export default {
       }
     }
   },
+
   created () {
     this.getQualification()
     this.getCampaigns()
@@ -238,8 +245,8 @@ export default {
       this.loading = true
       try {
         // console.log(this.qualificationIpfs)
-        const { name, description, image, ishidden } = this.qualificationIpfs
-        const result = await this.$blockchain.editQualification(this.id, name, description, 0, image, ishidden)
+        const { name, description, image, ishidden, campaignId } = this.qualificationIpfs
+        const result = await this.$blockchain.editQualification(this.id, name, description, 0, image, ishidden, campaignId)
 
         // Wait for transaction and reload campaigns
         await this.$blockchain.waitForTransaction(result)

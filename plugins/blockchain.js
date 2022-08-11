@@ -469,11 +469,11 @@ export default (context, inject) => {
       async waitForTransaction (transactionResult) {
         return await this.sdk.force.waitTransaction(transactionResult)
       },
-      async createQualification (name, description, type, image, ishidden) {
-        return await this.sdk.force.createQualification(name, description, type, image, ishidden)
+      async createQualification (name, description, type, image, ishidden, campaignid) {
+        return await this.sdk.force.createQualification(name, description, type, image, ishidden, campaignid)
       },
-      async editQualification (id, name, description, type, image, ishidden) {
-        return await this.sdk.force.editQualification(id, name, description, type, image, ishidden)
+      async editQualification (id, name, description, type, image, ishidden, campaignid) {
+        return await this.sdk.force.editQualification(id, name, description, type, image, ishidden, campaignid)
       },
       async assignQualification (qualificationId, campaignId, hash) {
         return await this.sdk.force.assignQualification(qualificationId, campaignId, hash)
