@@ -36,6 +36,52 @@
             </div>
           </div>
 
+          <!-- The easy thing to do here is to just let the user fill in the id themselves. It would be nicer if the user can search through the ids themselves. -->
+          <!-- Now that I'm thinking about it, all it needs to be is a list of the campaigns that the user owns. -->
+          <!-- <div class="field"> -->
+            <!-- <label for="" class="label"> -->
+              <!-- Qualifier Task ID -->
+            <!-- </label> -->
+            <!-- <div class="control"> -->
+              <!-- <input v-model="qualificationIpfs.campaignId" type="number" class="input" placeholder="123"> -->
+            <!-- </div> -->
+          <!-- </div> -->
+
+          <!-- A better solution is the dropdown component.  -->
+          <!-- <div class="field"> -->
+            <!-- <label for="" class="label"> -->
+              <!-- Qualifier Task -->
+            <!-- </label> -->
+            <!-- <div class="control"> -->
+              <!-- <div class="dropdown is-hoverable"> -->
+                <!-- <div class="dropdown-trigger"> -->
+                  <!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu-list" @click="$event.preventDefault()"> -->
+                    <!-- <span> -->
+                      <!-- Qualifier Task -->
+                    <!-- </span> -->
+                    <!-- <span class="icon is-small"> -->
+                      <!-- <font-awesome-icon icon="fa-solid fa-angle-down" /> -->
+                    <!-- </span> -->
+                  <!-- </button> -->
+                <!-- </div> -->
+                <!-- <div id="dropdown-menu-list" class="dropdown-menu" role="menu"> -->
+                  <!-- <div class="dropdown-content"> -->
+                    <!-- <a v-for="(campaign, index) in userCampaigns" :key="index" href="#" class="dropdown-item"> -->
+                      <!-- {{ index }}. ID:{{ campaign.id }} - {{ campaign.info.title }} -->
+                    <!-- </a> -->
+                  <!-- </div> -->
+                <!-- </div> -->
+              <!-- </div> -->
+            <!-- </div> -->
+          <!-- </div> -->
+
+          <div class="field">
+            <label for="" class="label">
+              Qualifier Task
+            </label>
+            <v-select label="name" :options="userCampaigns" />
+          </div>
+
           <div class="field">
             <label class="label">
               Description
@@ -62,11 +108,11 @@
 
           <div class="field">
             <label for="" class="label">
-              Hidden
+              Hidden / BlockList
             </label>
             <label class="checkbox">
               <input v-model="qualificationIpfs.ishidden" type="checkbox" class="checkbox">
-              Check if this qualifications needs to be hidden from the user.
+              Check if this qualifications needs to be hidden from the user and or is a blocklist qualification.
             </label>
           </div>
 
@@ -92,6 +138,7 @@
 
 <script>
 import _ from 'lodash'
+import vSelect from 'vue-select'
 import VueSimplemde from 'vue-simplemde'
 import { mapState, mapGetters } from 'vuex'
 import SuccessModal from '~/components/SuccessModal.vue'
@@ -99,7 +146,8 @@ import SuccessModal from '~/components/SuccessModal.vue'
 export default {
   components: {
     VueSimplemde,
-    SuccessModal
+    SuccessModal,
+    vSelect
   },
   middleware: ['auth'],
   data () {
@@ -118,17 +166,21 @@ export default {
         name: null,
         description: null,
         image: null,
-        type: null
+        type: null,
+        campaignId: null
       }
     }
   },
   computed: {
     ...mapState({
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
-      qualifications: state => state.qualification.qualifications
+      qualifications: state => state.qualification.qualifications,
+      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
+      campaigns: state => state.campaign.campaigns
     }),
     ...mapGetters({
-      qualificationById: 'qualification/qualificationById'
+      qualificationById: 'qualification/qualificationById',
+      campaignsByOwner: 'campaign/campaignsByOwner'
     }),
     allQualifications () {
       if (!this.qualifications) { return }
@@ -136,6 +188,25 @@ export default {
     },
     hasChanged () {
       return this.qualification && !_.isEqual(this.qualification.info, this.qualificationIpfs)
+    },
+    userCampaigns () {
+      // return this.allQualificationsLoaded ? this.campaignsByOwner(this.$auth.user.vAccountRows[0].id) : []
+      if (!this.allCampaignsLoaded) {
+        return []
+      } else {
+        // [{"id":389,"nonce":16,"address":["name","efxdavid1bot"],"balance":{"quantity":"118.0000 EFX","contract":"efxtoken1112"}}]
+        console.debug('userCampaigns', this.$auth.user.accountName)
+        // return this.campaignsByOwner(this.$auth.user.accountName)
+        return this.campaigns
+          .filter(qualification => qualification.info.owner === this.$auth.user.accountName)
+          .map((campaign) => {
+            return {
+              name: `${campaign.id}. ${campaign.info?.title}`,
+              id: campaign.id
+            }
+          })
+        // return this.qualificatons
+      }
     }
   },
   created () {
@@ -162,7 +233,7 @@ export default {
     async editQualification () {
       this.loading = true
       try {
-        console.log(this.qualificationIpfs)
+        // console.log(this.qualificationIpfs)
         const { name, description, image, ishidden } = this.qualificationIpfs
         const result = await this.$blockchain.editQualification(this.id, name, description, 0, image, ishidden)
 
@@ -208,7 +279,6 @@ export default {
       return true
     }
   }
-
 }
 </script>
 
