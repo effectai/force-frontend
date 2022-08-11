@@ -140,7 +140,7 @@
 import _ from 'lodash'
 import vSelect from 'vue-select'
 import VueSimplemde from 'vue-simplemde'
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import SuccessModal from '~/components/SuccessModal.vue'
 
 export default {
@@ -190,28 +190,19 @@ export default {
       return this.qualification && !_.isEqual(this.qualification.info, this.qualificationIpfs)
     },
     userCampaigns () {
-      // return this.allQualificationsLoaded ? this.campaignsByOwner(this.$auth.user.vAccountRows[0].id) : []
-      if (!this.allCampaignsLoaded) {
+      if (!this.campaigns) {
         return []
       } else {
-        // [{"id":389,"nonce":16,"address":["name","efxdavid1bot"],"balance":{"quantity":"118.0000 EFX","contract":"efxtoken1112"}}]
-        console.debug('userCampaigns', this.$auth.user.accountName)
-        // return this.campaignsByOwner(this.$auth.user.accountName)
         return this.campaigns
-          .filter(qualification => qualification.info.owner === this.$auth.user.accountName)
-          .map((campaign) => {
-            return {
-              name: `${campaign.id}. ${campaign.info?.title}`,
-              id: campaign.id
-            }
-          })
-        // return this.qualificatons
+          .filter(c => c.owner[1] === this.$auth.user.accountName)
+          .map(c => ({ ...c }))
+          .map(c => ({ id: c.id, name: `${c.id}. ${c.info?.title}` }))
       }
     }
   },
   created () {
     this.getQualification()
-    // this.qualificationById(this.id)
+    this.getCampaigns()
   },
 
   beforeDestroy () {
@@ -219,6 +210,9 @@ export default {
   },
 
   methods: {
+    ...mapActions({
+      getCampaigns: 'campaign/getCampaigns'
+    }),
     async getQualification () {
       this.qualificationLoading = true
       try {
