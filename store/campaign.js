@@ -132,23 +132,6 @@ export default {
     campaignsByCategory (state) {
       return category => state.campaigns && category ? state.campaigns.filter(c => c.info ? c.info.category === category : false) : state.campaigns
     },
-    campaignsByOwner (state) {
-      // TODO - not completely sure about the predicate in the filter below. Seems a bit redundant to check for c.owner
-      // There seems to be a difference in the owner array, some of them are address and others are name.
-      // Are they the same?
-      // const filteredCampaigns = this.campaigns.filter(c => c.owner[1] === this.$auth.user.accountName).map((c) => { return { ...c } })
-      /**
-       * [{"id":389,"nonce":16,"address":["name","efxdavid1bot"],"balance":{"quantity":"118.0000 EFX","contract":"efxtoken1112"}}]
-       */
-      const val = (owner) => {
-        console.debug('owner', owner)
-        const ownerCampaigns = (state.campaigns && owner) ? state.campaigns.filter(c => c.owner[1] === owner) : []
-        console.debug('ownerCampaigns', ownerCampaigns)
-        return ownerCampaigns
-      }
-      console.debug('campaignsByOwner', val)
-      return val
-    },
     reservationsByAccountId (state) {
       return id => state.submissions ? state.submissions.filter(s => s.account_id === id && !s.data) : null
     },
