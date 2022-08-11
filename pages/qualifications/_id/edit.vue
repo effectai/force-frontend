@@ -36,57 +36,24 @@
             </div>
           </div>
 
-          <!-- The easy thing to do here is to just let the user fill in the id themselves. It would be nicer if the user can search through the ids themselves. -->
-          <!-- Now that I'm thinking about it, all it needs to be is a list of the campaigns that the user owns. -->
-          <!-- <div class="field"> -->
-            <!-- <label for="" class="label"> -->
-              <!-- Qualifier Task ID -->
-            <!-- </label> -->
-            <!-- <div class="control"> -->
-              <!-- <input v-model="qualificationIpfs.campaignId" type="number" class="input" placeholder="123"> -->
-            <!-- </div> -->
-          <!-- </div> -->
-
-          <!-- A better solution is the dropdown component.  -->
-          <!-- <div class="field"> -->
-            <!-- <label for="" class="label"> -->
-              <!-- Qualifier Task -->
-            <!-- </label> -->
-            <!-- <div class="control"> -->
-              <!-- <div class="dropdown is-hoverable"> -->
-                <!-- <div class="dropdown-trigger"> -->
-                  <!-- <button class="button" aria-haspopup="true" aria-controls="dropdown-menu-list" @click="$event.preventDefault()"> -->
-                    <!-- <span> -->
-                      <!-- Qualifier Task -->
-                    <!-- </span> -->
-                    <!-- <span class="icon is-small"> -->
-                      <!-- <font-awesome-icon icon="fa-solid fa-angle-down" /> -->
-                    <!-- </span> -->
-                  <!-- </button> -->
-                <!-- </div> -->
-                <!-- <div id="dropdown-menu-list" class="dropdown-menu" role="menu"> -->
-                  <!-- <div class="dropdown-content"> -->
-                    <!-- <a v-for="(campaign, index) in userCampaigns" :key="index" href="#" class="dropdown-item"> -->
-                      <!-- {{ index }}. ID:{{ campaign.id }} - {{ campaign.info.title }} -->
-                    <!-- </a> -->
-                  <!-- </div> -->
-                <!-- </div> -->
-              <!-- </div> -->
-            <!-- </div> -->
-          <!-- </div> -->
-
           <div class="field">
             <label for="" class="label">
               Qualifier Task
             </label>
-            <v-select
-              v-model="qualificationIpfs.campaignId"
+            <!-- TODO FINISH this component -->
+            <multiselect
+              v-model="qualificationIpfs.qualifier"
               :options="userCampaigns"
-              label="name"
-              autocomplete="on"
-              :loading="!allCampaignsLoaded"
-              placeholder="Your qualifier"
-            />
+              label="info.title"
+              placeholder="Select the qualifier associated with this qualification"
+              searchable="true"
+              close-on-select="true"
+              show-labels="true"
+            >
+              <template slot="singleLabel" slot-scope="{ option }">
+                <strong>{{ option.info.title }}</strong>
+              </template>
+            </multiselect>
           </div>
 
           <div class="field">
@@ -153,7 +120,7 @@
 
 <script>
 import _ from 'lodash'
-import vSelect from 'vue-select'
+import Multiselect from 'vue-multiselect'
 import VueSimplemde from 'vue-simplemde'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import SuccessModal from '~/components/SuccessModal.vue'
@@ -163,8 +130,8 @@ export default {
   components: {
     VueSimplemde,
     SuccessModal,
+    Multiselect
     // UploadToIpfs,
-    vSelect
   },
   middleware: ['auth'],
   data () {
@@ -184,7 +151,7 @@ export default {
         description: null,
         image: null,
         type: null,
-        campaignId: null
+        qualifier: null
       }
     }
   },
@@ -212,7 +179,7 @@ export default {
         return this.campaigns
           .filter(c => c.owner[1] === this.$auth.user.accountName)
           .map(c => ({ ...c }))
-          .map(c => ({ id: c.id, name: `${c.id}. ${c.info?.title}` }))
+          // TODO add extra map here to add the info object to the top of the object. instead of  being nested.
       }
     }
   },
@@ -245,8 +212,8 @@ export default {
       this.loading = true
       try {
         // console.log(this.qualificationIpfs)
-        const { name, description, image, ishidden, campaignId } = this.qualificationIpfs
-        const result = await this.$blockchain.editQualification(this.id, name, description, 0, image, ishidden, campaignId)
+        const { name, description, image, ishidden, qualifier } = this.qualificationIpfs
+        const result = await this.$blockchain.editQualification(this.id, name, description, 0, image, ishidden, qualifier)
 
         // Wait for transaction and reload campaigns
         await this.$blockchain.waitForTransaction(result)
