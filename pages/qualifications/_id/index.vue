@@ -60,6 +60,18 @@
               <div class="columns ">
                 <div class="column is-full">
                   <div class="block">
+                    Qualifier Task
+                    <br>
+                    <div v-if="singleQualification.info.campaignid" class="blockchain-address">
+                      <nuxt-link :to="`/campaigns/${singleQualification.info.campaignid.id}`">
+                        {{ singleQualification.info.campaignid.name }}
+                      </nuxt-link>
+                    </div>
+                    <div v-else>
+                      - No Qualifier Task -
+                    </div>
+                  </div>
+                  <div class="block">
                     Requester
                     <br>
                     <div v-if="vaccount" class="blockchain-address">
