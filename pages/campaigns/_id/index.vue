@@ -242,7 +242,7 @@
                 </div>
                 <div v-if="allQualificationsLoaded">
                   <div>Required <i>(Having these qualifications is required)</i></div>
-                  <div v-if="inclusiveQualifications.length > 0" class="tags has-addons">
+                  <div v-if="inclusiveQualifications.length > 0" class="tags">
                     <span
                       v-for="quali in inclusiveQualifications"
                       :key="quali.id"
@@ -266,7 +266,7 @@
                       v-for="quali in exclQualis"
                       :key="quali.id"
                       class="tag"
-                      :class="quali.userHasQuali ? 'is-light is-danger' : 'is-warning is-light'"
+                      :class="quali.userHasQuali ? 'is-light is-danger' : 'is-success is-light'"
                       :data-tooltip="quali.userHasQuali ? 'Found: Excluded' : 'Not found: Ok'"
                     >
                       <span v-if="quali.userHasQuali">❌</span>
@@ -369,8 +369,6 @@ export default {
       waitingOnTransaction: false,
       categories: ['translate', 'captions', 'socials', 'dao'],
       successMessage: null,
-      userQualis: [],
-      // canUserQualify: false,
       campaignQualis: []
     }
   },
@@ -449,15 +447,13 @@ export default {
       }
     },
     canUserQualify () {
-      if (this.campaign.qualis.length > 0) {
+      if (this.campaign?.qualis && this.campaign.qualis.length > 0) {
         for (const quali of this.campaign.qualis) {
-          if ((quali.value === 0 && !this.userQualis.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.userQualis.find(uq => uq.id === quali.key))) {
+          if (!this.assignedQualifications || (quali.value === 0 && !this.assignedQualifications.find(uq => uq.id === quali.key)) || (quali.value === 1 && this.assignedQualifications.find(uq => uq.id === quali.key))) {
             // user doesnt have qualification that is required or user has qualification that is not allowed
             return false
           }
         }
-      } else {
-        return true
       }
       return true
     }
