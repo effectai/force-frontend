@@ -40,18 +40,17 @@
             <label for="" class="label">
               Qualifier Task
             </label>
-            <!-- TODO FINISH this component -->
             <multiselect
               v-model="qualificationIpfs.qualifier"
               :options="userCampaigns"
-              label="info.title"
+              label="label"
               placeholder="Select the qualifier associated with this qualification"
-              searchable="true"
-              close-on-select="true"
-              show-labels="true"
+              :searchable="true"
+              :close-on-select="true"
+              :show-labels="true"
             >
-              <template slot="singleLabel" slot-scope="{ option }">
-                <strong>{{ option.info.title }}</strong>
+              <template slot="singleLabel" slot-scope="{ }">
+                {{ qualificationIpfs.qualifier.label }}
               </template>
             </multiselect>
           </div>
@@ -179,7 +178,10 @@ export default {
         return this.campaigns
           .filter(c => c.owner[1] === this.$auth.user.accountName)
           .map(c => ({ ...c }))
+          .map(c => ({ id: c.id, label: `ID: ${c.id} - ${c.info?.title}` }))
           // TODO add extra map here to add the info object to the top of the object. instead of  being nested.
+          // How do I want to display the data?
+          // ID: 123 - Title name goes here.
       }
     }
   },
