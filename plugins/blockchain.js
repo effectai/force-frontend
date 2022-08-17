@@ -489,6 +489,9 @@ export default (context, inject) => {
         return await this.sdk.force.getQualifications(nextKey, limit, processQualification)
       },
       async getAssignedQualifications (nextKey, limit = 50, processQualification = false) {
+        if (context.$auth.user === undefined || context.$auth.user === null) {
+          setTimeout(async () => await this.getAccountBalance(nextKey, limit, processQualification), 1000)
+        }
         return await this.sdk.force.getAssignedQualifications(nextKey, limit, processQualification, context.$auth.user.vAccountRows[0].id)
       },
       async recoverPublicKey () {
