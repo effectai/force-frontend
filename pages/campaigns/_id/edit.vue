@@ -126,6 +126,19 @@
             </div>
           </div>
 
+          <div v-if="campaignIpfs.category === 'qualifier'" class="field">
+            <label for="" class="label">
+              Qualification
+            </label>
+            <multiselect
+              v-model="campaignIpfs.qualification"
+              :options="myQualifications"
+              label="label"
+              :loading="!allQualificationsLoaded"
+              placeholder="Select a qualification for this qualifier task"
+            />
+          </div>
+
           <hr>
           <div class="field">
             <label class="label">
@@ -417,7 +430,8 @@ export default {
   },
   computed: {
     ...mapState({
-      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
+      qualifications: state => state.qualification.qualifications
     }),
     ...mapGetters({
       qualificationById: 'qualification/qualificationById'
@@ -435,6 +449,14 @@ export default {
       } else {
         return { efxPerHour: 0, dollarPerHour: 0 }
       }
+    },
+    myQualifications () {
+      if (!this.allQualificationsLoaded) {
+        return []
+      }
+      return this.qualifications
+        .filter(qualification => qualification.account_id === this.$auth.user.vAccountRows[0].id)
+        .map(q => ({ ...q, label: `ID: ${q.id} - ${q.info?.name}` }))
     },
     qualificationsDropdownData () {
       const qualifications = []
