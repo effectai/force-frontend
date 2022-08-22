@@ -257,12 +257,12 @@
                     <div
                       v-for="quali in inclusiveQualifications"
                       :key="quali.id"
-                      class="field tags"
+                      class="field tags px-6"
                       :data-tooltip="quali.userHasQuali ? 'You have this qualification' : 'You do not have this qualification'"
                     >
-                      <label class="b-checkbox checkbox is-medium tag is-light" :class="quali.userHasQuali ? 'is-success' : 'is-danger'">
+                      <label class="b-checkbox checkbox is-medium tag is-light is-info">
                         <input v-model="quali.userHasQuali" type="checkbox" disabled>
-                        <span class="check"></span>
+                        <span class="check is-success"></span>
                         <span class="control-label">
                           <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
                         </span>
@@ -272,17 +272,17 @@
                   <br>
                   <div v-if="exclusiveQualifications.length > 0" class="">
                     <div class="is-size-5 has-text-centered">
-                      Having these qualifications will disqualify you:
+                      These qualifications will disqualify you:
                     </div>
                     <div
                       v-for="quali in exclusiveQualifications"
                       :key="quali.id"
-                      class="field tags"
+                      class="field tags px-6"
                       :data-tooltip="quali.userHasQuali ? 'You have this qualification' : 'You do not have this qualification'"
                     >
-                      <label class="b-checkbox checkbox is-medium tag is-light" :class="quali.userHasQuali ? 'is-danger' : 'is-success'">
+                      <label class="b-checkbox checkbox is-medium tag is-light is-danger">
                         <input v-model="quali.userHasQuali" type="checkbox" disabled>
-                        <span class="check"></span>
+                        <span class="check is-danger"></span>
                         <span class="control-label">
                           <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
                         </span>
