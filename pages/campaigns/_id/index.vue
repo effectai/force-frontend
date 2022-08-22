@@ -237,6 +237,7 @@
               </div>
 
               <div v-if="campaign.info && campaign.info.qualification && campaign.info.category === 'qualifier'" class="block is-vcentered has-text-centered">
+                <hr>
                 <div class="is-size-4 has-text-centered">
                   Qualifies you for:
                 </div>
@@ -246,6 +247,7 @@
               </div>
 
               <div v-if="inclusiveQualifications.length > 0 || exclusiveQualifications.length > 0" class="block is-vcentered">
+                <hr>
                 <div class="is-size-4 has-text-centered">
                   Qualifications
                 </div>
@@ -260,7 +262,7 @@
                       class="field tags px-6"
                       :data-tooltip="quali.userHasQuali ? 'You have this qualification' : 'You do not have this qualification'"
                     >
-                      <label class="b-checkbox checkbox is-medium tag is-light is-info">
+                      <label class="b-checkbox checkbox is-medium tag is-light is-success">
                         <input v-model="quali.userHasQuali" type="checkbox" disabled>
                         <span class="check is-success"></span>
                         <span class="control-label">
@@ -297,7 +299,15 @@
               </div>
 
               <div class="block is-vcentered ">
+                <hr>
                 <div v-if="$auth.user.accountName === campaign.owner[1]">
+                  <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" class="button is-fullwidth is-primary has-margin-bottom-mobile" :to="`/campaigns/${id}/new`">
+                    <span class="icon">
+                      +
+                    </span>
+                    <span>Add Tasks</span>
+                  </nuxt-link>
+                  <br>
                   <nuxt-link :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
                     Edit Task
                   </nuxt-link>
