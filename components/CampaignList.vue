@@ -110,16 +110,16 @@
       :per-page="perPage"
       @setPage="setPage"
     />
-    <div v-if="campaignsLoading" class="subtitle loading-text">
+    <div v-if="campaignsLoading" class="subtitle loading-text has-text-centered">
       Campaigns loading
     </div>
-    <div v-else-if="!allBatchesLoaded" class="loading-text">
+    <div v-else-if="!allBatchesLoaded" class="loading-text has-text-centered">
       Batches loading
     </div>
-    <div v-else-if="campaigns && !campaigns.length" class="subtitle">
+    <div v-else-if="campaigns && !campaigns.length" class="subtitle has-text-centered">
       No tasks
     </div>
-    <div v-else-if="!campaigns" class="subtitle has-text-danger">
+    <div v-else-if="!campaigns" class="subtitle has-text-centered has-text-danger">
       Could not retrieve campaigns
     </div>
   </div>

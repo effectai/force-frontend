@@ -53,8 +53,13 @@
             </div>
             <div class="navbar-item is-hidden-touch" @click="mobileMenu = false, showUserModal = !showUserModal">
               <button :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
-                <span class="icon">
-                  <img src="~assets/img/icons/user.svg" style="height: 24px">
+                <span class="icon-text">
+                  <span class="icon">
+                    <img src="~assets/img/icons/user.svg" style="height: 24px">
+                  </span>
+                  <span class="">&nbsp;{{ $auth.user.accountName.slice(0, 12) }}
+                    <span v-if="$auth.user.accountName.length > 12">...</span>
+                  </span>
                 </span>
               </button>
             </div>
@@ -64,6 +69,14 @@
                   <img src="~assets/img/icons/user.svg" style="height: 24px">
                 </span>
                 <span v-if="mobileMenu">Profile</span>
+              </nuxt-link>
+            </div>
+            <div class="navbar-item is-hidden-desktop" @click="mobileMenu = false, showUserModal = !showUserModal">
+              <nuxt-link :key="$auth.user ? $auth.user.vAccountRows[0].id : null" to="/manage" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
+                <span class="icon">
+                  <img src="~assets/img/icons/settings.svg" style="height: 22px">
+                </span>
+                <span v-if="mobileMenu">Manage</span>
               </nuxt-link>
             </div>
             <div class="navbar-item is-hidden-desktop" @click="logout">
