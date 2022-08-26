@@ -419,7 +419,7 @@ export default {
             .filter(q => q.value === 0) // only inclusive qualifications
             .map((q) => {
               const quali = this.qualificationById(q.key)
-              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              quali.userHasQuali = this.assignedQualifications?.some(aq => aq.id === quali.id)
               return quali
             })
         } else {
@@ -436,7 +436,7 @@ export default {
             .filter(q => q.value === 1) // only exclusive qualifications
             .map((q) => {
               const quali = this.qualificationById(q.key)
-              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              quali.userHasQuali = this.assignedQualifications?.some(aq => aq.id === quali.id)
               return quali
             })
         } else {
