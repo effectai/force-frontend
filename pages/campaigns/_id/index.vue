@@ -74,7 +74,7 @@
               <li :class="{'is-active': body === 'preview'}">
                 <a @click.prevent="body = 'preview'">Preview</a>
               </li>
-              <li :class="{'is-active': body === 'description'}">
+              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'description'}">
                 <a @click.prevent="body = 'description'">Batches</a>
               </li>
             </ul>
