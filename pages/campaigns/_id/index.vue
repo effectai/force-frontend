@@ -236,6 +236,15 @@
                 </div>
               </div>
 
+              <div v-if="campaign.info && campaign.info.category === 'qualifier' && campaign.info.qualification" class="block is-vcentered has-text-centered">
+                <div class="is-size-4 has-text-centered">
+                  Qualifies you for:
+                </div>
+                <nuxt-link :to="`/qualifications/${campaign.info.qualification.id}`">
+                  {{ campaign.info.qualification.label }}
+                </nuxt-link>
+              </div>
+
               <div class="block is-vcentered">
                 <div class="is-size-4 has-text-centered">
                   Qualifications
@@ -515,7 +524,7 @@ export default {
     async getBatches () {
       await this.$store.dispatch('campaign/getBatches')
 
-      if (!this.campaignBatches.length) {
+      if (!this.campaignBatches?.length) {
         this.userReservation = false
       }
 

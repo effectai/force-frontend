@@ -37,6 +37,25 @@
           </div>
 
           <div class="field">
+            <label for="" class="label">
+              Qualifier Task
+            </label>
+            <multiselect
+              v-model="qualificationIpfs.qualifier"
+              :options="userCampaigns"
+              label="label"
+              placeholder="Select the qualifier associated with this qualification"
+              :searchable="true"
+              :close-on-select="true"
+              :show-labels="true"
+            >
+              <template slot="singleLabel" slot-scope="{ }">
+                {{ qualificationIpfs.qualifier.label }}
+              </template>
+            </multiselect>
+          </div>
+
+          <div class="field">
             <label class="label">
               Description
               <span class="has-text-info" />
@@ -50,6 +69,14 @@
             </div>
           </div>
 
+          <!-- TODO: Use ipfs upload for images. -->
+          <!-- <div class="field"> -->
+            <!-- <label for="" class="label">Ipfs Image</label> -->
+            <!-- <div class="control"> -->
+              <!-- <upload-to-ipfs v-model="qualificationIpfs.image" /> -->
+            <!-- </div> -->
+          <!-- </div> -->
+
           <div class="field">
             <label class="label">
               Image
@@ -62,11 +89,11 @@
 
           <div class="field">
             <label for="" class="label">
-              Hidden
+              Hidden / BlockList
             </label>
             <label class="checkbox">
               <input v-model="qualificationIpfs.ishidden" type="checkbox" class="checkbox">
-              Check if this qualifications needs to be hidden from the user.
+              Check if this qualifications needs to be hidden from the user and or is a blocklist qualification.
             </label>
           </div>
 
@@ -92,14 +119,18 @@
 
 <script>
 import _ from 'lodash'
+import Multiselect from 'vue-multiselect'
 import VueSimplemde from 'vue-simplemde'
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import SuccessModal from '~/components/SuccessModal.vue'
+// import UploadToIpfs from '~/components/UploadToIpfs.vue'
 
 export default {
   components: {
     VueSimplemde,
-    SuccessModal
+    SuccessModal,
+    Multiselect
+    // UploadToIpfs,
   },
   middleware: ['auth'],
   data () {
@@ -118,14 +149,17 @@ export default {
         name: null,
         description: null,
         image: null,
-        type: null
+        type: null,
+        qualifier: null
       }
     }
   },
   computed: {
     ...mapState({
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
-      qualifications: state => state.qualification.qualifications
+      qualifications: state => state.qualification.qualifications,
+      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
+      campaigns: state => state.campaign.campaigns
     }),
     ...mapGetters({
       qualificationById: 'qualification/qualificationById'
@@ -136,11 +170,25 @@ export default {
     },
     hasChanged () {
       return this.qualification && !_.isEqual(this.qualification.info, this.qualificationIpfs)
+    },
+    userCampaigns () {
+      if (!this.campaigns) {
+        return []
+      } else {
+        return this.campaigns
+          .filter(c => c.owner[1] === this.$auth.user.accountName)
+          .map(c => ({ ...c }))
+          .map(c => ({ id: c.id, label: `ID: ${c.id} - ${c.info?.title}` }))
+          // TODO add extra map here to add the info object to the top of the object. instead of  being nested.
+          // How do I want to display the data?
+          // ID: 123 - Title name goes here.
+      }
     }
   },
+
   created () {
     this.getQualification()
-    // this.qualificationById(this.id)
+    this.getCampaigns()
   },
 
   beforeDestroy () {
@@ -148,6 +196,9 @@ export default {
   },
 
   methods: {
+    ...mapActions({
+      getCampaigns: 'campaign/getCampaigns'
+    }),
     async getQualification () {
       this.qualificationLoading = true
       try {
@@ -162,9 +213,9 @@ export default {
     async editQualification () {
       this.loading = true
       try {
-        console.log(this.qualificationIpfs)
-        const { name, description, image, ishidden } = this.qualificationIpfs
-        const result = await this.$blockchain.editQualification(this.id, name, description, 0, image, ishidden)
+        // console.log(this.qualificationIpfs)
+        const { name, description, image, ishidden, qualifier } = this.qualificationIpfs
+        const result = await this.$blockchain.editQualification(this.id, name, description, 0, image, ishidden, qualifier)
 
         // Wait for transaction and reload campaigns
         await this.$blockchain.waitForTransaction(result)
@@ -208,7 +259,6 @@ export default {
       return true
     }
   }
-
 }
 </script>
 

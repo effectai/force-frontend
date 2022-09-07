@@ -60,6 +60,27 @@
               <div class="columns ">
                 <div class="column is-full">
                   <div class="block">
+                    <div v-if="userHasQuali">
+                      <strong>✅ - You have this Qualification</strong>
+                    </div>
+                    <div v-else>
+                      <strong>❌ - You do not have this Qualification</strong>
+                    </div>
+                  </div>
+                  <hr>
+                  <div class="block">
+                    Qualifier Task
+                    <br>
+                    <div v-if="singleQualification.info.campaignid" class="blockchain-address">
+                      <nuxt-link :to="`/campaigns/${singleQualification.info.campaignid.id}`">
+                        {{ singleQualification.info.campaignid.name }}
+                      </nuxt-link>
+                    </div>
+                    <div v-else>
+                      - No Qualifier Task -
+                    </div>
+                  </div>
+                  <div class="block">
                     Requester
                     <br>
                     <div v-if="vaccount" class="blockchain-address">
@@ -114,11 +135,20 @@ export default {
   computed: {
     ...mapState({
       qualifications: state => state.qualification.qualifications,
-      loading: state => !state.qualification.allQualificationsLoaded
+      loading: state => !state.qualification.allQualificationsLoaded,
+      assignedQualifications: state => state.qualification.assignedQualifications,
+      allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded
     }),
     singleQualification () {
       if (!this.qualifications) { return }
       return this.qualifications.find(el => el.id === this.id)
+    },
+    userHasQuali () {
+      if (!this.singleQualification && !this.allAssignedQualificationsLoaded) {
+        return null
+      } else {
+        return this.assignedQualifications.some(el => el.id === this.id)
+      }
     }
   },
   watch: {

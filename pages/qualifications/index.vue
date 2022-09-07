@@ -21,8 +21,6 @@ export default {
       loading: null
     }
   },
-  created () {
-  },
   computed: {
     ...mapState({
       qualifications: state => state.qualification.qualifications
@@ -31,6 +29,8 @@ export default {
       if (!this.qualifications) { return }
       return this.qualifications
     }
+  },
+  created () {
   },
   methods: {
   }
