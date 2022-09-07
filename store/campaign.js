@@ -106,6 +106,13 @@ export default {
         state.campaigns = [campaign]
       }
     },
+    ADD_SUBMISSION (state, submission) {
+      if (state.submissions) {
+        state.submissions.push(submission)
+      } else {
+        state.submissions = [submission]
+      }
+    },
     ADD_BATCH (state, batch) {
       if (state.batches) {
         const index = state.batches.findIndex(b => b.batch_id === batch.batch_id)
@@ -287,6 +294,33 @@ export default {
         }
       } catch (e) {
         commit('SET_CAMPAIGN_INFO', { id: campaign.id, info: null })
+      }
+    },
+    async getSubmission ({ dispatch, commit, state }, id) {
+      commit('SET_LOADING_SUBMISSIONS', true)
+      try {
+        let submission
+        if (state.submissions) {
+          submission = state.submissions.find(c => c.id === id)
+        }
+        if (!submission) {
+          const data = await this.$blockchain.getSubmissions(id, 1, false)
+
+          if (data.rows.length > 0) {
+            const submissions = data.rows.map(function (x) {
+              x.batch_id = parseInt(x.batch_id)
+              return x
+            })
+            commit('ADD_SUBMISSION', submissions[0])
+          } else {
+            throw new Error('Cannot find submission with the given id.')
+          }
+        }
+
+        commit('SET_LOADING_SUBMISSIONS', false)
+      } catch (error) {
+        this.$blockchain.handleError(error)
+        commit('SET_LOADING_SUBMISSIONS', false)
       }
     },
     async getSubmissions ({ dispatch, commit, state }, nextKey) {

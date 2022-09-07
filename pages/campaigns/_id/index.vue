@@ -236,7 +236,7 @@
                 </div>
               </div>
 
-              <div v-if="campaign.info && campaign.info.category === 'qualifier'" class="block is-vcentered has-text-centered">
+              <div v-if="campaign.info && campaign.info.category === 'qualifier' && campaign.info.qualification" class="block is-vcentered has-text-centered">
                 <div class="is-size-4 has-text-centered">
                   Qualifies you for:
                 </div>
