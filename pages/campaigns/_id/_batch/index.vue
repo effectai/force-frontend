@@ -54,7 +54,7 @@
               <li :class="{'is-active': body === 'preview'}">
                 <a @click.prevent="body = 'preview'">Preview</a>
               </li>
-              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'tasks'}">
+              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName || true" :class="{'is-active': body === 'tasks'}">
                 <a @click.prevent="body = 'tasks'">Tasks</a>
               </li>
             </ul>
@@ -678,9 +678,11 @@ export default {
           const sub = {}
           sub.data = JSON.parse(x.data)
 
-          // add answers as seperate columns
-          for (const result of Object.keys(sub.data)) {
-            x[result] = sub.data[result]
+          if (typeof sub.data === 'object') {
+            // add answers as seperate columns
+            for (const result of Object.keys(sub.data)) {
+              x[result] = sub.data[result]
+            }
           }
 
           // add placeholders
