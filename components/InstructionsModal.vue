@@ -76,7 +76,7 @@
         </button>
         <template v-else>
           <button class="button is-primary has-tooltip has-tooltip-arrow" :data-tooltip="!tac ? 'agree to the terms and\nconditions to qualify' : 'No additional\nqualifications needed'" :disabled="!tac || !info || !functional" @click.prevent="onClick()">
-            Qualify
+            Enter Task
           </button>
           <button class="button" :disabled="!functional" @click.prevent="onCancel()">
             Cancel
