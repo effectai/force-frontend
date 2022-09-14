@@ -15,7 +15,7 @@
             >
               <a>
                 <!-- <span class="icon is-large"><img src="@/assets/img/providers/EOS-logo.svg" alt="EOS" /></span> -->
-                <span>Tasks</span>
+                <span>Tasks You Created</span>
               </a>
             </li>
             <li>|</li>
@@ -24,7 +24,7 @@
               @click.prevent="toggleSection('qualifications')"
             >
               <a>
-                <span>Qualifications</span>
+                <span>Qualifications You Created</span>
                 <!-- <span class="icon is-large"><img src="@/assets/img/providers/BSC-logo.svg" alt="BSC" /></span> -->
               </a>
             </li>
@@ -41,7 +41,7 @@
                 <span class="icon">
                   +
                 </span>
-                <span>Create Task</span>
+                <span>Create a Task</span>
               </nuxt-link>
             </div>
           </div>
@@ -59,7 +59,7 @@
                 <span class="icon">
                   +
                 </span>
-                <span>Create Qualification</span>
+                <span>Create a Qualification</span>
               </nuxt-link>
             </div>
           </div>
