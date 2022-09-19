@@ -257,56 +257,60 @@
                 </div>
               </div>
 
-              <div v-if="campaign.info && campaign.info.category === 'qualifier' && campaign.info.qualification" class="block is-vcentered has-text-centered">
+              <div v-if="campaign.info && campaign.info.qualification && campaign.info.category === 'qualifier'" class="block is-vcentered has-text-centered">
+                <hr>
                 <div class="is-size-4 has-text-centered">
                   Qualifies you for:
                 </div>
-                <nuxt-link :to="`/qualifications/${campaign.info.qualification.id}`">
-                  {{ campaign.info.qualification.label }}
+                <nuxt-link :to="`/qualifications/${campaign.info.qualification?.id}`">
+                  {{ campaign.info.qualification?.label }}
                 </nuxt-link>
               </div>
 
-              <div class="block is-vcentered">
+              <div v-if="inclusiveQualifications.length > 0 || exclusiveQualifications.length > 0" class="block is-vcentered">
+                <hr>
                 <div class="is-size-4 has-text-centered">
                   Qualifications
                 </div>
                 <div v-if="allQualificationsLoaded">
-                  <div>Required <i>(Having these qualifications is required)</i></div>
-                  <div v-if="inclusiveQualifications.length > 0" class="tags">
-                    <span
+                  <div v-if="inclusiveQualifications.length > 0" class="">
+                    <div class="is-size-5 has-text-centered">
+                      You need these qualifications:
+                    </div>
+                    <div
                       v-for="quali in inclusiveQualifications"
                       :key="quali.id"
-                      class="tag"
-                      :class="quali.userHasQuali ? 'is-light is-success' : 'is-danger is-light'"
-                      :data-tooltip="quali.userHasQuali ? 'Found: Ok' : 'Not Found: Required'"
+                      class="tags"
+                      :data-tooltip="quali.userHasQuali ? 'You have this qualification' : 'You do not have this qualification'"
                     >
-                      <span v-if="quali.userHasQuali">✅</span>
-                      <span v-else>❌</span>
-                      &nbsp;
-                      <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
-                    </span>
-                  </div>
-                  <div v-else>
-                    None
+                      <label class="b-checkbox checkbox is-medium tag is-light is-success is-size-6-mobile">
+                        <input v-model="quali.userHasQuali" type="checkbox" disabled>
+                        <span class="check is-success"></span>
+                        <span class="control-label">
+                          <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
+                        </span>
+                      </label>
+                    </div>
                   </div>
                   <br>
-                  <div>Exclude <i>(Having these qualifications will exclude you from this task)</i></div>
-                  <div v-if="exclQualis.length > 0" class="tags">
-                    <span
-                      v-for="quali in exclQualis"
+                  <div v-if="exclusiveQualifications.length > 0" class="">
+                    <div class="is-size-5 has-text-centered">
+                      Having these qualifications will disqualify you:
+                    </div>
+                    <div
+                      v-for="quali in exclusiveQualifications"
                       :key="quali.id"
-                      class="tag"
-                      :class="quali.userHasQuali ? 'is-light is-danger' : 'is-success is-light'"
-                      :data-tooltip="quali.userHasQuali ? 'Found: Excluded' : 'Not found: Ok'"
+                      class="tags"
+                      :data-tooltip="quali.userHasQuali ? 'You have this qualification' : 'You do not have this qualification'"
                     >
-                      <span v-if="quali.userHasQuali">❌</span>
-                      <span v-else>✅</span>
-                      &nbsp;
-                      <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
-                    </span>
-                  </div>
-                  <div v-else>
-                    None
+                      <label class="b-checkbox checkbox is-medium tag is-light is-danger is-size-6-mobile">
+                        <input v-model="quali.userHasQuali" type="checkbox" disabled>
+                        <span class="check is-danger"></span>
+                        <span class="control-label">
+                          <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
+                        </span>
+                      </label>
+                    </div>
                   </div>
                 </div>
                 <div v-else class="loading-text has-text-centered">
@@ -316,7 +320,15 @@
               </div>
 
               <div class="block is-vcentered ">
+                <hr>
                 <div v-if="$auth.user.accountName === campaign.owner[1]">
+                  <nuxt-link v-if="$auth.user.accountName === campaign.owner[1]" class="button is-fullwidth is-primary has-margin-bottom-mobile" :to="`/campaigns/${id}/new`">
+                    <span class="icon">
+                      +
+                    </span>
+                    <span>Add Tasks</span>
+                  </nuxt-link>
+                  <br>
                   <nuxt-link :to="`/campaigns/${id}/edit`" class="button is-fullwidth is-primary is-light has-margin-bottom-mobile">
                     Edit Task
                   </nuxt-link>
