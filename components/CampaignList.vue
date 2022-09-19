@@ -93,9 +93,10 @@
               </h2>
             </div>
             <div class="column has-text-right" :class="{'is-12': grid}">
-              <button class="button is-primary has-text-weight-semibold is-fullwidth" :disabled="!campaign || campaign.info === null || campaign.joinable === false" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null,'is-wide': !grid}">
+              <button class="button is-primary has-text-weight-semibold is-fullwidth" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null || campaign.joinable === false,'is-wide': !grid}">
                 <span v-if="campaign.userHasReservation">Go to Task</span>
-                <span v-else>Start</span>
+                <span v-else-if="campaign.joinable">Start</span>
+                <span v-else>View</span>
               </button>
             </div>
           </div>
