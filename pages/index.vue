@@ -62,7 +62,7 @@ export default {
       approvedRequesters: approvedCampaigns.requesters,
       unmoderated: false,
       categoryFilter: this.$route.query.category,
-      joinableFilter: null
+      joinableFilter: 'joinable'
     }
   },
   computed: {
