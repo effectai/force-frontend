@@ -218,10 +218,10 @@
                       },0) }} left</b>
                     </span>
                   </div>
-                  <div class="block">
+                  <div v-if="campaign.info && campaign.info.category === 'qualifier'" class="block">
                     EFX <strong>/</strong> Hour
                     <br>
-                    <div v-if="campaign.info && campaign.info.estimated_time">
+                    <div v-if="campaign.info.estimated_time">
                       <b>
                         <span>{{ estimatedEarnings.efxPerHour }} EFX</span>
                         <span v-if="estimatedEarnings.dollarPerHour">(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
