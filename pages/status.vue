@@ -108,6 +108,12 @@
               <td>{{ prop }}</td>
               <td>{{ val }}</td>
             </tr>
+            <tr>
+              <td>advanced</td>
+              <td>
+                <span class="is-clickable" @click="toggleAdvanced">{{ advanced }}</span>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -116,6 +122,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 import { defaultConfiguration } from '@effectai/effect-js'
 const defaultConfig = defaultConfiguration(process.env.NUXT_ENV_SDK_ENV)
 delete defaultConfig.web3
@@ -146,7 +154,9 @@ export default {
   },
 
   computed: {
-
+    ...mapState({
+      advanced: state => state.view.advanced
+    }),
     relayer () {
       return this.$blockchain ? this.$blockchain.relayerStatus : null
     },
@@ -196,7 +206,9 @@ export default {
     this.pingRelayer()
   },
   methods: {
-
+    toggleAdvanced () {
+      this.$store.commit('view/SET_ADVANCED_VIEW', !this.advanced)
+    },
     async pingRelayer () {
       const response = await fetch(`${this.$blockchain.sdk.config.eosRelayerUrl}/info`, { mode: 'cors' }).catch(console.error)
       this.relayerOk = response.ok

@@ -145,26 +145,31 @@ export default {
 
         // get assigned qualification info from store
         const assignedQualis = []
-        for (const aq of data) {
-          const qualiInfo = state.qualifications.find(q => q.id === aq.quali_id)
-          assignedQualis.push(qualiInfo)
-        }
+        if (data) {
+          for (const aq of data) {
+            const qualiInfo = state.qualifications.find(q => q.id === aq.quali_id)
+            assignedQualis.push(qualiInfo)
+          }
 
-        if (!state.allAssignedQualificationsLoaded) {
-          commit('UPSERT_ASSIGNED_QUALIFICATIONS', assignedQualis)
-        }
-        setTimeout(() => {
-          commit('UPSERT_ASSIGNED_QUALIFICATIONS', assignedQualis)
-        }, 0)
+          if (!state.allAssignedQualificationsLoaded) {
+            commit('UPSERT_ASSIGNED_QUALIFICATIONS', assignedQualis)
+          }
+          setTimeout(() => {
+            commit('UPSERT_ASSIGNED_QUALIFICATIONS', assignedQualis)
+          }, 0)
 
-        if (data.more) {
-          console.log('retrieving more assigned qualifications..')
-          await sleep(100)
-          await dispatch('getAssignedQualifications', data.next_key)
-        } else {
+          if (data.more) {
+            console.log('retrieving more assigned qualifications..')
+            await sleep(100)
+            await dispatch('getAssignedQualifications', data.next_key)
+          } else {
           // No more Qualifications, we are done
-          commit('SET_ALL_ASSIGNED_QUALIFICATION_LOADED', true)
+            commit('SET_ALL_ASSIGNED_QUALIFICATION_LOADED', true)
+            commit('SET_LOADING', false)
+          }
+        } else {
           commit('SET_LOADING', false)
+          console.error('could not yet retrieve assigned qualifications')
         }
       } catch (error) {
         this.$blockchain.handleError(error)
