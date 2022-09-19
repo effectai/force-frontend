@@ -16,6 +16,9 @@ export default {
         state.manage = value
       }
     },
+    SET_ADVANCED_VIEW (state, value) {
+      state.advanced = !!(value)
+    },
     ADD_JOINED_CAMPAIGN (state, campaignId) {
       if (state.batches) {
         const index = state.joinedCampaigns.findIndex(c => c === campaignId)
@@ -31,7 +34,8 @@ export default {
     return {
       grid: true,
       manage: 'tasks',
-      joinedCampaigns: []
+      joinedCampaigns: [],
+      advanced: false
     }
   }
 }

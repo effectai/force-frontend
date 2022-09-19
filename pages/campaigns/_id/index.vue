@@ -74,13 +74,13 @@
               <li :class="{'is-active': body === 'preview'}">
                 <a @click.prevent="body = 'preview'">Preview</a>
               </li>
-              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'description'}">
-                <a @click.prevent="body = 'description'">Batches</a>
+              <li :class="{'is-active': body === 'batches'}">
+                <a @click.prevent="body = 'batches'">Batches</a>
               </li>
             </ul>
           </div>
 
-          <div v-if="body === 'description'" class="block">
+          <div v-if="body === 'batches'" class="block">
             <div class="mt-5">
               <div class="is-flex is-justify-content-space-between is-align-items-center">
                 <h4 class="is-size-6 mb-0 has-text-weight-bold">
@@ -99,7 +99,7 @@
                   <nuxt-link
                     v-for="batch in campaignBatches.slice().reverse()"
                     :key="batch.id"
-                    :to="`/campaigns/${batch.campaign_id}/${batch.batch_id}`"
+                    :to="(campaign && campaign.owner[1] === $auth.user.accountName || advanced) ? `/campaigns/${batch.campaign_id}/${batch.batch_id}` : ''"
                     class="box p-4"
                     :class="{'is-disabled': false}"
                   >
@@ -199,6 +199,15 @@
                       <span v-else>...</span>
                     </b>
                   </div>
+                  <div v-if="advanced" class="block">
+                    Requester
+                    <br>
+                    <div class="blockchain-address">
+                      <nuxt-link :to="'/profile/' + campaign.owner[1]">
+                        {{ campaign.owner[1] }}
+                      </nuxt-link>
+                    </div>
+                  </div>
                 </div>
 
                 <div class="column is-half">
@@ -218,13 +227,13 @@
                       },0) }} left</b>
                     </span>
                   </div>
-                  <div class="block">
+                  <div v-if="campaign.info && campaign.info.category !== 'qualifier'" class="block">
                     EFX <strong>/</strong> Hour
                     <br>
-                    <div v-if="campaign.info && campaign.info.estimated_time">
+                    <div v-if="campaign.info.estimated_time">
                       <b>
                         <span>{{ estimatedEarnings.efxPerHour }} EFX</span>
-                        <span>(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
+                        <span v-if="estimatedEarnings.dollarPerHour">(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
                       </b>
                     </div>
                     <div v-else>
@@ -232,6 +241,18 @@
                         <span>...</span>
                       </b>
                     </div>
+                  </div>
+                  <div v-if="advanced" class="block">
+                    IPFS
+                    <br>
+                    <div class="blockchain-address">
+                      <a target="_blank" :href="`${ipfsExplorer}/ipfs/${campaign.content.field_1}`">{{ campaign.content.field_1 }}</a>
+                    </div>
+                  </div>
+                  <div v-if="advanced" class="block">
+                    Blockchain
+                    <br>
+                    <a target="_blank" :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.forceContract}?loadContract=true&tab=Tables&table=campaign&account=${$blockchain.sdk.force.config.forceContract}&scope=${$blockchain.sdk.force.config.forceContract}&limit=1&lower_bound=${id}&upper_bound=${id}`">View in Explorer</a>
                   </div>
                 </div>
               </div>
@@ -397,7 +418,8 @@ export default {
       batchesLoading: state => state.campaign.loadingBatch && !state.campaign.allBatchesLoaded,
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
       assignedQualifications: state => state.qualification.assignedQualifications,
-      allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded
+      allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded,
+      advanced: state => state.view.advanced
     }),
     campaignBatches () {
       return this.batchesByCampaignId(this.id)

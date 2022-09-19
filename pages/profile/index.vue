@@ -61,7 +61,7 @@
               <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
                 Manage
               </div>
-              <nuxt-link to="/manage">Tasks & Qualifications</nuxt-link>
+              <nuxt-link to="/manage">Tasks & Qualifications You Created</nuxt-link>
             </div>
           </div>
           <div class="column">
@@ -165,7 +165,7 @@
         <!-- Qualifications -->
         <div class="py-2">
           <h2 class="title is-4 mt-6 is-spaced">
-            Qualifications
+            Your Qualifications
           </h2>
           <div v-if="assignedQualifications && assignedQualifications.length > 0" class="columns is-mobile is-multiline is-max-widescreen">
             <div

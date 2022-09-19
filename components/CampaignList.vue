@@ -88,7 +88,7 @@
               </p>
               <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
                 <span>
-                  {{ campaign.num_tasks - campaign.tasks_done }}/{{ campaign.num_tasks }} left
+                  {{ campaign.num_tasks - campaign.tasks_done }}<span v-if="advanced">/{{ campaign.num_tasks }}</span> left
                 </span>
               </h2>
             </div>
@@ -151,7 +151,8 @@ export default {
       campaignsLoading: state => state.campaign.loading,
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
       allBatchesLoaded: state => state.campaign.allBatchesLoaded,
-      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded
+      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded,
+      advanced: state => state.view.advanced
     }),
     list: {
       get () {
