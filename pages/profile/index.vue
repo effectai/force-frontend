@@ -71,6 +71,11 @@
               </div>
               <nuxt-link to="/profile/transactions">View Transactions</nuxt-link>
             </div>
+          <div class="column">
+            <div class="block">
+              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">Community</div>
+                    <a title="Discord" href="https://discord.gg/effectnetwork" target="_blank" rel="noopener">Effect Network Discord Server</a></div>
+                </div>  
           </div>
         </div>
         <hr>
