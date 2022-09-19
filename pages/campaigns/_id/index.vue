@@ -74,7 +74,7 @@
               <li :class="{'is-active': body === 'preview'}">
                 <a @click.prevent="body = 'preview'">Preview</a>
               </li>
-              <li :class="{'is-active': body === 'description'}">
+              <li v-if="campaign && campaign.owner[1] === $auth.user.accountName" :class="{'is-active': body === 'description'}">
                 <a @click.prevent="body = 'description'">Batches</a>
               </li>
             </ul>
@@ -259,10 +259,10 @@
                     <div
                       v-for="quali in inclusiveQualifications"
                       :key="quali.id"
-                      class="field tags px-6"
+                      class="tags"
                       :data-tooltip="quali.userHasQuali ? 'You have this qualification' : 'You do not have this qualification'"
                     >
-                      <label class="b-checkbox checkbox is-medium tag is-light is-success">
+                      <label class="b-checkbox checkbox is-medium tag is-light is-success is-size-6-mobile">
                         <input v-model="quali.userHasQuali" type="checkbox" disabled>
                         <span class="check is-success"></span>
                         <span class="control-label">
@@ -279,10 +279,10 @@
                     <div
                       v-for="quali in exclusiveQualifications"
                       :key="quali.id"
-                      class="field tags px-6"
+                      class="tags"
                       :data-tooltip="quali.userHasQuali ? 'You have this qualification' : 'You do not have this qualification'"
                     >
-                      <label class="b-checkbox checkbox is-medium tag is-light is-danger">
+                      <label class="b-checkbox checkbox is-medium tag is-light is-danger is-size-6-mobile">
                         <input v-model="quali.userHasQuali" type="checkbox" disabled>
                         <span class="check is-danger"></span>
                         <span class="control-label">
@@ -440,7 +440,7 @@ export default {
             .filter(q => q.value === 0) // only inclusive qualifications
             .map((q) => {
               const quali = this.qualificationById(q.key)
-              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              quali.userHasQuali = this.assignedQualifications?.some(aq => aq.id === quali.id)
               return quali
             })
         } else {
@@ -457,7 +457,7 @@ export default {
             .filter(q => q.value === 1) // only exclusive qualifications
             .map((q) => {
               const quali = this.qualificationById(q.key)
-              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              quali.userHasQuali = this.assignedQualifications?.some(aq => aq.id === quali.id)
               return quali
             })
         } else {

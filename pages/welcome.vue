@@ -43,7 +43,7 @@
                   Access a global, on-demand, 24x7 scalable workforce
                 </h1>
                 <p class="has-text-aligned block">
-                  Tap into a diverse workforce of over 10,000 people that
+                  Tap into a diverse workforce of over 10,000 people who
                   complete tasks for you. Choose one of the default task
                   templates to get started with text analysis, document
                   transcription, image annotations, sentiment analyis and many

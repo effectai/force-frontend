@@ -81,12 +81,12 @@
             </h2>
             <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout !== 0" :class="{'is-loading': loading === true}" class="button is-fullwidth-mobile is-primary" @click.prevent="payout()">
               <p v-if="!loading">
-                Cash out <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span>
+                Claim <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span>
               </p>
             </button>
             <button v-else-if="$blockchain.efxPayout === 0" disabled="disabled" class="button is-fullwidth-mobile is-primary is-wide">
               <p class="">
-                Nothing to cash out
+                Nothing to claim
               </p>
             </button>
             <button v-else disabled="disabled" class="button is-fullwidth-mobile is-primary">
