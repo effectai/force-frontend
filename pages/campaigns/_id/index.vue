@@ -224,7 +224,7 @@
                     <div v-if="campaign.info && campaign.info.estimated_time">
                       <b>
                         <span>{{ estimatedEarnings.efxPerHour }} EFX</span>
-                        <span>(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
+                        <span v-if="estimatedEarnings.dollarPerHour">(${{ parseFloat(estimatedEarnings.dollarPerHour).toFixed(2) }})</span>
                       </b>
                     </div>
                     <div v-else>
