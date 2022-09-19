@@ -218,7 +218,7 @@
                       },0) }} left</b>
                     </span>
                   </div>
-                  <div v-if="campaign.info && campaign.info.category === 'qualifier'" class="block">
+                  <div v-if="campaign.info && campaign.info.category !== 'qualifier'" class="block">
                     EFX <strong>/</strong> Hour
                     <br>
                     <div v-if="campaign.info.estimated_time">
