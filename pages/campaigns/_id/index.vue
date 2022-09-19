@@ -274,7 +274,7 @@
                   <br>
                   <div v-if="exclusiveQualifications.length > 0" class="">
                     <div class="is-size-5 has-text-centered">
-                      These qualifications will disqualify you:
+                      Having these qualifications will disqualify you:
                     </div>
                     <div
                       v-for="quali in exclusiveQualifications"
