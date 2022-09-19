@@ -156,7 +156,7 @@ export default {
       await this.getTask()
     },
     async getTask () {
-      await this.$store.dispatch('campaign/getSubmissions')
+      await this.$store.dispatch('campaign/getSubmission', this.submissionId)
       this.reservation = this.submissionById(this.submissionId)
 
       // if the submission can't be found, or is not from the current user, throw error and redirect

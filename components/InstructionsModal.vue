@@ -21,7 +21,7 @@
             Qualifications
           </div>
           <div v-if="allQualificationsLoaded">
-            <div>Required <i>(Having these qualifications is required)</i></div>
+            <div>Task Requirements <i>(You must have this qualification in order to enter the task.)</i></div>
             <div v-if="inclusiveQualifications.length > 0" class="tags">
               <span
                 v-for="quali in inclusiveQualifications"
@@ -40,7 +40,7 @@
               None
             </div>
             <br>
-            <div>Exclude <i>(Having these qualifications will exclude you from this task)</i></div>
+            <div>Blocked Qualifications<i>(Having these qualifications will exclude you from this task.)</i></div>
             <div v-if="exclQualis.length > 0" class="tags">
               <span
                 v-for="quali in exclQualis"
@@ -76,7 +76,7 @@
         </button>
         <template v-else>
           <button class="button is-primary has-tooltip has-tooltip-arrow" :data-tooltip="!tac ? 'agree to the terms and\nconditions to qualify' : 'No additional\nqualifications needed'" :disabled="!tac || !info || !functional" @click.prevent="onClick()">
-            Qualify
+            Enter Task
           </button>
           <button class="button" :disabled="!functional" @click.prevent="onCancel()">
             Cancel

@@ -469,11 +469,11 @@ export default (context, inject) => {
       async waitForTransaction (transactionResult) {
         return await this.sdk.force.waitTransaction(transactionResult)
       },
-      async createQualification (name, description, type, image, ishidden) {
-        return await this.sdk.force.createQualification(name, description, type, image, ishidden)
+      async createQualification (name, description, type, image, ishidden, campaignid) {
+        return await this.sdk.force.createQualification(name, description, type, image, ishidden, campaignid)
       },
-      async editQualification (id, name, description, type, image, ishidden) {
-        return await this.sdk.force.editQualification(id, name, description, type, image, ishidden)
+      async editQualification (id, name, description, type, image, ishidden, campaignid) {
+        return await this.sdk.force.editQualification(id, name, description, type, image, ishidden, campaignid)
       },
       async assignQualification (qualificationId, campaignId, hash) {
         return await this.sdk.force.assignQualification(qualificationId, campaignId, hash)
@@ -489,6 +489,9 @@ export default (context, inject) => {
         return await this.sdk.force.getQualifications(nextKey, limit, processQualification)
       },
       async getAssignedQualifications (nextKey, limit = 50, processQualification = false) {
+        if (context.$auth.user === undefined || context.$auth.user === null) {
+          return null
+        }
         return await this.sdk.force.getAssignedQualifications(nextKey, limit, processQualification, context.$auth.user.vAccountRows[0].id)
       },
       async recoverPublicKey () {

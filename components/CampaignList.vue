@@ -88,14 +88,15 @@
               </p>
               <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
                 <span>
-                  {{ campaign.num_tasks - campaign.tasks_done }}/{{ campaign.num_tasks }} left
+                  {{ campaign.num_tasks - campaign.tasks_done }}<span v-if="advanced">/{{ campaign.num_tasks }}</span> left
                 </span>
               </h2>
             </div>
             <div class="column has-text-right" :class="{'is-12': grid}">
-              <button class="button is-primary has-text-weight-semibold is-fullwidth" :disabled="!campaign || campaign.info === null || campaign.joinable === false" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null,'is-wide': !grid}">
+              <button class="button is-primary has-text-weight-semibold is-fullwidth" :disabled="!campaign || campaign.info === null" :class="{'is-loading': typeof campaign.info === 'undefined', 'is-accent': campaign.info === null || campaign.userHasReservation, 'is-outlined': campaign.info === null || campaign.joinable === false,'is-wide': !grid}">
                 <span v-if="campaign.userHasReservation">Go to Task</span>
-                <span v-else>Start</span>
+                <span v-else-if="campaign.joinable">Start</span>
+                <span v-else>View</span>
               </button>
             </div>
           </div>
@@ -151,7 +152,8 @@ export default {
       campaignsLoading: state => state.campaign.loading,
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
       allBatchesLoaded: state => state.campaign.allBatchesLoaded,
-      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded
+      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded,
+      advanced: state => state.view.advanced
     }),
     list: {
       get () {
