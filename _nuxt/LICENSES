@@ -9,17 +9,6 @@
 
 
 /*!
- * vue-countdown v1.1.5
- * https://fengyuanchen.github.io/vue-countdown
- *
- * Copyright 2018-present Chen Fengyuan
- * Released under the MIT license
- *
- * Date: 2020-02-25T01:19:32.769Z
- */
-
-
-/*!
  * Vue.js v2.7.10
  * (c) 2014-2022 Evan You
  * Released under the MIT License.
@@ -39,14 +28,6 @@
  */
 
 /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
-
-
-/*!
- * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
- *
- * Copyright (c) 2014-2017, Jon Schlinkert.
- * Released under the MIT License.
- */
 
 
 /*
@@ -174,7 +155,26 @@ object-assign
 
 
 /*!
+ * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
+ *
+ * Copyright (c) 2014-2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+
+/*!
  * vue-carousel v0.18.0-alpha
  * (c) 2019 todd.beauchamp@ssense.com
  * https://github.com/ssense/vue-carousel#readme
+ */
+
+
+/*!
+ * vue-countdown v1.1.5
+ * https://fengyuanchen.github.io/vue-countdown
+ *
+ * Copyright 2018-present Chen Fengyuan
+ * Released under the MIT license
+ *
+ * Date: 2020-02-25T01:19:32.769Z
  */
