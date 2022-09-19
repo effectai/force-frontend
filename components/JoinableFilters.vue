@@ -2,13 +2,6 @@
   <div>
     <client-only>
       <carousel :pagination-enabled="false" :per-page-custom="[[768, 3], [1024, 5]]" class="columns mb-5">
-        <slide class="column py-3 is-2">
-          <a href="#" class="box is-flat dapp-null" style="padding: 14px !important" @click.prevent="onFilter()">
-            <div class="has-text-centered">
-              <h4 class="is-size-5"><b>All Tasks</b></h4>
-            </div>
-          </a>
-        </slide>
         <slide v-for="option in options" :key="option" class="column">
           <a
             href="#"
@@ -17,7 +10,14 @@
             @click.prevent="onFilter(option)"
           >
             <div class="has-text-centered">
-              <h4 class="is-size-5"><b>{{ option }}<span v-if="option === 'qualifier'">s</span></b></h4>
+              <h4 class="is-size-5"><b><span v-if="option === 'qualifier'">Get Qualifications</span><span v-else>{{ option }}</span></b></h4>
+            </div>
+          </a>
+        </slide>
+        <slide class="column py-3 is-2">
+          <a href="#" class="box is-flat dapp-null" style="padding: 14px !important" @click.prevent="onFilter()">
+            <div class="has-text-centered">
+              <h4 class="is-size-5"><b>All Tasks</b></h4>
             </div>
           </a>
         </slide>
