@@ -28,11 +28,15 @@
           <nuxt-link to="/status">Status Page</nuxt-link>
         </strong>
       </div>
+      <div v-if="advanced" class="pl-5">
+        <strong>Advanced Mode</strong>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
   name: 'ChainStatus',
@@ -41,6 +45,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      advanced: state => state.view.advanced
+    }),
     chainName () {
       let chainName
       if (this.$blockchain && this.$blockchain.eosInfo) {

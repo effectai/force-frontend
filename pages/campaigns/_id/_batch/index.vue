@@ -365,6 +365,9 @@
                     <span v-if="batch.status === 'Active'">Pause Batch</span>
                     <span v-else-if="batch.status === 'Paused'">Resume Batch</span>
                   </button>
+                  <button v-if="batch" class="button is-danger is-fullwidth is-light mt-3" @click.prevent="deleteBatch">
+                    <span>Remove batch</span>
+                  </button>
                   <br>
                 </template>
                 <button v-if="loading || userReservation === null || campaignLoading || !batch" class="button is-fullwidth is-primary is-loading">
@@ -516,7 +519,7 @@ export default {
             .filter(q => q.value === 0) // only inclusive qualifications
             .map((q) => {
               const quali = this.qualificationById(q.key)
-              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              quali.userHasQuali = this.assignedQualifications?.some(aq => aq.id === quali.id)
               return quali
             })
         } else {
@@ -533,7 +536,7 @@ export default {
             .filter(q => q.value === 1) // only exclusive qualifications
             .map((q) => {
               const quali = this.qualificationById(q.key)
-              quali.userHasQuali = this.assignedQualifications.some(aq => aq.id === quali.id)
+              quali.userHasQuali = this.assignedQualifications?.some(aq => aq.id === quali.id)
               return quali
             })
         } else {
@@ -586,6 +589,23 @@ export default {
         }
       } catch (e) {
         this.$blockchain.handleError(e)
+      }
+    },
+    async deleteBatch () {
+      let data
+      if (confirm('Are you sure you to delete this batch?')) {
+        try {
+          data = await this.$blockchain.deleteBatch(this.batch.id, this.campaign.id)
+          this.$store.dispatch('transaction/addTransaction', data)
+          if (data) {
+            this.loading = true
+            this.joinCampaignPopup = false
+            await this.$blockchain.waitForTransaction(data)
+            this.$router.push(`/campaigns/${this.campaign.id}`)
+          }
+        } catch (e) {
+          this.$blockchain.handleError(e)
+        }
       }
     },
     async reserveTask () {

@@ -431,7 +431,8 @@ export default {
   computed: {
     ...mapState({
       allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
-      qualifications: state => state.qualification.qualifications
+      qualifications: state => state.qualification.qualifications,
+      advanced: state => state.view.advanced
     }),
     ...mapGetters({
       qualificationById: 'qualification/qualificationById'
@@ -454,8 +455,7 @@ export default {
       if (!this.allQualificationsLoaded) {
         return []
       }
-      return this.qualifications
-        .filter(qualification => qualification.account_id === this.$auth.user.vAccountRows[0].id)
+      return (this.advanced ? this.qualifications : this.qualifications.filter(qualification => qualification.account_id === this.$auth.user.vAccountRows[0].id))
         .map(q => ({ ...q, label: `ID: ${q.id} - ${q.info?.name}` }))
     },
     qualificationsDropdownData () {
