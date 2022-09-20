@@ -8,8 +8,8 @@
         </h1>
         <balance />
         <hr>
-        <div class="columns my-auto">
-          <div class="column">
+        <div class="columns is-multiline">
+          <div class="column is-4">
             <div class="block">
               <div class="has-text-weight-bold is-size-6 is-vecentered" style="min-height: 32px;">
                 <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
@@ -36,7 +36,7 @@
               >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
             </div>
           </div>
-          <div class="column">
+          <div class="column is-4">
             <div class="block">
               <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
                 Account Name
@@ -48,7 +48,7 @@
               >{{ $auth.user.accountName }}</a>
             </div>
           </div>
-          <div class="column">
+          <div class="column is-4">
             <div class="block">
               <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
                 ID
@@ -56,26 +56,33 @@
               {{ $auth.user.vAccountRows[0].id }}
             </div>
           </div>
-          <div class="column">
+          <div class="column is-4">
             <div class="block">
               <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
                 Manage
               </div>
-              <nuxt-link to="/manage">Tasks & Qualifications You Created</nuxt-link>
+              <nuxt-link to="/manage">
+                Tasks & Qualifications You Created
+              </nuxt-link>
             </div>
           </div>
-          <div class="column">
+          <div class="column is-4">
             <div class="block">
               <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
                 Transactions
               </div>
-              <nuxt-link to="/profile/transactions">View Transactions</nuxt-link>
+              <nuxt-link to="/profile/transactions">
+                View Transactions
+              </nuxt-link>
             </div>
-          <div class="column">
+          </div>
+          <div class="column is-4">
             <div class="block">
-              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">Community</div>
-                    <a title="Discord" href="https://discord.gg/effectnetwork" target="_blank" rel="noopener">Effect Network Discord Server</a></div>
-                </div>  
+              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
+                Community
+              </div>
+              <a title="Discord" href="https://discord.gg/effectnetwork" target="_blank" rel="noopener">Effect Network Discord Server</a>
+            </div>
           </div>
         </div>
         <hr>
@@ -179,8 +186,8 @@
               class="is-1-desktop column is-one-quarter-mobile quali"
             >
               <nuxt-link v-if="!q.info.ishidden || q.account_id === $auth.user.vAccountRows[0].id" :to="`/qualifications/${q.id}`" :data-tooltip="q.info.name">
-                <img :src="q.info.image" v-if="q.info.image">
-                <img :src="require(`~/assets/img/dapps/effect-force-icon.png`)" v-else>
+                <img v-if="q.info.image" :src="q.info.image">
+                <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)">
               </nuxt-link>
             </div>
           </div>
@@ -256,7 +263,6 @@ export default {
     }
   },
   mounted () {
-    console.log('mounted')
     this.$store.dispatch('pendingPayout/loadPendingPayouts')
     // console.debug(this.$auth)
   },
