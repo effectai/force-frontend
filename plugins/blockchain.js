@@ -437,6 +437,9 @@ export default (context, inject) => {
       async resumeBatch (batch) {
         return await this.sdk.force.resumeBatch(batch)
       },
+      async deleteBatch (batchId, campaignId) {
+        return await this.sdk.force.deleteBatch(batchId, campaignId)
+      },
       async editCampaign (id, hash, reward, qualis) {
         return await this.sdk.force.editCampaign(id, hash, reward, qualis)
       },
