@@ -425,7 +425,8 @@ export default {
       answer: null,
       inclusiveQualis: [],
       exclusiveQualis: [],
-      options: []
+      options: [],
+      efxQualifierAccount: 127
     }
   },
   computed: {
@@ -455,7 +456,11 @@ export default {
       if (!this.allQualificationsLoaded) {
         return []
       }
-      return (this.advanced ? this.qualifications : this.qualifications.filter(qualification => qualification.account_id === this.$auth.user.vAccountRows[0].id))
+      return (this.advanced
+        ? this.qualifications
+        : this.qualifications.filter((qualification) => {
+          return qualification.account_id === this.$auth.user.vAccountRows[0].id || qualification.account_id === this.efxQualifierAccount
+        }))
         .map(q => ({ ...q, label: `ID: ${q.id} - ${q.info?.name}` }))
     },
     qualificationsDropdownData () {
