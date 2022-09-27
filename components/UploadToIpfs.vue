@@ -55,7 +55,7 @@ export default {
                 body: formData
               })
             this.file = await response.json()
-            this.$emit('upload', `${this.ipfsExplorer}/${this.file.Hash}`)
+            this.$emit('upload', `${this.ipfsExplorer}/ipfs/${this.file.Hash}`)
             this.selectedFile = null
             this.$refs.file.value = ''
           }
