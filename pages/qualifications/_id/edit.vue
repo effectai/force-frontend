@@ -176,13 +176,9 @@ export default {
       if (!this.campaigns) {
         return []
       } else {
-        return (this.advanced ? this.qualifications : this.qualifications.filter(qualification => qualification.account_id === this.$auth.user.vAccountRows[0].id))
-          .map(q => ({ ...q, label: `ID: ${q.id} - ${q.info?.name}` }))
+        return (this.advanced ? this.campaigns : this.campaigns.filter(c => c.owner[1] === this.$auth.user.accountName))
           .map(c => ({ ...c }))
           .map(c => ({ id: c.id, label: `ID: ${c.id} - ${c.info?.title}` }))
-          // TODO add extra map here to add the info object to the top of the object. instead of  being nested.
-          // How do I want to display the data?
-          // ID: 123 - Title name goes here.
       }
     }
   },
