@@ -30,6 +30,7 @@ jobs:
 
       - run: npm ci
       - run: npm run generate
+      - run: rm ./dist/CNAME && mv ./dist/CNAME_TESTNET ./dist/CNAME
 
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
