@@ -2,6 +2,29 @@
 
 # Force Frontend
 
+# Production Deploy
+The [mainnet](https://app.effect.network) and [testnet](https://testnet.effect.network) version of the Force are on two different repo's.
+
+```bash
+
+# Add remote, if you haven't added it already!
+git remote add prd git@github.com:effectai/force-frontend-prd.git
+
+# Fetch remote info
+git fetch
+
+# Switch to branch prd/deploy
+git switch deploy
+
+# Merge changes from your branch
+git merge <your-branch>
+
+# Push deploy to prd
+git push
+
+# Go to Github and make a Pull Request from deploy to mainnet-config
+```
+
 ## Build Setup
 
 ```bash
