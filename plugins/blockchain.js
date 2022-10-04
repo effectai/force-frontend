@@ -492,7 +492,7 @@ export default (context, inject) => {
         return await this.sdk.force.getQualifications(nextKey, limit, processQualification)
       },
       async getAssignedQualifications (nextKey, limit = 50, processQualification = false) {
-        if (context.$auth.user === undefined || context.$auth.user === null) {
+        if (context.$auth.user === undefined || context.$auth.user === null || !context.$auth.user.vAccountRows) {
           return null
         }
         return await this.sdk.force.getAssignedQualifications(nextKey, limit, processQualification, context.$auth.user.vAccountRows[0].id)
