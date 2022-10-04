@@ -1,80 +1,123 @@
 <template>
-  <section class="section">
-    <div class="container">
+  <section class="section columns is-centered">
+    <aside class="column is-2 is-fullheight pt-6">
+      <ul class="menu-list">
+        <li c>
+          <a
+            href="#"
+            class="py-3 is-flex is-align-items-center"
+            :class="{'is-active': activeTab === 'account'}"
+            @click.prevent="activeTab = 'account'"
+          >
+            <div><font-awesome-icon class="icon" icon="fa-solid fa-user" /></div>
+            Effect Account
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="py-3 is-flex is-align-items-center"
+            :class="{'is-active': activeTab === 'qualifications'}"
+            @click.prevent="activeTab = 'qualifications'"
+          >
+            <div><font-awesome-icon class="icon" icon="fa-solid fa-trophy" /></div>
+            Qualifications
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="py-3 is-flex is-align-items-center"
+            :class="{'is-active': activeTab === 'payouts'}"
+            @click.prevent="activeTab = 'payouts'"
+          >
+            <div><font-awesome-icon class="icon" icon="fa-solid fa-money-bills" /></div>
+            Payouts
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            class="py-3 is-flex is-align-items-center"
+            :class="{'is-active': activeTab === 'transactions'}"
+            @click.prevent="activeTab = 'transactions'"
+          >
+            <div><font-awesome-icon class="icon" icon="fa-solid fa-book" /></div>
+            Transactions
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <div class="column is-7 pt-6 has-background-white section">
       <div class="text-center">
-        <h1 class="title is-spaced has-text-weight-bold">
-          <!-- Effect Account (ID: {{ $auth.user.vAccountRows[0].id }}) -->
-          Effect Account | {{ $auth.user.provider }}@{{ $auth.user.blockchain }}
-        </h1>
-        <balance />
-        <hr>
-        <div class="columns my-auto">
-          <div class="column">
-            <div class="block">
-              <div class="has-text-weight-bold is-size-6 is-vecentered" style="min-height: 32px;">
-                <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
-                <span v-if="$auth.user.blockchain === 'bsc'">
-                  <span>&nbsp;BSC Address</span>
-                  <button v-if="$auth.user.provider === 'burner-wallet'" class="button is-info is-light is-small" @click="showPK = !showPK">
-                    <span>
-                      <font-awesome-icon class="is-small icon" icon="fa-solid fa-key" />
-                    </span>
-                  </button>
-                </span>
+        <div v-if="activeTab === 'account'">
+          <h2 class="title is-4 is-spaced">
+            Effect Account
+          </h2>
+          <div class="columns my-auto">
+            <div class="column">
+              <div class="block">
+                <div class="has-text-weight-bold is-size-6 is-vecentered" style="min-height: 32px;">
+                  <span>{{ $auth.user.blockchain === 'bsc' ? '' : 'EOS Account Name' }}</span>
+                  <span v-if="$auth.user.blockchain === 'bsc'">
+                    <span>&nbsp;BSC Address</span>
+                    <button v-if="$auth.user.provider === 'burner-wallet'" class="button is-info is-light is-small" @click="showPK = !showPK">
+                      <span>
+                        <font-awesome-icon class="is-small icon" icon="fa-solid fa-key" />
+                      </span>
+                    </button>
+                  </span>
+                </div>
+                <a
+                  v-if="$auth.user.blockchain === 'bsc'"
+                  :href="$blockchain.bsc.explorer + '/address/'+ $auth.user.address"
+                  target="_blank"
+                  class="blockchain-address is-flex is-clipped"
+                >{{ $auth.user.address }}</a>
+                <a
+                  v-else
+                  :href="$blockchain.eos.explorer + '/address/'+ $auth.user.accountName"
+                  target="_blank"
+                  class="blockchain-address"
+                >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
               </div>
-              <a
-                v-if="$auth.user.blockchain === 'bsc'"
-                :href="$blockchain.bsc.explorer + '/address/'+ $auth.user.address"
-                target="_blank"
-                class="blockchain-address is-flex is-clipped"
-              >{{ $auth.user.address }}</a>
-              <a
-                v-else
-                :href="$blockchain.eos.explorer + '/address/'+ $auth.user.accountName"
-                target="_blank"
-                class="blockchain-address"
-              >{{ $auth.user.accountName }}</a><span v-if="$auth.user.permission">@{{ $auth.user.permission }}</span>
+            </div>
+            <div class="column">
+              <div class="block">
+                <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
+                  Account Name
+                </div>
+                <a
+                  class="is-flex is-clipped"
+                  :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.accountContract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.accountContract}&scope=${$blockchain.sdk.account.config.accountContract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
+                  target="_blank"
+                >{{ $auth.user.accountName }}</a>
+              </div>
+            </div>
+            <div class="column">
+              <div class="block">
+                <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
+                  ID
+                </div>
+                {{ $auth.user.vAccountRows[0].id }}
+              </div>
+            </div>
+            <div class="column">
+              <div class="block">
+                <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
+                  Manage
+                </div>
+                <nuxt-link to="/manage">
+                  Tasks & Qualifications You Created
+                </nuxt-link>
+              </div>
             </div>
           </div>
-          <div class="column">
-            <div class="block">
-              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
-                Account Name
-              </div>
-              <a
-                class="is-flex is-clipped"
-                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.account.config.accountContract}?loadContract=true&tab=Tables&table=account&account=${$blockchain.sdk.account.config.accountContract}&scope=${$blockchain.sdk.account.config.accountContract}&limit=1&lower_bound=${$auth.user.vAccountRows[0].id}&upper_bound=${$auth.user.vAccountRows[0].id}`"
-                target="_blank"
-              >{{ $auth.user.accountName }}</a>
-            </div>
-          </div>
-          <div class="column">
-            <div class="block">
-              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
-                ID
-              </div>
-              {{ $auth.user.vAccountRows[0].id }}
-            </div>
-          </div>
-          <div class="column">
-            <div class="block">
-              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
-                Manage
-              </div>
-              <nuxt-link to="/manage">Tasks & Qualifications You Created</nuxt-link>
-            </div>
-          </div>
-          <div class="column">
-            <div class="block">
-              <div class="has-text-weight-bold is-size-6" style="min-height: 32px;">
-                Transactions
-              </div>
-              <nuxt-link to="/profile/transactions">View Transactions</nuxt-link>
-            </div>
-          </div>
+          <hr>
+          <balance />
         </div>
-        <hr>
-        <div v-if="$blockchain.efxPending !== 0" class="py-4">
+        <div v-if="activeTab === 'payouts'">
           <div>
             <h2 class="title is-4">
               Pending Payout
@@ -92,15 +135,8 @@
             <button v-else disabled="disabled" class="button is-fullwidth-mobile is-primary">
               <p>... EFX</p>
             </button>
-            <div class="payout-detail mt-3" @click="showPayoutDetails = !showPayoutDetails">
-              <span>
-                View Details
-                <font-awesome-icon v-if="!showPayoutDetails" class="ml-1 icon" icon="fa-solid fa-chevron-down" style="width: 10px;" />
-                <font-awesome-icon v-else class="ml-1 icon" icon="fa-solid fa-chevron-up" style="width: 10px;" />
-              </span>
-            </div>
           </div>
-          <div v-if="showPayoutDetails" class="mt-5 payout-table">
+          <div class="mt-5 payout-table">
             <div v-if="pendingPayoutsStore" class="table-container">
               <table class="table" style="width: 100%">
                 <thead>
@@ -163,9 +199,9 @@
         </div>
 
         <!-- Qualifications -->
-        <div class="py-2">
-          <h2 class="title is-4 mt-6 is-spaced">
-            Your Qualifications
+        <div v-if="activeTab === 'qualifications'">
+          <h2 class="title is-4 is-spaced">
+            Your Earned Qualifications
           </h2>
           <div v-if="assignedQualifications && assignedQualifications.length > 0" class="columns is-mobile is-multiline is-max-widescreen">
             <div
@@ -174,12 +210,62 @@
               class="is-1-desktop column is-one-quarter-mobile quali"
             >
               <nuxt-link v-if="!q.info.ishidden || q.account_id === $auth.user.vAccountRows[0].id" :to="`/qualifications/${q.id}`" :data-tooltip="q.info.name">
-                <img :src="q.info.image" v-if="q.info.image">
-                <img :src="require(`~/assets/img/dapps/effect-force-icon.png`)" v-else>
+                <img v-if="q.info.image" :src="q.info.image">
+                <img v-else :src="require(`~/assets/img/dapps/effect-force-icon.png`)">
               </nuxt-link>
             </div>
           </div>
-          <!-- <span v-else>No qualifications found</span> -->
+          <span v-else>No qualifications found</span>
+        </div>
+
+        <!-- Transactions -->
+        <div v-if="activeTab === 'transactions'">
+          <h2 class="title is-4 is-spaced">
+            Transactions
+          </h2>
+          <p class="mb-5">
+            Transaction made by this account on Effect Force.*
+          </p>
+          <div class="table-container">
+            <table class="table" style="width: 100%">
+              <thead>
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="transaction in paginatedTransactions"
+                  :key="transaction.transaction_id"
+                >
+                  <td>
+                    <a
+                      :href="`${$blockchain.eos.explorer}/transaction/${transaction.transaction_id}`"
+                      target="_blank"
+                    >{{ transaction.transaction_id.substr(0, 30) }}&hellip;</a>
+                  </td>
+                  <td><span v-if="transaction.processed && transaction.processed.action_traces">{{ transaction.processed.action_traces[0].act.name }}</span></td>
+                  <td><span v-if="transaction.processed">{{ new Date(transaction.processed.block_time).toLocaleString() }}</span></td>
+                  <td><span v-if="transaction.processed && transaction.processed.receipt">{{ transaction.processed.receipt.status }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- <span v-else>No transactions found</span> -->
+          <pagination
+            v-if="transactions"
+            :items="transactions.length"
+            :page="page"
+            :per-page="perPage"
+            @setPage="setPage"
+          />
+          <p class="is-size-7">
+            * This list may vary on different devices, as the transactions are saved locally in the browser.
+          </p>
         </div>
 
         <hr>
@@ -204,26 +290,31 @@ import VueCountdown from '@chenfengyuan/vue-countdown/dist/vue-countdown.common'
 import Balance from '@/components/Balance'
 import KeyModal from '@/components/KeyModal.vue'
 import SuccessModal from '@/components/SuccessModal'
+import Pagination from '@/components/Pagination.vue'
 
 export default {
-  components: { Balance, KeyModal, VueCountdown, SuccessModal },
+  components: { Balance, KeyModal, VueCountdown, SuccessModal, Pagination },
   filters: {},
   middleware: ['auth'],
   data () {
     return {
       loading: null,
       pendingPayouts: [],
-      showPayoutDetails: false,
       successMessage: null,
       successTitle: null,
-      showPK: false
+      showPK: false,
+      activeTab: 'account',
+      page: 1,
+      perPage: 10,
+      pages: []
     }
   },
   computed: {
     ...mapGetters({
       getPendingPayouts: 'pendingPayout/getPendingPayouts',
       campaignById: 'campaign/campaignById',
-      activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId'
+      activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId',
+      transactionsByUser: 'transaction/transactionsByUser'
     }),
     ...mapState({
       assignedQualifications: state => state.qualification.assignedQualifications
@@ -248,6 +339,16 @@ export default {
     },
     pendingPayoutsStore () {
       return this.getPendingPayouts ?? null
+    },
+    transactions () {
+      return this.transactionsByUser(this.$auth.user.vAccountRows[0].id)
+    },
+    paginatedTransactions () {
+      const start = (this.page - 1) * this.perPage
+      if (this.transactions) {
+        return this.transactions.slice(start, start + this.perPage)
+      }
+      return []
     }
   },
   mounted () {
@@ -299,6 +400,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.menu-list {
+  svg {
+    height: 1.2em;
+  }
+  a {
+    border-radius: 7px !important;
+    div {
+      width: 30px;
+      margin-right: 5px;
+    }
+  }
+}
+
 button.button.is-small.is-info {
   border-radius: 8px;
 }
