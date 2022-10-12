@@ -166,10 +166,7 @@
               ...
             </p>
           </div>
-          <div v-if="body === 'preview'" class="block" style="position:relative;">
-            <div id="preview-overlay" class="is-flex is-justify-content-center is-align-items-center">
-              <h2 class="title is-2">Task Preview</h2>
-            </div>
+          <div v-if="body === 'preview'" class="block">
             <template-media
               v-if="campaign && campaign.info"
               :html="renderTemplate(
@@ -635,13 +632,5 @@ export default {
       }
     }
   }
-}
-#preview-overlay {
-  z-index: 10;
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  top: 0; bottom: 0; left: 0; right: 0;
-  background: rgba(255,255,255,0.2);
 }
 </style>
