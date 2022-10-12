@@ -53,7 +53,7 @@
       <div class="text-center">
         <div v-if="activeTab === 'account'">
           <h2 class="title is-4 is-spaced">
-            Effect Account
+            Account Info
           </h2>
           <div class="columns my-auto">
             <div class="column">
@@ -115,8 +115,19 @@
             </div>
           </div>
           <hr>
-          <balance />
+          <h2 class="title is-5 is-spaced">
+            Balances
+          </h2>
+          <balance class="balance-block" />
+          <hr>
+          <button class="button is-white" exact-active-class="is-active" @click="logout">
+            <span class="icon">
+              <img src="~assets/img/icons/logout.svg" style="height: 18px">
+            </span>
+            <span class="is-size-7">Logout</span>
+          </button>
         </div>
+        <!-- Payouts -->
         <div v-if="activeTab === 'payouts'">
           <div>
             <h2 class="title is-4">
@@ -267,15 +278,6 @@
             * This list may vary on different devices, as the transactions are saved locally in the browser.
           </p>
         </div>
-
-        <hr>
-        <button class="button is-white" exact-active-class="is-active" @click="logout">
-          <span class="icon">
-            <img src="~assets/img/icons/logout.svg" style="height: 24px">
-          </span>
-          <span>Logout</span>
-        </button>
-        <br><br>
       </div>
       <key-modal v-if="showPK" :message="$auth.user.privateKey" :title="'PrivateKey 🔑'" @close="showPK = !showPK" />
       <!-- SuccessModal -->
@@ -438,6 +440,9 @@ button.button.is-small.is-info {
     float: none !important;
     margin-bottom: 25px;
   }
+  .menu-list {
+    border-bottom: 1px solid $light;
+  }
 }
 .quali {
   img {
@@ -445,6 +450,12 @@ button.button.is-small.is-info {
     object-fit: contain;
     margin: 0 auto;
     display: block;
+  }
+}
+
+.balance-block {
+  .column {
+    width: 33%;
   }
 }
 </style>
