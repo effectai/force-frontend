@@ -455,10 +455,4 @@ button.button.is-small.is-info {
     display: block;
   }
 }
-
-.balance-block {
-  .column {
-    width: 33%;
-  }
-}
 </style>
