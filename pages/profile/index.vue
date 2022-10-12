@@ -165,7 +165,7 @@
                     :key="pendingPayout.id"
                   >
                     <td>
-                      <nuxt-link :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">
+                      <nuxt-link v-if="campaignById($blockchain.splitCompositeKey(pendingPayout.batch_id).campaign)" :to="{ path: `/campaigns/${$blockchain.splitCompositeKey(pendingPayout.batch_id).campaign}`}">
                         {{ campaignById($blockchain.splitCompositeKey(pendingPayout.batch_id).campaign).info.title }}
                       </nuxt-link>
                     </td>
@@ -354,7 +354,6 @@ export default {
     }
   },
   mounted () {
-    console.log('mounted')
     this.$store.dispatch('pendingPayout/loadPendingPayouts')
     // console.debug(this.$auth)
   },
@@ -442,6 +441,10 @@ button.button.is-small.is-info {
   }
   .menu-list {
     border-bottom: 1px solid $light;
+  }
+  aside {
+    padding-top: 0 !important;
+    padding-bottom: 0;
   }
 }
 .quali {

@@ -1,7 +1,7 @@
-![example workflow](https://github.com/effectai/force-frontend-new/actions/workflows/ci.yml/badge.svg)
-
 # Force Frontend
+https://app.effect.network
 
+[![Effect Force Select Screen](docs/Effect-Force_Select-Screen.gif)](https://app.effect.network)
 ## Build Setup
 
 ```bash
@@ -29,4 +29,4 @@ npm link /path/to/effect-js/
 When you make changes to the SDK you should run `npm run build:cjs` in that,
 after which the force frontend will automatically reload the changes.
 
-# Node version V.16
+# Node version V.14

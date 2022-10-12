@@ -6,7 +6,7 @@
           <thead>
             <tr>
               <th />
-              <th></th>
+              <th />
               <!-- <th>Requester</th> -->
             </tr>
           </thead>
@@ -104,7 +104,7 @@ export default {
     }),
     paginatedQualifications () {
       const start = (this.page - 1) * this.perPage
-      if (this.qualifications) {
+      if (this.qualifications && this.$auth.user) {
         return this.qualifications.filter(q => !q.info.ishidden || q.account_id === this.$auth.user.vAccountRows[0].id).slice(start, start + this.perPage)
       }
       return []

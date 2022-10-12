@@ -20,7 +20,7 @@
                   Effect Network is the platform for the Future-of-Work. You can
                   work from anywhere, at any time, from any device. Simply
                   create an Effect Account and start completing tasks while
-                  collecting $EFX directly to your wallet.
+                  collecting $EFX directly to your wallet!
                 </p>
                 <p class="block">
                   <nuxt-link class="button is-primary is-outlined is-medium" to="/login">

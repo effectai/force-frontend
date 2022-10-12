@@ -437,6 +437,9 @@ export default (context, inject) => {
       async resumeBatch (batch) {
         return await this.sdk.force.resumeBatch(batch)
       },
+      async deleteBatch (batchId, campaignId) {
+        return await this.sdk.force.deleteBatch(batchId, campaignId)
+      },
       async editCampaign (id, hash, reward, qualis) {
         return await this.sdk.force.editCampaign(id, hash, reward, qualis)
       },
@@ -489,7 +492,7 @@ export default (context, inject) => {
         return await this.sdk.force.getQualifications(nextKey, limit, processQualification)
       },
       async getAssignedQualifications (nextKey, limit = 50, processQualification = false) {
-        if (context.$auth.user === undefined || context.$auth.user === null) {
+        if (context.$auth.user === undefined || context.$auth.user === null || !context.$auth.user.vAccountRows) {
           return null
         }
         return await this.sdk.force.getAssignedQualifications(nextKey, limit, processQualification, context.$auth.user.vAccountRows[0].id)
