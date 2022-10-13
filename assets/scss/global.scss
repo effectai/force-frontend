@@ -80,6 +80,9 @@ a.card {
 }
 
 .notification {
+  &.has-border {
+    border: 1px solid $grey-lighter;
+  }
   &.is-primary {
     &.is-outlined {
       border: 2px solid $primary;
