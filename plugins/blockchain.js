@@ -143,6 +143,7 @@ export default (context, inject) => {
               account: this.account,
               $blockchain: this
             })
+            context.store.dispatch('qualification/getAssignedQualifications')
             this.getAccountBalance()
             this.getPendingBalance()
             this.getPayoutBalance()

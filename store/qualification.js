@@ -8,6 +8,9 @@ export default {
     SET_LOADING (state, loading) {
       state.loading = loading
     },
+    SET_LOADING_ASSIGNED (state, loading) {
+      state.loadingAssigned = loading
+    },
     UPSERT_QUALIFICATIONS (state, qualifications) {
       if (!state.qualifications) {
         // We have no qualifications yet
@@ -62,6 +65,7 @@ export default {
     },
     CLEAR_ALL_ASSIGNED_QUALIFICATIONS (state) {
       state.assignedQualifications = null
+      state.allAssignedQualificationsLoaded = false
     }
   },
   getters: {
@@ -135,11 +139,15 @@ export default {
       }
     },
     async getAssignedQualifications ({ dispatch, rootGetters, commit, state }, nextKey) {
-      if (!nextKey && state.loading) {
+      if (!state.allQualificationsLoaded) {
+        await dispatch('getQualifications')
+        return
+      }
+      if (!nextKey && state.loadingAssigned) {
         console.log('Already retrieving assigned qualifications somewhere else, aborting..')
         return
       }
-      commit('SET_LOADING', true)
+      commit('SET_LOADING_ASSIGNED', true)
       try {
         const data = await this.$blockchain.getAssignedQualifications(nextKey, 200, false)
 
@@ -165,15 +173,15 @@ export default {
           } else {
           // No more Qualifications, we are done
             commit('SET_ALL_ASSIGNED_QUALIFICATION_LOADED', true)
-            commit('SET_LOADING', false)
+            commit('SET_LOADING_ASSIGNED', false)
           }
         } else {
-          commit('SET_LOADING', false)
+          commit('SET_LOADING_ASSIGNED', false)
           console.error('could not yet retrieve assigned qualifications')
         }
       } catch (error) {
         this.$blockchain.handleError(error)
-        commit('SET_LOADING', false)
+        commit('SET_LOADING_ASSIGNED', false)
       }
     },
     async processQualification ({ commit, rootGetters, dispatch }, qualification) {
@@ -200,6 +208,7 @@ export default {
       qualifications: null,
       assignedQualifications: null,
       loading: false,
+      loadingAssigned: false,
       allQualificationsLoaded: false,
       allAssignedQualificationsLoaded: false
     }

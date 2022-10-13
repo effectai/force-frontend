@@ -153,6 +153,7 @@ export default {
       allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
       allBatchesLoaded: state => state.campaign.allBatchesLoaded,
       allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded,
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
       advanced: state => state.view.advanced
     }),
     list: {
@@ -183,6 +184,9 @@ export default {
       this.page = newPage
     },
     getForceInfo () {
+      if (!this.allQualificationsLoaded) {
+        this.$store.dispatch('qualification/getQualifications')
+      }
       if (!this.campaigns || !this.allCampaignsLoaded) {
         // on the requester campaign list process all campaignss
         this.$store.dispatch('campaign/getCampaigns')

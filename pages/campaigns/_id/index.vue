@@ -285,7 +285,7 @@
                     >
                       <label class="b-checkbox checkbox is-medium tag is-light is-success is-size-6-mobile">
                         <input v-model="quali.userHasQuali" type="checkbox" disabled>
-                        <span class="check is-success"></span>
+                        <span class="check is-success" />
                         <span class="control-label">
                           <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
                         </span>
@@ -305,7 +305,7 @@
                     >
                       <label class="b-checkbox checkbox is-medium tag is-light is-danger is-size-6-mobile">
                         <input v-model="quali.userHasQuali" type="checkbox" disabled>
-                        <span class="check is-danger"></span>
+                        <span class="check is-danger" />
                         <span class="control-label">
                           <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
                         </span>
@@ -519,7 +519,9 @@ export default {
       getAssignedQualifications: 'qualification/getAssignedQualifications'
     }),
     async bootup () {
-      await this.getAssignedQualifications()
+      if (!this.allQualificationsLoaded) {
+        await this.$store.dispatch('qualification/getQualifications')
+      }
       await this.checkUserCampaign()
       await this.getCampaign()
       await this.getBatches()

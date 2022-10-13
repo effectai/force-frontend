@@ -3,6 +3,38 @@
     <bsc-wallet />
     <eos-wallet />
     <error-modal />
+    <div style="position: fixed; bottom:5px; left:5px; z-index:2;">
+      <div v-if="!allCampaignsLoaded" class="notification has-border">
+        <span :class="{'loading-text': campaignsLoading}">Campaigns loading: {{ campaigns ? campaigns.length : 0 }}</span>
+      </div>
+      <div v-else-if="campaignsLoading" class="notification has-border">
+        <span class="loading-text">Refreshing {{ campaigns.length }} campaigns</span>
+      </div>
+      <div v-if="!allBatchesLoaded" class="notification has-border">
+        <span :class="{'loading-text': batchesLoading}">Batches loading: {{ batches ? batches.length : 0 }}</span>
+      </div>
+      <div v-else-if="batchesLoading" class="notification has-border">
+        <span class="loading-text">Refreshing {{ batches.length }} batches</span>
+      </div>
+      <div v-if="!allSubmissionsLoaded" class="notification has-border">
+        <span :class="{'loading-text': submissionsLoading}">Submissions loading: {{ submissions ? submissions.length : 0 }}</span>
+      </div>
+      <div v-else-if="submissionsLoading" class="notification has-border">
+        <span class="loading-text">Refreshing {{ submissions.length }} submissions</span>
+      </div>
+      <div v-if="!allQualificationsLoaded" class="notification has-border">
+        <span :class="{'loading-text': qualificationsLoading}">Qualifications loading: {{ qualifications ? qualifications.length : 0 }}</span>
+      </div>
+      <div v-else-if="qualificationsLoading" class="notification has-border">
+        <span class="loading-text">Refreshing {{ qualifications.length }} qualifications</span>
+      </div>
+      <div v-if="!allAssignedQualificationsLoaded" class="notification has-border">
+        <span :class="{'loading-text': assignedQualificationsLoading}">Assigned Qualifications loading: {{ assignedQualifications ? assignedQualifications.length : 0 }}</span>
+      </div>
+      <div v-else-if="assignedQualificationsLoading" class="notification has-border">
+        <span class="loading-text">Refreshing {{ assignedQualifications.length }} assigned qualifications</span>
+      </div>
+    </div>
     <chain-status v-if="$auth && $auth.loggedIn" />
     <div class="notif-banner is-size-6">
       <div class="container">
@@ -22,6 +54,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import BscWallet from '@/components/BscWallet'
 import EosWallet from '@/components/EosWallet'
 import NavBar from '@/components/NavBar'
@@ -50,6 +83,23 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      campaigns: state => state.campaign.campaigns,
+      campaignsLoading: state => state.campaign.loading,
+      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
+      batches: state => state.campaign.batches,
+      batchesLoading: state => state.campaign.loadingBatch,
+      allBatchesLoaded: state => state.campaign.allBatchesLoaded,
+      submissions: state => state.campaign.submissions,
+      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded,
+      submissionsLoading: state => state.campaign.loadingSubmissions,
+      qualifications: state => state.qualification.qualifications,
+      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
+      qualificationsLoading: state => state.qualification.loading,
+      assignedQualifications: state => state.qualification.assignedQualifications,
+      allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded,
+      assignedQualificationsLoading: state => state.qualification.loadingAssigned
+    })
   },
   created () {
   },
