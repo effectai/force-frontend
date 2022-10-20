@@ -125,7 +125,7 @@ export default {
                     } else {
                       tasks[batchSubmission.leaf_hash]++
                     }
-                    if (tasks[batchSubmission.leaf_hash] >= batch.repetitions) {
+                    if (tasks[batchSubmission.leaf_hash] === batch.repetitions) {
                       realTasksDone++
                     }
                   }
@@ -134,7 +134,9 @@ export default {
               } else {
                 realTasksDone = batch.tasks_done
               }
-              return a + realTasksDone
+
+              // TODO: for some reason, often realTasksDone is bigger than num_tasks how is that possible?
+              return a + Math.min(realTasksDone, batch.num_tasks)
             }, 0)
           }
           filteredCampaigns[i].joinable = this.checkUserQualify(filteredCampaigns[i])

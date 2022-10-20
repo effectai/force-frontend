@@ -215,7 +215,31 @@ export default {
 
           if (data.rows.length > 0) {
             const batch = data.rows[0]
-            batch.real_tasks_done = Math.floor(batch.tasks_done / batch.repetitions)
+            const batchSubmissions = state.submissions ? state.submissions.filter(s => s.batch_id === batch.batch_id) : null
+            if (batch.repetitions > 1 && batchSubmissions && batch.tasks_done < batch.num_tasks * batch.repetitions) {
+              batch.real_tasks_done = 0
+              const tasks = {}
+              for (const batchSubmission of batchSubmissions) {
+                if (!tasks[batchSubmission.leaf_hash]) {
+                  tasks[batchSubmission.leaf_hash] = 0
+                }
+                if (tasks[batchSubmission.leaf_hash] < batch.repetitions) {
+                  if (this.$auth.user && this.$auth.user.vAccountRows && parseInt(batchSubmission.account_id) === parseInt(this.$auth.user.vAccountRows[0].id)) {
+                    if (batchSubmission.submitted_on) {
+                      // user already submitted this task
+                      tasks[batchSubmission.leaf_hash] = batch.repetitions
+                    }
+                  } else {
+                    tasks[batchSubmission.leaf_hash]++
+                  }
+                  if (tasks[batchSubmission.leaf_hash] >= batch.repetitions) {
+                    batch.real_tasks_done++
+                  }
+                }
+              }
+            } else {
+              batch.real_tasks_done = Math.floor(batch.tasks_done / batch.repetitions)
+            }
             await commit('ADD_BATCH', batch)
           } else {
             throw new Error('Cannot find batch with the given id.')
