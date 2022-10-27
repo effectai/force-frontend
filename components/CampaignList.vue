@@ -192,10 +192,12 @@ export default {
         this.$store.dispatch('campaign/getCampaigns')
       }
       if (!this.allBatchesLoaded) {
-        this.$store.dispatch('campaign/getBatches')
-      }
-      if (!this.allSubmissionsLoaded) {
-        this.$store.dispatch('campaign/getSubmissions')
+        (async () => {
+          await this.$store.dispatch('campaign/getBatches')
+          if (!this.allSubmissionsLoaded) {
+            this.$store.dispatch('campaign/getSubmissionsForActiveBatches')
+          }
+        })()
       }
     }
   }

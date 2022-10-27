@@ -77,9 +77,11 @@ export default (context, inject) => {
     methods: {
       updateForceInfo () {
         // console.log('updating campaigns and batches and submissions..')
-        context.store.dispatch('campaign/getCampaigns')
-        context.store.dispatch('campaign/getBatches')
-        context.store.dispatch('campaign/getSubmissions')
+        context.store.dispatch('campaign/getCampaigns');
+        (async () => {
+          await context.store.dispatch('campaign/getBatches')
+          context.store.dispatch('campaign/getSubmissionsForActiveBatches')
+        })()
         context.store.dispatch('qualification/getQualifications')
         context.store.dispatch('pendingPayout/loadPendingPayouts')
       },

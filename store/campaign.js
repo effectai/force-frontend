@@ -371,6 +371,49 @@ export default {
         commit('SET_LOADING_SUBMISSIONS', false)
       }
     },
+    async getSubmissionsForBatch ({ commit }, batchId) {
+      commit('SET_LOADING_SUBMISSIONS', true)
+      try {
+        console.log('retrieving submissions for batch', batchId)
+        const data = await this.$blockchain.getSubmissionsAndReservationsForBatch(batchId)
+        const submissions = data.map(function (x) {
+          x.batch_id = parseInt(x.batch_id)
+          return x
+        })
+        commit('UPSERT_SUBMISSIONS', submissions)
+        commit('SET_LOADING_SUBMISSIONS', false)
+      } catch (error) {
+        this.$blockchain.handleError(error)
+        commit('SET_LOADING_SUBMISSIONS', false)
+      }
+    },
+    async getSubmissionsForActiveBatches ({ dispatch, commit, state }) {
+      if (state.loadingSubmissions) {
+        console.error('Already retrieving submissions somewhere else, aborting..')
+        return
+      }
+      if (!state.allBatchesLoaded) {
+        console.error('Please load all batches first before retrieving active submissions, aborting..')
+        return
+      }
+      commit('SET_LOADING_SUBMISSIONS', true)
+      try {
+        for (let i = 0; i < state.batches.length; i++) {
+          if (state.batches[i].tasks_done < state.batches[i].num_tasks * state.batches[i].repetitions) {
+            console.log('retrieving submissions for batch', state.batches[i].batch_id)
+            const data = await this.$blockchain.getSubmissionsAndReservationsForBatch(state.batches[i].batch_id)
+            const submissions = data.map(function (x) {
+              x.batch_id = parseInt(x.batch_id)
+              return x
+            })
+            commit('UPSERT_SUBMISSIONS', submissions)
+          }
+        }
+      } catch (error) {
+        this.$blockchain.handleError(error)
+      }
+      commit('SET_LOADING_SUBMISSIONS', false)
+    },
     async getSubmissions ({ dispatch, commit, state }, nextKey) {
       if (!nextKey && state.loadingSubmissions) {
         console.log('Already retrieving submissions somewhere else, aborting..')

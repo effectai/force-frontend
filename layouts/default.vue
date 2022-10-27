@@ -16,11 +16,8 @@
       <div v-else-if="batchesLoading" class="notification has-border">
         <span class="loading-text">Refreshing {{ batches.length }} batches</span>
       </div>
-      <div v-if="!allSubmissionsLoaded" class="notification has-border">
-        <span :class="{'loading-text': submissionsLoading}">Submissions loading: {{ submissions ? submissions.length : 0 }}</span>
-      </div>
-      <div v-else-if="submissionsLoading" class="notification has-border">
-        <span class="loading-text">Refreshing {{ submissions.length }} submissions</span>
+      <div v-if="submissionsLoading" class="notification has-border">
+        <span class="loading-text">Refreshing {{ submissions ? submissions.length : 0 }} submissions</span>
       </div>
       <div v-if="!allQualificationsLoaded" class="notification has-border">
         <span :class="{'loading-text': qualificationsLoading}">Qualifications loading: {{ qualifications ? qualifications.length : 0 }}</span>
