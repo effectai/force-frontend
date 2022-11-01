@@ -21,13 +21,13 @@
           <div class="columns is-multiline">
             <div class="column is-half">
               <div class="provider has-radius" @click="selectWallet(providers.anchor)">
-                <img src="@/assets/img/providers/anchor.svg">
+                <a><img src="@/assets/img/providers/anchor.svg"></a>
                 Anchor
               </div>
             </div>
             <div class="column is-half">
               <div class="provider has-radius" @click="selectWallet(providers.scatter)">
-                <img src="@/assets/img/providers/scatter.svg">
+                <a><img src="@/assets/img/providers/scatter.svg"></a>
                 Scatter
               </div>
             </div>
