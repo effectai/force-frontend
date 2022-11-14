@@ -21,19 +21,19 @@ export default (context, inject) => {
         await context.$auth.logout()
       },
       addNotificationToastNewQualification (quali) {
-        const rejected = quali.info.ishidden
+        const rejected = quali.info?.ishidden
         context.store.dispatch('notification/addNotification', {
           type: rejected ? 'QUALIFICATION_REJECTED' : 'QUALIFICATION_ACCEPTED',
-          message: rejected ? 'Your qualification has been rejected.' : `Your qualification has been validated. You can now start working on campaigns that require the ${quali.info.name} qualification. You can find your qualification in the profile page.`,
+          message: rejected ? 'Your qualification has been rejected.' : `Your qualification has been validated. You can now start working on campaigns that require the ${quali.info?.name} qualification. You can find your qualification in the profile page.`,
           account_id: quali.account_id,
-          taskGroupName: quali.info.name,
+          taskGroupName: quali.info?.name,
           qualification_id: quali.id,
           createdAt: new Date(),
           qualification_image: quali.info.image
         })
 
         toast({
-          message: `Qualification ${quali.info.name} assigned to you.`,
+          message: `Qualification ${quali.info?.name} assigned to you.`,
           type: rejected ? 'is-danger' : 'is-success',
           // dismissible: true,
           // animate: { in: 'fadeIn', out: 'fadeOut' },
@@ -47,7 +47,7 @@ export default (context, inject) => {
           // alert('This browser does not support desktop notification')
         } else if (Notification.permission === 'granted') {
           // eslint-disable-next-line no-new
-          new Notification(`Qualification ${quali.info.name} assigned to you.`, {
+          new Notification(`Qualification ${quali.info?.name} assigned to you.`, {
             body: 'You can now start working on campaigns that require the qualification.',
             icon: quali.info.image
           })
@@ -55,7 +55,7 @@ export default (context, inject) => {
           Notification.requestPermission(function (permission) {
             if (permission === 'granted') {
               // eslint-disable-next-line no-new
-              new Notification(`Qualification ${quali.info.name} assigned to you.`, {
+              new Notification(`Qualification ${quali.info?.name} assigned to you.`, {
                 body: 'You can now start working on campaigns that require the qualification.',
                 icon: quali.info.image
               })

@@ -287,7 +287,7 @@
                         <input v-model="quali.userHasQuali" type="checkbox" disabled>
                         <span class="check is-success" />
                         <span class="control-label">
-                          <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
+                          <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info?.name }}</nuxt-link>
                         </span>
                       </label>
                     </div>
@@ -307,7 +307,7 @@
                         <input v-model="quali.userHasQuali" type="checkbox" disabled>
                         <span class="check is-danger" />
                         <span class="control-label">
-                          <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
+                          <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info?.name }}</nuxt-link>
                         </span>
                       </label>
                     </div>

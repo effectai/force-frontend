@@ -420,10 +420,10 @@ export default {
       const qualifications = []
       const selectableQualifications = this.$store.state.qualification.qualifications.filter(q => (q.account_id === this.$auth.user.vAccountRows[0].id || q.account_id === this.$blockchain.sdk.config.qualifierAccountId))
       for (const qualification of selectableQualifications) {
-        if (qualification.info.name) {
+        if (qualification.info?.name) {
           qualifications.push(
             {
-              name: qualification.info.name,
+              name: qualification.info?.name,
               code: qualification.id
             }
           )
