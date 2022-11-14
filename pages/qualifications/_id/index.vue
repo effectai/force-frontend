@@ -34,8 +34,8 @@
             <div class="title has-text-weight-bold">
               <span>#{{ id }}</span>
               <span v-if="!singleQualification.info" class="loading-text">Loading</span>
-              <span v-else-if="!singleQualification.info.name || singleQualification.info.name.length == 0">Untitled</span>
-              <span v-else>{{ singleQualification.info.name }}</span>
+              <span v-else-if="!singleQualification.info?.name || singleQualification.info?.name.length == 0">Untitled</span>
+              <span v-else>{{ singleQualification.info?.name }}</span>
             </div>
           </div>
 

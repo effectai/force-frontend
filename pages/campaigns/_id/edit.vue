@@ -467,10 +467,10 @@ export default {
       const qualifications = []
       const selectableQualifications = this.$store.state.qualification.qualifications.filter(q => (q.account_id === this.$auth.user.vAccountRows[0].id || q.account_id === this.$blockchain.sdk.config.qualifierAccountId))
       for (const qualification of selectableQualifications) {
-        if (qualification.info.name) {
+        if (qualification.info?.name) {
           qualifications.push(
             {
-              name: qualification.info.name,
+              name: qualification.info?.name,
               code: qualification.id
             }
           )
@@ -563,10 +563,10 @@ export default {
             const q = this.qualificationById(quali.key)
             if (quali.value === 1) {
               if (this.exclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
-                this.addExclusiveQuali(q.info.name, quali.key)
+                this.addExclusiveQuali(q.info?.name, quali.key)
               }
             } else if (this.inclusiveQualis.filter(qf => qf.code === quali.key).length === 0) {
-              this.addInclusiveQuali(q.info.name, quali.key)
+              this.addInclusiveQuali(q.info?.name, quali.key)
             }
           }
           this.campaignIpfs = { ...this.campaign.info }
