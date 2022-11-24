@@ -37,3 +37,9 @@
     </div>
   </section>
 </template>
+
+export default {
+  name: 'SecurityPage',
+  middleware: ['auth']
+}
+</script>

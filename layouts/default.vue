@@ -42,6 +42,15 @@
         </div>
       </div>
     </div>
+    <div v-if="resourceIsLow" class="resource-banner is-size-6">
+      <div class="container">
+        <div class="columns">
+          <nuxt-link to="/status" class="column has-text-centered warning">
+            🔋 Effect Network Resources low, please donate »
+          </nuxt-link>
+        </div>
+      </div>
+    </div>
     <nav-bar />
     <div id="content">
       <Nuxt />
@@ -96,7 +105,19 @@ export default {
       assignedQualifications: state => state.qualification.assignedQualifications,
       allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded,
       assignedQualificationsLoading: state => state.qualification.loadingAssigned
-    })
+    }),
+    percentageRam () {
+      return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.ram_usage / this.$blockchain.relayerStatus.ram_quota * 100, 10) : 0
+    },
+    percentageNet () {
+      return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.net_limit.used / this.$blockchain.relayerStatus.net_limit.max * 100, 10) : 0
+    },
+    percentageCpu () {
+      return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.cpu_limit.used / this.$blockchain.relayerStatus.cpu_limit.max * 100, 10) : 0
+    },
+    resourceIsLow () {
+      return (this.percentageCpu > 90) || (this.percentageNet > 90) || (this.percentageRam > 95)
+    }
   },
   created () {
   },
@@ -107,6 +128,10 @@ export default {
 <style lang="scss">
 .notif-banner {
   background-color: $yellow;
+  padding: 0.4rem 0;
+}
+.resource-banner {
+  background-color: $red;
   padding: 0.4rem 0;
 }
 </style>

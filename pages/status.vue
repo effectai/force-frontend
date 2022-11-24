@@ -3,8 +3,16 @@
     <div class="container">
       <div class="title">
         <span>
-          Relayer Status:
+          Relayer:
+          <a
+            :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.eosRelayerAccount}`"
+            target="_blank"
+            rel="noopener noreferrer"
+            >
+            {{ $blockchain.sdk.force.config.eosRelayerAccount }}
+            </a>
         </span>
+        <strong>-</strong>
         <strong>
           <span>
             <a
@@ -23,33 +31,72 @@
 
       <hr>
 
-      <div class="block mx-auto is-half-desktop">
-        <ul>
-          <li>
-            <div class="subtitle mx-auto has-text-centered">
-              <a class="button is-info" href="https://eospowerup.io/auto" target="_blank" rel="noopener noreferrer">
-                Power Up Relayer
-              </a>
-
-              <br>
-              <br>
-
-              <span>Relayer Contract:</span>
-              <a
-                :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.eosRelayerAccount}`"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {{ $blockchain.sdk.force.config.eosRelayerAccount }}
-              </a>
-
-              <br>
-            </div>
-          </li>
-
+      <div class="block">
+        <h1 class="subtitle has-text-centered">EOS Powerup</h1>
+        <p class="has-text-centered px-6 mx-6">
+          Please consider donating to the relayer contract to keep it running.
+          <br><br>
+          This will help the network to grow and become more decentralized.
           <br>
+          <ul>
+            <li>
+                Please click <strong>Powerup Relayer</strong>.
+            </li>
+            <li>
+                Fill in the account name: <strong>{{ $blockchain.sdk.force.config.eosRelayerAccount }}</strong>
+            </li>
+          </ul>
 
-          <li>
+                <br>
+                Thank you for your support!
+
+                <br><br>
+                <a class="button is-info" href="https://eospowerup.io/free" target="_blank" rel="noopener noreferrer">
+                  Powerup Relayer
+                </a>
+              <br>
+        </p>
+      </div>
+
+      <hr>
+
+      <div class="block has-text-centered">
+        <h1 class="subtitle">Bloks.io</h1>
+        <p class="has-text-centered" px-6 mx-6>
+            An alternative way to power up the relayer account is by using Bloks.io.
+            <br><br>
+            <ul mx-auto>
+                <li>
+                    Please click <strong>Powerup CPU/NET</strong> or <strong>Powerup RAM</strong>.
+                </li>
+                <li>
+                    Fill in the account name: <strong>{{ $blockchain.sdk.force.config.eosRelayerAccount }}</strong>
+                </li>
+                <li>
+                    Add the amount of CPU/NET or RAM you want to power up.
+                </li>
+                <li>
+                    click on the <strong>Power Up</strong> or <strong>Buy RAM</strong> button.
+                </li>
+            </ul>
+            <br>
+            Thank you for your support!
+        </p>
+        <br><br>
+        <div class="buttons is-centered">
+            <a class="button is-info" href="https://bloks.io/wallet/powerup" target="_blank" rel="noopener noreferrer">
+                Powerup CPU/NET
+            </a>
+            <a class="button is-info"  href="https://bloks.io/wallet/ram" target="_blank" rel="noopener noreferrer">Powerup Ram</a>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="block mx-auto mx-6 px-6 is-max-desktop">
+        <h1 class="subtitle has-text-centered">Relayer Resources</h1>
+        <ul>
+          <li class="px-6 mx-6">
             <div class="has-text-centered">
               RAM: <strong>{{ percentageRam }}% Used</strong>
               <br>
@@ -58,7 +105,7 @@
             <progress class="progress is-warning" name="progress" :value="relayerRamUsage" :max="relayerRamQuota" />
           </li>
           <br>
-          <li>
+          <li class="px-6 mx-6">
             <div class="has-text-centered">
               NET: <strong>{{ percentageNet }}% Used</strong>
               <br>
@@ -68,7 +115,7 @@
           </li>
 
           <br>
-          <li>
+          <li class="px-6 mx-6">
             <div class="has-text-centered">
               CPU: <strong>{{ percentageCpu }}% Used</strong>
               <br>
@@ -79,7 +126,10 @@
         </ul>
       </div>
 
+      <hr>
+
       <div class="block">
+        <h1 class="subtitle has-text-centered">Relayer Estimates</h1>
         <table class="table has-text-centered mx-auto">
           <thead>
             <th>Action</th>
@@ -97,26 +147,6 @@
           </tbody>
         </table>
       </div>
-      <div>
-        <table class="table mx-auto">
-          <thead>
-            <th>Configuration</th>
-            <th>Values</th>
-          </thead>
-          <tbody>
-            <tr v-for="(val, prop) in config" :key="val">
-              <td>{{ prop }}</td>
-              <td>{{ val }}</td>
-            </tr>
-            <tr>
-              <td>advanced</td>
-              <td>
-                <span class="is-clickable" @click="toggleAdvanced">{{ advanced }}</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
   </section>
 </template>
@@ -130,6 +160,7 @@ delete defaultConfig.web3
 
 export default {
   name: 'StatusPage',
+  middleware: ['auth'],
   data () {
     return {
       config: defaultConfig,
@@ -160,43 +191,33 @@ export default {
     relayer () {
       return this.$blockchain ? this.$blockchain.relayerStatus : null
     },
-
     accountNameRelayer () {
       return this.$blockchain.relayerStatus ? this.$blockchain.relayerStatus.account_name : '...'
     },
-
     relayerRamUsage () {
       return this.$blockchain.relayerStatus ? this.$blockchain.relayerStatus.ram_usage : 0
     },
-
     relayerRamQuota () {
       return this.$blockchain.relayerStatus ? this.$blockchain.relayerStatus.ram_quota : 0
     },
-
     relayerNetUsage () {
       return this.$blockchain.relayerStatus ? this.$blockchain.relayerStatus.net_limit.used : 0
     },
-
     relayerNetQuota () {
       return this.$blockchain.relayerStatus ? this.$blockchain.relayerStatus.net_limit.max : 0
     },
-
     relayerCpuUsage () {
       return this.$blockchain.relayerStatus ? this.$blockchain.relayerStatus.cpu_limit.used : 0
     },
-
     relayerCpuQuota () {
       return this.$blockchain.relayerStatus ? this.$blockchain.relayerStatus.cpu_limit.max : 0
     },
-
     percentageRam () {
       return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.ram_usage / this.$blockchain.relayerStatus.ram_quota * 100, 10) : 0
     },
-
     percentageNet () {
       return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.net_limit.used / this.$blockchain.relayerStatus.net_limit.max * 100, 10) : 0
     },
-
     percentageCpu () {
       return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.cpu_limit.used / this.$blockchain.relayerStatus.cpu_limit.max * 100, 10) : 0
     }

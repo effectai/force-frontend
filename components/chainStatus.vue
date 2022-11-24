@@ -25,11 +25,16 @@
       </div>
       <div class="pl-5">
         <strong>
-          <nuxt-link to="/status">Status Page</nuxt-link>
+          <nuxt-link to="/config">Configuration</nuxt-link>
+        </strong>
+      </div>
+      <div class="pl-5">
+        <strong>
+          <nuxt-link to="/status">Relayer Status</nuxt-link>
         </strong>
       </div>
       <div v-if="advanced" class="pl-5">
-        <strong>Advanced Mode</strong>
+        <strong><span class="is-clickable" @click="toggleAdvanced">Advanced: {{ advanced }}</span></strong>
       </div>
     </div>
   </div>
@@ -71,6 +76,9 @@ export default {
   beforeDestroy () {
   },
   methods: {
+    toggleAdvanced () {
+      this.$store.commit('view/SET_ADVANCED_VIEW', !this.advanced)
+    }
   }
 }
 
