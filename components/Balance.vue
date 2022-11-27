@@ -61,6 +61,20 @@
             Withdraw
           </nuxt-link>
         </span>
+        <span>&nbsp;</span>
+        <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout !== 0" :class="{'is-loading': loading === true}" class="button is-fullwidth-mobile is-primary" @click.prevent="payout()">
+          <p v-if="!loading">
+            Claim <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span>
+          </p>
+        </button>
+        <button v-else-if="$blockchain.efxPayout === 0" disabled="disabled" class="button is-fullwidth-mobile is-primary is-wide">
+          <p class="">
+            Nothing to claim
+          </p>
+        </button>
+        <button v-else disabled="disabled" class="button is-fullwidth-mobile is-primary">
+          <p>... EFX</p>
+        </button>
       </div>
     </div>
   </div>
@@ -69,7 +83,31 @@
 <script>
 export default {
   name: 'Balances',
-  computed: {}
+  computed: {},
+  data () {
+    return {
+      loading: null,
+      successMessage: null,
+      successTitle: null
+    }
+  },
+  methods: {
+    async payout () {
+      this.loading = true
+      try {
+        const result = await this.$blockchain.payout()
+        this.$store.dispatch('transaction/addTransaction', result)
+        this.$store.dispatch('pendingPayout/loadPendingPayouts')
+        this.$blockchain.updateUserInfo()
+        this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
+        this.successTitle = 'Payout Completed'
+        this.successMessage = 'All your available pending payouts have been completed and are added to your Effect account'
+      } catch (error) {
+        this.loading = false
+      }
+      this.loading = false
+    }
+  }
 }
 </script>
 
