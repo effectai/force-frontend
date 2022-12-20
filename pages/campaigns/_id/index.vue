@@ -343,7 +343,7 @@
                   :disabled="!canUserQualify"
                   @click.prevent="joinCampaignPopup = true"
                 >
-                  Qualify
+                  Enter Task
                 </button>
                 <button
                   v-else-if="activeCampaignBatches.reduce((a,b) => a + b.num_tasks, 0) - activeCampaignBatches.reduce((a,b) => a + b.real_tasks_done, 0) > 0 && !userReservation"
