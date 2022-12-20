@@ -83,7 +83,6 @@
 <script>
 export default {
   name: 'Balances',
-  computed: {},
   data () {
     return {
       loading: null,
@@ -91,19 +90,20 @@ export default {
       successTitle: null
     }
   },
+  computed: {},
   methods: {
     async payout () {
       this.loading = true
       try {
         const result = await this.$blockchain.payout()
         this.$store.dispatch('transaction/addTransaction', result)
-        this.$store.dispatch('pendingPayout/loadPendingPayouts')
+        await this.$store.dispatch('pendingPayout/loadPendingPayouts')
         this.$blockchain.updateUserInfo()
         this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
         this.successTitle = 'Payout Completed'
         this.successMessage = 'All your available pending payouts have been completed and are added to your Effect account'
       } catch (error) {
-        this.loading = false
+        this.$blockchain.handleError(error)
       }
       this.loading = false
     }
