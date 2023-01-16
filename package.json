@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run webpack:dev && nuxt",
-    "prod": "NODE_ENV=production APP_ENV=production npm run webpack:dev && nuxt",
+    "prod": "npm run webpack:dev && APP_ENV=production nuxt",
     "build": "npm run webpack && nuxt build",
     "start": "nuxt start",
     "generate": "npm run webpack && nuxt generate",
