@@ -94,7 +94,7 @@ export default {
         return value
       } else {
         value = value.toString()
-        return value.split('').map(function (char) { char = '•'; return char }).join('')
+        return value.split('')?.map(function (char) { char = '•'; return char }).join('')
       }
     }
   },
