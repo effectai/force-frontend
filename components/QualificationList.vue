@@ -6,7 +6,7 @@
           <thead>
             <tr>
               <th />
-              <th></th>
+              <th />
               <!-- <th>Requester</th> -->
             </tr>
           </thead>
@@ -23,7 +23,7 @@
                 <nuxt-link :to="`/qualifications/${qualification.id}`">
                   <h2 class="subtitle is-6 has-text-weight-semibold mb-0">
                     <span v-if="qualification.info">
-                      <span v-if="qualification.info.name">{{ qualification.info.name }}</span>
+                      <span v-if="qualification.info?.name">{{ qualification.info?.name }}</span>
                       <i v-else>- Untitled -</i>
                     </span>
                     <span v-else-if="qualification.info !== null" class="loading-text">Loading</span>
@@ -104,8 +104,8 @@ export default {
     }),
     paginatedQualifications () {
       const start = (this.page - 1) * this.perPage
-      if (this.qualifications) {
-        return this.qualifications.filter(q => !q.info.ishidden || q.account_id === this.$auth.user.vAccountRows[0].id).slice(start, start + this.perPage)
+      if (this.qualifications && this.$auth.user) {
+        return this.qualifications.filter(q => !q.info?.ishidden || q.account_id === this.$auth.user.vAccountRows[0].id).slice(start, start + this.perPage)
       }
       return []
     }

@@ -52,19 +52,19 @@
               </div>
             </div>
             <div class="navbar-item is-hidden-touch" @click="mobileMenu = false, showUserModal = !showUserModal">
-              <button :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
+              <button :key="$auth.user && $auth.user.vAccountRows ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span class="icon-text">
                   <span class="icon">
                     <img src="~assets/img/icons/user.svg" style="height: 24px">
                   </span>
-                  <span class="">&nbsp;{{ $auth.user.accountName.slice(0, 12) }}
+                  <span v-if="$auth.user" class="">&nbsp;{{ $auth.user.accountName.slice(0, 12) }}
                     <span v-if="$auth.user.accountName.length > 12">...</span>
                   </span>
                 </span>
               </button>
             </div>
             <div class="navbar-item is-hidden-desktop" @click="mobileMenu = false, showUserModal = !showUserModal">
-              <nuxt-link :key="$auth.user ? $auth.user.vAccountRows[0].id : null" to="/profile" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
+              <nuxt-link :key="$auth.user && $auth.user.vAccountRows ? $auth.user.vAccountRows[0].id : null" to="/profile" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/user.svg" style="height: 24px">
                 </span>
@@ -72,7 +72,7 @@
               </nuxt-link>
             </div>
             <div class="navbar-item is-hidden-desktop" @click="mobileMenu = false, showUserModal = !showUserModal">
-              <nuxt-link :key="$auth.user ? $auth.user.vAccountRows[0].id : null" to="/manage" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
+              <nuxt-link :key="$auth.user && $auth.user.vAccountRows ? $auth.user.vAccountRows[0].id : null" to="/manage" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/settings.svg" style="height: 22px">
                 </span>
@@ -80,7 +80,7 @@
               </nuxt-link>
             </div>
             <div class="navbar-item is-hidden-desktop" @click="logout">
-              <button :key="$auth.user ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
+              <button :key="$auth.user && $auth.user.vAccountRows ? $auth.user.vAccountRows[0].id : null" class="button is-white" :class="{'is-fullwidth': mobileMenu}" exact-active-class="is-active">
                 <span class="icon">
                   <img src="~assets/img/icons/logout.svg" style="height: 24px">
                 </span>
@@ -291,12 +291,11 @@ export default {
       try {
         const result = await this.$blockchain.payout()
         this.$store.dispatch('transaction/addTransaction', result)
-        this.$store.dispatch('pendingPayout/loadPendingPayouts')
+        await this.$store.dispatch('pendingPayout/loadPendingPayouts')
         this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
         this.successTitle = 'Payout Completed'
         this.successMessage = 'All your available pending payouts have been completed and are added to your Effect account'
       } catch (error) {
-        this.loading = false
         this.$blockchain.handleError(error)
       }
       this.loading = false

@@ -33,7 +33,7 @@
                 <span v-if="quali.userHasQuali">✅</span>
                 <span v-else>❌</span>
                 &nbsp;
-                <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
+                <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info?.name }}</nuxt-link>
               </span>
             </div>
             <div v-else>
@@ -52,7 +52,7 @@
                 <span v-if="quali.userHasQuali">❌</span>
                 <span v-else>✅</span>
                 &nbsp;
-                <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info.name }}</nuxt-link>
+                <nuxt-link :to="`/qualifications/${quali.id}`">{{ quali.info?.name }}</nuxt-link>
               </span>
             </div>
             <div v-else>
@@ -179,7 +179,7 @@ export default {
         })
         console.log(`UserHasQualiInclusive: ${quali}`)
         if (quali.value === inclusive0orExclusive1) {
-          quals.push({ name: campaignQuali.info.name, code: quali.key, userHasQuali })
+          quals.push({ name: campaignQuali.info?.name, code: quali.key, userHasQuali })
         }
       }
       return quals

@@ -161,7 +161,8 @@ export default {
 
       // if the submission can't be found, or is not from the current user, throw error and redirect
       if (!this.reservation || this.reservation.account_id !== this.$auth.user.vAccountRows[0].id) {
-        this.$blockchain.handleError('Reservation not found')
+        // this.$blockchain.handleError('Reservation not found')
+        console.error('Reservation not found ⚠⚠⚠')
         this.$router.push('/campaigns/' + this.campaignId)
       } else if (this.reservation.data) {
         this.$blockchain.handleError('Task already submitted by you')

@@ -41,26 +41,40 @@
           </b>
         </div>
       </div>
-      <div class="column has-margin-bottom-mobile is-v-centered my-auto">
-        <div class="field is-horizontal is-grouped-centered has-text-centered">
-          <span class="control">
-            <nuxt-link to="/deposit" class="button is-fullwidth-mobile is-responsive is-primary ">
-              Deposit
-            </nuxt-link>
-          </span>
-          <span>&nbsp;</span>
-          <span class="control">
-            <nuxt-link to="/vtransfer" class="button is-fullwidth-mobile is-responsive is-secondary is-outlined">
-              vTransfer
-            </nuxt-link>
-          </span>
-          <span>&nbsp;</span>
-          <span class="control">
-            <nuxt-link to="/withdraw" class="button is-fullwidth-mobile is-responsive is-primary is-outlined">
-              Withdraw
-            </nuxt-link>
-          </span>
-        </div>
+    </div>
+    <div class="column has-margin-bottom-mobile is-v-centered my-auto">
+      <div class="field is-horizontal is-grouped-centered has-text-centered">
+        <span class="control">
+          <nuxt-link to="/deposit" class="button is-fullwidth-mobile is-primary ">
+            Deposit
+          </nuxt-link>
+        </span>
+        <span>&nbsp;</span>
+        <span class="control">
+          <nuxt-link to="/vtransfer" class="button is-fullwidth-mobile is-secondary is-outlined">
+            vTransfer
+          </nuxt-link>
+        </span>
+        <span>&nbsp;</span>
+        <span class="control">
+          <nuxt-link to="/withdraw" class="button is-fullwidth-mobile is-primary is-outlined">
+            Withdraw
+          </nuxt-link>
+        </span>
+        <span>&nbsp;</span>
+        <button v-if="$blockchain.efxAvailable !== null && $blockchain.efxPayout !== 0" :class="{'is-loading': loading === true}" class="button is-fullwidth-mobile is-primary" @click.prevent="payout()">
+          <p v-if="!loading">
+            Claim <span>{{ $blockchain.efxPayout.toFixed(2) }} EFX!</span>
+          </p>
+        </button>
+        <button v-else-if="$blockchain.efxPayout === 0" disabled="disabled" class="button is-fullwidth-mobile is-primary is-wide">
+          <p class="">
+            Nothing to claim
+          </p>
+        </button>
+        <button v-else disabled="disabled" class="button is-fullwidth-mobile is-primary">
+          <p>... EFX</p>
+        </button>
       </div>
     </div>
   </div>
@@ -69,7 +83,31 @@
 <script>
 export default {
   name: 'Balances',
-  computed: {}
+  data () {
+    return {
+      loading: null,
+      successMessage: null,
+      successTitle: null
+    }
+  },
+  computed: {},
+  methods: {
+    async payout () {
+      this.loading = true
+      try {
+        const result = await this.$blockchain.payout()
+        this.$store.dispatch('transaction/addTransaction', result)
+        await this.$store.dispatch('pendingPayout/loadPendingPayouts')
+        this.$blockchain.updateUserInfo()
+        this.transactionUrl = `${this.$blockchain.sdk.config.eosExplorerUrl}/transaction/${result.transaction_id}`
+        this.successTitle = 'Payout Completed'
+        this.successMessage = 'All your available pending payouts have been completed and are added to your Effect account'
+      } catch (error) {
+        this.$blockchain.handleError(error)
+      }
+      this.loading = false
+    }
+  }
 }
 </script>
 

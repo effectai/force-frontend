@@ -69,7 +69,8 @@ export default {
     ...mapGetters({
       activeBatchesByCampaignId: 'campaign/activeBatchesByCampaignId',
       campaignsByCategory: 'campaign/campaignsByCategory',
-      reservationsByAccountId: 'campaign/reservationsByAccountId'
+      reservationsByAccountId: 'campaign/reservationsByAccountId',
+      submissionsByBatchId: 'campaign/submissionsByBatchId'
     }),
     ...mapState({
       assignedQualifications: state => state.qualification.assignedQualifications
@@ -106,8 +107,36 @@ export default {
             filteredCampaigns[i].num_tasks = batches.reduce(function (a, b) {
               return a + b.num_tasks
             }, 0)
-            filteredCampaigns[i].tasks_done = batches.reduce(function (a, b) {
-              return a + b.real_tasks_done
+            filteredCampaigns[i].tasks_done = batches.reduce((a, batch) => {
+              const batchSubmissions = this.submissionsByBatchId(batch.batch_id)
+              let realTasksDone = 0
+              if (batch.repetitions > 1 && batchSubmissions && batch.tasks_done < batch.num_tasks * batch.repetitions) {
+                const tasks = {}
+                for (const batchSubmission of batchSubmissions) {
+                  if (!tasks[batchSubmission.leaf_hash]) {
+                    tasks[batchSubmission.leaf_hash] = 0
+                  }
+                  if (tasks[batchSubmission.leaf_hash] < batch.repetitions) {
+                    if (this.$auth.user && this.$auth.user.vAccountRows && parseInt(batchSubmission.account_id) === parseInt(this.$auth.user.vAccountRows[0].id)) {
+                      if (batchSubmission.submitted_on) {
+                        // user already submitted this task
+                        tasks[batchSubmission.leaf_hash] = batch.repetitions
+                      }
+                    } else {
+                      tasks[batchSubmission.leaf_hash]++
+                    }
+                    if (tasks[batchSubmission.leaf_hash] === batch.repetitions) {
+                      realTasksDone++
+                    }
+                  }
+                }
+                // TODO: compare with real_tasks_done in store for this batch and update store if different
+              } else {
+                realTasksDone = batch.tasks_done
+              }
+
+              // TODO: for some reason, often realTasksDone is bigger than num_tasks how is that possible?
+              return a + Math.min(realTasksDone, batch.num_tasks)
             }, 0)
           }
           filteredCampaigns[i].joinable = this.checkUserQualify(filteredCampaigns[i])

@@ -94,7 +94,7 @@ export default {
         return value
       } else {
         value = value.toString()
-        return value.split('').map(function (char) { char = '•'; return char }).join('')
+        return value.split('')?.map(function (char) { char = '•'; return char }).join('')
       }
     }
   },
@@ -159,6 +159,7 @@ export default {
         }
         this.$blockchain.getAccountBalance()
         this.$blockchain.getPendingBalance()
+        this.$store.dispatch('qualification/getAssignedQualifications')
         this.$auth.$storage.setUniversal('rememberAccount', JSON.stringify(this.$blockchain.account))
         // Needed because there is a redirect bug when going to a protected route from the login page
         const path = this.$auth.$storage.getUniversal('redirect') || '/'

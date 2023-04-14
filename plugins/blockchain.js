@@ -77,9 +77,11 @@ export default (context, inject) => {
     methods: {
       updateForceInfo () {
         // console.log('updating campaigns and batches and submissions..')
-        context.store.dispatch('campaign/getCampaigns')
-        context.store.dispatch('campaign/getBatches')
-        context.store.dispatch('campaign/getSubmissions')
+        context.store.dispatch('campaign/getCampaigns');
+        (async () => {
+          await context.store.dispatch('campaign/getBatches')
+          context.store.dispatch('campaign/getSubmissionsForActiveBatches')
+        })()
         context.store.dispatch('qualification/getQualifications')
         context.store.dispatch('pendingPayout/loadPendingPayouts')
       },
@@ -143,6 +145,7 @@ export default (context, inject) => {
               account: this.account,
               $blockchain: this
             })
+            context.store.dispatch('qualification/getAssignedQualifications')
             this.getAccountBalance()
             this.getPendingBalance()
             this.getPayoutBalance()
@@ -492,7 +495,7 @@ export default (context, inject) => {
         return await this.sdk.force.getQualifications(nextKey, limit, processQualification)
       },
       async getAssignedQualifications (nextKey, limit = 50, processQualification = false) {
-        if (context.$auth.user === undefined || context.$auth.user === null) {
+        if (context.$auth.user === undefined || context.$auth.user === null || !context.$auth.user.vAccountRows) {
           return null
         }
         return await this.sdk.force.getAssignedQualifications(nextKey, limit, processQualification, context.$auth.user.vAccountRows[0].id)
