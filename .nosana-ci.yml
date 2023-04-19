@@ -1,0 +1,20 @@
+global:
+  image: node:14
+  trigger:
+    branch:
+      - testnet
+
+jobs:
+  - name: build
+    commands:
+      - npm ci
+      - npm run generate
+      - rm ./dist/CNAME && mv ./dist/CNAME_TESTNET ./dist/CNAME
+    artifacts:
+      - name: dist
+
+  - name: deploy
+    commands:
+      - ls -lha dist
+    resources:
+      - name: dist
