@@ -15,7 +15,8 @@ jobs:
     artifacts:
       - name: dist
 
-  - name: alpine/git
+  - name: deploy
+    image: alpine/git
     work-dir: /app
     secrets:
       - GH_DEPLOY_KEY_TESTNET
