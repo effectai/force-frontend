@@ -8,9 +8,9 @@
             :href="`${$blockchain.eos.explorer}/account/${$blockchain.sdk.force.config.eosRelayerAccount}`"
             target="_blank"
             rel="noopener noreferrer"
-            >
+          >
             {{ $blockchain.sdk.force.config.eosRelayerAccount }}
-            </a>
+          </a>
         </span>
         <strong>-</strong>
         <strong>
@@ -32,7 +32,9 @@
       <hr>
 
       <div class="block">
-        <h1 class="subtitle has-text-centered">EOS Powerup</h1>
+        <h1 class="subtitle has-text-centered">
+          EOS Powerup
+        </h1>
         <p class="has-text-centered px-6 mx-6">
           Please consider donating to the relayer contract to keep it running.
           <br><br>
@@ -40,61 +42,66 @@
           <br>
           <ul>
             <li>
-                Please click <strong>Powerup Relayer</strong>.
+              Please click <strong>Powerup Relayer</strong>.
             </li>
             <li>
-                Fill in the account name: <strong>{{ $blockchain.sdk.force.config.eosRelayerAccount }}</strong>
+              Fill in the account name: <strong>{{ $blockchain.sdk.force.config.eosRelayerAccount }}</strong>
             </li>
           </ul>
 
-                <br>
-                Thank you for your support!
+          <br>
+          Thank you for your support!
 
-                <br><br>
-                <a class="button is-info" href="https://eospowerup.io/free" target="_blank" rel="noopener noreferrer">
-                  Powerup Relayer
-                </a>
-              <br>
+          <br><br>
+          <a class="button is-info" href="https://eospowerup.io/free" target="_blank" rel="noopener noreferrer">
+            Powerup Relayer
+          </a>
+          <br>
         </p>
       </div>
 
       <hr>
 
       <div class="block has-text-centered">
-        <h1 class="subtitle">Bloks.io</h1>
+        <h1 class="subtitle">
+          Bloks.io
+        </h1>
         <p class="has-text-centered" px-6 mx-6>
-            An alternative way to power up the relayer account is by using Bloks.io.
-            <br><br>
-            <ul mx-auto>
-                <li>
-                    Please click <strong>Powerup CPU/NET</strong> or <strong>Powerup RAM</strong>.
-                </li>
-                <li>
-                    Fill in the account name: <strong>{{ $blockchain.sdk.force.config.eosRelayerAccount }}</strong>
-                </li>
-                <li>
-                    Add the amount of CPU/NET or RAM you want to power up.
-                </li>
-                <li>
-                    click on the <strong>Power Up</strong> or <strong>Buy RAM</strong> button.
-                </li>
-            </ul>
-            <br>
-            Thank you for your support!
+          An alternative way to power up the relayer account is by using Bloks.io.
+          <br><br>
+          <ul mx-auto>
+            <li>
+              Please click <strong>Powerup CPU/NET</strong> or <strong>Powerup RAM</strong>.
+            </li>
+            <li>
+              Fill in the account name: <strong>{{ $blockchain.sdk.force.config.eosRelayerAccount }}</strong>
+            </li>
+            <li>
+              Add the amount of CPU/NET or RAM you want to power up.
+            </li>
+            <li>
+              click on the <strong>Power Up</strong> or <strong>Buy RAM</strong> button.
+            </li>
+          </ul>
+          <br>
+          Thank you for your support!
         </p>
         <br><br>
         <div class="buttons is-centered">
-            <a class="button is-info" href="https://bloks.io/wallet/powerup" target="_blank" rel="noopener noreferrer">
-                Powerup CPU/NET
-            </a>
-            <a class="button is-info"  href="https://bloks.io/wallet/ram" target="_blank" rel="noopener noreferrer">Powerup Ram</a>
+          <a class="button is-info" href="https://bloks.io/wallet/powerup" target="_blank" rel="noopener noreferrer">
+            Powerup CPU/NET
+          </a>
+          <a class="button is-info" href="https://bloks.io/wallet/ram" target="_blank" rel="noopener noreferrer">Powerup
+            Ram</a>
         </div>
       </div>
 
       <hr>
 
       <div class="block mx-auto mx-6 px-6 is-max-desktop">
-        <h1 class="subtitle has-text-centered">Relayer Resources</h1>
+        <h1 class="subtitle has-text-centered">
+          Relayer Resources
+        </h1>
         <ul>
           <li class="px-6 mx-6">
             <div class="has-text-centered">
@@ -129,7 +136,9 @@
       <hr>
 
       <div class="block">
-        <h1 class="subtitle has-text-centered">Relayer Estimates</h1>
+        <h1 class="subtitle has-text-centered">
+          Relayer Estimates
+        </h1>
         <table class="table has-text-centered mx-auto">
           <thead>
             <th>Action</th>

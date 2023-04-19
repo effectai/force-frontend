@@ -334,7 +334,7 @@
                   </nuxt-link>
                   <br>
                 </div>
-                <button v-if="loading || campaignBatches === null || !allQualificationsLoaded" class="button is-fullwidth is-primary is-loading">
+                <button v-if="loading || campaignBatches === null || (userReservation === undefined || userReservation === null) || !allQualificationsLoaded" class="button is-fullwidth is-primary is-loading">
                   Loading
                 </button>
                 <button
@@ -343,7 +343,7 @@
                   :disabled="!canUserQualify"
                   @click.prevent="joinCampaignPopup = true"
                 >
-                  Qualify
+                  Enter Task
                 </button>
                 <button
                   v-else-if="activeCampaignBatches.reduce((a,b) => a + b.num_tasks, 0) - activeCampaignBatches.reduce((a,b) => a + b.real_tasks_done, 0) > 0 && !userReservation"
@@ -519,12 +519,12 @@ export default {
       getAssignedQualifications: 'qualification/getAssignedQualifications'
     }),
     async bootup () {
+      await this.getBatches()
       if (!this.allQualificationsLoaded) {
         await this.$store.dispatch('qualification/getQualifications')
       }
       await this.checkUserCampaign()
       await this.getCampaign()
-      await this.getBatches()
     },
     showCompletedPopup () {
       if (this.completed) {
@@ -574,6 +574,10 @@ export default {
       }
       if (this.campaignBatches.length === 0) {
         this.showBatchesPopup = true
+      }
+      // Make sure that userReservation is false if no reservation was found
+      if (this.userReservation === null || this.userReservation === undefined) {
+        this.userReservation = false
       }
     },
     async checkUserCampaign () {

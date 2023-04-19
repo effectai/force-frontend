@@ -11,7 +11,7 @@ export default {
         // We have no campaigns yet
         state.campaigns = campaigns
       } else {
-        const updatedCampaigns = state.campaigns.map((c) => { return { ...c } })
+        const updatedCampaigns = state.campaigns?.map((c) => { return { ...c } })
         for (let i = 0; i < campaigns.length; i++) {
           const index = state.campaigns.findIndex(c => c.id === campaigns[i].id)
           if (index !== -1) {
@@ -32,7 +32,7 @@ export default {
       if (!state.batches) {
         state.batches = batches
       } else {
-        const updatedBatches = state.batches.map((b) => { return { ...b } })
+        const updatedBatches = state.batches?.map((b) => { return { ...b } })
         for (let i = 0; i < batches.length; i++) {
           const index = state.batches.findIndex(c => c.batch_id === batches[i].batch_id)
           if (index !== -1) {
@@ -50,7 +50,7 @@ export default {
       if (!state.submissions) {
         state.submissions = submissions
       } else {
-        const updatedSubmissions = state.submissions.map((s) => { return { ...s } })
+        const updatedSubmissions = state.submissions?.map((s) => { return { ...s } })
         for (let i = 0; i < submissions.length; i++) {
           const index = state.submissions.findIndex(s => s.id === submissions[i].id)
           if (index !== -1) {
@@ -155,7 +155,7 @@ export default {
   actions: {
     async getBatches ({ dispatch, commit, state }, nextKey) {
       if (!nextKey && state.loadingBatch) {
-        console.log('Already retrieving batches somewhere else, aborting..')
+        // console.log('Already retrieving batches somewhere else, aborting..')
         return
       }
       commit('SET_LOADING_BATCH', true)
@@ -283,7 +283,7 @@ export default {
     },
     async getCampaigns ({ dispatch, rootGetters, commit, state }, nextKey) {
       if (!nextKey && state.loading) {
-        console.log('Already retrieving campaigns somewhere else, aborting..')
+        // console.log('Already retrieving campaigns somewhere else, aborting..')
         return
       }
       commit('SET_LOADING', true)
@@ -355,7 +355,7 @@ export default {
           const data = await this.$blockchain.getSubmissions(id, 1, false)
 
           if (data.rows.length > 0) {
-            const submissions = data.rows.map(function (x) {
+            const submissions = data.rows?.map(function (x) {
               x.batch_id = parseInt(x.batch_id)
               return x
             })
@@ -374,9 +374,9 @@ export default {
     async getSubmissionsForBatch ({ commit }, batchId) {
       commit('SET_LOADING_SUBMISSIONS', true)
       try {
-        console.log('retrieving submissions for batch', batchId)
+        // console.log('retrieving submissions for batch', batchId)
         const data = await this.$blockchain.getSubmissionsAndReservationsForBatch(batchId)
-        const submissions = data.map(function (x) {
+        const submissions = data?.map(function (x) {
           x.batch_id = parseInt(x.batch_id)
           return x
         })
@@ -389,7 +389,7 @@ export default {
     },
     async getSubmissionsForActiveBatches ({ dispatch, commit, state }) {
       if (state.loadingSubmissions) {
-        console.error('Already retrieving submissions somewhere else, aborting..')
+        // console.error('Already retrieving submissions somewhere else, aborting..')
         return
       }
       if (!state.allBatchesLoaded) {
@@ -400,9 +400,9 @@ export default {
       try {
         for (let i = 0; i < state.batches.length; i++) {
           if (state.batches[i].tasks_done < state.batches[i].num_tasks * state.batches[i].repetitions) {
-            console.log('retrieving submissions for batch', state.batches[i].batch_id)
+            // console.log('retrieving submissions for batch', state.batches[i].batch_id)
             const data = await this.$blockchain.getSubmissionsAndReservationsForBatch(state.batches[i].batch_id)
-            const submissions = data.map(function (x) {
+            const submissions = data?.map(function (x) {
               x.batch_id = parseInt(x.batch_id)
               return x
             })
@@ -416,20 +416,20 @@ export default {
     },
     async getSubmissions ({ dispatch, commit, state }, nextKey) {
       if (!nextKey && state.loadingSubmissions) {
-        console.log('Already retrieving submissions somewhere else, aborting..')
+        // console.log('Already retrieving submissions somewhere else, aborting..')
         return
       }
       commit('SET_LOADING_SUBMISSIONS', true)
       try {
         const data = await this.$blockchain.getSubmissions(nextKey, 200, false)
-        const submissions = data.rows.map(function (x) {
+        const submissions = data.rows?.map(function (x) {
           x.batch_id = parseInt(x.batch_id)
           return x
         })
         commit('UPSERT_SUBMISSIONS', submissions)
 
         if (data.more) {
-          console.log('retrieving more submissions..')
+          // console.log('retrieving more submissions..')
           await dispatch('getSubmissions', data.next_key)
         } else {
           // No more campaigns, we are done

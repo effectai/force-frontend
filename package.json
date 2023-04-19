@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run webpack:dev && nuxt",
-    "prod": "NODE_ENV=production APP_ENV=production npm run webpack:dev && nuxt",
+    "prod": "npm run webpack:dev && APP_ENV=production nuxt",
     "build": "npm run webpack && nuxt build",
     "start": "nuxt start",
     "generate": "npm run webpack && nuxt generate",
@@ -17,7 +17,7 @@
     "@chenfengyuan/vue-countdown": "^1.1.5",
     "@creativebulma/bulma-badge": "^1.0.1",
     "@creativebulma/bulma-tooltip": "^1.2.0",
-    "@effectai/effect-js": "^0.3.33",
+    "@effectai/effect-js": "^0.3.35",
     "@fortawesome/fontawesome-svg-core": "^1.3.0",
     "@fortawesome/free-brands-svg-icons": "^6.1.0",
     "@fortawesome/free-regular-svg-icons": "^6.1.0",
