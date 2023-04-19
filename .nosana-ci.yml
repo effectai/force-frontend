@@ -3,6 +3,8 @@ global:
   trigger:
     branch:
       - testnet
+  environment:
+    APP_ENV: testnet
 
 jobs:
   - name: build
@@ -13,8 +15,22 @@ jobs:
     artifacts:
       - name: dist
 
-  - name: deploy
+  - name: alpine/git
+    work-dir: /app
+    secrets:
+      - GH_DEPLOY_KEY_TESTNET
     commands:
-      - ls -lha dist
+      - mkdir -p /root/.ssh
+      - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+      - echo $GH_DEPLOY_KEY_TESTNET | base64 -d > /root/.ssh/id_rsa
+      - chmod 400 /root/.ssh/id_rsa
+      - cd dist
+      - git init
+      - git add -A
+      - git config --local user.name "Effect Network"
+      - git config --local user.email "ops@effect.ai"
+      - git commit -m "deploy"
+      - ls -lha .git
+      - git push -f git@github.com:effectai/force-frontend-testnet.git master:gh-pages
     resources:
       - name: dist

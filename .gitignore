@@ -101,3 +101,6 @@ OneSignalSDK*
 static/force-defaults.css
 
 .env.local
+
+.nosana-secrets.json
+.nos
