@@ -16,7 +16,6 @@ jobs:
       - name: dist
 
   - name: deploy
-    image: alpine/git
     work-dir: /app
     secrets:
       - GH_DEPLOY_KEY_TESTNET
