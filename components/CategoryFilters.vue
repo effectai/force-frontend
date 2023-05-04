@@ -29,7 +29,7 @@ export default {
   props: ['filter'],
   data () {
     return {
-      effect_dapps: ['annotations', 'socials']
+      effect_dapps: ['annotations', 'socials', 'Query Trainer']
     }
   },
   methods: {

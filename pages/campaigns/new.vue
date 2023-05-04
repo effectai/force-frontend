@@ -102,6 +102,9 @@
                 <option value="socials">
                   Socials
                 </option>
+                <option value="query_trainer">
+                  Query Trainer
+                </option>
               </select>
             </div>
           </div>
