@@ -14,6 +14,7 @@
       allowFullScreen
       @load="mediaFrameLoaded"
     />
+    <div v-if="iframeLoaded" class="watermark columns is-centered is-vcentered"><p>PREVIEW</p></div>
   </div>
 </template>
 
@@ -28,7 +29,8 @@ export default {
   data () {
     return {
       alternativeFrontendUrl: process.env.NUXT_ENV_ALTERNATIVE_FRONTEND,
-      loading: true
+      loading: true,
+      iframeLoaded: false
     }
   },
   watch: {
@@ -38,6 +40,8 @@ export default {
     }
   },
   mounted () {
+    const frame = document.getElementById('mediaFrame')
+    frame.addEventListener('load', this.frameIsLoaded)
     document.addEventListener('keydown', this.sendKeyEvents)
   },
   created () {
@@ -49,6 +53,10 @@ export default {
     document.removeEventListener('keydown', this.sendKeyEvents)
   },
   methods: {
+    // helps check when iframe is fully rendered
+    frameIsLoaded () {
+      this.iframeLoaded = true
+    },
     mediaFrameLoaded () {
       this.loading = false
       const frame = document.getElementById('mediaFrame')
@@ -87,11 +95,59 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.watermark{
+  background-color: rgba(0, 0, 0, 0.15);
+  position: absolute;
+  top: 15em;
+  left: 0;
+  height: -webkit-fill-available;
+  width: 60%;
+  vertical-align: middle;
+}
+.watermark > p{
+  // transform: rotate(-45deg) translate(-1.1em,1em);
+  transform: rotate(-45deg);
+  font-size: 9vw;
+  color: rgba(0, 0, 0, 0.3);
+  // text-align: center;
+}
 .template-wrapper {
   width: 100%;
 }
 #mediaFrame {
   width: 100%;
   border:none;
+}
+
+@media (max-width: 768px) {
+  .watermark{
+    width: -webkit-fill-available;
+    top: 20em;
+    height: 50%;
+  }
+
+.watermark > p{
+  transform: rotate(-45deg) translate(-22vh, 42vw);
+    font-size: 17vw;
+    color: rgba(0, 0, 0, 0.3);
+    // text-align: center;
+  }
+}
+
+@media (max-width: 540px) {
+  .watermark > p{
+    transform: rotate(-45deg) translate(-24vh, 57vw);
+    font-size: 17vw;
+    color: rgba(0, 0, 0, 0.3);
+    // text-align: center;
+  }
+
+}
+
+@media (max-width: 419px) {
+  .watermark{
+    top: 21em;
+  }
 }
 </style>
