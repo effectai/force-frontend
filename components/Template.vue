@@ -14,13 +14,18 @@
       allowFullScreen
       @load="mediaFrameLoaded"
     />
-    <div v-if="iframeLoaded" class="watermark columns is-centered is-vcentered"><p>PREVIEW</p></div>
+
+    <div v-if="isLiveTask == true">
+      <div v-if="iframeLoaded" class="watermark columns is-centered is-vcentered"><p>PREVIEW</p></div>
+    </div>
+
   </div>
 </template>
 
 <script>
 export default {
   props: {
+    isLiveTask: Boolean,
     html: {
       type: String,
       default: null

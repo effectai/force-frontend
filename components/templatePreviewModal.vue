@@ -14,6 +14,7 @@
           campaignIpfs.template || 'No template found..',
           campaignIpfs.example_task || {})"
         @submit="showSubmission"
+        :isLiveTask="false"
       />
       <button class="button modal-close is-large" aria-label="close" @click="$emit('close')" />
       <br>

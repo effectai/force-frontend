@@ -80,6 +80,7 @@
                 campaign.info.template || 'No template found..',
                 campaign.info.example_task || {})"
               @submit="submitTask"
+              :isLiveTask="true"
             />
           </div>
 
@@ -255,6 +256,7 @@
                     campaign.info.template || 'No template found..',
                     viewTaskResult.placeholders)"
                   @templateLoaded="postResults(viewTaskResult.results)"
+                  :isLiveTask="true"
                 />
               </div>
               <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />

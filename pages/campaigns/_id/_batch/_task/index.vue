@@ -58,6 +58,7 @@
             campaign.info.template || 'No template found..',
             task)"
           @submit="submitTask"
+          :isLiveTask="true"
         />
 
         <!-- Reserve task -->
