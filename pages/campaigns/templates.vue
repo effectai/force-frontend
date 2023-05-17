@@ -34,7 +34,7 @@
           <h2 class="panel-heading">
             Preview
           </h2>
-          <template-media :html="previewTemplate" />
+          <template-media :isLiveTask="false" :html="previewTemplate" />
         </div>
       </div>
       <div class="field is-grouped is-grouped-right">

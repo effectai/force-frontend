@@ -173,6 +173,7 @@
                 campaign.info.template || 'No template found..',
                 campaign.info.example_task || {})"
               @submit="submitTask"
+              :isLiveTask="true"
             />
           </div>
         </div>
