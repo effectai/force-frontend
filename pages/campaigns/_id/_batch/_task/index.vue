@@ -57,8 +57,8 @@
           :html="renderTemplate(
             campaign.info.template || 'No template found..',
             task)"
+          :is-live-task="false"
           @submit="submitTask"
-          :isLiveTask="true"
         />
 
         <!-- Reserve task -->
