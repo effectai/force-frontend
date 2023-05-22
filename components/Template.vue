@@ -15,7 +15,7 @@
       @load="mediaFrameLoaded"
     />
 
-    <div v-if="isLiveTask == true">
+    <div v-if="isLiveTask !== true">
       <div v-if="iframeLoaded" class="watermark columns is-centered is-vcentered"><p>PREVIEW</p></div>
     </div>
 
@@ -25,7 +25,10 @@
 <script>
 export default {
   props: {
-    isLiveTask: Boolean,
+    isLiveTask: {
+      type: Boolean,
+      default: false
+    },
     html: {
       type: String,
       default: null
