@@ -204,6 +204,7 @@
               campaign.info.template || 'No template found..',
               previewTask)"
             @templateLoaded="postResults(previewTask.results)"
+            :isLiveTask="false"
           />
         </div>
         <button class="modal-close is-large" aria-label="close" @click="previewTask = false" />

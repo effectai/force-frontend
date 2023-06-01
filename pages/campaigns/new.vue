@@ -269,6 +269,7 @@
                     campaignIpfs.template || 'No template found..',
                     campaignIpfs.example_task || {})"
                   @submit="showSubmission"
+                  :isLiveTask="false"
                 />
                 <div class="mt-5">
                   <h2 class="subtitle">
