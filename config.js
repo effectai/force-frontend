@@ -9,6 +9,8 @@ const localEnvPath = path.resolve(process.cwd(), '.env.local')
 const envPath = path.resolve(process.cwd(), `.env.${env}`)
 const defaultEnvPath = path.resolve(process.cwd(), '.env')
 
+console.log('localEnvPath', localEnvPath, 'envPath', envPath, 'defaultEnvPath', defaultEnvPath)
+
 const envFile = fs.existsSync(localEnvPath) ? localEnvPath : fs.existsSync(envPath) ? envPath : defaultEnvPath
 
 require('dotenv').config({
