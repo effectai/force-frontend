@@ -125,7 +125,7 @@ export default {
       tokenAmount: null,
       memo: null,
       transactionUrl: null,
-      destinationBlockchain: this.$auth.user.blockchain
+      destinationBlockchain: 'eos' // this.$auth.user.blockchain
     }
   },
   computed: {
@@ -166,12 +166,12 @@ export default {
       this.account = null
     },
     toggleDestination (destBlockChain) {
-      this.destinationBlockchain = destBlockChain
-      if (destBlockChain === 'bsc') {
-        this.account = this.$auth.user.blockchain === 'bsc' ? this.$auth.user.address : ''
-      } else {
-        this.account = this.$auth.user.blockchain === 'eos' ? this.$auth.user.accountName : ''
-      }
+      // this.destinationBlockchain = destBlockChain
+      // if (destBlockChain === 'bsc') {
+      //   this.account = this.$auth.user.blockchain === 'bsc' ? this.$auth.user.address : ''
+      // } else {
+      //   this.account = this.$auth.user.blockchain === 'eos' ? this.$auth.user.accountName : ''
+      // }
     },
     validateWithdrawForm (e) {
       e.preventDefault()
@@ -193,7 +193,9 @@ export default {
         this.message = 'Invalid BSC Address'
         this.err = true
       } else {
-        this.withdraw()
+        this.message = 'BSC withdrawals are temporarily disabled'
+        this.err = true
+        // this.withdraw()
       }
     }
   }
