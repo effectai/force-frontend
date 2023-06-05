@@ -265,8 +265,8 @@
                   :html="renderTemplate(
                     campaignIpfs.template || 'No template found..',
                     campaignIpfs.example_task || {})"
-                  @submit="showSubmission"
                   :isLiveTask="false"
+                  @submit="showSubmission"
                 />
                 <div class="mt-5">
                   <h2 class="subtitle">
@@ -454,6 +454,8 @@ export default {
   },
 
   created () {
+    this.applyDefaultQualifications()
+
     this.getQualifications()
     this.cacheFormData()
     // eslint-disable-next-line nuxt/no-globals-in-created
@@ -469,6 +471,20 @@ export default {
   },
 
   methods: {
+    applyDefaultQualifications () {
+      const defaultExclusiveQualis = (process.env.NUXT_ENV_DEFAULT_EX_QUALIS || '').split(',')
+      const defaultInclusiveQualis = (process.env.NUXT_ENV_DEFAULT_IN_QUALIS || '').split(',')
+
+      defaultExclusiveQualis.forEach(async (id) => {
+        const quali = await this.$blockchain.getQualification(id)
+        this.addExclusiveQuali(quali?.info?.name, quali?.id)
+      })
+
+      defaultInclusiveQualis.forEach(async (id) => {
+        const quali = await this.$blockchain.getQualification(id)
+        this.addInclusiveQuali(quali?.info?.name, quali?.id)
+      })
+    },
     selectImage (file) {
       this.campaignIpfs.image = file
     },
