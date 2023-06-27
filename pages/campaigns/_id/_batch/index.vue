@@ -79,8 +79,8 @@
               :html="renderTemplate(
                 campaign.info.template || 'No template found..',
                 campaign.info.example_task || {})"
+              :is-live-task="true"
               @submit="submitTask"
-              :isLiveTask="true"
             />
           </div>
 
@@ -255,8 +255,8 @@
                   :html="renderTemplate(
                     campaign.info.template || 'No template found..',
                     viewTaskResult.placeholders)"
+                  :is-live-task="true"
                   @templateLoaded="postResults(viewTaskResult.results)"
-                  :isLiveTask="true"
                 />
               </div>
               <button class="modal-close is-large" aria-label="close" @click="viewTaskResult = false" />
@@ -643,10 +643,12 @@ export default {
     postResults (results) {
       const frame = document.getElementById('mediaFrame')
       if (frame) {
-        frame.contentWindow.postMessage(
-          { task: 'results', value: results },
-          '*'
-        )
+        setTimeout(() => {
+          frame.contentWindow.postMessage(
+            { task: 'results', value: results },
+            '*'
+          )
+        }, 250)
       }
     },
     async viewTask (sub) {
