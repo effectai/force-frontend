@@ -1,0 +1,14 @@
+# docker-compose.yml
+version: '3.3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    environment:
+      HOST: 0.0.0.0
