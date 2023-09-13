@@ -1,16 +1,18 @@
 # Dockerfile
-FROM node:14-alpine
+FROM oven/bun:latest
 
 # Create app directory
 WORKDIR /app
 
 # Install app dependencies
-COPY package*.json ./
-RUN npm ci
+# COPY package*.json ./
+COPY bun.lockb ./
+RUN bun install
 
 # Bundle app source
 COPY . .
 
 # Expose port and start app
 EXPOSE 3000
-CMD [ "npm", "run", "dev" ]
+# CMD [ "npm", "run", "prod" ]
+CMD [ "bun", "run", "dev" ]

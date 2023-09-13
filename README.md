@@ -1,71 +1,63 @@
-# [Effect Force](https://app.effect.network)
+# Nuxt 3 Minimal Starter
 
-[![Effect Force Select Screen](docs/Effect-Force_Select-Screen.gif)](https://app.effect.network)
+Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-## Production Deploy
+## Setup
 
-The [mainnet](https://app.effect.network) and [testnet](https://testnet.effect.network) versions of the Force are on two different repositories.
-
-```bash
-
-# Add remote, if you haven't added it already!
-git remote add prd git@github.com:effectai/force-frontend-prd.git
-
-# Fetch remote info
-git fetch
-
-# Switch to branch prd/deploy
-git switch deploy
-
-# Merge changes from your branch
-git merge <your-branch>
-
-# Push deploy to prd
-git push
-
-# Go to Github and make a Pull Request from deploy to mainnet-config
-```
-
-## Build Setup
+Make sure to install the dependencies:
 
 ```bash
-# install dependencies
-$ npm install
+# npm
+npm install
 
-# serve with hot reload at localhost:3000
-$ npm run dev
+# pnpm
+pnpm install
 
-# build for production and launch server
-$ npm run build
-$ npm run start
-
-# generate static project
-$ npm run generate
+# yarn
+yarn install
 ```
 
-## Add Local Version of Effect SDK
+## Development Server
 
-1. Clone the GitHub repository: https://github.com/effectai/effect-js/
-2. Install & build SDK: ```npm i && npm run build```
-3. Link effect-js to local install:
+Start the development server on `http://localhost:3000`:
 
 ```bash
-npm link /path/to/effect-js/
+# npm
+npm run dev
+
+# pnpm
+pnpm run dev
+
+# yarn
+yarn dev
 ```
 
-When you make changes to the SDK you should run `npm run build:cjs` in that,
-after which the force frontend will automatically reload the changes.
+## Production
 
-## Node version V.14
+Build the application for production:
 
-Node version v14 is required to run the project. If you have nvm installed, you can run `nvm use` to switch to the correct version.
+```bash
+# npm
+npm run build
 
----
+# pnpm
+pnpm run build
 
-## Deployment
+# yarn
+yarn build
+```
 
-there are 2 GitHub actions workflows:
+Locally preview production build:
 
-- if you push to the main branch, it will build the static website for mainnet and push it to the `gh-pages` branch. The files on the `gh-pages` branch are served on https://app.effect.network
-- if you push to the testnet branch, it will build the static website for testnet (APP_ENV=testnet) and commit all the build files (in /dist) to another repository (effectai/force-frontend-testnet). That repository is set to serve files to testnet.effect.network
-main is protected and you cannot directly push to main, so best to first push/make a PR to testnet and from there we make a PR to main
+```bash
+# npm
+npm run preview
+
+# pnpm
+pnpm run preview
+
+# yarn
+yarn preview
+```
+
+Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
