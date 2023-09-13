@@ -25,6 +25,7 @@
     "@wharfkit/wallet-plugin-scatter": "^1.0.2",
     "@wharfkit/wallet-plugin-tokenpocket": "^1.0.2",
     "@wharfkit/wallet-plugin-wombat": "^1.0.2",
-    "@wharfkit/web-renderer": "^1.0.3"
+    "@wharfkit/web-renderer": "^1.0.3",
+    "daisyui": "latest"
   }
 }
