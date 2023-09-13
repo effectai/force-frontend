@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="26px" height="26px" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59 (86127) - https://sketch.com -->
+    <title>icon / user / inactive</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="26" height="26" rx="2"></rect>
+    </defs>
+    <g id="icon-/-user-/-inactive" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="user-icon">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="Rectangle"></g>
+            <g id="Group" mask="url(#mask-2)" fill="#81889D">
+                <path d="M26,26 C26,23.4279497 25.7692926,20.1066915 23.7416246,18.3204284 C21.3597651,16.2221421 16.8782026,15.8888889 13,15.8888889 C9.13780865,15.8888889 4.66898902,16.2112406 2.28793221,18.2944796 C0.242673443,20.0839215 0,23.4154761 0,26 L26,26 Z" id="Path"></path>
+                <circle id="Oval" cx="13" cy="6.5" r="6.5"></circle>
+            </g>
+        </g>
+    </g>
+</svg>

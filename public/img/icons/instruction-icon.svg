@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.2 (57519) - http://www.bohemiancoding.com/sketch -->
+    <title>instruction</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Elements-/-type-bar" transform="translate(-169.000000, -9.000000)">
+            <g id="Group-4" transform="translate(170.000000, 10.000000)">
+                <g id="instruction">
+                    <circle id="Oval" stroke="#FFFFFF" cx="10" cy="10" r="10"></circle>
+                    <path d="M9.86083984,15 L8.54248047,15 L9.91943359,7.07519531 L11.237793,7.07519531 L9.86083984,15 Z M10.9521484,4.18212891 C11.1767589,4.17236323 11.3635246,4.23950123 11.5124512,4.38354492 C11.6613777,4.52758861 11.7358398,4.7167957 11.7358398,4.95117188 C11.730957,5.18066521 11.6564949,5.36865161 11.5124512,5.51513672 C11.3684075,5.66162183 11.1816418,5.73974604 10.9521484,5.74951172 C10.7226551,5.75927739 10.5346687,5.69336008 10.3881836,5.55175781 C10.2416985,5.41015554 10.1708984,5.22461052 10.1757812,4.99511719 C10.1806641,4.76562385 10.2539055,4.57519607 10.3955078,4.42382812 C10.5371101,4.27246018 10.7226551,4.19189458 10.9521484,4.18212891 Z" id="i" fill="#FFFFFF"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
