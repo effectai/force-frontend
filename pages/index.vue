@@ -1,19 +1,12 @@
 <template>
     <div class="container mx-auto my-10">
-        <h1>
-            Effect Network
-        </h1>
-
-        <button @click="login()">Login</button>
+        <p>
+            Effect Network is the largerst decentralized network for human annoted Machine Learning data 
+        </p>
     </div>
 </template>
 
 <script setup lang="ts">
-
-const login = async () => {
-    const { $sessionKit } = useNuxtApp()
-    await $sessionKit.login()
-}
 
 </script>
 
