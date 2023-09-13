@@ -7,6 +7,18 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxtjs/tailwindcss',
-    '@formkit/nuxt',
+    '@vueuse/nuxt',
+    '@nuxt/image',
   ],
+  vite: {
+    server: {
+      watch: {
+        usePolling: true,
+        interval: 500
+      }
+    }
+  },
+  image: {
+    dir: 'public/'
+  },
 })
