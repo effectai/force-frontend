@@ -16,10 +16,12 @@
     "@vueuse/core": "^10.4.1",
     "@vueuse/nuxt": "^10.4.1",
     "daisyui": "latest",
-    "nuxt": "^3.7.2"
+    "nuxt": "^3.7.3",
+    "sharp": "^0.32.5"
   },
   "dependencies": {
-    "@effectai/effect-js": "0.3.44",
+    "@effectai/effect-js": "rc",
+    "@types/node": "^20.6.0",
     "@wharfkit/session": "^1.0.0",
     "@wharfkit/wallet-plugin-anchor": "^1.0.0",
     "@wharfkit/wallet-plugin-cleos": "^1.0.0",
