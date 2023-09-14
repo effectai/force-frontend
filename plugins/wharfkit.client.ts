@@ -2,9 +2,9 @@ import { SessionKit } from "@wharfkit/session"
 import { WebRenderer } from "@wharfkit/web-renderer"
 import { WalletPluginAnchor } from "@wharfkit/wallet-plugin-anchor"
 import { WalletPluginCleos } from "@wharfkit/wallet-plugin-cleos"
-import { WalletPluginScatter } from "@wharfkit/wallet-plugin-scatter"
-import { WalletPluginWombat } from "@wharfkit/wallet-plugin-wombat"
-import { WalletPluginTokenPocket } from "@wharfkit/wallet-plugin-tokenpocket"
+// import { WalletPluginScatter } from "@wharfkit/wallet-plugin-scatter"
+// import { WalletPluginWombat } from "@wharfkit/wallet-plugin-wombat"
+// import { WalletPluginTokenPocket } from "@wharfkit/wallet-plugin-tokenpocket"
 
 export default defineNuxtPlugin(() => {
   const webRenderer = new WebRenderer()
@@ -24,9 +24,9 @@ export default defineNuxtPlugin(() => {
     ui: webRenderer,
     walletPlugins: [
       new WalletPluginAnchor(),
-      new WalletPluginTokenPocket(),
-      new WalletPluginScatter(),
-      new WalletPluginWombat(),
+      // new WalletPluginTokenPocket(),
+      // new WalletPluginScatter(),
+      // new WalletPluginWombat(),
       new WalletPluginCleos(),
     ],
   })
