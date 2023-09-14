@@ -26,3 +26,7 @@
 - [ ] Tailwind Config https://tailwindcss.nuxtjs.org/getting-started/options
 - [ ] start using daisyui https://daisyui.com/docs/installation
 - [ ] Does it make sense to use formkit https://formkit.com/getting-started/installation?
+
+
+- [ ] figure out why the images aren't loading properly.
+- [ ] 

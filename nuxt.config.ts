@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  ssr: true,
   devtools: { enabled: true },
   devServer: {
     port: 3000,
@@ -8,13 +9,14 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@vueuse/nuxt',
-    '@nuxt/image',
+    // '@nuxt/image',
   ],
   vite: {
     server: {
       watch: {
+        useFsEvents: true,
         usePolling: true,
-        interval: 500
+        interval: 1000
       }
     }
   },
