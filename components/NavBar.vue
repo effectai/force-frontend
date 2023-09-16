@@ -10,38 +10,26 @@
             <a href="/" class="text-lg font-bold">Effect Network</a>
         </div>
         <div class="navbar-end">
-            <button v-if="!userName" class="btn btn-primary" @click="login()">Connect Wallet</button>
+            <button v-if="!userLoggedIn.valueOf()" class="btn btn-primary" @click="login()">Connect Wallet</button>
             <button v-else class="btn btn-primary">{{ userName }}</button>
         </div>
     </div>
 </template>
 
-<script lang="ts">
-export default {
-    data() {
-        return {
-            userName: null
-        }
-    },
-    computed: {
-        userLoggedIn (): boolean {
-            if (this.$effectClient === null || this.$effectClient === null) {
-                return false
-            } else {
-                return this.$effectClient?.isLoggedIn()
-            }
-        },
-    },
-    methods: {
-        async login (): Promise<void> {
-            const { session } = await this.$sessionKit.login()
-            this.$effectClient.loginWithSession(session)
-            this.userName = this.$effectClient.session.actor.toString()
-        }
-    }
+<script setup lang="ts">
+const effectClient = useEffectClient().effectClient
+const sessionKit = useSessionKit().sessionKit
+
+const userLoggedIn = ref(false)
+const userName = ref('')
+
+const login = async () => {
+    const { session } = await sessionKit.login()
+    effectClient.loginWithSession(session)
+    userName.value = effectClient?.session.actor.toString()
+    userLoggedIn.value = true
 }
 </script>
-
 
 <style>
 header {
