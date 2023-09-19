@@ -16,7 +16,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="campaign in campaignsData" :key="campaign.id">
+      <tr v-for="campaign in campaignList" :key="campaign.id">
         <th>
           <label>
             <!-- <input type="checkbox" class="checkbox" /> -->
@@ -64,8 +64,7 @@
 
 <script setup lang="ts">
 const {
-    campaigns,
-    campaignsData,
+    campaignList,
 } = useEffectClient()
 </script>
 
