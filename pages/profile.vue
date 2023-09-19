@@ -1,5 +1,6 @@
 <template>
     <div class="">
+        <div class="text-2xl">Profile</div>
         <Vaccount />
     </div>
 </template>

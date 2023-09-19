@@ -2,7 +2,6 @@
     <div class="flex content-center">
 
         <div class="card lg:card-side bg-base-100">
-            <div class="card-title">Profile</div>
             <div class="card-body">
 
                 <!-- <h2 v-if="userLoggedIn" class="card-title text-center">{{ userName }}</h2> -->

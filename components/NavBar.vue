@@ -21,13 +21,13 @@
                 </label>
                 <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                     <li>
-                        <NuxtLink to="/profile" class="btn btn-ghost justify-center">Profile</NuxtLink>
+                        <NuxtLink to="/profile" class="btn btn-ghost justify-center content-center">Profile</NuxtLink>
                     </li>
                     <li>
-                        <NuxtLink to="/settings" class="btn btn-ghost justify-center">Settings</NuxtLink>
+                        <NuxtLink to="/settings" class="btn btn-ghost justify-center content-center">Settings</NuxtLink>
                     </li>
                     <li>
-                        <button @click="disconnectWallet()" class="btn btn-ghost justify-center">Logout</button>
+                        <button @click="disconnectWallet()" class="btn btn-ghost justify-center content-center">Logout</button>
                     </li>
                 </ul>
             </div>
