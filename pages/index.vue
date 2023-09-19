@@ -9,6 +9,10 @@
                 <code>
                     {{ userAccount }}
                 </code>
+                <hr>
+                <code>
+                    {{ campaigns }}
+                </code>
             </p>
         </div>
     </div>
@@ -18,7 +22,8 @@
 const { 
     userLoggedIn,
     userName,
-    userAccount
+    userAccount,
+    campaigns
  } = useEffectClient()
 
 </script>

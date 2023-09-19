@@ -1,5 +1,5 @@
 import { Client, } from "@effectai/effect-js/dist/";
-import { VAccount,  } from "@effectai/effect-js/dist/types/user";
+import { VAccount, Campaign, Reservation } from "@effectai/effect-js/dist/types/index";
 
 const { sessionKit } = useSessionKit()
 const { fetch } = sessionKit
@@ -11,11 +11,18 @@ const userAccount: Ref<VAccount | null> = ref(null)
 const userName: Ref<string> = ref('')
 const userPermission: Ref<string> = ref('')
 const efxPrice: Ref<number> = ref(0)
+const reservation: Ref<Reservation | null> = ref(null)
+const campaigns: Ref<Campaign[]> = ref([])
 
 const connectWallet = async () => {
-    console.debug('connectWallet')
+    // Login
     const { session } = await sessionKit.login()
     effectClient.loginWithSession(session)
+    
+    // Retrieve reservation
+    campaigns.value = await effectClient.tasks.getAllCampaigns()
+
+    // Retrieve user Data
     // efxPrice.value = await effectClient.efx.getEfxPrice()
     userAccount.value = await effectClient.vaccount.get()
     userName.value = effectClient?.session.actor.toString()
@@ -38,4 +45,7 @@ export const useEffectClient = () => ({
     userName,
     userPermission,
     userAccount,
+    efxPrice,
+    reservation,
+    campaigns,
  })
