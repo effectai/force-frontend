@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="container mx-auto">
         <NavBar />
         <section class="">
-            <div>
+            <div class="flex items-center">
                 <slot />
             </div>
         </section>
