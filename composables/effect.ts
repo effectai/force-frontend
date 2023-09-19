@@ -17,8 +17,13 @@ const campaignsData: Ref<Campaign[]> = ref([])
 
 const connectWallet = async () => {
     // Login
-    const { session } = await sessionKit.login()
-    effectClient.loginWithSession(session)
+    const restoreSession = await sessionKit.restore()
+    if (restoreSession) {
+        effectClient.loginWithSession(restoreSession)
+    } else {
+        const { session } = await sessionKit.login()
+        effectClient.loginWithSession(session)
+    }
     
     // Retrieve reservation
     campaigns.value = await effectClient.tasks.getAllCampaigns()
@@ -46,6 +51,9 @@ const disconnectWallet = async () => {
     userLoggedIn.value = false
     // effectClient.logout() // TODO: Should we add this to the effect-js library?
 }
+
+// Uncomment to persist session
+// await connectWallet()
 
 export const useEffectClient = () => ({
     effectClient,
