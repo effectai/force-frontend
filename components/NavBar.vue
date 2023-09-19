@@ -1,34 +1,48 @@
 <template>
     <div class="navbar bg-base-100">
-        <div class="navbar-start">
-            <!-- <nuxt-img 
-                src="/img/dapps/effect-force-icon.png"  
-                height="60"
-                fit="iniside"
-            /> -->
-            <img src="/img/dapps/effect-force-icon.png" style="height: 60px;"/>
-            <a href="/" class="text-lg font-bold">Effect Network</a>
+        <div class="flex-1">
+            <NuxtLink to="/" class="btn btn-ghost normal-case text-xl">
+                <span>
+                    <img src="/img/dapps/effect-force_h100.png" style="height: 40px;" />
+                </span>
+            </NuxtLink>
         </div>
-        <div class="navbar-end">
-            <button v-if="!userLoggedIn.valueOf()" class="btn btn-primary" @click="login()">Connect Wallet</button>
-            <button v-else class="btn btn-primary">{{ userName }}</button>
+
+        <div v-if="!userLoggedIn" class="flex-none">
+            <button class="btn btn-ghost btn-outline" @click="connectWallet()">Connect Wallet</button>
+        </div>
+        <div v-else class="flex-none">
+            <div class="dropdown dropdown-end m-6">
+                <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 rounded-full">
+                        <img src="/img/dapps/effect-force-icon.png" />
+                    </div>
+                    {{ userName }}
+                </label>
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                    <li>
+                        <NuxtLink to="/profile" class="btn btn-ghost justify-center">Profile</NuxtLink>
+                    </li>
+                    <li>
+                        <NuxtLink to="/settings" class="btn btn-ghost justify-center">Settings</NuxtLink>
+                    </li>
+                    <li>
+                        <button @click="disconnectWallet()" class="btn btn-ghost justify-center">Logout</button>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-const effectClient = useEffectClient().effectClient
-const sessionKit = useSessionKit().sessionKit
-
-const userLoggedIn = ref(false)
-const userName = ref('')
-
-const login = async () => {
-    const { session } = await sessionKit.login()
-    effectClient.loginWithSession(session)
-    userName.value = effectClient?.session.actor.toString()
-    userLoggedIn.value = true
-}
+const {
+    connectWallet,
+    disconnectWallet,
+    userName,
+    userLoggedIn,
+    userAccount,
+} = useEffectClient()
 </script>
 
 <style>
