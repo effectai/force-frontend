@@ -27,6 +27,12 @@
                         <NuxtLink to="/settings" class="btn btn-ghost justify-center content-center">Settings</NuxtLink>
                     </li>
                     <li>
+                        <a href="https://docs.effect.network" class="btn btn-ghost justify-center content-center" target="_blank" rel="noopener noreferrer">Documentation</a>
+                    </li>
+                    <li>
+                        <a href="https://discord.gg/effectnetwork" class="btn btn-ghost justify-center content-center" target="_blank" rel="noopener noreferrer">Discord</a>
+                    </li>
+                    <li>
                         <button @click="disconnectWallet()" class="btn btn-ghost justify-center content-center">Logout</button>
                     </li>
                 </ul>
