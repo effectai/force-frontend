@@ -13,6 +13,7 @@ const userPermission: Ref<string> = ref('')
 const efxPrice: Ref<number> = ref(0)
 const reservation: Ref<Reservation | null> = ref(null)
 const campaigns: Ref<Campaign[]> = ref([])
+const campaignsData: Ref<Campaign[]> = ref([])
 
 const connectWallet = async () => {
     // Login
@@ -21,6 +22,7 @@ const connectWallet = async () => {
     
     // Retrieve reservation
     campaigns.value = await effectClient.tasks.getAllCampaigns()
+    campaignsData.value = await Promise.all(campaigns.value.map(getCampaignContent))
 
     // Retrieve user Data
     // efxPrice.value = await effectClient.efx.getEfxPrice()
@@ -28,6 +30,14 @@ const connectWallet = async () => {
     userName.value = effectClient?.session.actor.toString()
     userPermission.value = await effectClient?.session?.permission.toString()
     userLoggedIn.value = true
+}
+
+const getCampaignContent = async (campaign: Campaign) => {
+    const ipfsContent = await effectClient.ipfs.fetch(campaign.content.field_1)
+    return {
+        ...campaign,
+        ipfsContent,
+    }
 }
 
 const disconnectWallet = async () => {
@@ -48,4 +58,5 @@ export const useEffectClient = () => ({
     efxPrice,
     reservation,
     campaigns,
+    campaignsData,
  })
