@@ -13,7 +13,11 @@
                         <p class="mb-5">
                             Effect Network is the largerst decentralized network for human annoted Machine Learning data
                         </p>
-                        <button @click="connectWallet" class="btn btn-primary">Get Started</button>
+                        <button @click="connectWallet()" class="btn btn-primary">Connect Wallet</button>
+                        <!-- <button @click="connectWallet" class="btn btn-primary">Get Started</button> -->
+                        <br>
+                        <br>
+                        <a href="https://docs.effect.network" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Documentation</a>
                     </div>
                 </div>
             </div>
@@ -24,9 +28,6 @@
 <script setup lang="ts">
 const {
     userLoggedIn,
-    userName,
-    userAccount,
-    campaigns,
     connectWallet,
 } = useEffectClient()
 
