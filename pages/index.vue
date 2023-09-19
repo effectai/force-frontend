@@ -3,18 +3,24 @@
         <p>
             Effect Network is the largerst decentralized network for human annoted Machine Learning data
         </p>
-        <div v-if="user">
+        <div v-if="userLoggedIn">
             <p>
-                You are logged in as {{ user }}
+                You are logged in as {{ userName }}
+                <code>
+                    {{ userAccount }}
+                </code>
             </p>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-const effectClient = useEffectClient().effectClient
+const { 
+    userLoggedIn,
+    userName,
+    userAccount
+ } = useEffectClient()
 
-const user = ref(() => effectClient?.session?.actor?.toJSON())
 </script>
 
 <style >
