@@ -43,29 +43,23 @@
         </td>
         <td>{{ campaign.reward.quantity }}</td>
         <th>
-          <button class="btn btn-ghost btn-xs">details</button>
+          <button @click="goToCampaign(campaign.id)" class="btn btn-ghost btn-xs">details</button>
         </th>
       </tr>
-    </tbody>
-    <!-- foot -->
-    <!-- <tfoot> -->
-      <!-- <tr> -->
-        <!-- <th></th> -->
-        <!-- <th>Name</th> -->
-        <!-- <th>Job</th> -->
-        <!-- <th>Favorite Color</th> -->
-        <!-- <th></th> -->
-      <!-- </tr> -->
-    <!-- </tfoot> -->
-    
+    </tbody>    
   </table>
 </div>
 </template>
 
 <script setup lang="ts">
+const route = useRouter()
 const {
     allCampaigns
 } = useEffectClient()
+
+const goToCampaign = (id: number) => {
+  route.push(`/campaign/${id}`)
+}
 </script>
 
 <style>

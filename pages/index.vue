@@ -14,10 +14,12 @@
                             Effect Network is the largerst decentralized network for human annoted Machine Learning data
                         </p>
                         <button @click="connectWallet()" class="btn btn-primary">Connect Wallet</button>
-                        <!-- <button @click="connectWallet" class="btn btn-primary">Get Started</button> -->
-                        <br>
-                        <br>
+                        <br><br>
+                        <a href="https://dao.effect.network" class="btn btn-accent" target="_blank" rel="noopener noreferrer">DAO</a>
+                        <br><br>
                         <a href="https://docs.effect.network" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Documentation</a>
+                        <br><br>
+                        <a href="https://discord.gg/effectnetwork" class="btn btn-info" target="_blank" rel="noopener noreferrer">Discord</a>
                     </div>
                 </div>
             </div>
