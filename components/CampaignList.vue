@@ -16,7 +16,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="campaign in campaignList" :key="campaign.id">
+      <tr v-for="campaign in allCampaigns" :key="campaign.id">
         <th>
           <label>
             <!-- <input type="checkbox" class="checkbox" /> -->
@@ -37,9 +37,9 @@
           </div>
         </td>
         <td>
-          {{ campaign.ipfsContent.title }}
+          {{ campaign?.info.title }}
           <br/>
-          <div class="text-sm opacity-50">{{ campaign.ipfsContent.description }}</div>
+          <div class="text-sm opacity-50">{{ campaign?.info.description }}</div>
         </td>
         <td>{{ campaign.reward.quantity }}</td>
         <th>
@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 const {
-    campaignList,
+    allCampaigns
 } = useEffectClient()
 </script>
 

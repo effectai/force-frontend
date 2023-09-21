@@ -13,8 +13,7 @@ const userName       : Ref<string>             = ref('')
 const userPermission : Ref<string>             = ref('')
 const efxPrice       : Ref<number>             = ref(0)
 const reservation    : Ref<Reservation | null> = ref(null)
-// const campaigns      : Ref<Campaign[]>         = ref([])
-const campaignList  : Ref<Campaign[]>         = ref([])
+const allCampaigns  : Ref<Campaign[]>         = ref([])
 
 const connectWallet = async (session?: Session) => {
     // Login
@@ -26,8 +25,7 @@ const connectWallet = async (session?: Session) => {
     }
     
     // Retrieve Campaigns
-    const allCampaigns = await effectClient.tasks.getAllCampaigns()
-    campaignList.value = await Promise.all(allCampaigns.map(getCampaignContent))
+    allCampaigns.value = await effectClient.tasks.getAllCampaigns()
 
     // Retrieve user Data
     // efxPrice.value = await effectClient.efx.getEfxPrice()
@@ -37,22 +35,13 @@ const connectWallet = async (session?: Session) => {
     userLoggedIn.value = true
 }
 
-const getCampaignContent = async (campaign: Campaign) => {
-    const ipfsContent = await effectClient.ipfs.fetch(campaign.content.field_1)
-    return {
-        ...campaign,
-        ipfsContent,
-    }
-}
-
-const disconnectWallet = async () => {
-    console.debug('disconnectWallet')
+const disconnectWallet = async (): Promise<void> => {
     await sessionKit.logout()
     userLoggedIn.value = false
-    // effectClient.logout() // TODO: Should we add this to the effect-js library?
+    useRouter().push('/')// Go home after logout
 }
 
-// Uncomment to persist session
+// Persist session
 const restoreSession = await sessionKit.restore()
 if (restoreSession) {
     await connectWallet(restoreSession)
@@ -68,5 +57,5 @@ export const useEffectClient = () => ({
     userAccount,
     efxPrice,
     reservation,
-    campaignList,
+    allCampaigns,
  })
