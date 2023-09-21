@@ -60,10 +60,6 @@
                     </div>
 
                 </div>
-                <hr>
-                <div class="card-actions justify-center my-5">
-                    <button class="btn btn-warning">Logout</button>
-                </div>
             </div>
         </div>
 
