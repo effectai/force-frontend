@@ -1,5 +1,6 @@
 <template>
-    
+    <!-- TODO -->
+    <div>Campaigns</div>
 </template>
 
 <script setup lang="ts">

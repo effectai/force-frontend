@@ -42,17 +42,17 @@
 </template>
 
 <script setup lang="ts">
-import { Campaign } from '@effectai/effect-js/dist/types'
-const { allCampaigns, effectClient } = useEffectClient()
+import { Campaign } from '@effectai/effect-js'
+const { effectClient } = useEffectClient()
 const route = useRouter()
 const props = defineProps<{ campaignId: number; }>();
 
 // const campaign = allCampaigns.value.find((c: Campaign) => c.id === props.campaignId);
-const campaign: Ref<Campaign | undefined> = ref(await effectClient.tasks.getCampaign(props.campaignId))
+const campaign: Ref<Campaign | undefined> = ref(await effectClient.tasks.getCampaign(props.campaignId, ))
 // TODO Add a default image for campaigns without an image.
 const imgurl: Ref<string> = computed(() => campaign.value?.info?.image || '/img/dapps/effect-force_h100.png')
 
-    const reserveTask = async () => {
+const reserveTask = async () => {
     const reserveResponse = await effectClient.tasks.reserveTask(props.campaignId)
     console.debug('reserveResponse', reserveResponse)
     // TODO user reserveResponse to determine if the task was reserved or not.
