@@ -36,14 +36,19 @@
             </div>
           </div>
         </td>
-        <td>
+        <td v-if="campaign && campaign.info">
           {{ campaign?.info.title }}
           <br/>
           <div class="text-sm opacity-50">{{ campaign?.info.description }}</div>
         </td>
+        <td v-else>
+          {{ 'No title' }}
+          <br>
+          <div class="text-sm opacity-50">{{ 'No description' }}</div>
+        </td>
         <td>{{ campaign.reward.quantity }}</td>
         <th>
-          <button @click="goToCampaign(campaign.id)" class="btn btn-ghost btn-xs">details</button>
+          <NuxtLink :to="`campaign/${campaign.id}`" class="btn btn-ghost btn-xs">Details</NuxtLink>
         </th>
       </tr>
     </tbody>    
@@ -52,14 +57,7 @@
 </template>
 
 <script setup lang="ts">
-const route = useRouter()
-const {
-    allCampaigns
-} = useEffectClient()
-
-const goToCampaign = (id: number) => {
-  route.push(`/campaign/${id}`)
-}
+const { allCampaigns } = useEffectClient()
 </script>
 
 <style>
