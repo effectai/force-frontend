@@ -1,15 +1,9 @@
 <template>
-    <Campaign :campaign="campaign"/>
+    <Campaign :campaignId="campaignId"/>
 </template>
 
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' })
 const route = useRouter()
-const {
-    allCampaigns
-} = useEffectClient()
-
-console.log(allCampaigns)
-
-const campaign = allCampaigns.value.find((c) => 0 === 0)
+const campaignId = Number(route.currentRoute.value.params.id)
 </script>
