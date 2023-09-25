@@ -13,7 +13,7 @@
                         <p class="mb-5">
                             Effect Network is the largerst decentralized network for human annoted Machine Learning data
                         </p>
-                        <button @click="connectWallet()" class="btn btn-primary">Connect Wallet</button>
+                        <ConnectWallet />
                         <br><br>
                         <a href="https://dao.effect.network" class="btn btn-accent" target="_blank" rel="noopener noreferrer">DAO</a>
                         <br><br>
@@ -31,6 +31,7 @@
 const {
     userLoggedIn,
     connectWallet,
+    walletConnecting,
 } = useEffectClient()
 
 </script>

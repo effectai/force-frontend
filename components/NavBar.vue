@@ -9,7 +9,7 @@
         </div>
 
         <div v-if="!userLoggedIn" class="flex-none">
-            <button class="btn btn-ghost btn-outline" @click="connectWallet()">Connect Wallet</button>
+            <ConnectWallet />
         </div>
         <div v-else class="flex-none">
             <div class="dropdown dropdown-end m-6">
@@ -45,6 +45,7 @@
 const {
     connectWallet,
     disconnectWallet,
+    walletConnecting,
     userName,
     userLoggedIn,
     userAccount,
