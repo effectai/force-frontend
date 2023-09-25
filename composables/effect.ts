@@ -51,10 +51,11 @@ const disconnectWallet = async (): Promise<void> => {
 }
 
 // Persist session
-const restoreSession = await sessionKit.restore()
-if (restoreSession) {
-    await connectWallet(restoreSession)
-}
+sessionKit.restore().then((restoreSession) => {
+    if (restoreSession) {
+        connectWallet(restoreSession).catch(console.error)
+    }
+})
 
 export const useEffectClient = () => ({
     effectClient,
