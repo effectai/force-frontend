@@ -22,10 +22,12 @@
                         </div>
                     </div>
                     <strong>Task Description</strong>
-                    <p>{{ campaign.info?.description }}</p>
+                    <p v-if="campaign && campaign.info && campaign.info.description">{{ campaign.info?.description }}</p>
+                    <p v-else>No description found.</p>
                     <div class="divider"></div>
                     <strong>Task instructions</strong>
-                    <p>{{ campaign.info?.instructions }}</p>
+                    <p v-if="campaign && campaign.info && campaign.info.instructions">{{ campaign.info?.instructions }}</p>
+                    <p v-else>No instructions found.</p>
                     <div class="divider"></div>
                     <div class="card-actions">
                         <button @click="reserveTask" class="btn btn-primary">Start</button>
