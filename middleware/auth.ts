@@ -1,9 +1,8 @@
 const { userLoggedIn } = useEffectClient()
 
 export default defineNuxtRouteMiddleware((to, from) => {
-    // isAuthenticated() is an example method verifying if a user is authenticated
-    console.debug('auth middleware', userLoggedIn, to, from)
-    if (userLoggedIn) {
+    // If the user is not logged in, redirect to home page
+    if (!userLoggedIn) {
       return navigateTo('/')
     }
 })
