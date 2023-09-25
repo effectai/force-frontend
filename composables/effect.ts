@@ -15,24 +15,33 @@ const efxPrice       : Ref<number>             = ref(0)
 const reservation    : Ref<Reservation | null> = ref(null)
 const allCampaigns  : Ref<Campaign[]>         = ref([])
 
-const connectWallet = async (session?: Session) => {
-    // Login
-    if (session) {
-        effectClient.loginWithSession(session)
-    } else {
-        const { session: newSession } = await sessionKit.login()
-        effectClient.loginWithSession(newSession)
-    }
-    
-    // Retrieve Campaigns
-    allCampaigns.value = await effectClient.tasks.getAllCampaigns()
+const walletConnecting = ref(false)
 
-    // Retrieve user Data
-    // efxPrice.value = await effectClient.efx.getEfxPrice()
-    userAccount.value = await effectClient.vaccount.get()
-    userName.value = effectClient?.session.actor.toString()
-    userPermission.value = await effectClient?.session?.permission.toString()
-    userLoggedIn.value = true
+const connectWallet = async (session?: Session) => {
+    walletConnecting.value = true
+    try {
+        // Login
+        if (session) {
+            effectClient.loginWithSession(session)
+        } else {
+            const { session: newSession } = await sessionKit.login()
+            effectClient.loginWithSession(newSession)
+        }
+        
+        // Retrieve Campaigns
+        allCampaigns.value = await effectClient.tasks.getAllCampaigns()
+
+        // Retrieve user Data
+        // efxPrice.value = await effectClient.efx.getEfxPrice()
+        userAccount.value = await effectClient.vaccount.get()
+        userName.value = effectClient?.session.actor.toString()
+        userPermission.value = await effectClient?.session?.permission.toString()
+        userLoggedIn.value = true
+        walletConnecting.value = false
+    } catch (error) {
+        console.error(error)
+        walletConnecting.value = false
+    }
 }
 
 const disconnectWallet = async (): Promise<void> => {
@@ -52,6 +61,7 @@ export const useEffectClient = () => ({
     connectWallet,
     disconnectWallet,
     userLoggedIn,
+    walletConnecting,
     userName,
     userPermission,
     userAccount,
