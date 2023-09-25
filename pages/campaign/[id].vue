@@ -3,8 +3,7 @@
 </template>
 
 <script setup lang="ts">
-// import { Campaign } from '@effectai/effect-js/dist/types';
-
+definePageMeta({ middleware: 'auth' })
 const route = useRouter()
 const {
     allCampaigns
