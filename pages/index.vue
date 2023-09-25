@@ -13,13 +13,12 @@
                         <p class="mb-5">
                             Effect Network is the largerst decentralized network for human annoted Machine Learning data
                         </p>
-                        <ConnectWallet />
-                        <br><br>
-                        <a href="https://dao.effect.network" class="btn btn-accent" target="_blank" rel="noopener noreferrer">DAO</a>
-                        <br><br>
-                        <a href="https://docs.effect.network" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Documentation</a>
-                        <br><br>
-                        <a href="https://discord.gg/effectnetwork" class="btn btn-info" target="_blank" rel="noopener noreferrer">Discord</a>
+                        <div class="join join-vertical lg:join-horizontal">
+                            <ConnectWallet class="join-item" />
+                            <a href="https://dao.effect.network" class="btn join-item btn-accent" target="_blank" rel="noopener noreferrer">DAO</a>
+                            <a href="https://docs.effect.network" class="btn join-item btn-secondary" target="_blank" rel="noopener noreferrer">Documentation</a>
+                            <a href="https://discord.gg/effectnetwork" class="btn join-item btn-info" target="_blank" rel="noopener noreferrer">Discord</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -30,8 +29,6 @@
 <script setup lang="ts">
 const {
     userLoggedIn,
-    connectWallet,
-    walletConnecting,
 } = useEffectClient()
 
 </script>
