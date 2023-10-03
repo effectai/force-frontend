@@ -26,7 +26,20 @@
                     <p v-else>No description found.</p>
                     <div class="divider"></div>
                     <strong>Task instructions</strong>
-                    <p v-if="campaign && campaign.info && campaign.info.instructions">{{ campaign.info?.instructions }}</p>
+                    <div v-if="campaign && campaign.info && campaign.info.instructions">
+                        <!-- Open the modal using ID.showModal() method -->
+                        <button class="btn" onclick="instruction_modal.showModal()">Show Instructions</button>
+                        <dialog id="instruction_modal" class="modal">
+                        <div class="modal-box w-11/12 max-w-5xl">
+                            <h3 class="font-bold text-xl text-center">Instructions</h3>
+                            <div class="divider"></div>
+                            <p v-html="campaign.info.instructions"></p>
+                        </div>
+                        <form method="dialog" class="modal-backdrop">
+                            <button>close</button>
+                        </form>
+                        </dialog>
+                    </div>
                     <p v-else>No instructions found.</p>
                     <div class="divider"></div>
                     <div class="card-actions">
