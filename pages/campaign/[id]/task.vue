@@ -2,7 +2,7 @@
     <div class="container">
         <div v-if="!loading">
             <div v-if="campaign && campaign.info && campaign.info.template && templateHtml">
-                <Template :html="templateHtml" />
+                <Template :html="templateHtml"/>
                 <div class="divider"></div>
                 <div class="container mx-auto text-center">
                     <div class="join join-horizontal">
@@ -22,7 +22,8 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' })
 
-import { Template } from '@effectai/effect-js'
+// Template needs to be renamed to avoid naming conflict with Vue3's template tag.
+import { Template as EffectTemplate } from '@effectai/effect-js'
 
 const router = useRouter()
 const { effectClient, userAccount } = useEffectClient()
@@ -35,23 +36,22 @@ const renderTask = async (): Promise<void> => {
     try {
         const myReservation = await effectClient.tasks.getMyReservation(campaignId)
         const taskData = await effectClient.tasks.getTaskData(myReservation)
+
         const task = {
             accountId: userAccount.value?.id,
             campaignId: myReservation.campaign_id,
             batchId: myReservation.batch_id,
             submissionId: myReservation.id,
         }
-        console.debug('myReservation', myReservation)
-        // TODO TaskData should be an object. Now it is only a string.
-        // In this is example it returns, taskData What did you have for dinner yesterday?
-        // It should be an object with a key of the question and a value of the answer.
-        // { placeholderName: 'What did you have for dinner yesterday?' }
-        console.debug('taskData', taskData)
-        console.debug('task', task)
-        const template = new Template(campaign.value?.info?.template, taskData, {}, task)
+
+        console.debug('🔥🔥🔥-TaskPlaceHolder', taskData)
+        // TODO remove these parameters from the template.
+        const tempTaskData = { id: 1, annotations: [], ...taskData}
+
+        const template = new EffectTemplate(campaign.value?.info?.template, tempTaskData, {}, task)
         templateHtml.value = template.render()
         loading.value = false
-        console.debug('templateHtml', templateHtml.value)
+
     } catch (error) {
         console.error(error)
     }
