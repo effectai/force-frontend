@@ -1,7 +1,7 @@
 <template>
     <div
         class="template-wrapper"
-        style="width: 100%; height: 100%; border: none;"
+        style="width: 100%;border: none;"
     >
         <div v-if="loading" class="loading-text subtitle">
             Loading
@@ -11,7 +11,7 @@
             id="mediaFrame"
             ref="mediaFrame"
             src="https://effectai.github.io/force-frontend/template"
-            style="width: 100%; height: 100%; border: none;"
+            style="width: 100%;border: none;"
             name="mediaFrame"
             sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-same-origin"
             allow="geolocation; microphone; camera; autoplay; fullscreen"
@@ -49,7 +49,7 @@ export default {
         document.addEventListener('keydown', this.sendKeyEvents)
     },
     created() {
-        console.debug('Template created', this.html)
+        // console.debug('Template created', this.html)
         // eslint-disable-next-line nuxt/no-globals-in-created
         window.addEventListener('message', this.communicateWithIframe)
     },
