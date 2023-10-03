@@ -2,7 +2,7 @@
     <div class="container">
         <div v-if="!loading">
             <div v-if="campaign && campaign.info && campaign.info.template && templateHtml">
-                <Template :html="templateHtml"/>
+                <Template :html="templateHtml" @submit="submitTask"/>
                 <div class="divider"></div>
                 <div class="container mx-auto text-center">
                     <div class="join join-horizontal">
@@ -22,7 +22,7 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'auth' })
 
-// Template needs to be renamed to avoid naming conflict with Vue3's template tag.
+// Template needs to be renamed to avoid naming conflict with Vue3's template variable.
 import { Template as EffectTemplate } from '@effectai/effect-js'
 
 const router = useRouter()
@@ -48,7 +48,7 @@ const renderTask = async (): Promise<void> => {
         // TODO remove these parameters from the template.
         const tempTaskData = { id: 1, annotations: [], ...taskData}
 
-        const template = new EffectTemplate(campaign.value?.info?.template, tempTaskData, {}, task)
+        const template = new EffectTemplate(campaign.value?.info?.template!, tempTaskData, {}, task)
         templateHtml.value = template.render()
         loading.value = false
 
@@ -58,21 +58,34 @@ const renderTask = async (): Promise<void> => {
 }
 
 const stopTask = async (): Promise<void> => {
-    // const stopResponse = await effectClient.tasks.stopTask(campaignId)
+    // const reservation = await effectClient.tasks.getMyReservation(campaignId)
+    // const stopResponse = await effectClient.tasks.stopTask(reservation)
     // console.debug('stopResponse', stopResponse)
-    // router.push(`/campaign/${campaignId}`)
+    router.push(`/campaign/${campaignId}`)
 }
 
-const submitTask = async (): Promise<void> => {
-    // const submitResponse = await effectClient.tasks.submitTask(campaignId)
-    // console.debug('submitResponse', submitResponse)
-    // router.push(`/campaign/${campaignId}`)
+const submitTask = async (data: any): Promise<void> => {
+    console.log('Task::submitTask', data)
+    
+    const reservation = await effectClient.tasks.getMyReservation(campaignId).catch((error) => { throw error })
+    console.debug('reservation', reservation)
+
+    // BUG: there is an issue with submitTask here.
+    // Uncaught (in promise) Error: could not insert object, most likely a uniqueness constraint was violated.
+    const submitResponse = await effectClient.tasks.submitTask(campaignId, reservation.task_idx, data)
+    console.debug('submitResponse', submitResponse)
+
+    const nextReservation = await effectClient.tasks.reserveNextTask(campaignId, userAccount.value?.id!)
+    console.debug('nextReservation', nextReservation)
+    
+    await renderTask()
 }
 
 const reportTask = async (): Promise<void> => {
     // const reportResponse = await effectClient.tasks.reportTask(campaignId)
     // console.debug('reportResponse', reportResponse)
-    // router.push(`/campaign/${campaignId}`)
+    window.open('https://discord.com/channels/519860537891487745/846388926234099763')
+
 }
 
 onMounted(async () => {
