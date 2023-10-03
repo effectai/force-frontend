@@ -1,5 +1,4 @@
-import { Client, } from "@effectai/effect-js/dist/";
-import { VAccount, Campaign, Reservation } from "@effectai/effect-js/dist/types/index";
+import { Client, VAccount, Campaign, Reservation } from "@effectai/effect-js";
 import { Session } from "@wharfkit/session";
 
 const { sessionKit } = useSessionKit()
