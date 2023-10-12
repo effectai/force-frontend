@@ -6,13 +6,14 @@ const { fetch } = sessionKit
 
 const effectClient = reactive(new Client("jungle4", { fetch }));
 
-const userLoggedIn   : Ref<boolean>            = ref(false)
-const userAccount    : Ref<VAccount | null>    = ref(null)
-const userName       : Ref<string>             = ref('')
-const userPermission : Ref<string>             = ref('')
-const efxPrice       : Ref<number>             = ref(0)
-const reservation    : Ref<Reservation | null> = ref(null)
-const allCampaigns  : Ref<Campaign[]>         = ref([])
+const userLoggedIn    : Ref<boolean>            = ref(false)
+const userAccount     : Ref<VAccount | null>    = ref(null)
+const userName        : Ref<string>             = ref('')
+const userPermission  : Ref<string>             = ref('')
+const efxPrice        : Ref<number>             = ref(0)
+const reservation     : Ref<Reservation | null> = ref(null)
+const allCampaigns    : Ref<Campaign[]>         = ref([])
+const loadingAllCampaigns : Ref<boolean>           = ref(false)
 
 const walletConnecting = ref(false)
 
@@ -28,7 +29,9 @@ const connectWallet = async (session?: Session) => {
         }
         
         // Retrieve Campaigns
+        loadingAllCampaigns.value = true
         allCampaigns.value = await effectClient.tasks.getAllCampaigns()
+        loadingAllCampaigns.value = false
 
         // Retrieve user Data
         // efxPrice.value = await effectClient.efx.getEfxPrice()
@@ -68,4 +71,5 @@ export const useEffectClient = () => ({
     efxPrice,
     reservation,
     allCampaigns,
+    loadingAllCampaigns,
  })
