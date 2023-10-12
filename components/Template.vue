@@ -1,24 +1,24 @@
 <template>
     <div
         class="template-wrapper"
-        style="width: 100%;border: none;"
+        style="width: 100%; border: none; overflow: hidden;"
     >
-        <div v-if="loading" class="loading-text subtitle">
-            Loading
+        <div v-show="loading && !iframeLoaded" class="flex">
+            <TemplateSkeleton />
         </div>
         <!-- TODO: add polyfill for srcdoc or move to different URL and use src -->
         <iframe
+            v-show="!loading && iframeLoaded"
             id="mediaFrame"
             ref="mediaFrame"
             src="https://effectai.github.io/force-frontend/template"
-            style="width: 100%;border: none;"
+            style="width: 100%;border: none; overflow: hidden;"
             name="mediaFrame"
             sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-same-origin"
             allow="geolocation; microphone; camera; autoplay; fullscreen"
             allowFullScreen
             @load="mediaFrameLoaded"
         />
-
     </div>
 </template>
 
