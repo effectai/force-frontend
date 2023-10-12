@@ -12,7 +12,7 @@
             <ConnectWallet />
         </div>
         <div v-else class="flex-none">
-            <div class="dropdown dropdown-end m-6">
+            <div class="dropdown dropdown-end m-6" ref="dropDownElement">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
                     <div class="w-10 rounded-full">
                         <img src="/img/dapps/effect-force-icon.png" />
@@ -21,16 +21,19 @@
                 </label>
                 <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                     <li>
-                        <NuxtLink to="/profile" class="btn btn-ghost justify-center content-center">Profile</NuxtLink>
+                        <NuxtLink @click="closeDropdown" to="/" class="btn btn-ghost justify-center content-center">Home</NuxtLink>
                     </li>
                     <li>
-                        <NuxtLink to="/settings" class="btn btn-ghost justify-center content-center">Settings</NuxtLink>
+                        <NuxtLink @click="closeDropdown" to="/profile" class="btn btn-ghost justify-center content-center">Profile</NuxtLink>
                     </li>
                     <li>
-                        <a href="https://docs.effect.network" class="btn btn-ghost justify-center content-center" target="_blank" rel="noopener noreferrer">Documentation</a>
+                        <NuxtLink @click="closeDropdown" to="/settings" class="btn btn-ghost justify-center content-center">Settings</NuxtLink>
                     </li>
                     <li>
-                        <a href="https://discord.gg/effectnetwork" class="btn btn-ghost justify-center content-center" target="_blank" rel="noopener noreferrer">Discord</a>
+                        <a @click="closeDropdown" href="https://docs.effect.network" class="btn btn-ghost justify-center content-center" target="_blank" rel="noopener noreferrer">Documentation</a>
+                    </li>
+                    <li>
+                        <a @click="closeDropdown" href="https://discord.gg/effectnetwork" class="btn btn-ghost justify-center content-center" target="_blank" rel="noopener noreferrer">Discord</a>
                     </li>
                     <li>
                         <button @click="disconnectWallet()" class="btn btn-ghost justify-center content-center">Logout</button>
@@ -50,6 +53,15 @@ const {
     userLoggedIn,
     userAccount,
 } = useEffectClient()
+
+// retrieve ref of ul
+const dropDownElement = ref(null)
+
+const closeDropdown = () => {
+    console.log('closeDropdown', dropDownElement.value)
+    dropDownElement.value?.classList?.remove('dropdown-open')
+}
+
 </script>
 
 <style>
