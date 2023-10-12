@@ -1,20 +1,20 @@
 <template>
     <div class="container">
         <div v-if="!loading">
-            <div v-if="campaign && campaign.info && campaign.info.template && templateHtml">
+            <div v-if="campaign?.info?.template && templateHtml">
                 <Template :html="templateHtml" @submit="submitTask"/>
                 <div class="divider"></div>
                 <div class="container mx-auto text-center">
                     <div class="join join-horizontal">
-                        <button @click="stopTask" class="btn join-item">Stop</button>
+                        <button @click="stopTask" class="btn join-item" >Stop</button>
                         <button @click="submitTask" class="btn btn-primary join-item">Submit</button>
                         <button @click="reportTask" class="btn join-item">Report</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div v-else>
-            Loading...
+        <div v-else class="mx-auto flex">
+            <TemplateSkeleton />
         </div>
     </div>
 </template>
@@ -46,7 +46,7 @@ const renderTask = async (): Promise<void> => {
 
         console.debug('🔥🔥🔥-TaskPlaceHolder', taskData)
         // TODO remove these parameters from the template.
-        const tempTaskData = { id: 1, annotations: [], ...taskData}
+        const tempTaskData = { id: 1, annotations: [], ...taskData }
 
         const template = new EffectTemplate(campaign.value?.info?.template!, tempTaskData, {}, task)
         templateHtml.value = template.render()
@@ -57,6 +57,7 @@ const renderTask = async (): Promise<void> => {
     }
 }
 
+// TODO: Implement drop reservation functionality in the contract and sdk.
 const stopTask = async (): Promise<void> => {
     // const reservation = await effectClient.tasks.getMyReservation(campaignId)
     // const stopResponse = await effectClient.tasks.stopTask(reservation)
@@ -64,20 +65,14 @@ const stopTask = async (): Promise<void> => {
     router.push(`/campaign/${campaignId}`)
 }
 
+// TODO: This flow needs work
 const submitTask = async (data: any): Promise<void> => {
-    console.log('Task::submitTask', data)
-    
+    const allReservations = await effectClient.tasks.getAllReservations()
+    const nextReservation = await effectClient.tasks.reserveTask(campaignId)
     const reservation = await effectClient.tasks.getMyReservation(campaignId).catch((error) => { throw error })
-    console.debug('reservation', reservation)
-
-    // BUG: there is an issue with submitTask here.
-    // Uncaught (in promise) Error: could not insert object, most likely a uniqueness constraint was violated.
-    const submitResponse = await effectClient.tasks.submitTask(campaignId, reservation.task_idx, data)
-    console.debug('submitResponse', submitResponse)
-
-    const nextReservation = await effectClient.tasks.reserveNextTask(campaignId, userAccount.value?.id!)
-    console.debug('nextReservation', nextReservation)
-    
+    const task = await effectClient.tasks.getTaskData(reservation).catch((error) => { throw error })
+    const submitResponse = await effectClient.tasks.submitTask(reservation, data)
+    const followingReservation = await effectClient.tasks.reserveTask(campaignId)
     await renderTask()
 }
 
