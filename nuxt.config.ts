@@ -8,7 +8,6 @@ export default defineNuxtConfig({
     host: 'localhost',
   },
   modules: [
-    '@nuxtjs/tailwindcss',
     '@vueuse/nuxt',
     // '@nuxt/image',
   ],

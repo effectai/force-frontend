@@ -1,0 +1,48 @@
+@import url(https://fonts.googleapis.com/css?family=Inter);
+
+:root {
+    --c-gray-1: #eee;
+    --c-gray-2: #ebebeb;
+    --c-gray-3: #fefefe;
+    
+    --c-dark-silver: #3e3e3e;
+
+    --c-pink-1: pink;
+
+    --fontColor: hsla(0, 0%, 0%, 0.8);
+    --fontColor-light: #fff;
+
+    --body-font: 'Inter', sans-serif;
+    --header-font: 'Georgia', serif;
+
+    --base-font-size: 112.5%;
+    --ratio: 1.414;
+    --max-w: 768px;
+    --font-size-sm: 90%;
+
+    /* Calculations */
+    --space-unit: 1.778rem;
+    --space-vert: var(--space-unit);
+    --space-vert-2: calc(2 * var(--space-unit));
+    --space-vert-3: calc(3 * var(--space-unit));
+
+    /* Sizes */
+    --border-radius-md: 1rem;
+}
+
+html {
+    height: 100%;
+    font-size: var(--base-font-size);
+    color: var(--font-color);
+    font-family: var(--body-font);
+}
+
+body {
+    height: 100%;
+    background-color: var(--c-gray-1);
+}
+
+.container {
+    max-width: var(--max-w);
+    margin: 0 auto;
+}
