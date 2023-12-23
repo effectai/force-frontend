@@ -6,7 +6,7 @@
     </NuxtLink>
 
     <NuxtLink to="/" class="login">
-      <div>Login</div>
+      <div>Connect</div>
     </NuxtLink>
   </nav>
 </template>
