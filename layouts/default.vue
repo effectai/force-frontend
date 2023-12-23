@@ -1,8 +1,3 @@
-<style>
-  @import '../assets/css/normalize.css';
-  @import '../assets/css/global.css';
-</style>
-
 <template>
     <NavBar />
     <div class="container">

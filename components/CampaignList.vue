@@ -58,7 +58,7 @@ const { allCampaigns, loadingAllCampaigns } = useEffectClient()
 
 <style>
   .rounded {
-    border-radius: 1rem;
+    border-radius: 0.55rem;
     overflow: hidden;
   }
 
@@ -68,6 +68,9 @@ const { allCampaigns, loadingAllCampaigns } = useEffectClient()
     background-color: var(--c-gray-3);
     font-size: var(--font-size-sm);
 
+    tr {
+      border-bottom: 1px solid var(--c-gray-1);
+    }
     td {
       padding: 0.9rem;
       overflow: hidden;
@@ -93,6 +96,4 @@ const { allCampaigns, loadingAllCampaigns } = useEffectClient()
       background-color: var(--c-gray-3);
     }
   }
-
-
 </style>
