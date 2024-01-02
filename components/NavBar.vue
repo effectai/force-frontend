@@ -2,12 +2,17 @@
   <nav>
     <NuxtLink to="/" class="logo">
       <img src="/img/effect-logo-black.png" style="height: 35px;" />
-      <h1><strong>Effect</strong> Net</h1>
+      <h1>Effect.AI</h1>
     </NuxtLink>
 
-    <NuxtLink to="/" class="login">
-      <div>Connect</div>
-    </NuxtLink>
+    <div class="user" v-if="!userLoggedIn">
+	<NuxtLink to="/" class="connect"  @click="connectWallet()">
+	    <div>Connect</div>
+	</NuxtLink>
+    </div>
+    <div v-else class="user">
+	<span class="profile">{{ userName }}</span>
+    </div>
   </nav>
 </template>
 
@@ -38,7 +43,7 @@ nav {
   border-bottom: 1px solid var(--c-border);
   display: flex;
 }
-nav .login {
+nav .user {
   margin-left: auto;
   padding: 0 1.45rem;  
   align-self: center;
@@ -47,7 +52,11 @@ nav .login {
   align-self: stretch;
   display: flex;
   align-items: center;
+}
+nav .user .connect {
   font-size: 1em;
+}
+nav .user .profile {
 }
 .logo h1 {
   padding: 0.75rem 0;

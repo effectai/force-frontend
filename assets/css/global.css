@@ -4,7 +4,7 @@
     --c-gray-1: #eee;
     --c-gray-2: #ebebeb;
     --c-gray-3: #fefefe;
-    
+
     --c-dark-silver: #3e3e3e;
     --c-border: hsla(0, 0%, 0%, 0.2);
 
@@ -29,6 +29,7 @@
 
     /* Sizes */
     --border-radius-md: 1rem;
+    --border-radius-sm: 0.25rem;
 }
 
 html {
@@ -46,4 +47,34 @@ body {
 .container {
     max-width: var(--max-w);
     margin: 0 auto;
+}
+
+ol, ul, dl, p {
+    margin: var(--space-vert) 0;
+}
+dt {
+    font-weight: 700;
+}
+
+.space {
+    margin: var(--space-vert) 0;
+}
+
+.cols {
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+}
+
+.btn {
+    font-size: 0.9rem;
+    border-radius: var(--border-radius-sm);
+    padding: 0.1rem 0.75rem;
+    font-weight: 400;
+    text-align: center;
+    line-height: 1.5;
+    user-select: none;
+    border: 1px solid var(--c-dark-silver);
+    transition: background .1s linear;
+    cursor: pointer;
 }
