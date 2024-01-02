@@ -53,7 +53,7 @@
         background-color: var(--c-gray-3);
         padding: 0 0.9rem;
         border-radius: var(--border-radius-sm);
-        border: 1px solid var(--c-border);
+        border: 1px solid var(--c-gray-1);
     }
 </style>
 

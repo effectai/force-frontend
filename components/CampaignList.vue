@@ -58,7 +58,8 @@ const { allCampaigns, loadingAllCampaigns } = useEffectClient()
 
 <style>
   .rounded {
-    border-radius: 0.55rem;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--c-gray-1);
     overflow: hidden;
   }
 
