@@ -41,7 +41,6 @@
                 <p v-else>No instructions found.</p>
                 <div class="divider"></div>
                 <div class="card-actions">
-
                 </div>
             </div>
 	</div>

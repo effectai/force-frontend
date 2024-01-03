@@ -68,8 +68,7 @@ dt {
 
 .btn {
     font-size: 0.9rem;
-    border-radius: var(--border-radius-sm);
-    padding: 0.1rem 0.75rem;
+    padding: 0.1rem .9rem;
     font-weight: 400;
     text-align: center;
     line-height: 1.5;
@@ -77,4 +76,19 @@ dt {
     border: 1px solid var(--c-dark-silver);
     transition: background .1s linear;
     cursor: pointer;
+    text-decoration: none;
+}
+
+a {
+    text-decoration: underline;
+    color: black;
+}
+a:link {
+}
+a:visited {
+}
+a:hover {
+    text-decoration: none;
+}
+a:active {
 }

@@ -22,7 +22,9 @@
                 <div class="avatar">
                 </div>
                 <div>
-                  <div class="font-bold">{{ campaign.owner.at(1) }}</div>
+                    <div class="font-bold">
+			{{ campaign.owner.at(1) }}
+		    </div>
                 </div>
               </div>
             </td>
@@ -36,7 +38,9 @@
             </td>
             <td>{{ campaign.reward.quantity }}</td>
             <td>
-              <NuxtLink :to="`campaign/${campaign.id}`" class="btn btn-ghost btn-xs">Details</NuxtLink>
+		<NuxtLink :to="`campaign/${campaign.id}`" class="btn">
+		    Details
+		</NuxtLink>
             </td>
           </tr>
         </tbody>
@@ -73,7 +77,7 @@ const { allCampaigns, loadingAllCampaigns } = useEffectClient()
       border-bottom: 1px solid var(--c-gray-1);
     }
     td {
-      padding: 0.9rem;
+      padding: .9rem .9rem;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;

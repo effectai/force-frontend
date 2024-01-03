@@ -1,8 +1,8 @@
 <template>
   <nav>
     <NuxtLink to="/" class="logo">
-      <img src="/img/effect-logo-black.png" style="height: 35px;" />
-      <h1>Effect.AI</h1>
+	<img src="/img/effect-logo-black.png" style="height: 35px;" />
+	<h1>Effect.AI</h1>
     </NuxtLink>
 
     <div class="user" v-if="!userLoggedIn">
@@ -66,24 +66,16 @@ nav .user .profile {
   font-size: 1em;
   margin: 0;
 }
+a.logo {
+  text-decoration: none;
+}
+
 .logo img {
   margin: 0 0.45rem;  
 }
 .logo {
   display: flex;
   align-items: center;
-}
-a:link { 
-  text-decoration: none; 
-} 
-a:visited { 
-  text-decoration: none; 
-} 
-a:hover { 
-  text-decoration: none; 
-} 
-a:active { 
-  text-decoration: none; 
 }
 
 </style>
