@@ -64,7 +64,6 @@ const { allCampaigns, loadingAllCampaigns } = useEffectClient()
   .rounded {
     border-radius: var(--border-radius-sm);
     border: 1px solid var(--c-gray-1);
-    overflow: hidden;
   }
 
   table {

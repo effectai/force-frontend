@@ -2,7 +2,7 @@
   <nav>
     <NuxtLink to="/" class="logo">
 	<img src="/img/effect-logo-black.png" style="height: 35px;" />
-	<h1>Effect.AI</h1>
+	<h1>Effect</h1>
     </NuxtLink>
 
     <div class="user" v-if="!userLoggedIn">

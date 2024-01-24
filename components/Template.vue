@@ -1,7 +1,7 @@
 <template>
     <div
         class="template-wrapper"
-        style="width: 100%; border: none; overflow: hidden;"
+        style="width: 100%; height: 100%;  border: none; overflow: hidden;"
     >
         <div v-show="loading && !iframeLoaded" class="flex">
             <TemplateSkeleton />
@@ -12,7 +12,7 @@
             id="mediaFrame"
             ref="mediaFrame"
             src="https://effectai.github.io/force-frontend/template"
-            style="width: 100%;border: none; overflow: hidden;"
+            style="width: 100%; height: 100%; border: none; overflow: hidden;"
             name="mediaFrame"
             sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-same-origin"
             allow="geolocation; microphone; camera; autoplay; fullscreen"
@@ -99,13 +99,15 @@ export default {
 }
 </script>
 
-<!-- <style lang="scss" scoped>
+<style lang="css" scoped>
 .template-wrapper {
     width: 100%;
+    border: 4px solid var(--c-border) !important;
+    box-sizing: border-box;
 }
 
 #mediaFrame {
     width: 100%;
     border: none;
 }
-</style> -->
+</style>

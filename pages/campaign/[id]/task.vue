@@ -1,26 +1,19 @@
 <template>
-    <div class="container">
-        <div v-if="!loading">
-            <div v-if="campaign?.info?.template && templateHtml">
+        <template v-if="!loading">
+            <template v-if="campaign?.info?.template && templateHtml">
                 <Template :html="templateHtml" @submit="submitTask"/>
-                <div class="divider"></div>
-                <div class="container mx-auto text-center">
-                    <div class="join join-horizontal">
-                        <button @click="stopTask" class="btn join-item" >Stop</button>
-                        <button @click="submitTask" class="btn btn-primary join-item">Submit</button>
-                        <button @click="reportTask" class="btn join-item">Report</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div v-else class="mx-auto flex">
+	    </template>
+        </template>
+        <template v-else class="mx-auto flex">
             <TemplateSkeleton />
-        </div>
-    </div>
+        </template>
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+definePageMeta({
+    middleware: 'auth',
+    layout: 'task'
+})
 
 // Template needs to be renamed to avoid naming conflict with Vue3's template variable.
 import { Template as EffectTemplate } from '@effectai/effect-js'
