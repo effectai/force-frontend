@@ -1,14 +1,15 @@
 <template>
+    <div v-show="loading && !iframeLoaded" style="height: 100%;">
+	<TemplateSkeleton />
+    </div>
     <div
+        v-show="!loading && iframeLoaded"
         class="template-wrapper"
         style="width: 100%; height: 100%;  border: none; overflow: hidden;"
-    >
-        <div v-show="loading && !iframeLoaded" class="flex">
-            <TemplateSkeleton />
-        </div>
+	>
+
         <!-- TODO: add polyfill for srcdoc or move to different URL and use src -->
         <iframe
-            v-show="!loading && iframeLoaded"
             id="mediaFrame"
             ref="mediaFrame"
             src="https://effectai.github.io/force-frontend/template"
@@ -18,7 +19,7 @@
             allow="geolocation; microphone; camera; autoplay; fullscreen"
             allowFullScreen
             @load="mediaFrameLoaded"
-        />
+            />
     </div>
 </template>
 
@@ -102,7 +103,7 @@ export default {
 <style lang="css" scoped>
 .template-wrapper {
     width: 100%;
-    border: 4px solid var(--c-border) !important;
+    border: 2px solid var(--c-border) !important;
     box-sizing: border-box;
 }
 

@@ -28,6 +28,7 @@ nav.task-nav {
   border-bottom: 1px solid var(--c-border);
   margin-bottom: 0;
   display: flex;
+  transition: background 15s linear;
 }
 nav .user {
   margin-left: auto;
