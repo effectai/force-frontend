@@ -9,10 +9,11 @@
 	>
 
         <!-- TODO: add polyfill for srcdoc or move to different URL and use src -->
+        <!-- TODO: configurable template server host  -->
         <iframe
             id="mediaFrame"
             ref="mediaFrame"
-            src="https://effectai.github.io/force-frontend/template"
+            src="http://localhost:3030/template"
             style="width: 100%; height: 100%; border: none; overflow: hidden;"
             name="mediaFrame"
             sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-same-origin"
