@@ -104,7 +104,7 @@ export default {
 <style lang="css" scoped>
 .template-wrapper {
     width: 100%;
-    border: 2px solid var(--c-border) !important;
+    border: 8px solid var(--c-border) !important;
     box-sizing: border-box;
 }
 
