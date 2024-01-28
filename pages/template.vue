@@ -7,7 +7,7 @@
       v-if="html"
       id="mediaFrame"
       ref="mediaFrame"
-      style="min-height: 100%; box-sizing: border-box; margin: 0;"
+      style="box-sizing: border-box; margin: 0;"
       :srcdoc="html"
       name="mediaFrame"
       sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-same-origin"
