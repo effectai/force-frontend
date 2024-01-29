@@ -8,7 +8,6 @@
 
 	<div class="user" v-if="!userLoggedIn">
 	    <NuxtLink to="/" class="connect"  @click="connectWallet()">
-		<div>Get Support</div>
 	    </NuxtLink>
 	</div>
 	<div v-else class="user">
