@@ -1,46 +1,35 @@
 <template>
   <div class="container mx-auto px-2">
-    <div v-if="!loadingAllCampaigns">
+    <div class="rounded" v-if="!loadingAllCampaigns">
       <table v-if="allCampaigns && allCampaigns.length && allCampaigns.length > 0" class="table">
-        <!-- head -->
         <thead>
           <tr>
-            <th>
-              <label>
-                <!-- <input type="checkbox" class="checkbox" /> -->
-              </label>
-            </th>
-            <th>Name</th>
-            <th>Job</th>
-            <th>EFX / Task</th>
+            <th></th>
+            <th>Dataset</th>
+            <th>Title</th>
+            <th>Reward</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="campaign in allCampaigns" :key="campaign.id">
-            <th>
-              <label>
-                <!-- <input type="checkbox" class="checkbox" /> -->
-                {{ campaign.id }}
-              </label>
-            </th>
             <td>
-              <div class="flex items-center space-x-3">
+              <label> 
+             </label>
+            </td>
+            <td>
+              <div class="">
                 <div class="avatar">
-                  <div class="mask mask-squircle w-12 h-12">
-                    <img src="/badges/data_master.svg" alt="Avatar Tailwind CSS Component" />
-                  </div>
                 </div>
                 <div>
-                  <div class="font-bold">{{ campaign.owner.at(1) }}</div>
-                  <div class="text-sm opacity-50 badge badge-ghost badge-sm">{{ 'NL' }}</div>
+                    <div class="font-bold">
+			{{ campaign.owner.at(1) }}
+		    </div>
                 </div>
               </div>
             </td>
-            <td v-if="campaign && campaign.info">
+            <td v-if="campaign && campaign.info" class="title">
               {{ campaign?.info.title }}
-              <br />
-              <div class="text-sm opacity-50">{{ campaign?.info.description }}</div>
             </td>
             <td v-else>
               {{ 'No title' }}
@@ -48,9 +37,11 @@
               <div class="text-sm opacity-50">{{ 'No description' }}</div>
             </td>
             <td>{{ campaign.reward.quantity }}</td>
-            <th>
-              <NuxtLink :to="`campaign/${campaign.id}`" class="btn btn-ghost btn-xs">Details</NuxtLink>
-            </th>
+            <td>
+		<NuxtLink :to="`campaign/${campaign.id}`" class="btn">
+		    Details
+		</NuxtLink>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -66,6 +57,47 @@
 
 <script setup lang="ts">
 const { allCampaigns, loadingAllCampaigns } = useEffectClient()
+
 </script>
 
-<style></style>
+<style>
+  .rounded {
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--c-gray-1);
+  }
+
+  table {
+  border-collapse: collapse; 
+    width: 100%;
+    background-color: var(--c-gray-3);
+    font-size: var(--font-size-sm);
+
+    tr {
+      border-bottom: 1px solid var(--c-gray-1);
+    }
+    td {
+      padding: .9rem .9rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    td.title {
+      max-width: 200px;
+    }
+
+    th {
+      padding: 0.3rem 0;
+      border: 0;
+      border-style: hidden;
+    }
+
+    thead {
+      background-color: var(--c-dark-silver);
+      color: var(--fontColor-light);
+      tr {      border-style: hidden;}
+    }
+    tbody {
+      background-color: var(--c-gray-3);
+    }
+  }
+</style>

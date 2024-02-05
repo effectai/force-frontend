@@ -1,0 +1,94 @@
+@import url(https://fonts.googleapis.com/css?family=Inter);
+
+:root {
+    --c-gray-1: #eee;
+    --c-gray-2: #ebebeb;
+    --c-gray-3: #fefefe;
+
+    --c-dark-silver: #3e3e3e;
+    --c-border: hsla(0, 0%, 0%, 0.2);
+
+    --c-pink-1: #ffc627;
+
+    --fontColor: hsla(0, 0%, 0%, 0.8);
+    --fontColor-light: #fff;
+
+    --body-font: 'Inter', sans-serif;
+    --header-font: 'Georgia', serif;
+
+    --base-font-size: 112.5%;
+    --ratio: 1.414;
+    --max-w: 768px;
+    --font-size-sm: 90%;
+
+    /* Calculations */
+    --space-unit: 1.778rem;
+    --space-vert: var(--space-unit);
+    --space-vert-2: calc(2 * var(--space-unit));
+    --space-vert-3: calc(3 * var(--space-unit));
+
+    /* Sizes */
+    --border-radius-md: 1rem;
+    --border-radius-sm: 0.25rem;
+}
+
+html {
+    height: 100%;
+    font-size: var(--base-font-size);
+    color: var(--font-color);
+    font-family: var(--body-font);
+}
+
+body {
+    height: 100%;
+    background-color: var(--c-gray-1);
+}
+
+.container {
+    max-width: var(--max-w);
+    margin: 0 auto;
+}
+
+ol, ul, dl, p {
+    margin: var(--space-vert) 0;
+}
+dt {
+    font-weight: 700;
+}
+
+.space {
+    margin: var(--space-vert) 0;
+}
+
+.cols {
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+}
+
+.btn {
+    font-size: 0.9rem;
+    padding: 0.1rem .9rem;
+    font-weight: 400;
+    text-align: center;
+    line-height: 1.5;
+    user-select: none;
+    border: 1px solid var(--c-dark-silver);
+    transition: background .1s linear;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+a {
+    text-decoration: underline;
+    color: black;
+}
+a:link {
+}
+a:visited {
+}
+a:hover {
+    text-decoration: none;
+}
+a:active {
+}

@@ -13,9 +13,13 @@ const userPermission  : Ref<string>             = ref('')
 const efxPrice        : Ref<number>             = ref(0)
 const reservation     : Ref<Reservation | null> = ref(null)
 const allCampaigns    : Ref<Campaign[]>         = ref([])
-const loadingAllCampaigns : Ref<boolean>           = ref(false)
+const loadingAllCampaigns : Ref<boolean>        = ref(false)
 
 const walletConnecting = ref(false)
+
+const loadData = async () => {
+  allCampaigns.value = await effectClient.tasks.getAllCampaigns()
+}
 
 const connectWallet = async (session?: Session) => {
     walletConnecting.value = true
@@ -72,4 +76,5 @@ export const useEffectClient = () => ({
     reservation,
     allCampaigns,
     loadingAllCampaigns,
+    loadData,
  })

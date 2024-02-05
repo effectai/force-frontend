@@ -1,11 +1,11 @@
 <template>
-    <div class="container mx-auto">
-        <NavBar />
+    <NavBar />
+    <div class="container">
         <section class="">
             <div class="flex items-center">
                 <slot />
             </div>
         </section>
-        <Footer />
     </div>
 </template>
+
