@@ -80,6 +80,7 @@ dt {
     transition: background .1s linear;
     cursor: pointer;
     text-decoration: none;
+    background-color: #e9e9ed;
 }
 
 a {

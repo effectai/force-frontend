@@ -6,14 +6,11 @@
 	  <div class="content">
             <div>
               <div class="">
-                <div class="avatar">
+                <div class="cols campaign">
+                  <div>{{ campaign.owner.at(1) }}</div>
+                  <div class="quant">{{ campaign.reward.quantity }}/tsk</div>
                 </div>
-                <div>
-                    <div class="font-bold">
-			{{ campaign.owner.at(1) }}
-		    </div>
-                </div>
-              </div>
+	      </div>
             </div>
             <div v-if="campaign && campaign.info" class="title">
               <span class="title">{{ campaign?.info.title }}</span>
@@ -23,12 +20,10 @@
               <br>
               <div class="text-sm opacity-50">{{ 'No description' }}</div>
             </div>
-            <div>{{ campaign.reward.quantity }}</div>
-
 	    <div class="small-space"></div>
             <div class="">
 		<NuxtLink :to="`campaign/${campaign.id}`" class="btn">
-		    Details
+		    details
 		</NuxtLink>
             </div>
           </div>
@@ -45,8 +40,7 @@
 </template>
 
 <script setup lang="ts">
-const { allCampaigns, loadingAllCampaigns } = useEffectClient()
-
+const { effectClient, allCampaigns, loadingAllCampaigns } = useEffectClient()
 </script>
 
 <style>
@@ -88,5 +82,12 @@ const { allCampaigns, loadingAllCampaigns } = useEffectClient()
     tbody {
       background-color: var(--c-gray-3);
     }
+  }
+  .campaign .quant {
+      margin-left: auto;
+
+  }
+  .cols.campaign {
+      font-size: var(--font-size-sm);
   }
 </style>
