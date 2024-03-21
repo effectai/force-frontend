@@ -2,7 +2,7 @@
   <nav>
     <NuxtLink to="/" class="logo">
 	<img src="/img/effect-logo-black.png" style="height: 35px;" />
-	<h1>Effect</h1>
+	<h1>Effect AI</h1>
     </NuxtLink>
 
     <div class="user" v-if="!userLoggedIn">
@@ -11,7 +11,9 @@
 	</NuxtLink>
     </div>
     <div v-else class="user">
-	<span class="profile">{{ userName }}</span>
+	<NuxtLink to="/" class="connect"  @click="disconnectWallet()">
+            <span class="profile">{{ userName }}</span>
+	</NuxtLink>
     </div>
   </nav>
 </template>

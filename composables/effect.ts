@@ -13,12 +13,19 @@ const userPermission  : Ref<string>             = ref('')
 const efxPrice        : Ref<number>             = ref(0)
 const reservation     : Ref<Reservation | null> = ref(null)
 const allCampaigns    : Ref<Campaign[]>         = ref([])
+const campaignsMap    : Ref<Map>                 = ref(new Map())
+const reservations    : Ref<Reservation[]>      = ref([])
 const loadingAllCampaigns : Ref<boolean>        = ref(false)
 
 const walletConnecting = ref(false)
 
 const loadData = async () => {
-  allCampaigns.value = await effectClient.tasks.getAllCampaigns()
+    allCampaigns.value = await effectClient.tasks.getAllCampaigns()
+    reservations.value = await effectClient.tasks.getAllMyReservations();
+    for (var c in allCampaigns.value) {
+	const camp = allCampaigns.value[c]
+	campaignsMap.value.set(camp.id, camp);
+    };
 }
 
 const connectWallet = async (session?: Session) => {
@@ -26,10 +33,12 @@ const connectWallet = async (session?: Session) => {
     try {
         // Login
         if (session) {
-            effectClient.loginWithSession(session)
+            await effectClient.loginWithSession(session)
         } else {
             const { session: newSession } = await sessionKit.login()
-            effectClient.loginWithSession(newSession)
+            await effectClient.loginWithSession(newSession)
+	    console.log('---------')
+	    console.log(effectClient.vaccountId)
         }
         
         // Retrieve Campaigns
@@ -75,6 +84,8 @@ export const useEffectClient = () => ({
     efxPrice,
     reservation,
     allCampaigns,
+    reservations,
+    campaignsMap,
     loadingAllCampaigns,
     loadData,
  })

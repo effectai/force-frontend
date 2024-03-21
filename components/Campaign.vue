@@ -54,6 +54,11 @@
         border-radius: var(--border-radius-sm);
         border: 1px solid var(--c-gray-1);
     }
+    .box > .content { margin: 0.9rem 0; }
+    .box .content > .title {
+        font-size: 1.2em;
+	margin: 0.5rem 0;
+    }
 </style>
 
 <script setup lang="ts">

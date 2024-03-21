@@ -59,6 +59,9 @@ dt {
 .space {
     margin: var(--space-vert) 0;
 }
+.small-space {
+    margin: calc(0.5 * var(--space-vert)) 0;
+}
 
 .cols {
     display: flex;

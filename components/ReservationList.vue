@@ -1,10 +1,23 @@
 <template>
   <div class="container mx-auto px-2">
-    <div class="" v-if="!loadingAllCampaigns">
-      <div v-if="allCampaigns && allCampaigns.length && allCampaigns.length > 0" class="table">
-        <div class="space box" v-for="campaign in allCampaigns" :key="campaign.id">
-	  <div class="content">
-            <div>
+    <div class="rounded" v-if="!loadingAllCampaigns">
+      <table v-if="reservations && reservations.length && reservations.length > 0" class="table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Dataset</th>
+            <th>Title</th>
+            <th>Reward</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="campaign in reservationCampaigns" :key="campaign.id">
+            <td>
+              <label> 
+             </label>
+            </td>
+            <td>
               <div class="">
                 <div class="avatar">
                 </div>
@@ -14,26 +27,24 @@
 		    </div>
                 </div>
               </div>
-            </div>
-            <div v-if="campaign && campaign.info" class="title">
-              <span class="title">{{ campaign?.info.title }}</span>
-            </div>
-            <div v-else>
+            </td>
+            <td v-if="campaign && campaign.info" class="title">
+              {{ campaign?.info.title }}
+            </td>
+            <td v-else>
               {{ 'No title' }}
               <br>
               <div class="text-sm opacity-50">{{ 'No description' }}</div>
-            </div>
-            <div>{{ campaign.reward.quantity }}</div>
-
-	    <div class="small-space"></div>
-            <div class="">
+            </td>
+            <td>{{ campaign.reward.quantity }}</td>
+            <td>
 		<NuxtLink :to="`campaign/${campaign.id}`" class="btn">
 		    Details
 		</NuxtLink>
-            </div>
-          </div>
-	  </div>
-      </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <div v-else class="flex">
         <p class="text-center">There are no campaigns to work on.</p>
       </div>
@@ -45,8 +56,11 @@
 </template>
 
 <script setup lang="ts">
-const { allCampaigns, loadingAllCampaigns } = useEffectClient()
+const { reservations, campaignsMap, allCampaigns, loadingAllCampaigns } = useEffectClient()
 
+const reservationCampaigns = computed(() => {
+      return reservations.value.map((r) => campaignsMap.value.get(r.campaign_id))
+})
 </script>
 
 <style>
