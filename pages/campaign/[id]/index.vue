@@ -74,7 +74,7 @@ const modal = ref(null);
 
 // const campaign = allCampaigns.value.find((c: Campaign) => c.id === props.campaignId);
 const campaign: Ref<Campaign | undefined> = ref(
-    await client.tasks.getCampaign(props.campaignId)
+    await client.value.tasks.getCampaign(props.campaignId)
 );
 // TODO Add a default image for campaigns without an image.
 const imgurl: Ref<string> = computed(
@@ -82,7 +82,7 @@ const imgurl: Ref<string> = computed(
 );
 
 const reserveTask = async () => {
-    const reserveResponse = await effectClient.tasks.reserveTask(
+    const reserveResponse = await client.value.tasks.reserveTask(
         props.campaignId
     );
     console.debug("reserveResponse", reserveResponse);
@@ -91,7 +91,4 @@ const reserveTask = async () => {
 };
 </script>
 
-<style>
-::backdrop {
-}
-</style>
+<style></style>
