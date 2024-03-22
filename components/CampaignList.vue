@@ -1,93 +1,74 @@
 <template>
-  <div class="container mx-auto px-2">
-    <div class="" v-if="!loadingAllCampaigns">
-      <div v-if="allCampaigns && allCampaigns.length && allCampaigns.length > 0" class="table">
-        <div class="space box" v-for="campaign in allCampaigns" :key="campaign.id">
-	  <div class="content">
-            <div>
-              <div class="">
-                <div class="cols campaign">
-                  <div>{{ campaign.owner.at(1) }}</div>
-                  <div class="quant">{{ campaign.reward.quantity }}/tsk</div>
-                </div>
-	      </div>
-            </div>
-            <div v-if="campaign && campaign.info" class="title">
-              <span class="title">{{ campaign?.info.title }}</span>
-            </div>
-            <div v-else>
-              {{ 'No title' }}
-              <br>
-              <div class="text-sm opacity-50">{{ 'No description' }}</div>
-            </div>
-	    <div class="small-space"></div>
-            <div class="">
-		<NuxtLink :to="`campaign/${campaign.id}`" class="btn">
-		    details
-		</NuxtLink>
-            </div>
-          </div>
-	  </div>
-      </div>
-      <div v-else class="flex">
-        <p class="text-center">There are no campaigns to work on.</p>
-      </div>
+    <div>
+        <div v-if="campaigns.length === 0">
+            <slot name="empty"></slot>
+        </div>
+        <div v-else-if="campaigns && campaigns.length > 0">
+            <table
+                class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+            >
+                <thead
+                    class="text-xs uppercase bg-primary text-white dark:bg-gray-700 dark:text-gray-400"
+                >
+                    <tr>
+                        <th class="px-6 py-3">Dataset</th>
+                        <th>Title</th>
+                        <th>Reward</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="(campaign, index) in campaigns"
+                        @click="router.push(`/campaign/${campaign.id}`)"
+                        :key="campaign.id"
+                        class="cursor-pointer hover:bg-gray-100 bg-white border-b"
+                    >
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-5">
+                                <UserAvatar :id="campaign.owner.at(1)" />
+                                <div>
+                                    <div class="font-bold">
+                                        {{ campaign.owner.at(1) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td v-if="campaign && campaign.info" class="">
+                            {{ campaign?.info.title }}
+                        </td>
+                        <td v-else>
+                            {{ "No title" }}
+                            <br />
+                            <div class="text-sm opacity-50">
+                                {{ "No description" }}
+                            </div>
+                        </td>
+                        <td class="quantity">
+                            {{ campaign.reward.quantity }}/tsk
+                        </td>
+                        <td v-if="showContinue">
+                            <NuxtLink :to="`campaign/${campaign.id}`"
+                                >continue</NuxtLink
+                            >
+
+                            <span
+                                aria-hidden="true"
+                                class="icon icon-caret-right"
+                            ></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div v-else>
-      <CampaignListSkeleton />
-    </div>
-  </div>
 </template>
 
 <script setup lang="ts">
-const { effectClient, allCampaigns, loadingAllCampaigns } = useEffectClient()
+import type { Campaign } from "@effectai/effect-js";
+
+const props = defineProps<{ campaigns: Campaign[]; showContinue: boolean }>();
+const router = useRouter();
 </script>
 
-<style>
-  .rounded {
-    border-radius: var(--border-radius-sm);
-    border: 1px solid var(--c-gray-1);
-  }
-
-  table {
-  border-collapse: collapse; 
-    width: 100%;
-    background-color: var(--c-gray-3);
-    font-size: var(--font-size-sm);
-
-    tr {
-      border-bottom: 1px solid var(--c-gray-1);
-    }
-    td {
-      padding: .9rem .9rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    td.title {
-      max-width: 200px;
-    }
-
-    th {
-      padding: 0.3rem 0;
-      border: 0;
-      border-style: hidden;
-    }
-
-    thead {
-      background-color: var(--c-dark-silver);
-      color: var(--fontColor-light);
-      tr {      border-style: hidden;}
-    }
-    tbody {
-      background-color: var(--c-gray-3);
-    }
-  }
-  .campaign .quant {
-      margin-left: auto;
-
-  }
-  .cols.campaign {
-      font-size: var(--font-size-sm);
-  }
-</style>
+<style></style>
