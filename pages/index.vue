@@ -9,15 +9,15 @@
                 a reservation for.
             </p>
             <CampaignList
-                :loading="isLoadingReservations"
                 v-if="reservedCampaigns"
+                :loading="isLoadingReservations"
                 :campaigns="reservedCampaigns"
             >
                 <template #empty>
-                    <div>No datasets found.</div>
+                    <div>No reservations found.</div>
                 </template>
                 <template #loading>
-                    <div>Loading...</div>
+                    <div>Loading reservations</div>
                 </template>
             </CampaignList>
         </div>
@@ -32,10 +32,10 @@
             </p>
             <CampaignList :loading="isLoadingCampaigns" :campaigns="campaigns">
                 <template #empty>
-                    <div>No datasets found.</div>
+                    <div>No campaigns found.</div>
                 </template>
                 <template #loading>
-                    <div>Loading...</div>
+                    <div>Loading campaigns</div>
                 </template>
             </CampaignList>
         </div>
@@ -49,10 +49,7 @@ const { data: campaigns, isLoading: isLoadingCampaigns } = useCampaigns();
 const { isReserved, isLoading: isLoadingReservations } = useReservations();
 
 const reservedCampaigns = computed(() => {
-    return (
-        (campaigns.value && campaigns.value.filter((c) => isReserved(c.id))) ??
-        []
-    );
+    return campaigns.value?.filter((c) => isReserved(c.id)) ?? [];
 });
 </script>
 

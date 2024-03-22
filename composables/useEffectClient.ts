@@ -38,8 +38,6 @@ export const initClient = (): void => {
 };
 
 export const createEffectClient = (): ClientStore => {
-    console.log("creating client..");
-
     /* --------- SESSION LOGIC --------- */
     const { sessionKit } = useSessionKit();
 
