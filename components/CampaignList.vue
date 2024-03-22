@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="overflow-x-auto">
         <div v-if="loading">
             <slot name="loading"></slot>
         </div>
@@ -11,7 +11,7 @@
                 class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
             >
                 <thead
-                    class="text-xs uppercase bg-primary text-white dark:bg-gray-700 dark:text-gray-400"
+                    class="text-xs uppercase bg-primary text-white dark:bg-primary-700 dark:text-gray-400"
                 >
                     <tr>
                         <th class="px-6 py-3">Dataset</th>
@@ -22,14 +22,18 @@
                 </thead>
                 <tbody>
                     <tr
-                        v-for="(campaign, index) in campaigns"
+                        v-for="campaign in campaigns"
                         @click="router.push(`/campaign/${campaign.id}`)"
                         :key="campaign.id"
                         class="cursor-pointer hover:bg-gray-100 bg-white border-b"
                     >
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-5">
-                                <UserAvatar :id="campaign.owner.at(1)" />
+                                <UAvatar
+                                    :src="`https://i.pravatar.cc/100?img=${campaign.owner.at(
+                                        1
+                                    )}`"
+                                />
                                 <div>
                                     <div class="font-bold">
                                         {{ campaign.owner.at(1) }}
@@ -51,14 +55,21 @@
                             {{ campaign.reward.quantity }}/tsk
                         </td>
                         <td v-if="isCampaignReserved(campaign.id)">
-                            <NuxtLink :to="`campaign/${campaign.id}`"
+                            <NuxtLink
+                                class="hover:text-black hover:underline"
+                                :to="`campaign/${campaign.id}`"
                                 >continue</NuxtLink
                             >
 
                             <span
                                 aria-hidden="true"
                                 class="icon icon-caret-right"
-                            ></span>
+                            >
+                                <UIcon
+                                    name="i-flowbite-angle-right-outline"
+                                    dynamic
+                                />
+                            </span>
                         </td>
                     </tr>
                 </tbody>

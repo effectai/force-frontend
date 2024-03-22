@@ -15,17 +15,11 @@
                     <p class="my-5">{{ campaign.info?.description }}</p>
                 </div>
 
-                <div class="my-5">
-                    <button class="btn btn-primary" @click="reserveTask">
-                        Start
-                    </button>
-
-                    <button
-                        class="btn btn-secondary"
-                        onclick="instruction_modal.showModal()"
-                    >
+                <div class="flex gap-1">
+                    <UButton @click="reserveTask"> Start </UButton>
+                    <UButton onclick="instruction_modal.showModal()">
                         Show Instructions
-                    </button>
+                    </UButton>
                 </div>
 
                 <div
@@ -48,9 +42,7 @@
                             <p v-html="campaign.info.instructions"></p>
                         </div>
                         <form method="dialog" class="modal-backdrop mt-5">
-                            <button class="btn btn-secondary mt-5">
-                                close
-                            </button>
+                            <UButton> close </UButton>
                         </form>
                     </dialog>
                 </div>

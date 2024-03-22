@@ -2,12 +2,6 @@
 export default defineNuxtConfig({
     ssr: false,
     devtools: { enabled: true },
-    modules: ["@vueuse/nuxt"],
+    modules: ["@vueuse/nuxt", "@nuxt/ui"],
     css: ["@/assets/scss/global.scss"],
-    postcss: {
-        plugins: {
-            tailwindcss: {},
-            autoprefixer: {},
-        },
-    },
 });

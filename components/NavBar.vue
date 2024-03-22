@@ -2,8 +2,8 @@
     <nav
         class="w-full flex-col block bg-gray-100 py-4 border-1 border-bottom-1"
     >
-        <div
-            class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-3"
+        <UContainer
+            class="flex flex-wrap items-center justify-between mx-auto px-3"
         >
             <NuxtLink to="/" class="flex gap-1 items-center">
                 <img src="/img/effect-logo-black.png" style="height: 35px" />
@@ -11,13 +11,13 @@
             </NuxtLink>
 
             <div v-if="!isLoggedIn">
-                <NuxtLink
+                <UButton
                     class="btn btn-primary"
                     to="/"
                     @click="connectWallet()"
                 >
                     connect
-                </NuxtLink>
+                </UButton>
             </div>
 
             <div v-else class="">
@@ -25,7 +25,7 @@
                     logout
                 </NuxtLink>
             </div>
-        </div>
+        </UContainer>
     </nav>
 </template>
 
@@ -33,15 +33,12 @@
 const {
     connectWallet,
     disconnectWallet,
-    isWalletConnecting,
     isLoggedIn,
 
+    isWalletConnecting,
     userName,
     userAccount,
 } = useEffectClient();
-
-// retrieve ref of ul
-const dropDownElement = ref(null);
 </script>
 
 <style></style>
