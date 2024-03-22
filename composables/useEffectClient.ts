@@ -4,6 +4,7 @@ import {
     type Campaign,
     type Reservation,
 } from "@effectai/effect-js";
+import { useQuery } from "@tanstack/vue-query";
 import { Session } from "@wharfkit/session";
 
 export const useEffectClient = () => {
@@ -37,34 +38,33 @@ export const useEffectClient = () => {
     /* --------- HOOKS --------- */
 
     const useCampaigns = () => {
-        const campaigns = ref<Campaign[]>([]);
-        const loading = ref(false);
-
-        const loadCampaigns = async () => {
-            loading.value = true;
-            campaigns.value = await effectClient.tasks.getAllCampaigns();
-            loading.value = false;
-        };
-
-        loadCampaigns();
-
-        return { campaigns, loading, loadCampaigns };
+        return useQuery({
+            queryKey: ["campaigns"],
+            queryFn: async () => {
+                return await effectClient.tasks.getAllCampaigns();
+            },
+        });
     };
 
     const useReservations = () => {
-        const reservations = ref<Reservation[]>([]);
-        const loading = ref(false);
+        const query = useQuery({
+            queryKey: ["reservations"],
+            queryFn: async () => {
+                return await effectClient.tasks.getAllMyReservations();
+            },
+        });
 
-        const loadReservations = async () => {
-            loading.value = true;
-            reservations.value =
-                await effectClient.tasks.getAllMyReservations();
-            loading.value = false;
+        const isReserved = (campaignId: number) => {
+            if (query.data?.value?.length) {
+                return query.data.value.some(
+                    (r) => r.campaign_id === campaignId
+                );
+            }
+
+            return false;
         };
 
-        loadReservations();
-
-        return { reservations, loading, loadReservations };
+        return { ...query, isReserved };
     };
 
     /* --------- METHODS ------- */

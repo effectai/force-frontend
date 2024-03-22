@@ -1,6 +1,9 @@
 <template>
     <div>
-        <div v-if="campaigns.length === 0">
+        <div v-if="loading">
+            <slot name="loading"></slot>
+        </div>
+        <div v-else-if="campaigns.length === 0">
             <slot name="empty"></slot>
         </div>
         <div v-else-if="campaigns && campaigns.length > 0">
@@ -47,7 +50,7 @@
                         <td class="quantity">
                             {{ campaign.reward.quantity }}/tsk
                         </td>
-                        <td v-if="showContinue">
+                        <td v-if="isCampaignReserved(campaign.id)">
                             <NuxtLink :to="`campaign/${campaign.id}`"
                                 >continue</NuxtLink
                             >
@@ -67,8 +70,15 @@
 <script setup lang="ts">
 import type { Campaign } from "@effectai/effect-js";
 
-const props = defineProps<{ campaigns: Campaign[]; showContinue: boolean }>();
+const props = defineProps<{ campaigns: Campaign[]; loading: boolean }>();
 const router = useRouter();
+
+const { useReservations } = useEffectClient();
+const { isReserved } = useReservations();
+
+const isCampaignReserved = (campaignId: number) => {
+    return isReserved(campaignId);
+};
 </script>
 
 <style></style>

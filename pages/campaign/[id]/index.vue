@@ -72,10 +72,6 @@ const route = useRouter();
 const props = defineProps<{ campaignId: number }>();
 const modal = ref(null);
 
-onClickOutside(modal, (event) => {
-    console.log("clicked outside", event);
-});
-
 // const campaign = allCampaigns.value.find((c: Campaign) => c.id === props.campaignId);
 const campaign: Ref<Campaign | undefined> = ref(
     await effectClient.tasks.getCampaign(props.campaignId)

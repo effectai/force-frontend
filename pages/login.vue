@@ -1,8 +1,6 @@
 <template>
     <div class="mt-5">
-        <button @click="connectWallet()" class="btn btn-primary btn-outline">
-            Connect Wallet
-        </button>
+        <ConnectWallet />
     </div>
 </template>
 
