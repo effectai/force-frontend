@@ -38,7 +38,7 @@
                     <dialog
                         ref="modal"
                         id="instruction_modal"
-                        class="modal p-5 rounded-xl shadow-lg"
+                        class="modal p-5 prose rounded-xl shadow-lg"
                     >
                         <div class="modal-box w-11/12 max-w-5xl">
                             <h3 class="font-bold text-xl text-center my-5">
