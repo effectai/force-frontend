@@ -19,9 +19,13 @@ export interface ClientStore {
     userAccount: Ref<VAccount | null>;
     efxPrice: Ref<number>;
     useCampaigns: () => UseQueryReturnType<Campaign[], any>;
+    useCampaign: (campaignId: number) => UseQueryReturnType<Campaign, any>;
     useReservations: () => UseQueryReturnType<Reservation[], any> & {
         isReserved: (campaignId: number) => boolean;
     };
+    useReservation: (
+        campaignId: number
+    ) => UseQueryReturnType<Reservation, any>;
     connectWallet: (session?: Session) => Promise<void>;
     disconnectWallet: () => Promise<void>;
 }
@@ -72,6 +76,24 @@ export const createEffectClient = (): ClientStore => {
             queryKey: ["campaigns"],
             queryFn: async () => {
                 return await client.value.tasks.getAllCampaigns();
+            },
+        });
+    };
+
+    const useCampaign = (campaignId: number) => {
+        return useQuery({
+            queryKey: ["campaign", campaignId],
+            queryFn: async () => {
+                return await client.value.tasks.getCampaign(campaignId);
+            },
+        });
+    };
+
+    const useReservation = (campaignId: number) => {
+        return useQuery({
+            queryKey: ["reservation", campaignId],
+            queryFn: async () => {
+                return await client.value.tasks.getMyReservation(campaignId);
             },
         });
     };
@@ -148,6 +170,8 @@ export const createEffectClient = (): ClientStore => {
 
         // hooks
         useCampaigns,
+        useCampaign,
+        useReservation,
         useReservations,
 
         // methods
