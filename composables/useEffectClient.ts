@@ -4,11 +4,27 @@ import {
     type Campaign,
     type Reservation,
 } from "@effectai/effect-js";
-import { useQuery } from "@tanstack/vue-query";
+import { Query, useQuery, type UseQueryReturnType } from "@tanstack/vue-query";
 import { Session } from "@wharfkit/session";
 import { ClientNotInitializedError } from "~/errors/errors";
 
-let effectClient: Client | null = null;
+let effectClient: ClientStore | null;
+
+export interface ClientStore {
+    client: Ref<Client>;
+    isLoggedIn: Ref<boolean>;
+    isWalletConnecting: Ref<boolean>;
+    userName: Ref<string>;
+    userPermission: Ref<string>;
+    userAccount: Ref<VAccount | null>;
+    efxPrice: Ref<number>;
+    useCampaigns: () => UseQueryReturnType<Campaign[], any>;
+    useReservations: () => UseQueryReturnType<Reservation[], any> & {
+        isReserved: (campaignId: number) => boolean;
+    };
+    connectWallet: (session?: Session) => Promise<void>;
+    disconnectWallet: () => Promise<void>;
+}
 
 export const useEffectClient = () => {
     if (effectClient) return effectClient;
@@ -21,7 +37,7 @@ export const initClient = (): void => {
     effectClient = createEffectClient();
 };
 
-export const createEffectClient = () => {
+export const createEffectClient = (): ClientStore => {
     console.log("creating client..");
 
     /* --------- SESSION LOGIC --------- */
@@ -37,7 +53,7 @@ export const createEffectClient = () => {
 
     /* --------- CLIENT --------- */
 
-    const client = reactive(new Client("jungle4", { fetch }));
+    const client = shallowRef(new Client("jungle4", { fetch }));
 
     /* --------- REACTIVE DATA --------- */
 
@@ -57,7 +73,7 @@ export const createEffectClient = () => {
         return useQuery({
             queryKey: ["campaigns"],
             queryFn: async () => {
-                return await client.tasks.getAllCampaigns();
+                return await client.value.tasks.getAllCampaigns();
             },
         });
     };
@@ -66,7 +82,7 @@ export const createEffectClient = () => {
         const query = useQuery({
             queryKey: ["reservations"],
             queryFn: async () => {
-                return await client.tasks.getAllMyReservations();
+                return await client.value.tasks.getAllMyReservations();
             },
         });
 
@@ -90,19 +106,20 @@ export const createEffectClient = () => {
         try {
             // Login
             if (session) {
-                await client.loginWithSession(session);
+                await client.value.loginWithSession(session);
             } else {
                 const { session: newSession } = await sessionKit.login();
-                await client.loginWithSession(newSession);
+                await client.value.loginWithSession(newSession);
                 console.log("---------");
-                console.log(client.vaccountId);
+                console.log(client.value.vaccountId);
             }
 
             // Retrieve user Data
-            userAccount.value = await client.vaccount.get();
+            userAccount.value = await client.value.vaccount.get();
 
-            userName.value = client?.session.actor.toString();
-            userPermission.value = await client?.session?.permission.toString();
+            userName.value = client?.value.session.actor.toString();
+            userPermission.value =
+                await client?.value.session?.permission.toString();
             isLoggedIn.value = true;
             isWalletConnecting.value = false;
         } catch (error) {

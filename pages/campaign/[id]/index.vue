@@ -66,7 +66,7 @@
 
 <script setup lang="ts">
 import type { Campaign } from "@effectai/effect-js";
-const { effectClient } = useEffectClient();
+const { client } = useEffectClient();
 
 const route = useRouter();
 const props = defineProps<{ campaignId: number }>();
@@ -74,7 +74,7 @@ const modal = ref(null);
 
 // const campaign = allCampaigns.value.find((c: Campaign) => c.id === props.campaignId);
 const campaign: Ref<Campaign | undefined> = ref(
-    await effectClient.tasks.getCampaign(props.campaignId)
+    await client.tasks.getCampaign(props.campaignId)
 );
 // TODO Add a default image for campaigns without an image.
 const imgurl: Ref<string> = computed(
