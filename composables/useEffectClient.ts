@@ -6,8 +6,24 @@ import {
 } from "@effectai/effect-js";
 import { useQuery } from "@tanstack/vue-query";
 import { Session } from "@wharfkit/session";
+import { ClientNotInitializedError } from "~/errors/errors";
+
+let effectClient: Client | null = null;
 
 export const useEffectClient = () => {
+    if (effectClient) return effectClient;
+    throw new ClientNotInitializedError(
+        "Client not initialized. Please use the `initClient` method to initialize the client."
+    );
+};
+
+export const initClient = (): void => {
+    effectClient = createEffectClient();
+};
+
+export const createEffectClient = () => {
+    console.log("creating client..");
+
     /* --------- SESSION LOGIC --------- */
     const { sessionKit } = useSessionKit();
 
@@ -21,7 +37,7 @@ export const useEffectClient = () => {
 
     /* --------- CLIENT --------- */
 
-    const effectClient = reactive(new Client("jungle4", { fetch }));
+    const client = reactive(new Client("jungle4", { fetch }));
 
     /* --------- REACTIVE DATA --------- */
 
@@ -41,7 +57,7 @@ export const useEffectClient = () => {
         return useQuery({
             queryKey: ["campaigns"],
             queryFn: async () => {
-                return await effectClient.tasks.getAllCampaigns();
+                return await client.tasks.getAllCampaigns();
             },
         });
     };
@@ -50,7 +66,7 @@ export const useEffectClient = () => {
         const query = useQuery({
             queryKey: ["reservations"],
             queryFn: async () => {
-                return await effectClient.tasks.getAllMyReservations();
+                return await client.tasks.getAllMyReservations();
             },
         });
 
@@ -74,20 +90,19 @@ export const useEffectClient = () => {
         try {
             // Login
             if (session) {
-                await effectClient.loginWithSession(session);
+                await client.loginWithSession(session);
             } else {
                 const { session: newSession } = await sessionKit.login();
-                await effectClient.loginWithSession(newSession);
+                await client.loginWithSession(newSession);
                 console.log("---------");
-                console.log(effectClient.vaccountId);
+                console.log(client.vaccountId);
             }
 
             // Retrieve user Data
-            userAccount.value = await effectClient.vaccount.get();
+            userAccount.value = await client.vaccount.get();
 
-            userName.value = effectClient?.session.actor.toString();
-            userPermission.value =
-                await effectClient?.session?.permission.toString();
+            userName.value = client?.session.actor.toString();
+            userPermission.value = await client?.session?.permission.toString();
             isLoggedIn.value = true;
             isWalletConnecting.value = false;
         } catch (error) {
@@ -104,7 +119,7 @@ export const useEffectClient = () => {
 
     return {
         // client
-        effectClient,
+        client,
 
         // booleans
         isLoggedIn,
