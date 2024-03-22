@@ -1,6 +1,6 @@
 <template>
     <nav
-        class="w-full flex-col block bg-gray-100 py-2 border-1 border-bottom-1"
+        class="w-full flex-col block bg-gray-100 py-4 border-1 border-bottom-1"
     >
         <div
             class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-3"

@@ -10,8 +10,5 @@
 </template>
 
 <script setup lang="ts">
-const {
-    connectWallet,
-    walletConnecting,
-} = useEffectClient()
+const { connectWallet, isWalletConnecting } = useEffectClient();
 </script>

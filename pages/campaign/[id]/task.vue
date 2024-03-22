@@ -19,9 +19,10 @@ definePageMeta({
 import { Template as EffectTemplate } from "@effectai/effect-js";
 
 const router = useRouter();
+const campaignId = Number(router.currentRoute.value.params.id);
+
 const { client, userAccount, useCampaign, useReservation } = useEffectClient();
 
-const campaignId = Number(router.currentRoute.value.params.id);
 const { data: campaign } = useCampaign(campaignId);
 const { data: reservation } = useReservation(campaignId);
 

@@ -122,28 +122,20 @@ export const createEffectClient = (): ClientStore => {
     /* --------- METHODS ------- */
 
     const connectWallet = async (session?: Session) => {
-        isWalletConnecting.value = true;
         try {
-            // Login
-            if (session) {
-                await client.value.loginWithSession(session);
-            } else {
-                const { session: newSession } = await sessionKit.login();
-                await client.value.loginWithSession(newSession);
-                console.log("---------");
-                console.log(client.value.vaccountId);
-            }
+            isWalletConnecting.value = true;
 
-            // Retrieve user Data
+            const sessionToUse = session || (await sessionKit.login()).session;
+            await client.value.loginWithSession(sessionToUse);
             userAccount.value = await client.value.vaccount.get();
 
-            userName.value = client?.value.session.actor.toString();
-            userPermission.value =
-                await client?.value.session?.permission.toString();
+            userName.value = client.value.session.actor.toString();
+            userPermission.value = client.value.session.permission.toString();
+
             isLoggedIn.value = true;
-            isWalletConnecting.value = false;
         } catch (error) {
             console.error(error);
+        } finally {
             isWalletConnecting.value = false;
         }
     };
@@ -151,7 +143,6 @@ export const createEffectClient = (): ClientStore => {
     const disconnectWallet = async (): Promise<void> => {
         await sessionKit.logout();
         isLoggedIn.value = false;
-        useRouter().push("/"); // Go home after logout
     };
 
     return {
