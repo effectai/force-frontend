@@ -1,11 +1,10 @@
 <template>
     <div v-show="loading && !iframeLoaded" style="height: 100%;">
-	<TemplateSkeleton />
+        loading..
     </div>
     <div
         v-show="!loading && iframeLoaded"
         class="template-wrapper"
-        style="width: 100%; height: 100%; overflow: hidden;  border: none;"
 	>
 
         <!-- TODO: add polyfill for srcdoc or move to different URL and use src -->
@@ -13,7 +12,7 @@
         <iframe
             id="mediaFrame"
             ref="mediaFrame"
-            src="http://localhost:3030/template"
+            :srcdoc="html"
             style="width: 100%; height: 100%; overflow: hidden; border: none;"
             name="mediaFrame"
             sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-same-origin"
@@ -105,6 +104,7 @@ export default {
 .template-wrapper {
     box-sizing: border-box;
     width: 100%;
+    height:90%;
     border: 8px solid var(--c-border) !important;
 }
 
@@ -112,4 +112,5 @@ export default {
     width: 100%;
     border: none;
 }
+
 </style>

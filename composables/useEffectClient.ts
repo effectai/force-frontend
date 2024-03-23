@@ -76,6 +76,7 @@ export const createEffectClient = (): ClientStore => {
     const useCampaigns = () => {
         return useQuery({
             queryKey: ["campaigns"],
+            enabled: isLoggedIn,
             queryFn: async () => {
                 return await client.value.tasks.getAllCampaigns();
             },
@@ -85,6 +86,7 @@ export const createEffectClient = (): ClientStore => {
     const useCampaign = (campaignId: number) => {
         return useQuery({
             queryKey: ["campaign", campaignId],
+            enabled: isLoggedIn,
             queryFn: async () => {
                 return await client.value.tasks.getCampaign(campaignId);
             },
@@ -94,6 +96,7 @@ export const createEffectClient = (): ClientStore => {
     const useReservation = (campaignId: number) => {
         return useQuery({
             queryKey: ["reservation", campaignId],
+            enabled: isLoggedIn,
             queryFn: async () => {
                 return await client.value.tasks.getMyReservation(campaignId);
             },
@@ -103,6 +106,7 @@ export const createEffectClient = (): ClientStore => {
     const useReservations = () => {
         const query = useQuery({
             queryKey: ["reservations"],
+            enabled: isLoggedIn,
             queryFn: async () => {
                 return await client.value.tasks.getAllMyReservations();
             },

@@ -24,3 +24,8 @@ logs
 !.env.example
 .vscode/**
 .vscode/settings.json
+
+
+.stylelintcache
+.eslintcache
+.editorconfig

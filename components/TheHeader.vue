@@ -47,6 +47,8 @@ nav .container {
     padding: 1rem;
 }
 
+/* Logo styling */
+
 nav .logo {
     display: flex;
     align-items: center;

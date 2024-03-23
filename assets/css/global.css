@@ -1,129 +1,135 @@
 @import url("normalize.css");
-@import url("https://fonts.googleapis.com/css?family=Inter");
+
+@font-face {
+  font-family: "Inter";
+  src: url("@/assets/fonts/Inter-Regular.ttf");
+}
 
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 :root {
-    --primary-color: #101d56;
-    --light-color: #ecf0f1;
-    --dark-color: #2c3e50;
+  --primary-color: #101d56;
+  --light-color: #ecf0f1;
+  --dark-color: #2c3e50;
 
-    --color-gray-100: #f8f9fa;
-    --color-gray-200: #e9ecef;
-    --color-gray-300: #dee2e6;
+  --color-gray-100: #f8f9fa;
+  --color-gray-200: #e9ecef;
+  --color-gray-300: #dee2e6;
 
-    --font-family-body: "Arial", sans-serif;
-    --font-family-header: "Inter", sans-serif;
+  --font-family-body: "Arial", sans-serif;
+  --font-family-header: "Inter", sans-serif;
 
-    --font-size: 1em;
-    --font-size-sm: 0.8em;
-    --font-size-lg: 1.25em;
-    --font-size-xl: 1.75em;
-    --font-size-2xl: 2em;
-    --font-size-3xl: 3em;
+  --font-size: 1em;
+  --font-size-sm: 0.8em;
+  --font-size-lg: 1.25em;
+  --font-size-xl: 1.75em;
+  --font-size-2xl: 2em;
+  --font-size-3xl: 3em;
 
-    --line-height: 1.5;
+  --line-height: 1.5;
 
-    --bg-color: #fff;
-    --bg-light-color: #f8f9fa;
-    --bg-dark-color: #343a40;
+  --bg-color: #fff;
+  --bg-light-color: #f8f9fa;
+  --bg-dark-color: #343a40;
 
-    --text-color: #212529;
-    --text-light-color: #f8f9fa;
-    --text-dark-color: #343a40;
+  --text-color: #212529;
+  --text-light-color: #f8f9fa;
+  --text-dark-color: #343a40;
 
-    --border-color: #dee2e6;
-    --border-light-color: #f8f9fa;
-    --border-dark-color: #343a40;
+  --border-color: #dee2e6;
+  --border-light-color: #f8f9fa;
+  --border-dark-color: #343a40;
 }
 
 html {
-    height: 100%;
-    font-family: var(--font-family-body);
-    font-size: var(--font-size);
-    color: var(--text-color);
+  height: 100%;
+  font-family: var(--font-family-body);
+  font-size: var(--font-size);
+  color: var(--text-color);
 }
 
 /* TABLE STYLING */
 
 table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .table-container {
-    overflow-x: auto;
+  overflow-x: auto;
 }
 
 th,
 td {
-    padding: 8px;
-    text-align: left;
-    border: 1px solid var(--border-color);
+  padding: 8px;
+  text-align: left;
+  border: 1px solid var(--border-color);
 }
 
 th {
-    background-color: var(--bg-light-color);
+  background-color: var(--bg-light-color);
 }
 
 tr:nth-child(even) {
-    background-color: var(--bg-light-color);
+  background-color: var(--bg-light-color);
 }
 
 /* BUTTON STYLING */
 
 .button {
-    padding: 0.5rem 1rem;
-    font-size: var(--font-size);
-    color: var(--text-light-color);
-    cursor: pointer;
-    background-color: var(--primary-color);
-    border: none;
-    border-radius: 5px;
+  padding: 0.5rem 1rem;
+  font-size: var(--font-size);
+  color: var(--text-light-color);
+  cursor: pointer;
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 5px;
 }
 
 .button:hover {
-    background-color: var(--dark-color);
+  background-color: var(--dark-color);
 }
 
 /* CONTAINER */
 
 .container {
-    width: 100%;
-    padding: 0 1rem;
-    margin: 0 auto;
+  width: 100%;
+
+  max-width: 1200px;
+  padding: 0 1rem;
+  margin: 0 auto;
 }
 
 /* MODAL */
 
 dialog {
-    width: 75%;
-    max-width: 600px;
-    padding: 1rem;
-    background-color: var(--bg-light-color);
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
+  width: 75%;
+  max-width: 600px;
+  padding: 1rem;
+  background-color: var(--bg-light-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
 }
 
 dialog::backdrop {
-    background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 /* Content Styling */
 
 .title {
-    margin-bottom: 1rem;
-    font-family: var(--font-family-header);
-    font-size: var(--font-size-xl);
-    color: var(--primary-color);
+  margin-bottom: 1rem;
+  font-family: var(--font-family-header);
+  font-size: var(--font-size-xl);
+  color: var(--primary-color);
 }
 
 p {
-    margin-bottom: 1rem;
-    font-size: var(--font-size);
-    line-height: var(--line-height);
+  margin-bottom: 1rem;
+  font-size: var(--font-size);
+  line-height: var(--line-height);
 }

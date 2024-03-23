@@ -1,5 +1,5 @@
 <template>
-    <div class="overflow-x-auto">
+    <div>
         <div v-if="loading">
             <slot name="loading"></slot>
         </div>
@@ -66,6 +66,7 @@ const props = defineProps<{
     campaigns: Campaign[] | undefined;
     loading: boolean;
 }>();
+
 const router = useRouter();
 
 const { useReservations } = useEffectClient();
