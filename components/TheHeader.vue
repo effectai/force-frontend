@@ -53,7 +53,7 @@ nav .logo {
 }
 
 nav .logo img {
-    width: 45px;
+    width: 32px;
     margin-right: 10px;
 }
 

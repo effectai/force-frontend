@@ -34,8 +34,9 @@
                         id="instruction_modal"
                         class="modal"
                     >
+                        <div class="backdrop"></div>
                         <div class="modal-box">
-                            <h3>
+                            <h3 class="title">
                                 Instructions
                             </h3>
                             <div class="divider"></div>
@@ -73,6 +74,7 @@ const reserveTask = async () => {
 </script>
 
 <style scoped>
+
 .campaign-toolbar {
     display: flex;
     gap: 10px;
@@ -88,4 +90,5 @@ const reserveTask = async () => {
 .campaign-info label{
     font-weight: bold;
 }
+
 </style>

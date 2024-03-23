@@ -98,6 +98,21 @@ tr:nth-child(even) {
     margin: 0 auto;
 }
 
+/* MODAL */
+
+dialog {
+    width: 75%;
+    max-width: 600px;
+    padding: 1rem;
+    background-color: var(--bg-light-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+}
+
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
 /* Content Styling */
 
 .title {
