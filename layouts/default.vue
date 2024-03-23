@@ -1,6 +1,6 @@
 <template>
     <NavBar />
-    <UContainer>
+    <div class="container">
         <slot />
-    </UContainer>
+    </div>
 </template>

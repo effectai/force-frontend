@@ -5,7 +5,7 @@
     <div
         v-show="!loading && iframeLoaded"
         class="template-wrapper"
-        style="width: 100%; height: 100%;  border: none; overflow: hidden;"
+        style="width: 100%; height: 100%; overflow: hidden;  border: none;"
 	>
 
         <!-- TODO: add polyfill for srcdoc or move to different URL and use src -->
@@ -14,7 +14,7 @@
             id="mediaFrame"
             ref="mediaFrame"
             src="http://localhost:3030/template"
-            style="width: 100%; height: 100%; border: none; overflow: hidden;"
+            style="width: 100%; height: 100%; overflow: hidden; border: none;"
             name="mediaFrame"
             sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-same-origin"
             allow="geolocation; microphone; camera; autoplay; fullscreen"
@@ -103,9 +103,9 @@ export default {
 
 <style lang="css" scoped>
 .template-wrapper {
+    box-sizing: border-box;
     width: 100%;
     border: 8px solid var(--c-border) !important;
-    box-sizing: border-box;
 }
 
 #mediaFrame {

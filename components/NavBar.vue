@@ -1,23 +1,15 @@
 <template>
-    <nav
-        class="w-full flex-col block bg-gray-100 py-4 border-1 border-bottom-1"
-    >
-        <UContainer
-            class="flex flex-wrap items-center justify-between mx-auto px-3"
-        >
-            <NuxtLink to="/" class="flex gap-1 items-center">
-                <img src="/img/effect-logo-black.png" style="height: 35px" />
-                <h1>Effect AI</h1>
+    <nav>
+        <div class="container">
+            <NuxtLink to="/" class="logo">
+                <img src="/img/effect-logo-black.png" />
+                <span>Effect AI</span>
             </NuxtLink>
 
             <div v-if="!isLoggedIn">
-                <UButton
-                    class="btn btn-primary"
-                    to="/"
-                    @click="connectWallet()"
-                >
+                <button class="button" to="/" @click="connectWallet()">
                     connect
-                </UButton>
+                </button>
             </div>
 
             <div v-else class="">
@@ -25,7 +17,7 @@
                     logout
                 </NuxtLink>
             </div>
-        </UContainer>
+        </div>
     </nav>
 </template>
 
@@ -34,11 +26,35 @@ const {
     connectWallet,
     disconnectWallet,
     isLoggedIn,
-
     isWalletConnecting,
     userName,
     userAccount,
 } = useEffectClient();
 </script>
 
-<style></style>
+<style scoped>
+nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem;
+}
+
+nav .logo {
+    display: flex;
+    align-items: center;
+}
+
+nav .logo img {
+    width: 45px;
+    margin-right: 10px;
+}
+
+nav a.logo {
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+    color: var(--color-black);
+    text-decoration: none;
+}
+</style>

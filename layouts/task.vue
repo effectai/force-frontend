@@ -1,7 +1,7 @@
 <template>
 <div id="layout">
     <nav class="task-nav">
-	<NuxtLink to="/" class="back">
+	<!-- <NuxtLink to="/" class="back">
 	    <img src="/img/effect-logo-black.png" style="height: 35px;" />
 	    <h1><strong>Working</strong></h1>
 	</NuxtLink>
@@ -13,6 +13,7 @@
 	<div v-else class="user">
 	    <span class="profile">{{ userName }}</span>
 	</div>
+   -->
     </nav>
 
     <section class="layout-slot">
@@ -22,35 +23,33 @@
 </template>
 
 <style>
-nav.task-nav {
+/* nav.task-nav {
+  display: flex;
+  margin-bottom: 0;
   background-color: var(--c-pink-1);
   border-bottom: 1px solid var(--c-border);
-  margin-bottom: 0;
-  display: flex;
   transition: background 15s linear;
 }
 nav .user {
-  margin-left: auto;
-  padding: 0 1.45rem;  
+  display: flex;
+  align-items: center;  
   align-self: center;
+  align-self: stretch;
+  padding: 0 1.45rem;
+  margin-left: auto;
   color: var(--fontColor);
   border-left: 1px solid var(--c-border);
-  align-self: stretch;
-  display: flex;
-  align-items: center;
 }
 nav .user .connect {
   font-size: 1em;
 }
-nav .user .profile {
-}
 .back h1 {
   padding: 0.75rem 0;
+  margin: 0;
+  font-size: 1em;
+  font-weight: normal;
   color: var(--fontColor);
   text-decoration: none;
-  font-weight: normal;
-  font-size: 1em;
-  margin: 0;
 
 }
 a.back {
@@ -68,7 +67,7 @@ a.logo {
 }
 
 #__nuxt { height: 100%; }
-#layout { height: 100%; display: flex; flex-direction: column; }
-.layout-slot { flex: 1; }
+#layout { display: flex; flex-direction: column; height: 100%; }
+.layout-slot { flex: 1; } */
 
 </style>

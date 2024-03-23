@@ -1,25 +1,25 @@
 <template>
     <div class="container">
-        <div class="card px-5 py-2" v-if="campaign">
-            <div class="card-body items-center">
-                <h3 class="text-3xl title mb-3">{{ campaign.info?.title }}</h3>
-                <div class="">
-                    <div>
-                        <label class="font-bold">Reward per task</label>
-                        <p>{{ campaign.reward.quantity }}</p>
+        <div v-if="campaign">
+            <div>
+                <h3>{{ campaign.info?.title }}</h3>
+                <div class="campaign-details">
+                    <div class="campaign-info">
+                        <label>Reward per task</label>
+                        <span>{{ campaign.reward.quantity }}</span>
                     </div>
-                    <div>
-                        <label class="font-bold">Time per task</label>
-                        <p>{{ campaign.max_task_time }}</p>
+                    <div class="campaign-info">
+                        <label>Time per task</label>
+                        <span>{{ campaign.max_task_time }}</span>
                     </div>
-                    <p class="my-5">{{ campaign.info?.description }}</p>
+                    <p class="campaign-description">{{ campaign.info?.description }}</p>
                 </div>
 
-                <div class="flex gap-1">
-                    <UButton @click="reserveTask"> Start </UButton>
-                    <UButton onclick="instruction_modal.showModal()">
+                <div class="campaign-toolbar">
+                    <button class="button" @click="reserveTask"> Start </button>
+                    <button class="button" onclick="instruction_modal.showModal()">
                         Show Instructions
-                    </UButton>
+                    </button>
                 </div>
 
                 <div
@@ -32,17 +32,17 @@
                     <dialog
                         ref="modal"
                         id="instruction_modal"
-                        class="modal p-5 prose rounded-xl shadow-lg"
+                        class="modal"
                     >
-                        <div class="modal-box w-11/12 max-w-5xl">
-                            <h3 class="font-bold text-xl text-center my-5">
+                        <div class="modal-box">
+                            <h3>
                                 Instructions
                             </h3>
                             <div class="divider"></div>
                             <p v-html="campaign.info.instructions"></p>
                         </div>
-                        <form method="dialog" class="modal-backdrop mt-5">
-                            <UButton> close </UButton>
+                        <form method="dialog">
+                            <button class="button"> close </button>
                         </form>
                     </dialog>
                 </div>
@@ -53,8 +53,6 @@
         </div>
     </div>
 </template>
-
-<style></style>
 
 <script setup lang="ts">
 const { client, useCampaign } = useEffectClient();
@@ -74,4 +72,20 @@ const reserveTask = async () => {
 };
 </script>
 
-<style></style>
+<style scoped>
+.campaign-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.campaign-info {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.campaign-info label{
+    font-weight: bold;
+}
+</style>

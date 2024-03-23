@@ -6,15 +6,14 @@
         <div v-else-if="campaigns.length === 0">
             <slot name="empty"></slot>
         </div>
-        <div v-else-if="campaigns && campaigns.length > 0">
-            <table
-                class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
-            >
-                <thead
-                    class="text-xs uppercase bg-primary text-white dark:bg-primary-700 dark:text-gray-400"
-                >
+        <div
+            class="table-container"
+            v-else-if="campaigns && campaigns.length > 0"
+        >
+            <table>
+                <thead>
                     <tr>
-                        <th class="px-6 py-3">Dataset</th>
+                        <th>Dataset</th>
                         <th>Title</th>
                         <th>Reward</th>
                         <th>Actions</th>
@@ -25,51 +24,41 @@
                         v-for="campaign in campaigns"
                         @click="router.push(`/campaign/${campaign.id}`)"
                         :key="campaign.id"
-                        class="cursor-pointer hover:bg-gray-100 bg-white border-b"
                     >
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-5">
+                        <td>
+                            <div>
                                 <UAvatar
                                     :src="`https://i.pravatar.cc/100?img=${campaign.owner.at(
                                         1
                                     )}`"
                                 />
                                 <div>
-                                    <div class="font-bold">
+                                    <div>
                                         {{ campaign.owner.at(1) }}
                                     </div>
                                 </div>
                             </div>
                         </td>
                         <td v-if="campaign && campaign.info" class="">
-                            {{ campaign?.info.title }}
+                            {{ campaign.info.title }}
                         </td>
                         <td v-else>
                             {{ "No title" }}
                             <br />
-                            <div class="text-sm opacity-50">
+                            <div>
                                 {{ "No description" }}
                             </div>
                         </td>
                         <td class="quantity">
                             {{ campaign.reward.quantity }}/tsk
                         </td>
-                        <td v-if="isCampaignReserved(campaign.id)">
-                            <NuxtLink
-                                class="hover:text-black hover:underline"
-                                :to="`campaign/${campaign.id}`"
-                                >continue</NuxtLink
-                            >
-
-                            <span
-                                aria-hidden="true"
-                                class="icon icon-caret-right"
-                            >
-                                <UIcon
-                                    name="i-flowbite-angle-right-outline"
-                                    dynamic
-                                />
-                            </span>
+                        <td>
+                            <div v-if="isReserved(campaign.id)">
+                                <NuxtLink :to="`campaign/${campaign.id}`"
+                                    >continue
+                                    <IconsArrowRightBold />
+                                </NuxtLink>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -81,15 +70,19 @@
 <script setup lang="ts">
 import type { Campaign } from "@effectai/effect-js";
 
-const props = defineProps<{ campaigns: Campaign[]; loading: boolean }>();
+const props = defineProps<{
+    campaigns: Campaign[] | undefined;
+    loading: boolean;
+}>();
 const router = useRouter();
 
 const { useReservations } = useEffectClient();
 const { isReserved } = useReservations();
-
-const isCampaignReserved = (campaignId: number) => {
-    return isReserved(campaignId);
-};
 </script>
 
-<style></style>
+<style scoped>
+tr:hover {
+    cursor: pointer;
+    background: var(--color-gray-200);
+}
+</style>

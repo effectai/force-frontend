@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div class="my-10">
-            <h2 class="text-3xl my-2 title">
+        <div>
+            <h2 class="title">
                 Reserved Datasets ({{ reservedCampaigns.length }})
             </h2>
-            <p class="mb-5">
+            <p>
                 These are the tasks you have started working on or that you have
                 a reservation for.
             </p>
@@ -22,9 +22,9 @@
             </CampaignList>
         </div>
 
-        <div class="my-10" v-if="campaigns">
+        <div>
             <h2 class="title text-3xl my-2">
-                All datasets ({{ campaigns.length }})
+                All datasets ({{ (campaigns && campaigns.length) ?? 0 }})
             </h2>
             <p class="my-3">
                 These are all the tasks on the platform, you might need to
@@ -53,8 +53,4 @@ const reservedCampaigns = computed(() => {
 });
 </script>
 
-<style>
-p {
-    font-size: var(--font-size-sm);
-}
-</style>
+<style></style>

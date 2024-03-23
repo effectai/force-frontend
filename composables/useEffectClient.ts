@@ -14,9 +14,11 @@ export interface ClientStore {
     client: Ref<Client>;
     isLoggedIn: Ref<boolean>;
     isWalletConnecting: Ref<boolean>;
-    userName: Ref<string>;
-    userPermission: Ref<string>;
+
+    userName: Ref<string | null>;
+    userPermission: Ref<string | null>;
     userAccount: Ref<VAccount | null>;
+
     efxPrice: Ref<number>;
     useCampaigns: () => UseQueryReturnType<Campaign[], any>;
     useCampaign: (campaignId: number) => UseQueryReturnType<Campaign, any>;
@@ -60,8 +62,8 @@ export const createEffectClient = (): ClientStore => {
     /* --------- REACTIVE DATA --------- */
 
     const userAccount: Ref<VAccount | null> = ref(null);
-    const userName: Ref<string> = ref("");
-    const userPermission: Ref<string> = ref("");
+    const userName: Ref<string | null> = ref(null);
+    const userPermission: Ref<string | null> = ref(null);
     const efxPrice: Ref<number> = ref(0);
 
     /* --------- REACTIVE BOOLEANS --------- */
@@ -141,8 +143,15 @@ export const createEffectClient = (): ClientStore => {
     };
 
     const disconnectWallet = async (): Promise<void> => {
-        await sessionKit.logout();
-        isLoggedIn.value = false;
+        try{
+            await sessionKit.logout();
+            isLoggedIn.value = false;
+            userAccount.value = null;
+            userName.value = null;
+            userPermission.value = null;
+        }catch(e){
+            console.error(e)
+        }
     };
 
     return {

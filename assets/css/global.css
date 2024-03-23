@@ -1,0 +1,113 @@
+@import url("normalize.css");
+@import url("https://fonts.googleapis.com/css?family=Inter");
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --main-color: #0d3652;
+    --light-color: #ecf0f1;
+    --dark-color: #2c3e50;
+    --color-gray-100: #f8f9fa;
+    --color-gray-200: #e9ecef;
+    --color-gray-300: #dee2e6;
+    --font-family-body: "Arial", sans-serif;
+    --font-family-header: "Inter", sans-serif;
+    --font-size: 1em;
+    --font-size-sm: 0.8em;
+    --font-size-lg: 1.5em;
+    --font-size-xl: 2em;
+    --font-size-2xl: 2.5em;
+    --line-height: 1.5;
+
+    /* Background Colors */
+    --bg-color: #fff;
+    --bg-light-color: #f8f9fa;
+    --bg-dark-color: #343a40;
+
+    /* Text Colors */
+    --text-color: #212529;
+    --text-light-color: #f8f9fa;
+    --text-dark-color: #343a40;
+
+    /* Border Colors */
+    --border-color: #dee2e6;
+    --border-light-color: #f8f9fa;
+    --border-dark-color: #343a40;
+}
+
+html {
+    height: 100%;
+    font-family: var(--font-family-body);
+    font-size: var(--font-size);
+    color: var(--text-color);
+}
+
+/* TABLE STYLING */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid var(--border-color);
+}
+
+th {
+    background-color: var(--bg-light-color);
+}
+
+tr:nth-child(even) {
+    background-color: var(--bg-light-color);
+}
+
+/* BUTTON STYLING */
+
+.button {
+    padding: 0.5rem 1rem;
+    font-size: var(--font-size);
+    color: var(--text-light-color);
+    cursor: pointer;
+    background-color: var(--main-color);
+    border: none;
+    border-radius: 5px;
+}
+
+.button:hover {
+    background-color: var(--dark-color);
+}
+
+/* FORM STYLING */
+
+/* CONTAINER */
+
+.container {
+    width: 100%;
+    padding: 0 1rem;
+    margin: 0 auto;
+}
+
+.title {
+    margin-bottom: 1rem;
+
+    font-family: var(--font-family-header);
+    font-size: var(--font-size-xl);
+    color: var(--main-color);
+}
+
+p {
+    margin-bottom: 1rem;
+    font-size: var(--font-size);
+    line-height: var(--line-height);
+}

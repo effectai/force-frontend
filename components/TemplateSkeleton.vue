@@ -9,11 +9,11 @@
 
 <style>
 .loading {
+    box-sizing: border-box;
     display: flex;
     justify-content: center;
-    border: 2px solid var(--c-border);
-    height: 100%;
     width: 100%;
-    box-sizing: border-box;
+    height: 100%;
+    border: 2px solid var(--c-border);
 }
 </style>
