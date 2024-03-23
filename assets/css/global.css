@@ -8,32 +8,34 @@
 }
 
 :root {
-    --main-color: #0d3652;
+    --primary-color: #101d56;
     --light-color: #ecf0f1;
     --dark-color: #2c3e50;
+
     --color-gray-100: #f8f9fa;
     --color-gray-200: #e9ecef;
     --color-gray-300: #dee2e6;
+
     --font-family-body: "Arial", sans-serif;
     --font-family-header: "Inter", sans-serif;
+
     --font-size: 1em;
     --font-size-sm: 0.8em;
-    --font-size-lg: 1.5em;
-    --font-size-xl: 2em;
-    --font-size-2xl: 2.5em;
+    --font-size-lg: 1.25em;
+    --font-size-xl: 1.75em;
+    --font-size-2xl: 2em;
+    --font-size-3xl: 3em;
+
     --line-height: 1.5;
 
-    /* Background Colors */
     --bg-color: #fff;
     --bg-light-color: #f8f9fa;
     --bg-dark-color: #343a40;
 
-    /* Text Colors */
     --text-color: #212529;
     --text-light-color: #f8f9fa;
     --text-dark-color: #343a40;
 
-    /* Border Colors */
     --border-color: #dee2e6;
     --border-light-color: #f8f9fa;
     --border-dark-color: #343a40;
@@ -79,7 +81,7 @@ tr:nth-child(even) {
     font-size: var(--font-size);
     color: var(--text-light-color);
     cursor: pointer;
-    background-color: var(--main-color);
+    background-color: var(--primary-color);
     border: none;
     border-radius: 5px;
 }
@@ -87,8 +89,6 @@ tr:nth-child(even) {
 .button:hover {
     background-color: var(--dark-color);
 }
-
-/* FORM STYLING */
 
 /* CONTAINER */
 
@@ -98,12 +98,13 @@ tr:nth-child(even) {
     margin: 0 auto;
 }
 
+/* Content Styling */
+
 .title {
     margin-bottom: 1rem;
-
     font-family: var(--font-family-header);
     font-size: var(--font-size-xl);
-    color: var(--main-color);
+    color: var(--primary-color);
 }
 
 p {

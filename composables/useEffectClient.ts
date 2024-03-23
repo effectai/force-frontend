@@ -4,7 +4,7 @@ import {
     type Campaign,
     type Reservation,
 } from "@effectai/effect-js";
-import { Query, useQuery, type UseQueryReturnType } from "@tanstack/vue-query";
+import { useQuery, type UseQueryReturnType } from "@tanstack/vue-query";
 import { Session } from "@wharfkit/session";
 import { ClientNotInitializedError } from "~/errors/errors";
 
@@ -108,6 +108,7 @@ export const createEffectClient = (): ClientStore => {
             },
         });
 
+        /* Utility function to check if a campaign is reserved */
         const isReserved = (campaignId: number) => {
             if (query.data?.value?.length) {
                 return query.data.value.some(

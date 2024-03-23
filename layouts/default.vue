@@ -1,5 +1,5 @@
 <template>
-    <NavBar />
+    <TheHeader />
     <div class="container">
         <slot />
     </div>

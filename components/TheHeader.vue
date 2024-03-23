@@ -33,6 +33,12 @@ const {
 </script>
 
 <style scoped>
+
+nav {
+    background-color: var(--white-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 nav .container {
     display: flex;
     align-items: center;
@@ -54,7 +60,7 @@ nav .logo img {
 nav a.logo {
     font-size: var(--font-size-lg);
     font-weight: bold;
-    color: var(--color-black);
+    color: var(--color-main);
     text-decoration: none;
 }
 </style>

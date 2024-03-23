@@ -2,7 +2,7 @@
     <div class="container">
         <div v-if="campaign">
             <div>
-                <h3>{{ campaign.info?.title }}</h3>
+                <h1 class="title">{{ campaign.info?.title }}</h1>
                 <div class="campaign-details">
                     <div class="campaign-info">
                         <label>Reward per task</label>

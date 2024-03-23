@@ -1,6 +1,6 @@
 <template>
     <div class="avatar">
-        <img class="w-10 h-10 rounded-full" alt="Rounded avatar" />
+        <img class="" :src="`https://i.pravatar.cc/100?img=${props.id}`" alt="Rounded avatar" />
     </div>
 </template>
 
@@ -8,4 +8,15 @@
 const props = defineProps<{ id: string | number }>();
 </script>
 
-<style></style>
+<style>
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    background-color: var(--c-gray-1);
+    border-radius: 50%;
+}
+</style>

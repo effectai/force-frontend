@@ -3,7 +3,7 @@
         <div v-if="loading">
             <slot name="loading"></slot>
         </div>
-        <div v-else-if="campaigns.length === 0">
+        <div v-else-if="campaigns && campaigns.length === 0">
             <slot name="empty"></slot>
         </div>
         <div
@@ -26,17 +26,9 @@
                         :key="campaign.id"
                     >
                         <td>
-                            <div>
-                                <UAvatar
-                                    :src="`https://i.pravatar.cc/100?img=${campaign.owner.at(
-                                        1
-                                    )}`"
-                                />
-                                <div>
-                                    <div>
-                                        {{ campaign.owner.at(1) }}
-                                    </div>
-                                </div>
+                            <div class="campaign-user">
+                                <UserAvatar :id="campaign.owner.at(1)!" />
+                                <span>{{ campaign.owner.at(1) }}</span>
                             </div>
                         </td>
                         <td v-if="campaign && campaign.info" class="">
@@ -84,5 +76,11 @@ const { isReserved } = useReservations();
 tr:hover {
     cursor: pointer;
     background: var(--color-gray-200);
+}
+
+.campaign-user {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
 }
 </style>
