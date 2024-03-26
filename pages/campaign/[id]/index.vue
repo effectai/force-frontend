@@ -19,7 +19,9 @@
         </div>
 
         <div class="campaign-toolbar">
-          <button class="button" @click="doReserveTask">Start</button>
+          <button :disabled="!isLoggedIn" class="button" @click="doReserveTask">
+            Start
+          </button>
           <button class="button" onclick="instruction_modal.showModal()">
             Show Instructions
           </button>
@@ -49,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-const { useCampaign, useReserveTask } = useEffectClient();
+const { useCampaign, useReserveTask, isLoggedIn } = useEffectClient();
 
 const { notify } = useNotification();
 

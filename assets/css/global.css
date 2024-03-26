@@ -94,6 +94,11 @@ tr:nth-child(even) {
   background-color: var(--dark-color);
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 /* CONTAINER */
 
 .container {
