@@ -1,5 +1,5 @@
 <template>
-  <div class="template">
+  <div class="container">
     <div v-if="error">
       {{ error }}
     </div>
