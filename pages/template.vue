@@ -1,6 +1,5 @@
 <template>
   <div class="template-wrapper">
-    hello!
     <div v-if="loading" class="loading-text subtitle">Loading</div>
     <iframe
       v-if="html"
@@ -46,10 +45,9 @@ export default {
       this.loading = false;
       const frame = document.getElementById("mediaFrame");
 
-      console.log("loaded!", this.html);
       frame.contentWindow.postMessage(
         { task: "template", value: this.html },
-        "*"
+        "*",
       );
       this.$emit("templateLoaded");
     },
@@ -60,7 +58,6 @@ export default {
       }
     },
     communicateWithIframe(event) {
-      console.log("communicating..");
       // TODO: check if sender of event is template iframe
       const data = event.data;
       switch (

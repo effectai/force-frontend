@@ -1,20 +1,41 @@
 <template>
-    <div class="background-primary">
-        <div class="text-2xl title my-5">Profile</div>
+  <div class="container">
+    <div class="text-2xl title my-5">Profile</div>
 
-        <Vaccount v-if="isLoggedIn" />
+    <div class="profile-stats">
+      <div>
+        <label>Name</label>
+        <div class="text-lg">{{ userName }}</div>
+      </div>
 
-        <div v-if="isLoggedIn" class="card-actions justify-center my-5">
-            <button @click="disconnectWallet" class="btn btn-warning">
-                Logout
-            </button>
-        </div>
+      <div>
+        <label>Permission</label>
+        <div class="text-lg">{{ userPermission }}</div>
+      </div>
     </div>
+
+    <div v-if="isLoggedIn" class="">
+      <button @click="disconnectWallet" class="button">Logout</button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 definePageMeta({ middleware: "auth" });
-const { disconnectWallet, isLoggedIn } = useEffectClient();
+const { disconnectWallet, isLoggedIn, userName, userPermission } =
+  useEffectClient();
 </script>
 
-<style></style>
+<style>
+.profile-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.profile-stats label {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--color-main);
+}
+</style>

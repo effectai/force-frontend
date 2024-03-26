@@ -1,41 +1,67 @@
 <template>
-  <template v-if="campaign?.info?.template && templateHtml">
-    <TaskTemplate :html="templateHtml" @submit="submitTask" />
-  </template>
+  <div class="template">
+    <div v-if="error">
+      {{ error }}
+    </div>
+    <div v-else-if="isLoadingTaskData || isReservingTask || isSubmittingTask">
+      <div class="backdrop-loader">Loading Task Data</div>
+    </div>
+    <TaskTemplate v-else ref="templateRef" @submit="doSubmitTask" />
+  </div>
 </template>
 
 <script setup lang="ts">
+import { Template as EffectTemplate } from "@effectai/effect-js";
+import type TaskTemplate from "~/components/TaskTemplate.vue";
+
 definePageMeta({
   middleware: "auth",
-  layout: "task",
 });
 
-// Template needs to be renamed to avoid naming conflict with Vue3's template variable.
-import { Template as EffectTemplate } from "@effectai/effect-js";
+const {
+  userAccount,
+  useCampaign,
+  useReservation,
+  useReserveTask,
+  useSubmitTask,
+  useTaskData,
+} = useEffectClient();
+
+const { notify } = useNotification();
 
 const router = useRouter();
 const campaignId = Number(router.currentRoute.value.params.id);
 
-const { client, userAccount, useCampaign, useReservation } = useEffectClient();
+const templateRef: Ref<InstanceType<typeof TaskTemplate> | null> = ref(null);
 
 const { data: campaign } = useCampaign(campaignId);
-const { data: reservation } = useReservation(campaignId);
+const {
+  data: reservation,
+  error: errorReservation,
+  refetch: refetchReservation,
+} = useReservation(campaignId);
 
-watch(reservation, () => {
-  renderTask();
-});
+const {
+  data: taskData,
+  error: errorTaskData,
+  isLoading: isLoadingTaskData,
+} = useTaskData(reservation);
 
-const loading = ref(true);
-const templateHtml = ref("");
+const error = computed(() => errorReservation.value || errorTaskData.value);
+
+const { mutateAsync: reserveTask, isPending: isReservingTask } =
+  useReserveTask();
+
+const { mutateAsync: submitTask, isPending: isSubmittingTask } =
+  useSubmitTask();
 
 const renderTask = async (): Promise<void> => {
   try {
-    console.log(reservation);
     if (!reservation.value) {
       throw new Error("No reservation found");
     }
 
-    const taskData = await client.value.tasks.getTaskData(reservation.value);
+    console.log("rendering task!");
 
     const task = {
       accountId: userAccount.value?.id,
@@ -44,56 +70,67 @@ const renderTask = async (): Promise<void> => {
       submissionId: reservation.value?.id,
     };
 
-    console.debug("🔥🔥🔥-TaskPlaceHolder", taskData);
-    // TODO remove these parameters from the template.
-    const tempTaskData = { id: 1, annotations: [], ...taskData };
-
     const template = new EffectTemplate(
       campaign.value?.info?.template!,
-      tempTaskData,
+      { id: 1, annotations: [], ...taskData.value },
       {},
-      task
+      task,
     );
 
-    templateHtml.value = template.render();
-    loading.value = false;
+    const html = template.render();
+
+    if (!templateRef.value) {
+      throw new Error("Template reference not found");
+    }
+
+    templateRef.value.setHtml(html);
   } catch (error) {
     console.error(error);
   }
 };
 
-// TODO: Implement drop reservation functionality in the contract and sdk.
-const stopTask = async (): Promise<void> => {
-  // const reservation = await effectClient.tasks.getMyReservation(campaignId)
-  // const stopResponse = await effectClient.tasks.stopTask(reservation)
-  // console.debug('stopResponse', stopResponse)
-  router.push(`/campaign/${campaignId}`);
+const doSubmitTask = async (data: any): Promise<void> => {
+  if (!reservation.value) {
+    throw new Error("No reservation found");
+  }
+
+  try {
+    // Submit the task.
+    await submitTask({ data, reservation: reservation.value });
+
+    // Try to reserve new task.
+    try {
+      // TODO:: update in cache for now just refetch
+      const newReservation = await reserveTask(campaignId);
+      refetchReservation();
+
+      if (reservation.value === null) {
+        notify({
+          message: "No more tasks available",
+          type: "warning",
+        });
+
+        return;
+      }
+    } catch (e) {
+      console.error("error while getting next reservation", e);
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
 
-// TODO: This flow needs work
-const submitTask = async (data: any): Promise<void> => {
-  const allReservations = await client.value.tasks.getAllReservations();
-  const nextReservation = await client.value.tasks.reserveTask(campaignId);
-  const reservation = await client.value.tasks
-    .getMyReservation(campaignId)
-    .catch((error) => {
-      throw error;
-    });
-  const task = await client.value.tasks
-    .getTaskData(reservation)
-    .catch((error) => {
-      throw error;
-    });
-  const submitResponse = await client.value.tasks.submitTask(reservation, data);
-  const followingReservation = await client.value.tasks.reserveTask(campaignId);
-  await renderTask();
-};
-
-const reportTask = async (): Promise<void> => {
-  // const reportResponse = await effectClient.tasks.reportTask(campaignId)
-  // console.debug('reportResponse', reportResponse)
-  window.open(
-    "https://discord.com/channels/519860537891487745/846388926234099763"
-  );
-};
+watchEffect(async () => {
+  console.log("watchEFfect triggered!");
+  if (!reservation.value || !taskData.value) return;
+  if (error.value) return;
+  await nextTick();
+  renderTask();
+});
 </script>
+
+<style>
+.template {
+  padding: 2rem 1rem;
+}
+</style>
