@@ -27,8 +27,6 @@ const {
   useTaskData,
 } = useEffectClient();
 
-const { notify } = useNotification();
-
 const router = useRouter();
 const campaignId = Number(router.currentRoute.value.params.id);
 
@@ -95,21 +93,11 @@ const doSubmitTask = async (data: any): Promise<void> => {
   try {
     // Submit the task.
     await submitTask({ data, reservation: reservation.value });
-
-    // Try to reserve new task.
     try {
-      // TODO:: update in cache for now just refetch
+      // Try to reserve new task.
+      // TODO:: update reservation in cache; for now just refetch.
       const newReservation = await reserveTask(campaignId);
-      refetchReservation();
-
-      if (reservation.value === null) {
-        notify({
-          message: "No more tasks available",
-          type: "warning",
-        });
-
-        return;
-      }
+      await refetchReservation();
     } catch (e) {
       console.error("error while getting next reservation", e);
     }

@@ -2,7 +2,7 @@
   <div class="notification-container">
     <div
       v-for="notification in notifications"
-      @click="doRemoveNotification(notification.id)"
+      @click="doRemoveNotification(notification.created)"
       class="notification"
       :class="notification.type"
     >
@@ -14,8 +14,8 @@
 <script setup lang="ts">
 const { notifications, removeNotification } = useNotification();
 
-const doRemoveNotification = (notificationId: string) => {
-  removeNotification(notifications.value.find((n) => n.id === notificationId));
+const doRemoveNotification = (created: Date) => {
+  removeNotification(notifications.value.find((n) => n.created === created)!);
 };
 </script>
 
