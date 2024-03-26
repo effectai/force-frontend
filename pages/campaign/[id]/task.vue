@@ -61,8 +61,6 @@ const renderTask = async (): Promise<void> => {
       throw new Error("No reservation found");
     }
 
-    console.log("rendering task!");
-
     const task = {
       accountId: userAccount.value?.id,
       campaignId: reservation.value?.campaign_id,
@@ -121,7 +119,6 @@ const doSubmitTask = async (data: any): Promise<void> => {
 };
 
 watchEffect(async () => {
-  console.log("watchEFfect triggered!");
   if (!reservation.value || !taskData.value) return;
   if (error.value) return;
   await nextTick();
