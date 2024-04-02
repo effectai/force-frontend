@@ -18,6 +18,7 @@ import {
   getTaskDataByReservation,
   getReservationForCampaign,
   TaskIpfsError,
+  getPrice,
 } from "@effectai/effect-js";
 
 import {
@@ -43,6 +44,8 @@ export interface ClientStore {
 
   useCampaigns: () => UseQueryReturnType<Campaign[], any>;
   useCampaign: (campaignId: number) => UseQueryReturnType<Campaign, any>;
+
+  useEfxPrice: () => UseQueryReturnType<number, any>;
 
   useReservations: () => UseQueryReturnType<Reservation[], any> & {
     isReserved: (campaignId: number) => boolean;
@@ -202,6 +205,15 @@ export const createEffectClient = (): ClientStore => {
     return { ...query, totalEfxPending };
   };
 
+  const useEfxPrice = () => {
+    return useQuery({
+      queryKey: ["efxPrice"],
+      queryFn: async () => {
+        return await getPrice();
+      },
+    });
+  };
+
   const useCampaigns = () => {
     return useQuery({
       queryKey: ["campaigns"],
@@ -330,6 +342,7 @@ export const createEffectClient = (): ClientStore => {
     useReservations,
     useTaskData,
     usePendingPayments,
+    useEfxPrice,
 
     // mutations
     useReserveTask,

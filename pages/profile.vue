@@ -2,8 +2,6 @@
   <div class="container">
     <div class="text-2xl title my-5">Profile</div>
 
-    vaccount: {{ vAccount }}
-
     <div class="profile-stats">
       <div>
         <label>Name</label>
@@ -33,6 +31,7 @@ const {
   isLoggedIn,
   userName,
   vAccount,
+  useEfxPrice,
 } = useEffectClient();
 
 const router = useRouter();
@@ -43,6 +42,8 @@ const logout = () => {
 };
 
 const { totalEfxPending } = usePendingPayments();
+
+const { data: price } = useEfxPrice();
 </script>
 
 <style>

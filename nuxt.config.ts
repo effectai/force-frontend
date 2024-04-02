@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import stylelint from "vite-plugin-stylelint";
+import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineNuxtConfig({
   ssr: false,
@@ -9,9 +10,16 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
+  build: {
+    analyze: {},
+  },
   modules: ["@vueuse/nuxt"],
   vite: {
     plugins: [
+      visualizer({
+        emitFile: true,
+        filename: "stats.html",
+      }),
       stylelint({
         fix: true,
         include: [`./**/*.{css,scss,sass,vue}`],
