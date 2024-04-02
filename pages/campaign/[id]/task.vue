@@ -3,10 +3,16 @@
     <div v-if="error">
       {{ error }}
     </div>
+
     <div v-else-if="isLoadingTaskData || isReservingTask || isSubmittingTask">
       <div class="backdrop-loader">Loading Task Data</div>
     </div>
-    <TaskTemplate v-else ref="templateRef" @submit="doSubmitTask" />
+
+    <TaskTemplate
+      v-if="!error && !isLoadingTaskData"
+      ref="templateRef"
+      @submit="doSubmitTask"
+    />
   </div>
 </template>
 
@@ -19,7 +25,7 @@ definePageMeta({
 });
 
 const {
-  userAccount,
+  vAccount,
   useCampaign,
   useReservation,
   useReserveTask,
@@ -60,7 +66,7 @@ const renderTask = async (): Promise<void> => {
     }
 
     const task = {
-      accountId: userAccount.value?.id,
+      accountId: vAccount.value?.id,
       campaignId: reservation.value?.campaign_id,
       batchId: reservation.value?.batch_id,
       submissionId: reservation.value?.id,
@@ -93,6 +99,7 @@ const doSubmitTask = async (data: any): Promise<void> => {
   try {
     // Submit the task.
     await submitTask({ data, reservation: reservation.value });
+
     try {
       // Try to reserve new task.
       // TODO:: update reservation in cache; for now just refetch.
@@ -102,6 +109,8 @@ const doSubmitTask = async (data: any): Promise<void> => {
       console.error("error while getting next reservation", e);
     }
   } catch (error) {
+    //something went wrong with the task submission
+    //let the user retry
     console.error(error);
   }
 };

@@ -1,7 +1,7 @@
 <template>
-    <div class="mt-5">
-        <ConnectWallet />
-    </div>
+  <div class="mt-5">
+    <ConnectWallet />
+  </div>
 </template>
 
 <script setup lang="ts">

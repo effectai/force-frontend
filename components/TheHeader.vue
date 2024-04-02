@@ -12,7 +12,7 @@
 
       <div v-else class="">
         <NuxtLink to="/" class="" @click="router.push('/profile')">
-          {{ userName }}
+          {{ userName }}@{{ permission }}
         </NuxtLink>
       </div>
     </div>
@@ -20,14 +20,7 @@
 </template>
 
 <script setup lang="ts">
-const {
-  connectWallet,
-  disconnectWallet,
-  isLoggedIn,
-  isWalletConnecting,
-  userName,
-  userAccount,
-} = useEffectClient();
+const { connectWallet, isLoggedIn, userName, permission } = useEffectClient();
 
 const router = useRouter();
 </script>

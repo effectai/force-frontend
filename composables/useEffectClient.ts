@@ -1,16 +1,34 @@
 import {
-  Client,
   type VAccount,
   type Campaign,
   type Reservation,
+  type Client,
+  createClient,
+  jungle4,
+  watchAccount,
+  watchSession,
+  setSession,
+  getCampaigns,
+  reserveTask,
+  submitTask,
+  getPendingPayments,
+  getCampaign,
+  getReservationsForVAccount,
+  getReservationsForCampaign,
+  getTaskData,
+  getTaskDataByReservation,
+  getReservations,
+  getReservationForCampaign,
 } from "@effectai/effect-js";
+
 import {
   useMutation,
   useQuery,
   type UseMutationReturnType,
   type UseQueryReturnType,
 } from "@tanstack/vue-query";
-import { Session } from "@wharfkit/session";
+
+import type { NameType, Session } from "@wharfkit/session";
 import { ClientNotInitializedError } from "~/errors/errors";
 
 let effectClient: ClientStore | null;
@@ -20,11 +38,10 @@ export interface ClientStore {
   isLoggedIn: Ref<boolean>;
   isWalletConnecting: Ref<boolean>;
 
-  userName: Ref<string | null>;
-  userPermission: Ref<string | null>;
-  userAccount: Ref<VAccount | null>;
+  userName: Ref<NameType | null>;
+  permission: Ref<NameType | null>;
+  vAccount: Ref<VAccount | null>;
 
-  efxPrice: Ref<number>;
   useCampaigns: () => UseQueryReturnType<Campaign[], any>;
   useCampaign: (campaignId: number) => UseQueryReturnType<Campaign, any>;
 
@@ -39,6 +56,8 @@ export interface ClientStore {
   useTaskData: (
     reservation: Ref<Reservation | null | undefined>,
   ) => UseQueryReturnType<any, any>;
+
+  usePendingPayments: () => UseQueryReturnType<Payment[], any>;
 
   useReserveTask: () => UseMutationReturnType<
     Reservation | null,
@@ -85,26 +104,57 @@ export const createEffectClient = (): ClientStore => {
 
   /* --------- CLIENT --------- */
 
-  const client = shallowRef(new Client("jungle4", { fetch }));
+  const client = shallowRef(
+    createClient(jungle4, {
+      fetchProviderOptions: {
+        fetch,
+      },
+      ipfsCacheDurationInMs: 1000 * 60 * 5,
+    }),
+  );
 
   /* --------- REACTIVE DATA --------- */
 
-  const userAccount: Ref<VAccount | null> = ref(null);
-  const userName: Ref<string | null> = ref(null);
-  const userPermission: Ref<string | null> = ref(null);
-  const efxPrice: Ref<number> = ref(0);
+  const vAccount: Ref<VAccount | null> = ref(null);
+  const session: Ref<Session | null> = ref(null);
+
+  const userName: Ref<NameType | null> = computed(
+    () => session.value?.actor || null,
+  );
+
+  const permission: Ref<NameType | null> = computed(
+    () => session.value?.permission || null,
+  );
 
   /* --------- REACTIVE BOOLEANS --------- */
 
-  const isLoggedIn: Ref<boolean> = ref(false);
   const isWalletConnecting: Ref<boolean> = ref(false);
+  const isLoggedIn = computed(() => !!session.value);
+
+  /* --------- WATCHERS --------- */
+
+  watchAccount(client.value, (account: VAccount | null) => {
+    vAccount.value = account;
+  });
+
+  watchSession(client.value, (_session: Session | null) => {
+    session.value = _session;
+  });
 
   /* --------- MUTATIONS --------- */
+
+  const useClaimEfx = () => {
+    return useMutation({
+      mutationFn: async () => {
+        // payout();
+      },
+    });
+  };
 
   const useReserveTask = () => {
     return useMutation({
       mutationFn: async (campaignId: number) => {
-        return await client.value.tasks.reserveTask(campaignId);
+        return await reserveTask(client.value, campaignId);
       },
     });
   };
@@ -118,18 +168,41 @@ export const createEffectClient = (): ClientStore => {
         reservation: Reservation;
         data: unknown;
       }) => {
-        return await client.value.tasks.submitTask(reservation, data);
+        return await submitTask(client.value, reservation, data);
       },
     });
   };
 
   /* --------- HOOKS --------- */
 
+  const usePendingPayments = () => {
+    const query = useQuery({
+      queryKey: ["pendingPayments", computed(() => userName.value)],
+      enabled: isLoggedIn,
+      queryFn: async () => {
+        if (!vAccount.value) return Promise.resolve([]);
+        const data = await getPendingPayments(client.value, vAccount.value.id);
+        return data.rows;
+      },
+    });
+
+    const totalEfxPending = computed(
+      () =>
+        query.data.value?.reduce(
+          (acc, p) =>
+            parseFloat(p.pending.quantity.match(/[0-9.]+/)?.[0] || "0") || 0,
+          0,
+        ) || 0,
+    );
+
+    return { ...query, totalEfxPending };
+  };
+
   const useCampaigns = () => {
     return useQuery({
       queryKey: ["campaigns"],
       queryFn: async () => {
-        return await client.value.tasks.getAllCampaigns();
+        return await getCampaigns(client.value);
       },
     });
   };
@@ -138,7 +211,7 @@ export const createEffectClient = (): ClientStore => {
     return useQuery({
       queryKey: ["campaign", campaignId],
       queryFn: async () => {
-        return await client.value.tasks.getCampaign(campaignId);
+        return await getCampaign(client.value, campaignId);
       },
     });
   };
@@ -148,7 +221,11 @@ export const createEffectClient = (): ClientStore => {
       queryKey: ["reservation", computed(() => userName.value), campaignId],
       enabled: isLoggedIn,
       queryFn: async () => {
-        return await client.value.tasks.getMyReservation(campaignId);
+        return await getReservationForCampaign(
+          client.value,
+          campaignId,
+          vAccount.value!.id,
+        );
       },
     });
   };
@@ -158,7 +235,7 @@ export const createEffectClient = (): ClientStore => {
       queryKey: ["taskData", computed(() => reservation.value)],
       enabled: computed(() => !!reservation.value),
       queryFn: async () => {
-        return await client.value.tasks.getTaskData(reservation.value!);
+        return await getTaskDataByReservation(client.value, reservation.value!);
       },
     });
   };
@@ -168,7 +245,10 @@ export const createEffectClient = (): ClientStore => {
       queryKey: ["reservations", computed(() => userName.value)],
       enabled: isLoggedIn,
       queryFn: async () => {
-        return await client.value.tasks.getAllMyReservations();
+        return await getReservationsForVAccount(
+          client.value,
+          vAccount.value!.id,
+        );
       },
     });
 
@@ -191,15 +271,8 @@ export const createEffectClient = (): ClientStore => {
   const connectWallet = async (session?: Session) => {
     try {
       isWalletConnecting.value = true;
-
       const sessionToUse = session || (await sessionKit.login()).session;
-      await client.value.loginWithSession(sessionToUse);
-
-      const { actor, permission } = client.value.useSession();
-      userName.value = actor.toString();
-      userPermission.value = permission.toString();
-
-      isLoggedIn.value = true;
+      await setSession(client.value, sessionToUse);
     } catch (error) {
       console.error(error);
       notify({
@@ -214,10 +287,7 @@ export const createEffectClient = (): ClientStore => {
   const disconnectWallet = async (): Promise<void> => {
     try {
       await sessionKit.logout();
-      userAccount.value = null;
-      userName.value = null;
-      userPermission.value = null;
-      isLoggedIn.value = false;
+      await setSession(client.value, null);
     } catch (e) {
       console.error(e);
     }
@@ -233,9 +303,8 @@ export const createEffectClient = (): ClientStore => {
 
     // data
     userName,
-    userPermission,
-    userAccount,
-    efxPrice,
+    permission,
+    vAccount,
 
     // hooks
     useCampaigns,
@@ -243,6 +312,7 @@ export const createEffectClient = (): ClientStore => {
     useReservation,
     useReservations,
     useTaskData,
+    usePendingPayments,
 
     // mutations
     useReserveTask,

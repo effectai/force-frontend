@@ -2,6 +2,8 @@
   <div class="container">
     <div class="text-2xl title my-5">Profile</div>
 
+    vaccount: {{ vAccount }}
+
     <div class="profile-stats">
       <div>
         <label>Name</label>
@@ -10,20 +12,38 @@
 
       <div>
         <label>Permission</label>
-        <div class="text-lg">{{ userPermission }}</div>
+        <div class="text-lg">{{ permission }}</div>
       </div>
     </div>
 
-    <div v-if="isLoggedIn" class="">
-      <button @click="disconnectWallet" class="button">Logout</button>
+    <div class="profile-toolbar">
+      <button class="button">Claim {{ totalEfxPending }} EFX</button>
+      <button v-if="isLoggedIn" @click="disconnectWallet" class="button">
+        Logout
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { getPrice } from "@effectai/effect-js";
+
 definePageMeta({ middleware: "auth" });
-const { disconnectWallet, isLoggedIn, userName, userPermission } =
-  useEffectClient();
+
+const {
+  usePendingPayments,
+  disconnectWallet,
+  permission,
+  isLoggedIn,
+  userName,
+  vAccount,
+} = useEffectClient();
+
+const {
+  data: pendingPayments,
+  isLoading: isLoadingPayments,
+  totalEfxPending,
+} = usePendingPayments();
 </script>
 
 <style>
@@ -37,5 +57,11 @@ const { disconnectWallet, isLoggedIn, userName, userPermission } =
   font-size: 1.2rem;
   font-weight: bold;
   color: var(--color-main);
+}
+
+.profile-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 </style>
