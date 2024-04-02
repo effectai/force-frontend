@@ -8,12 +8,10 @@ module.exports = {
     parser: 'babel-eslint'
   },
   extends: [
-    '@nuxtjs',
-    'plugin:nuxt/recommended'
+    '@nuxt/eslint-config'
   ],
   plugins: [
   ],
-  // add your custom rules here
   rules: {
     'no-console': ['error', { allow: ['warn', 'error', 'debug', 'log'] }],
     'no-trailing-spaces': 'off'

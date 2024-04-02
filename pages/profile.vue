@@ -18,16 +18,12 @@
 
     <div class="profile-toolbar">
       <button class="button">Claim {{ totalEfxPending }} EFX</button>
-      <button v-if="isLoggedIn" @click="disconnectWallet" class="button">
-        Logout
-      </button>
+      <button v-if="isLoggedIn" @click="logout" class="button">Logout</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { getPrice } from "@effectai/effect-js";
-
 definePageMeta({ middleware: "auth" });
 
 const {
@@ -39,11 +35,14 @@ const {
   vAccount,
 } = useEffectClient();
 
-const {
-  data: pendingPayments,
-  isLoading: isLoadingPayments,
-  totalEfxPending,
-} = usePendingPayments();
+const router = useRouter();
+
+const logout = () => {
+  disconnectWallet();
+  router.push("/");
+};
+
+const { totalEfxPending } = usePendingPayments();
 </script>
 
 <style>

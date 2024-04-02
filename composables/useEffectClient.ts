@@ -3,6 +3,7 @@ import {
   type Campaign,
   type Reservation,
   type Client,
+  type Payment,
   createClient,
   jungle4,
   watchAccount,
@@ -14,18 +15,16 @@ import {
   getPendingPayments,
   getCampaign,
   getReservationsForVAccount,
-  getReservationsForCampaign,
-  getTaskData,
   getTaskDataByReservation,
-  getReservations,
   getReservationForCampaign,
+  TaskIpfsError,
 } from "@effectai/effect-js";
 
 import {
-  useMutation,
-  useQuery,
   type UseMutationReturnType,
   type UseQueryReturnType,
+  useMutation,
+  useQuery,
 } from "@tanstack/vue-query";
 
 import type { NameType, Session } from "@wharfkit/session";
@@ -57,7 +56,9 @@ export interface ClientStore {
     reservation: Ref<Reservation | null | undefined>,
   ) => UseQueryReturnType<any, any>;
 
-  usePendingPayments: () => UseQueryReturnType<Payment[], any>;
+  usePendingPayments: () => UseQueryReturnType<Payment[], any> & {
+    totalEfxPending: Ref<number>;
+  };
 
   useReserveTask: () => UseMutationReturnType<
     Reservation | null,
@@ -177,11 +178,14 @@ export const createEffectClient = (): ClientStore => {
 
   const usePendingPayments = () => {
     const query = useQuery({
-      queryKey: ["pendingPayments", computed(() => userName.value)],
-      enabled: isLoggedIn,
+      queryKey: [
+        "pendingPayments",
+        computed(() => userName.value),
+        computed(() => vAccount.value?.id),
+      ],
+      enabled: computed(() => !!vAccount.value?.id),
       queryFn: async () => {
-        if (!vAccount.value) return Promise.resolve([]);
-        const data = await getPendingPayments(client.value, vAccount.value.id);
+        const data = await getPendingPayments(client.value, vAccount.value!.id);
         return data.rows;
       },
     });
@@ -234,8 +238,21 @@ export const createEffectClient = (): ClientStore => {
     return useQuery({
       queryKey: ["taskData", computed(() => reservation.value)],
       enabled: computed(() => !!reservation.value),
+      retry: (failureCount, error: TaskIpfsError | Error) =>
+        "retry" in error && failureCount < error.retry,
       queryFn: async () => {
-        return await getTaskDataByReservation(client.value, reservation.value!);
+        try {
+          return await getTaskDataByReservation(
+            client.value,
+            reservation.value!,
+          );
+        } catch (e) {
+          notify({
+            type: "error",
+            message: "Failed to fetch task data",
+          });
+          throw e;
+        }
       },
     });
   };
