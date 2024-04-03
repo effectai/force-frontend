@@ -35,11 +35,12 @@
 </template>
 
 <script setup lang="ts">
+import MdiCheck from "~/components/icons/MdiCheck.vue";
+
 const { notify } = useNotification();
 const key = ref();
 const shake = ref(false);
-
-const { betaKey } = useBetaKeys();
+const accessKey = useLocalStorage("accessKey", null);
 
 definePageMeta({
   layout: "preview",
@@ -55,8 +56,9 @@ const verifyAccessKey = () => {
     notify({
       type: "success",
       message: "Access granted",
+      icon: MdiCheck,
     });
-    betaKey.value = key.value;
+    accessKey.value = key.value;
     router.push("/");
   } else {
     shake.value = true;

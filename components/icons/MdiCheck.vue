@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 defineComponent({
-    name: "SolarArrowRightBold",
+  name: 'MdiCheck',
 });
 </script>
 <template>
@@ -14,7 +14,7 @@ defineComponent({
   >
     <path
       fill="currentColor"
-      d="M4 11.25a.75.75 0 0 0 0 1.5h9.25V18a.75.75 0 0 0 1.28.53l6-6a.75.75 0 0 0 0-1.06l-6-6a.75.75 0 0 0-1.28.53v5.25z"
+      d="M21 7L9 19l-5.5-5.5l1.41-1.41L9 16.17L19.59 5.59z"
     />
   </svg>
 </template>
