@@ -1,7 +1,9 @@
 <template>
   <div class="container">
     <div>
-      <h2 class="title">Reserved Datasets ({{ reservedCampaigns.length }})</h2>
+      <h2 class="title">
+        Reserved Datasets ({{ reservedCampaigns.length }})
+      </h2>
       <p>
         These are the tasks you have started working on or that you have a
         reservation for.
@@ -28,7 +30,10 @@
         These are all the tasks on the platform, you might need to qualify
         first.
       </p>
-      <CampaignList :loading="isLoadingCampaigns" :campaigns="campaigns">
+      <CampaignList
+        :loading="isLoadingCampaigns"
+        :campaigns="campaigns"
+      >
         <template #empty>
           <div>No campaigns found.</div>
         </template>

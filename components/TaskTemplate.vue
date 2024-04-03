@@ -1,7 +1,9 @@
 <template>
   <div class="template-wrapper">
     <div v-if="isLoading">
-      <div class="backdrop-loader">Loading Task</div>
+      <div class="backdrop-loader">
+        Loading Task
+      </div>
     </div>
     <iframe
       v-if="html"

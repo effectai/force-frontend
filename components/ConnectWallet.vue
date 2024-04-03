@@ -1,7 +1,12 @@
 <template>
-    <button v-if="true" @click="connectWallet()">Connect Wallet</button>
+  <button
+    v-if="true"
+    @click="connectWallet()"
+  >
+    Connect Wallet
+  </button>
 </template>
 
 <script setup lang="ts">
-const { connectWallet, isWalletConnecting } = useEffectClient();
+const { connectWallet } = useEffectClient();
 </script>

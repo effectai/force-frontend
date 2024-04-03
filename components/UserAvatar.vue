@@ -3,7 +3,7 @@
     <img
       :src="`https://i.pravatar.cc/100?img=${props.id}`"
       alt="Rounded avatar"
-    />
+    >
   </div>
 </template>
 

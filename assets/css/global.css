@@ -151,3 +151,15 @@ p {
   font-size: var(--font-size);
   line-height: var(--line-height);
 }
+
+/* Utility classes */
+
+.text-center {
+  text-align: center;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,12 +1,15 @@
 <template>
   <div>
     <div v-if="loading">
-      <slot name="loading"></slot>
+      <slot name="loading" />
     </div>
     <div v-else-if="campaigns && campaigns.length === 0">
-      <slot name="empty"></slot>
+      <slot name="empty" />
     </div>
-    <div class="table-container" v-else-if="campaigns && campaigns.length > 0">
+    <div
+      v-else-if="campaigns && campaigns.length > 0"
+      class="table-container"
+    >
       <table>
         <thead>
           <tr>
@@ -19,8 +22,8 @@
         <tbody>
           <tr
             v-for="campaign in campaigns"
-            @click="router.push(`/campaign/${campaign.id}`)"
             :key="campaign.id"
+            @click="router.push(`/campaign/${campaign.id}`)"
           >
             <td>
               <div class="campaign-user">
@@ -28,21 +31,26 @@
                 <span>{{ campaign.owner.at(1) }}</span>
               </div>
             </td>
-            <td v-if="campaign && campaign.info" class="">
+            <td
+              v-if="campaign && campaign.info"
+              class=""
+            >
               {{ campaign.info.title }}
             </td>
             <td v-else>
               {{ "No title" }}
-              <br />
+              <br>
               <div>
                 {{ "No description" }}
               </div>
             </td>
-            <td class="quantity">{{ campaign.reward.quantity }}/tsk</td>
+            <td class="quantity">
+              {{ campaign.reward.quantity }}/tsk
+            </td>
             <td>
               <div v-if="isReserved(campaign.id)">
-                <NuxtLink :to="`campaign/${campaign.id}`"
-                  >continue
+                <NuxtLink :to="`campaign/${campaign.id}`">
+                  continue
                   <IconsArrowRightBold />
                 </NuxtLink>
               </div>

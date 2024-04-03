@@ -1,10 +1,11 @@
 <template>
   <div class="notification-container">
     <div
-      v-for="notification in notifications"
-      @click="doRemoveNotification(notification.created)"
+      v-for="(notification, i) in notifications"
+      :key="i"
+      :class="[notification.type, {icon: notification.icon}]"
       class="notification"
-      :class="notification.type"
+      @click="doRemoveNotification(notification.created)"
     >
       {{ notification.message }}
     </div>
@@ -17,6 +18,7 @@ const { notifications, removeNotification } = useNotification();
 const doRemoveNotification = (created: Date) => {
   removeNotification(notifications.value.find((n) => n.created === created)!);
 };
+
 </script>
 
 <style>
@@ -36,6 +38,14 @@ const doRemoveNotification = (created: Date) => {
   border-radius: 0.5rem;
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
 }
+
+.notification.icon {
+  display: flex;
+  align-items: center;
+}
+.notification.success {
+  background-color: #2ecc40;
+} 
 
 .notification.error {
   background-color: #ff4136;

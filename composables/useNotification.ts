@@ -4,6 +4,7 @@ type Notification = {
 
   duration: number;
   created: Date;
+  icon?: string;
 };
 
 const notifications: Ref<Notification[]> = ref([]);
