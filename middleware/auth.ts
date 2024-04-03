@@ -1,9 +1,10 @@
 const { isLoggedIn } = useEffectClient();
-const { hasBetaKey } = useBetaKeys();
 
 export default defineNuxtRouteMiddleware((to, from) => {
+  const accessKey = useLocalStorage("accessKey", null);
+
   // If the user is not logged in, redirect to home page
-  if (!isLoggedIn.value && hasBetaKey.value) {
+  if (!isLoggedIn.value && accessKey.value) {
     console.log("nvigating to /home");
 
     return navigateTo("/");
