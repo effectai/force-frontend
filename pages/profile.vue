@@ -1,22 +1,39 @@
 <template>
   <div class="container">
-    <div class="text-2xl title my-5">Profile</div>
+    <div class="text-2xl title my-5">
+      Profile
+    </div>
 
     <div class="profile-stats">
       <div>
         <label>Name</label>
-        <div class="text-lg">{{ userName }}</div>
+        <div class="text-lg">
+          {{ userName }}
+        </div>
       </div>
 
       <div>
         <label>Permission</label>
-        <div class="text-lg">{{ permission }}</div>
+        <div class="text-lg">
+          {{ permission }}
+        </div>
       </div>
     </div>
 
     <div class="profile-toolbar">
-      <button class="button">Claim {{ totalEfxPending }} EFX</button>
-      <button v-if="isLoggedIn" @click="logout" class="button">Logout</button>
+      <button
+        class="button"
+        @click="claim"
+      >
+        Claim {{ totalEfxPending }} EFX
+      </button>
+      <button
+        v-if="isLoggedIn"
+        class="button"
+        @click="logout"
+      >
+        Logout
+      </button>
     </div>
   </div>
 </template>
@@ -31,10 +48,13 @@ const {
   isLoggedIn,
   userName,
   vAccount,
+  useClaimEfx,
   useEfxPrice,
 } = useEffectClient();
 
 const router = useRouter();
+
+const { mutateAsync: claim } = useClaimEfx();
 
 const logout = () => {
   disconnectWallet();

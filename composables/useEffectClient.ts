@@ -19,6 +19,7 @@ import {
   TaskIpfsError,
   getPrice,
   getVAccounts,
+  payout,
 } from "@effectai/effect-js";
 
 import {
@@ -28,7 +29,7 @@ import {
   useQuery,
 } from "@tanstack/vue-query";
 
-import type { NameType, Session } from "@wharfkit/session";
+import type { Name, Session } from "@wharfkit/session";
 import { ClientNotInitializedError } from "~/errors/errors";
 
 let effectClient: ClientStore | null;
@@ -38,8 +39,8 @@ export interface ClientStore {
   isLoggedIn: Ref<boolean>;
   isWalletConnecting: Ref<boolean>;
 
-  userName: Ref<NameType | null>;
-  permission: Ref<NameType | null>;
+  userName: Ref<Name | null>;
+  permission: Ref<Name | null>;
   vAccount: Ref<VAccount | null>;
 
   useCampaigns: () => UseQueryReturnType<Campaign[], any>;
@@ -77,6 +78,8 @@ export interface ClientStore {
     unknown
   >;
 
+  useClaimEfx: () => UseMutationReturnType<any, Error, void, unknown>;
+
   connectWallet: (session?: Session) => Promise<void>;
   disconnectWallet: () => Promise<void>;
 }
@@ -113,7 +116,7 @@ export const createEffectClient = (): ClientStore => {
       fetchProviderOptions: {
         fetch,
       },
-      ipfsCacheDurationInMs: 1000 * 60 * 5,
+      ipfsCacheDurationInMs: 10000,
     }),
   );
 
@@ -121,11 +124,11 @@ export const createEffectClient = (): ClientStore => {
 
   const session: Ref<EffectSession | null> = ref(null);
 
-  const userName: Ref<NameType | null> = computed(
+  const userName: Ref<Name | null> = computed(
     () => session.value?.actor || null,
   );
 
-  const permission: Ref<NameType | null> = computed(
+  const permission: Ref<Name | null> = computed(
     () => session.value?.permission || null,
   );
 
@@ -143,7 +146,10 @@ export const createEffectClient = (): ClientStore => {
   const useClaimEfx = () => {
     return useMutation({
       mutationFn: async () => {
-        // payout();
+        if (!userName.value || !permission.value)
+          throw new Error("User not logged in");
+
+        return await payout(client.value, userName.value, permission.value);
       },
     });
   };
@@ -293,10 +299,6 @@ export const createEffectClient = (): ClientStore => {
     return { ...query, isReserved };
   };
 
-  watch(session, () => {
-    console.log("session changed!");
-  });
-
   /* --------- METHODS ------- */
 
   const connectWallet = async (_session?: Session) => {
@@ -341,6 +343,7 @@ export const createEffectClient = (): ClientStore => {
     vAccount,
 
     // hooks
+    useClaimEfx,
     useCampaigns,
     useCampaign,
     useReservation,
