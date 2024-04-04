@@ -4,10 +4,9 @@ import {
   type Reservation,
   type Client,
   type Payment,
+  type EffectSession,
   createClient,
   jungle4,
-  watchAccount,
-  watchSession,
   setSession,
   getCampaigns,
   reserveTask,
@@ -19,6 +18,7 @@ import {
   getReservationForCampaign,
   TaskIpfsError,
   getPrice,
+  getVAccounts,
 } from "@effectai/effect-js";
 
 import {
@@ -119,8 +119,7 @@ export const createEffectClient = (): ClientStore => {
 
   /* --------- REACTIVE DATA --------- */
 
-  const vAccount: Ref<VAccount | null> = ref(null);
-  const session: Ref<Session | null> = ref(null);
+  const session: Ref<EffectSession | null> = ref(null);
 
   const userName: Ref<NameType | null> = computed(
     () => session.value?.actor || null,
@@ -130,20 +129,14 @@ export const createEffectClient = (): ClientStore => {
     () => session.value?.permission || null,
   );
 
+  const vAccount: Ref<VAccount | null> = computed(
+    () => session.value?.vAccount || null,
+  );
+
   /* --------- REACTIVE BOOLEANS --------- */
 
   const isWalletConnecting: Ref<boolean> = ref(false);
   const isLoggedIn = computed(() => !!session.value);
-
-  /* --------- WATCHERS --------- */
-
-  watchAccount(client.value, (account: VAccount | null) => {
-    vAccount.value = account;
-  });
-
-  watchSession(client.value, (_session: Session | null) => {
-    session.value = _session;
-  });
 
   /* --------- MUTATIONS --------- */
 
@@ -234,8 +227,13 @@ export const createEffectClient = (): ClientStore => {
 
   const useReservation = (campaignId: number) => {
     return useQuery({
-      queryKey: ["reservation", computed(() => userName.value), campaignId],
-      enabled: isLoggedIn,
+      queryKey: [
+        "reservation",
+        computed(() => userName.value),
+        computed(() => vAccount.value?.id),
+        campaignId,
+      ],
+      enabled: !!vAccount.value?.id,
       queryFn: async () => {
         return await getReservationForCampaign(
           client.value,
@@ -295,13 +293,19 @@ export const createEffectClient = (): ClientStore => {
     return { ...query, isReserved };
   };
 
+  watch(session, () => {
+    console.log("session changed!");
+  });
+
   /* --------- METHODS ------- */
 
-  const connectWallet = async (session?: Session) => {
+  const connectWallet = async (_session?: Session) => {
     try {
       isWalletConnecting.value = true;
-      const sessionToUse = session || (await sessionKit.login()).session;
+      const sessionToUse = _session || (await sessionKit.login()).session;
+
       await setSession(client.value, sessionToUse);
+      session.value = client.value.session;
     } catch (error) {
       console.error(error);
       notify({
@@ -317,6 +321,7 @@ export const createEffectClient = (): ClientStore => {
     try {
       await sessionKit.logout();
       await setSession(client.value, null);
+      session.value = null;
     } catch (e) {
       console.error(e);
     }

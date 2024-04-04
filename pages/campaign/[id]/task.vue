@@ -1,11 +1,13 @@
 <template>
   <div class="container">
     <div v-if="error">
-      {{ error }}
+      error: {{ error }}
     </div>
 
     <div v-else-if="isLoadingTaskData || isReservingTask || isSubmittingTask">
-      <div class="backdrop-loader">Loading Task Data</div>
+      <div class="backdrop-loader">
+        Loading Task Data
+      </div>
     </div>
 
     <TaskTemplate
