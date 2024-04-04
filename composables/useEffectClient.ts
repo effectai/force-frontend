@@ -11,6 +11,7 @@ import {
   getCampaigns,
   reserveTask,
   submitTask,
+  getSubmissions,
   getPendingPayments,
   getCampaign,
   getReservationsForVAccount,
@@ -18,8 +19,9 @@ import {
   getReservationForCampaign,
   TaskIpfsError,
   getPrice,
-  getVAccounts,
+  withdraw,
   payout,
+  getAccountById,
 } from "@effectai/effect-js";
 
 import {
@@ -45,6 +47,8 @@ export interface ClientStore {
 
   useCampaigns: () => UseQueryReturnType<Campaign[], any>;
   useCampaign: (campaignId: number) => UseQueryReturnType<Campaign, any>;
+
+  useGetAccountById: (accountId: number) => UseQueryReturnType<VAccount, any>;
 
   useEfxPrice: () => UseQueryReturnType<number, any>;
 
@@ -78,7 +82,10 @@ export interface ClientStore {
     unknown
   >;
 
-  useClaimEfx: () => UseMutationReturnType<any, Error, void, unknown>;
+  useSubmissions: () => UseQueryReturnType<any, any>;
+
+  usePayoutEfx: () => UseMutationReturnType<any, Error, void, unknown>;
+  useWithdrawEfx: () => UseMutationReturnType<any, Error, void, unknown>;
 
   connectWallet: (session?: Session) => Promise<void>;
   disconnectWallet: () => Promise<void>;
@@ -143,7 +150,18 @@ export const createEffectClient = (): ClientStore => {
 
   /* --------- MUTATIONS --------- */
 
-  const useClaimEfx = () => {
+  const useWithdrawEfx = () => {
+    return useMutation({
+      mutationFn: async () => {
+        if (!userName.value || !permission.value)
+          throw new Error("User not logged in");
+
+        return await withdraw(client.value);
+      },
+    });
+  };
+
+  const usePayoutEfx = () => {
     return useMutation({
       mutationFn: async () => {
         if (!userName.value || !permission.value)
@@ -177,6 +195,28 @@ export const createEffectClient = (): ClientStore => {
   };
 
   /* --------- HOOKS --------- */
+
+  const useGetAccountById = (accountId: number) => {
+    return useQuery({
+      queryKey: ["account", accountId],
+      queryFn: async () => {
+        return await getAccountById({ client: client.value, accountId });
+      },
+    });
+  };
+
+  const useSubmissions = () => {
+    return useQuery({
+      queryKey: ["tasks"],
+      queryFn: async () => {
+        const data = await getSubmissions({
+          client: client.value,
+          reverse: true,
+        });
+        return data.rows;
+      },
+    });
+  };
 
   const usePendingPayments = () => {
     const query = useQuery({
@@ -343,12 +383,16 @@ export const createEffectClient = (): ClientStore => {
     vAccount,
 
     // hooks
-    useClaimEfx,
+    usePayoutEfx,
+    useWithdrawEfx,
+
+    useGetAccountById,
     useCampaigns,
     useCampaign,
+    useSubmissions,
+    useTaskData,
     useReservation,
     useReservations,
-    useTaskData,
     usePendingPayments,
     useEfxPrice,
 

@@ -10,6 +10,11 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
+  runtimeConfig: {
+    public: {
+      BASE_EXPLORER_URL: process.env.BASE_EXPLORER_URL,
+    },
+  },
   build: {
     analyze: {},
   },

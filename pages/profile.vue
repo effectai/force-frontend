@@ -21,8 +21,13 @@
     </div>
 
     <div class="profile-toolbar">
+      <button @click="withdraw">
+        Withdraw
+      </button>
+
       <button
         class="button"
+        :disabled="totalEfxPending === 0"
         @click="claim"
       >
         Claim {{ totalEfxPending }} EFX
@@ -47,14 +52,15 @@ const {
   permission,
   isLoggedIn,
   userName,
-  vAccount,
-  useClaimEfx,
+  usePayoutEfx,
+  useWithdrawEfx,
   useEfxPrice,
 } = useEffectClient();
 
 const router = useRouter();
 
-const { mutateAsync: claim } = useClaimEfx();
+const { mutateAsync: claim } = usePayoutEfx();
+const { mutateAsync: withdraw } = useWithdrawEfx();
 
 const logout = () => {
   disconnectWallet();

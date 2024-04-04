@@ -1,8 +1,17 @@
 <template>
   <div class="container">
+    <h2 class="title">
+      Recent Submissions on the platform
+    </h2>
+    <SubmissionList
+      :limit="5"
+      :submissions="submissions"
+      :loading="isLoadingSubmissions"
+    />
+
     <div>
       <h2 class="title">
-        Reserved Datasets ({{ reservedCampaigns.length }})
+        Your active Reservations ({{ reservedCampaigns.length }})
       </h2>
       <p>
         These are the tasks you have started working on or that you have a
@@ -46,10 +55,11 @@
 </template>
 
 <script setup lang="ts">
-const { useCampaigns, useReservations } = useEffectClient();
+const { useCampaigns, useReservations, useSubmissions } = useEffectClient();
 
 const { data: campaigns, isLoading: isLoadingCampaigns } = useCampaigns();
 const { isReserved, isLoading: isLoadingReservations } = useReservations();
+const { data: submissions, isLoading: isLoadingSubmissions } = useSubmissions();
 
 const reservedCampaigns = computed(() => {
   return campaigns.value?.filter((c) => isReserved(c.id)) ?? [];
