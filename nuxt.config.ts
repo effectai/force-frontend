@@ -12,7 +12,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      BASE_EXPLORER_URL: process.env.BASE_EXPLORER_URL,
+      BASE_EXPLORER_URL:
+        process.env.BASE_EXPLORER_URL ?? "https://jungle4.eosq.eosnation.io/",
     },
   },
   build: {
