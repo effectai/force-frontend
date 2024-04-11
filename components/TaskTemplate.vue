@@ -40,7 +40,6 @@ onMounted(() => {
 
 const mediaFrameLoaded = async () => {
   isIframeLoaded.value = true;
-  console.log("loaded!");
   await nextTick();
   emit("ready");
 };

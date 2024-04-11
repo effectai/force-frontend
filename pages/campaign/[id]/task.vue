@@ -87,8 +87,6 @@ const renderTask = async (): Promise<void> => {
       throw new Error("No reservation found");
     }
 
-    console.log("render task..");
-
     const task = {
       accountId: vAccount.value?.id,
       campaignId: reservation.value?.campaign_id,
@@ -127,7 +125,7 @@ const doSubmitTask = async (data: any): Promise<void> => {
     try {
       // Try to reserve new task.
       // TODO:: update reservation in cache; for now just refetch.
-      const newReservation = await reserveTask(campaignId);
+      const newReservation = await reserveTask(campaignId.value);
       await refetchReservation();
     } catch (e) {
       console.error("error while getting next reservation", e);
