@@ -18,19 +18,52 @@
           {{ permission }}
         </div>
       </div>
+
+      <div>
+        <label>EFX</label>
+        <div class="text-lg">
+          {{ balance }}
+        </div>
+      </div>
+    </div>
+
+    <div class="payout-container">
+      <label>Pending EFX</label>
+      <div v-if="loadingPayments">
+        Loading..
+      </div>
+      <div
+        v-else
+        class="text-lg"
+      >
+        <div
+          v-for="payment in proccesedPayments"
+          :key="payment.id"
+        >
+          {{ payment.batch_id }} - {{ payment.pending.quantity }}
+
+          <span
+            v-if="payment.claimableIn < 0"
+            class="claimable"
+          >Claimable</span>
+          <span
+            v-else
+            class="pending"
+          >
+            Claimable in
+            {{ formatSecondsToTime(payment.claimableIn) }} seconds
+          </span>
+        </div>
+      </div>
     </div>
 
     <div class="profile-toolbar">
-      <button @click="withdraw">
-        Withdraw
-      </button>
-
       <button
         class="button"
-        :disabled="totalEfxPending === 0"
-        @click="claim"
+        :disabled="payments?.totalEfxClaimable === 0"
+        @click="payout()"
       >
-        Claim {{ totalEfxPending }} EFX
+        Claim {{ payments?.totalEfxClaimable }} EFX
       </button>
       <button
         v-if="isLoggedIn"
@@ -44,6 +77,8 @@
 </template>
 
 <script setup lang="ts">
+import { getTimeToClaim, type Payment } from "@effectai/effect-js";
+
 definePageMeta({ middleware: "auth" });
 
 const {
@@ -53,23 +88,63 @@ const {
   isLoggedIn,
   userName,
   usePayoutEfx,
-  useWithdrawEfx,
-  useEfxPrice,
+  useGetBalance,
+  useForceSettings,
 } = useEffectClient();
 
 const router = useRouter();
 
-const { mutateAsync: claim } = usePayoutEfx();
-const { mutateAsync: withdraw } = useWithdrawEfx();
+const { data: balance } = useGetBalance(userName);
+
+const { data: forceSettings, isLoading: isLoadingForceSettings } =
+  useForceSettings();
+
+/**
+ * Payments Logic
+ */
+
+const { data: payments, isLoading: isLoadingPayments } = usePendingPayments();
+
+const loadingPayments = computed(
+  () => isLoadingPayments.value || isLoadingForceSettings.value,
+);
+
+const proccesedPayments: Ref<
+  | (Payment & {
+      claimableIn: number;
+    })[]
+  | []
+> = ref([]);
+
+const processPayments = (payments: Payment[]) => {
+  return payments.map((payment) => {
+    return {
+      ...payment,
+      claimableIn: getTimeToClaim(payment, forceSettings.value),
+    };
+  });
+};
+
+/**
+ * Refresh Payment interval logic
+ */
+
+const paymentInterval = setInterval(() => {
+  if (payments.value) {
+    proccesedPayments.value = processPayments(payments.value.pendingPayments);
+  }
+}, 1000);
+
+const { mutateAsync: payout } = usePayoutEfx();
+
+onUnmounted(() => {
+  clearInterval(paymentInterval);
+});
 
 const logout = () => {
   disconnectWallet();
   router.push("/");
 };
-
-const { totalEfxPending } = usePendingPayments();
-
-const { data: price } = useEfxPrice();
 </script>
 
 <style>
@@ -79,7 +154,7 @@ const { data: price } = useEfxPrice();
   margin: 1rem 0;
 }
 
-.profile-stats label {
+label {
   font-size: 1.2rem;
   font-weight: bold;
   color: var(--color-main);
@@ -89,5 +164,13 @@ const { data: price } = useEfxPrice();
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
+}
+
+.claimable {
+  color: green;
+}
+
+.pending {
+  color: orange;
 }
 </style>

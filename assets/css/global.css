@@ -78,6 +78,11 @@ tr:nth-child(even) {
   background-color: var(--bg-light-color);
 }
 
+tr:hover {
+  cursor: pointer;
+  background: var(--color-gray-200);
+}
+
 /* BUTTON STYLING */
 
 .button {

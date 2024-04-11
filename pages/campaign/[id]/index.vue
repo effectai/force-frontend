@@ -1,11 +1,15 @@
 <template>
   <div class="container">
     <div v-if="isReservingTask">
-      <div class="backdrop-loader">Reserving task...</div>
+      <div class="backdrop-loader">
+        Reserving task...
+      </div>
     </div>
     <div v-if="campaign">
       <div>
-        <h1 class="title">{{ campaign.info?.title }}</h1>
+        <h1 class="title">
+          {{ campaign.info?.title }}
+        </h1>
         <div class="campaign-details">
           <div class="campaign-info">
             <label>Reward per task</label>
@@ -13,38 +17,55 @@
           </div>
           <div class="campaign-info">
             <label>Time per task</label>
-            <span>{{ campaign.max_task_time }}</span>
+            <span>{{ campaign.max_task_time }} seconds</span>
           </div>
-          <p class="campaign-description">{{ campaign.info?.description }}</p>
+          <p class="campaign-description">
+            {{ campaign.info?.description }}
+          </p>
         </div>
 
         <div class="campaign-toolbar">
-          <button :disabled="!isLoggedIn" class="button" @click="doReserveTask">
+          <button
+            :disabled="!isLoggedIn"
+            class="button"
+            @click="doReserveTask"
+          >
             Start
           </button>
-          <button class="button" onclick="instruction_modal.showModal()">
+          <button
+            class="button"
+            onclick="instruction_modal.showModal()"
+          >
             Show Instructions
           </button>
         </div>
 
         <div v-if="campaign && campaign.info && campaign.info.instructions">
-          <!-- Open the modal using ID.showModal() method -->
-
-          <dialog ref="modal" id="instruction_modal" class="modal">
-            <div class="backdrop"></div>
+          <dialog
+            id="instruction_modal"
+            ref="modal"
+            class="modal"
+          >
+            <div class="backdrop" />
             <div class="modal-box">
-              <h3 class="title">Instructions</h3>
-              <div class="divider"></div>
-              <p v-html="campaign.info.instructions"></p>
+              <h3 class="title">
+                Instructions
+              </h3>
+              <div class="divider" />
+              <p v-html="campaign.info.instructions" />
             </div>
             <form method="dialog">
-              <button class="button">close</button>
+              <button class="button">
+                close
+              </button>
             </form>
           </dialog>
         </div>
-        <p v-else>No instructions found.</p>
-        <div class="divider"></div>
-        <div class="card-actions"></div>
+        <p v-else>
+          No instructions found.
+        </p>
+        <div class="divider" />
+        <div class="card-actions" />
       </div>
     </div>
   </div>

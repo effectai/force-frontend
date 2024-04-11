@@ -8,7 +8,7 @@
       </a>
     </td>
     <td>{{ campaign?.info?.title }}</td>
-    <td>{{ formatDate(submittedOn) }}</td>
+    <td>{{ formatDateStringToTimeAgo(submittedOn) }}</td>
   </tr>
 </template>
 
@@ -18,6 +18,7 @@ const { useGetAccountById, useCampaign } = useEffectClient();
 const config = useRuntimeConfig();
 
 const props = defineProps<{
+  id: number;
   submittedOn: string;
   accountId: number;
   campaignId: number;

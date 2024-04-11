@@ -1,15 +1,17 @@
 <template>
   <div class="container">
-    <h2 class="title">
-      Recent Submissions on the platform
-    </h2>
-    <SubmissionList
-      :limit="5"
-      :submissions="submissions"
-      :loading="isLoadingSubmissions"
-    />
+    <!-- <div>
+      <h2 class="title">
+        Recent Submissions on the platform
+      </h2>
+      <SubmissionList
+        :limit="5"
+        :submissions="submissions"
+        :loading="isLoadingSubmissions"
+      />
+    </div> -->
 
-    <div>
+    <div v-if="isLoggedIn">
       <h2 class="title">
         Your active Reservations ({{ reservedCampaigns.length }})
       </h2>
@@ -55,11 +57,13 @@
 </template>
 
 <script setup lang="ts">
-const { useCampaigns, useReservations, useSubmissions } = useEffectClient();
+const { useCampaigns, useReservations, useSubmissions, isLoggedIn } =
+  useEffectClient();
 
 const { data: campaigns, isLoading: isLoadingCampaigns } = useCampaigns();
 const { isReserved, isLoading: isLoadingReservations } = useReservations();
-const { data: submissions, isLoading: isLoadingSubmissions } = useSubmissions();
+
+// const { data: submissions, isLoading: isLoadingSubmissions } = useSubmissions();
 
 const reservedCampaigns = computed(() => {
   return campaigns.value?.filter((c) => isReserved(c.id)) ?? [];

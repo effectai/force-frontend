@@ -15,7 +15,8 @@
           <tr>
             <th>Dataset</th>
             <th>Title</th>
-            <th>Reward</th>
+            <th>Tasks available</th>
+            <th>Reward Per Task</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -44,8 +45,9 @@
                 {{ "No description" }}
               </div>
             </td>
+            <td>{{ campaign.total_tasks - campaign.tasks_done }}</td>
             <td class="quantity">
-              {{ campaign.reward.quantity }}/tsk
+              {{ campaign.reward.quantity }}
             </td>
             <td>
               <div v-if="isReserved(campaign.id)">
@@ -77,11 +79,6 @@ const { isReserved } = useReservations();
 </script>
 
 <style scoped>
-tr:hover {
-  cursor: pointer;
-  background: var(--color-gray-200);
-}
-
 .campaign-user {
   display: flex;
   gap: 0.5rem;

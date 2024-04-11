@@ -21,6 +21,7 @@
         <tbody>
           <SubmissionRow
             v-for="submission in submissionsToShow"
+            :id="submission.id"
             :key="submission.id"
             :campaign-id="submission.campaign_id"
             :submitted-on="submission.submitted_on"
