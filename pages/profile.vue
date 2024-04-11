@@ -22,7 +22,7 @@
       <div>
         <label>EFX</label>
         <div class="text-lg">
-          {{ balance }}
+          {{ balance ?? 0 }}
         </div>
       </div>
     </div>

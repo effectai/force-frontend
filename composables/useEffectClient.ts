@@ -89,7 +89,7 @@ export interface ClientStore {
 
   useSubmissions: () => UseQueryReturnType<any, any>;
 
-  useGetBalance: (account: Ref<Name>) => UseQueryReturnType<any, any>;
+  useGetBalance: (account: Ref<Name | null>) => UseQueryReturnType<any, any>;
 
   usePayoutEfx: () => UseMutationReturnType<any, Error, void, unknown>;
   // useWithdrawEfx: () => UseMutationReturnType<any, Error, void, unknown>;
@@ -215,11 +215,12 @@ export const createEffectClient = (): ClientStore => {
     });
   };
 
-  const useGetBalance = (account: Ref<Name>) => {
+  const useGetBalance = (account: Ref<Name | null>) => {
     return useQuery({
       queryKey: ["balance", computed(() => account.value)],
       enabled: !!account.value,
       queryFn: async () => {
+        if (!account.value) throw new Error("Account not found");
         return await getBalance(client.value, account.value);
       },
     });
