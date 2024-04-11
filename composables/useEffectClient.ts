@@ -61,7 +61,7 @@ export interface ClientStore {
   };
 
   useReservation: (
-    campaignId: number,
+    campaignId: Ref<number>,
   ) => UseQueryReturnType<Reservation | null, any>;
 
   useTaskData: (
@@ -288,19 +288,19 @@ export const createEffectClient = (): ClientStore => {
     });
   };
 
-  const useReservation = (campaignId: number) => {
+  const useReservation = (campaignId: Ref<number>) => {
     return useQuery({
       queryKey: [
         "reservation",
         computed(() => userName.value),
         computed(() => vAccount.value?.id),
-        campaignId,
+        computed(() => campaignId.value),
       ],
-      enabled: !!vAccount.value?.id,
+      enabled: computed(() => !!vAccount.value && !!campaignId.value),
       queryFn: async () => {
         return await getReservationForCampaign(
           client.value,
-          campaignId,
+          campaignId.value,
           vAccount.value!.id,
         );
       },
@@ -315,9 +315,11 @@ export const createEffectClient = (): ClientStore => {
         "retry" in error && failureCount < error.retry,
       queryFn: async () => {
         try {
+          if (!reservation.value) throw new Error("Reservation not found");
+
           return await getTaskDataByReservation(
             client.value,
-            reservation.value!,
+            reservation.value,
           );
         } catch (e) {
           notify({

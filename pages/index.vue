@@ -57,8 +57,7 @@
 </template>
 
 <script setup lang="ts">
-const { useCampaigns, useReservations, useSubmissions, isLoggedIn } =
-  useEffectClient();
+const { useCampaigns, useReservations, isLoggedIn } = useEffectClient();
 
 const { data: campaigns, isLoading: isLoadingCampaigns } = useCampaigns();
 const { isReserved, isLoading: isLoadingReservations } = useReservations();

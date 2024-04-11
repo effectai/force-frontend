@@ -1,10 +1,5 @@
 <template>
   <div class="container">
-    <div v-if="isReservingTask">
-      <div class="backdrop-loader">
-        Reserving task...
-      </div>
-    </div>
     <div v-if="campaign">
       <div>
         <h1 class="title">
@@ -25,13 +20,14 @@
         </div>
 
         <div class="campaign-toolbar">
-          <button
+          <ForceButton
+            :is-loading="loading"
             :disabled="!isLoggedIn"
             class="button"
             @click="doReserveTask"
           >
             Start
-          </button>
+          </ForceButton>
           <button
             class="button"
             onclick="instruction_modal.showModal()"
@@ -80,6 +76,8 @@ const route = useRoute();
 const router = useRouter();
 const modal = ref(null);
 
+const loading = ref(false);
+
 const campaignId = Number(route.params.id);
 const { data: campaign } = useCampaign(campaignId);
 
@@ -87,17 +85,27 @@ const { mutateAsync: reserveTask, isPending: isReservingTask } =
   useReserveTask();
 
 const doReserveTask = async () => {
-  const reservation = await reserveTask(campaignId, {
-    onError: (error) => {
-      notify({
-        type: "error",
-        message: "Failed to reserve task",
-      });
-    },
-  });
+  try {
+    loading.value = true;
+    const reservation = await reserveTask(campaignId, {
+      onError: (error) => {
+        notify({
+          type: "error",
+          message: "Failed to reserve task",
+        });
+      },
+    });
 
-  if (reservation && reservation.id) {
-    router.push(`/campaign/${campaignId}/task/`);
+    if (reservation && reservation.id) {
+      await router.push(`/campaign/${campaignId}/task/`);
+    }
+  } catch (e) {
+    notify({
+      type: "error",
+      message: "Failed to reserve task",
+    });
+  } finally {
+    loading.value = false;
   }
 };
 </script>

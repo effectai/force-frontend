@@ -1,16 +1,12 @@
 <template>
   <div class="template-wrapper">
-    <div v-if="isLoading">
-      <div class="backdrop-loader">
-        Loading Task
-      </div>
-    </div>
     <iframe
       v-if="html"
       v-show="isIframeLoaded"
       id="mediaFrame"
       ref="mediaFrame"
       :srcdoc="html"
+      :scrolling="'no'"
       name="mediaFrame"
       sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-same-origin"
       allow="geolocation; microphone; camera; autoplay; fullscreen"
@@ -25,7 +21,6 @@ const html: Ref<string | null> = ref(null);
 const mediaFrame: Ref<HTMLElement | null> = ref(null);
 
 const isIframeLoaded = ref(false);
-const isLoading = ref(true);
 
 const setHtml = (newHtml: string) => {
   html.value = newHtml;
@@ -33,6 +28,7 @@ const setHtml = (newHtml: string) => {
 
 const emit = defineEmits<{
   (e: "submit", data: unknown): void;
+  (e: "ready"): void;
 }>();
 
 //expose the setting of html to the parent component
@@ -43,9 +39,10 @@ onMounted(() => {
 });
 
 const mediaFrameLoaded = async () => {
-  isLoading.value = false;
-  await nextTick();
   isIframeLoaded.value = true;
+  console.log("loaded!");
+  await nextTick();
+  emit("ready");
 };
 
 const communicateWithIframe = (event: any) => {
@@ -53,7 +50,7 @@ const communicateWithIframe = (event: any) => {
   switch (data.task) {
     case "setHeight":
       if (!mediaFrame.value) return;
-      mediaFrame.value!.style.height = data.height + "px";
+      mediaFrame.value.style.height = data.height + "px";
       break;
     case "submit":
       emit("submit", data);
@@ -71,17 +68,11 @@ const communicateWithIframe = (event: any) => {
 .template-wrapper {
   box-sizing: border-box;
   width: 100%;
-  height: 90%;
-  border: 8px solid var(--c-border) !important;
-}
-
-iframe {
-  width: 100%;
-  height: 100%;
 }
 
 #mediaFrame {
   width: 100%;
+  height: 100%;
   border: none;
 }
 </style>

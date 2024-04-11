@@ -1,6 +1,11 @@
 <template>
   <div class="template-wrapper">
-    <div v-if="loading" class="loading-text subtitle">Loading</div>
+    <div
+      v-if="loading"
+      class="loading-text subtitle"
+    >
+      Loading
+    </div>
     <iframe
       v-if="html"
       id="mediaFrame"
@@ -36,7 +41,7 @@ export default {
     // eslint-disable-next-line nuxt/no-globals-in-created
     window.addEventListener("message", this.communicateWithIframe);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener("message", this.communicateWithIframe);
     document.removeEventListener("keydown", this.sendKeyEvents);
   },

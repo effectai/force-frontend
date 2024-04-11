@@ -4,9 +4,20 @@
       error: {{ error }}
     </div>
 
-    <div v-else-if="isLoadingTaskData || isReservingTask || isSubmittingTask">
+    <div v-else-if="isTemplateLoading">
       <div class="backdrop-loader">
-        Loading Task Data
+        <div class="backdrop-loading-container">
+          <img src="/img/logo.svg">
+          <p class="flex-center">
+            Loading Task Data
+          </p>
+          <div class="lds-ellipsis">
+            <div />
+            <div />
+            <div />
+            <div />
+          </div>
+        </div>
       </div>
     </div>
 
@@ -14,6 +25,7 @@
       v-if="!error && !isLoadingTaskData"
       ref="templateRef"
       @submit="doSubmitTask"
+      @ready="templateReady = true"
     />
   </div>
 </template>
@@ -36,11 +48,12 @@ const {
 } = useEffectClient();
 
 const router = useRouter();
-const campaignId = Number(router.currentRoute.value.params.id);
+const campaignId = computed(() => Number(router.currentRoute.value.params.id));
+const templateReady = ref(false);
 
 const templateRef: Ref<InstanceType<typeof TaskTemplate> | null> = ref(null);
 
-const { data: campaign } = useCampaign(campaignId);
+const { data: campaign } = useCampaign(campaignId.value);
 const {
   data: reservation,
   error: errorReservation,
@@ -54,6 +67,13 @@ const {
 } = useTaskData(reservation);
 
 const error = computed(() => errorReservation.value || errorTaskData.value);
+const isTemplateLoading = computed(
+  () =>
+    isLoadingTaskData.value ||
+    isReservingTask.value ||
+    isSubmittingTask.value ||
+    !templateReady.value,
+);
 
 const { mutateAsync: reserveTask, isPending: isReservingTask } =
   useReserveTask();
@@ -66,6 +86,8 @@ const renderTask = async (): Promise<void> => {
     if (!reservation.value) {
       throw new Error("No reservation found");
     }
+
+    console.log("render task..");
 
     const task = {
       accountId: vAccount.value?.id,
@@ -111,8 +133,8 @@ const doSubmitTask = async (data: any): Promise<void> => {
       console.error("error while getting next reservation", e);
     }
   } catch (error) {
-    //something went wrong with the task submission
-    //let the user retry
+    // something went wrong with the task submission
+    // let the user retry ?
     console.error(error);
   }
 };
@@ -120,6 +142,7 @@ const doSubmitTask = async (data: any): Promise<void> => {
 watchEffect(async () => {
   if (!reservation.value || !taskData.value) return;
   if (error.value) return;
+  templateReady.value = false;
   await nextTick();
   renderTask();
 });
