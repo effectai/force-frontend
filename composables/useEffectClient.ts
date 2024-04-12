@@ -3,7 +3,6 @@ import {
   type Campaign,
   type Reservation,
   type Client,
-  type Payment,
   type EffectSession,
   createClient,
   jungle4,

@@ -21,7 +21,7 @@ export default defineNuxtConfig({
   build: {
     analyze: {},
   },
-  modules: ["@vueuse/nuxt"],
+  modules: ["@vueuse/nuxt", "@nuxt/content"],
   vite: {
     plugins: [
       visualizer({

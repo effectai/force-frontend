@@ -48,7 +48,7 @@
                 Instructions
               </h3>
               <div class="divider" />
-              <p v-html="campaign.info.instructions" />
+              <ContentRenderer :value="parsedInstructions" />
             </div>
             <form method="dialog">
               <button class="button">
@@ -68,6 +68,8 @@
 </template>
 
 <script setup lang="ts">
+import markdownParser from "@nuxt/content/transformers/markdown";
+
 const { useCampaign, useReserveTask, isLoggedIn } = useEffectClient();
 
 const { notify } = useNotification();
@@ -80,6 +82,17 @@ const loading = ref(false);
 
 const campaignId = Number(route.params.id);
 const { data: campaign } = useCampaign(campaignId);
+
+const parsedInstructions = computedAsync(() => {
+  if (campaign && campaign.value?.info && campaign.value.info.instructions) {
+    return markdownParser.parse(
+      campaign.value.id.toString(),
+      campaign.value.info.instructions,
+      {},
+    );
+  }
+  return "";
+});
 
 const { mutateAsync: reserveTask, isPending: isReservingTask } =
   useReserveTask();
