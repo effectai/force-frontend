@@ -60,6 +60,10 @@ nav .container {
 nav .logo {
   display: flex;
   align-items: center;
+
+  span {
+    color: black;
+  }
 }
 
 nav .logo img {
