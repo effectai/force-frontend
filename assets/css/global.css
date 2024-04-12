@@ -127,13 +127,13 @@ dialog {
 
 .backdrop-loader {
   position: fixed;
-  top: 80px;
+  top: 75px;
   left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: calc(100vh - 90px);
+  height: calc(100vh - 75px);
   font-size: 24px;
   color: white;
   background: white;
