@@ -59,6 +59,7 @@ const onMessage = (event: any) => {
 
   switch (event.data.event) {
     case "proxy-loaded":
+      console.log("loaded!");
       isIframeLoaded.value = true;
       emit("ready");
       break;

@@ -22,10 +22,11 @@
     </div>
 
     <TaskTemplate
-      v-if="!error && !isLoadingTaskData"
+      v-if="!error"
+      v-show="!isTemplateLoading"
       ref="templateRef"
       @submit="doSubmitTask"
-      @ready="templateReady = true"
+      @ready="isTemplateReady = true"
     />
   </div>
 </template>
@@ -50,7 +51,7 @@ const {
 
 const router = useRouter();
 const campaignId = computed(() => Number(router.currentRoute.value.params.id));
-const templateReady = ref(false);
+const isTemplateReady = ref(false);
 
 const templateRef: Ref<InstanceType<typeof TaskTemplate> | null> = ref(null);
 
@@ -68,12 +69,13 @@ const {
 } = useTaskData(reservation);
 
 const error = computed(() => errorReservation.value || errorTaskData.value);
+
 const isTemplateLoading = computed(
   () =>
     isLoadingTaskData.value ||
     isReservingTask.value ||
     isSubmittingTask.value ||
-    !templateReady.value,
+    !isTemplateReady.value,
 );
 
 const { mutateAsync: reserveTask, isPending: isReservingTask } =
@@ -104,6 +106,8 @@ const renderTask = async (): Promise<void> => {
 
     const html = template.render();
 
+    //wait for Ref template to be ready
+    await nextTick();
     if (!templateRef.value) {
       throw new Error("Template reference not found");
     }
@@ -141,7 +145,7 @@ const doSubmitTask = async (data: any): Promise<void> => {
 watchEffect(async () => {
   if (!reservation.value || !taskData.value) return;
   if (error.value) return;
-  templateReady.value = false;
+  isTemplateReady.value = false;
   await nextTick();
   renderTask();
 });
