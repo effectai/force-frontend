@@ -12,8 +12,10 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
+      ALTERNATIVE_FRONTEND_URL:
+        process.env.ALTERNATIVE_FRONTEND_URL ?? "http://localhost:3000",
       BASE_EXPLORER_URL:
-        process.env.BASE_EXPLORER_URL ?? "https://jungle4.eosq.eosnation.io/",
+        process.env.BASE_EXPLORER_URL ?? "https://jungle4.eosq.eosnation.io",
     },
   },
   build: {

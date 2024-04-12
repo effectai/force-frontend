@@ -5,6 +5,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   // If the user is not logged in, redirect to home page
   if (!isLoggedIn.value && accessKey.value) {
+    console.log("User is not logged in, redirecting to home page");
     return navigateTo("/");
   }
 });

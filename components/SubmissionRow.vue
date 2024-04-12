@@ -2,7 +2,7 @@
   <tr>
     <td>
       <a
-        :href="`${config.public.BASE_EXPLORER_URL}account/${account?.address[1]}`"
+        :href="`${config.public.BASE_EXPLORER_URL}/account/${account?.address[1]}`"
       >
         {{ account?.address[1] }}
       </a>

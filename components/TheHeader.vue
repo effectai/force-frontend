@@ -1,17 +1,33 @@
 <template>
   <nav>
     <div class="container">
-      <NuxtLink to="/" class="logo">
-        <img src="/img/effect-logo-black.png" />
+      <NuxtLink
+        to="/"
+        class="logo"
+      >
+        <img src="/img/effect-logo-black.png">
         <span>Effect AI</span>
       </NuxtLink>
 
       <div v-if="!isLoggedIn">
-        <button class="button" to="/" @click="connectWallet()">connect</button>
+        <button
+          class="button"
+          to="/"
+          @click="connectWallet()"
+        >
+          connect
+        </button>
       </div>
 
-      <div v-else class="">
-        <NuxtLink to="/" class="" @click="router.push('/profile')">
+      <div
+        v-else
+        class=""
+      >
+        <NuxtLink
+          to="/"
+          class=""
+          @click="router.push('/profile')"
+        >
           {{ userName }}@{{ permission }}
         </NuxtLink>
       </div>

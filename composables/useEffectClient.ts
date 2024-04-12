@@ -299,6 +299,7 @@ export const createEffectClient = (): ClientStore => {
       ],
       enabled: computed(() => !!vAccount.value && !!campaignId.value),
       queryFn: async () => {
+        console.log("getting reservation..");
         return await getReservationForCampaign(
           client.value,
           campaignId.value,

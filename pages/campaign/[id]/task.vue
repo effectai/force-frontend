@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div v-if="error">
       error: {{ error }}
     </div>
@@ -36,6 +36,7 @@ import type TaskTemplate from "~/components/TaskTemplate.vue";
 
 definePageMeta({
   middleware: "auth",
+  layout: "template",
 });
 
 const {
