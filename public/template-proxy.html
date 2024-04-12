@@ -18,7 +18,6 @@
       const handleTasks = (data) => {
         switch (data.task) {
           case "submit":
-            console.log("submit!");
             parent.postMessage(data, "*");
         }
       };

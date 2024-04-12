@@ -78,14 +78,12 @@ const route = useRoute();
 const router = useRouter();
 const modal = ref(null);
 
-const loading = ref(false);
-
 const campaignId = Number(route.params.id);
 const { data: campaign } = useCampaign(campaignId);
 
 const parsedInstructions = computedAsync(() => {
   if (campaign && campaign.value?.info && campaign.value.info.instructions) {
-    return markdownParser.parse(
+    return markdownParser.parse!(
       campaign.value.id.toString(),
       campaign.value.info.instructions,
       {},
@@ -94,9 +92,10 @@ const parsedInstructions = computedAsync(() => {
   return "";
 });
 
-const { mutateAsync: reserveTask, isPending: isReservingTask } =
-  useReserveTask();
+/* Reserving task logic */
 
+const { mutateAsync: reserveTask } = useReserveTask();
+const loading = ref(false);
 const doReserveTask = async () => {
   try {
     loading.value = true;
