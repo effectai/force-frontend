@@ -12,8 +12,7 @@
 }
 
 :root {
-  --primary-color: #101d56;
-  --light-color: #ecf0f1;
+  --primary-color: black;
   --dark-color: #2c3e50;
 
   --color-gray-100: #f8f9fa;
@@ -36,7 +35,7 @@
   --bg-light-color: #f8f9fa;
   --bg-dark-color: #343a40;
 
-  --text-color: #212529;
+  --text-color: #666;
   --text-light-color: #f8f9fa;
   --text-dark-color: #343a40;
 
@@ -154,7 +153,7 @@ dialog::backdrop {
 
 .title {
   font-family: var(--font-family-header);
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl);
   color: var(--primary-color);
 }
 
