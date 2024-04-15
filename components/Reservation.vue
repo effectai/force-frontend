@@ -5,9 +5,10 @@
   >
     <span class="started-on">
       started {{ formatDateStringToTimeAgo(props.reservedOn) }}</span>
-    <h2 class="owner">
-      {{ campaign?.owner[1] }}
+    <h2 class="card-title">
+      <span>{{ campaign.info.title }}</span>
     </h2>
+    <span class="owner">owner: {{ campaign?.owner[1] }}</span>
     <p>{{ campaign.reward.quantity }}</p>
 
     <ForceButton
@@ -15,7 +16,7 @@
       class="button"
       @click="mutate(campaignId)"
     >
-      Start
+      Continue
     </ForceButton>
   </div>
 </template>
@@ -75,8 +76,21 @@ button {
   width: 100%;
 }
 
+.card-title {
+  margin: 10px 0 5px 0;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
 .reservation .started-on {
   font-size: 0.8em;
+  color: #666;
+  opacity: 0.5;
+}
+
+.owner {
+  font-size: 0.8em;
+  font-style: italic;
   color: #666;
   opacity: 0.5;
 }
