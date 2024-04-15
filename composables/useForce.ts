@@ -10,8 +10,6 @@ export const useReserveTask = () => {
 
   const mutate = async (campaignId: number) => {
     try {
-      if(!!campaignId || campaignId !== 0) throw new Error("Campaign ID is required");
-
       loading.value = true;
       const reservation = await reserveTask(campaignId);
 
@@ -19,6 +17,7 @@ export const useReserveTask = () => {
         await router.push(`/campaign/${campaignId}/task/`);
       }
     } catch (e) {
+      console.error(e);
       notify({
         type: "error",
         message: "Failed to reserve task",
