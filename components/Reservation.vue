@@ -1,24 +1,26 @@
 <template>
-  <div
+  <nuxt-link
     v-if="campaign"
+    :to="`/campaign/${campaign.id}`"
     class="card reservation"
   >
-    <span class="started-on">
-      started {{ formatDateStringToTimeAgo(props.reservedOn) }}</span>
-    <h2 class="card-title">
-      <span>{{ campaign.info.title }}</span>
-    </h2>
-    <span class="owner">owner: {{ campaign?.owner[1] }}</span>
-    <p>{{ campaign.reward.quantity }}</p>
+    <div>
+      <span class="started-on">
+        started {{ formatDateStringToTimeAgo(props.reservedOn) }}</span>
+      <h2 class="card-title">
+        <span>{{ campaign.info.title }}</span>
+      </h2>
+      <span class="owner">owner: {{ campaign?.owner[1] }}</span>
 
-    <ForceButton
-      :is-loading="loading"
-      class="button"
-      @click="mutate(campaignId)"
-    >
-      Continue
-    </ForceButton>
-  </div>
+      <ForceButton
+        :is-loading="loading"
+        class="button"
+        @click.prevent="mutate(campaignId)"
+      >
+        Continue to earn {{ campaign.reward.quantity }}
+      </ForceButton>
+    </div>
+  </nuxt-link>
 </template>
 
 <script setup lang="ts">
@@ -49,7 +51,7 @@ const loadFromCache = async () => {
 
   if (cache) {
     const campaign = cache[0][1] as InfiniteData<
-      GetTableRowsResponse<any, Campaign>
+      GetTableRowsResponse<unknown, Campaign>
     >;
 
     //find the campaign in the cache
@@ -74,6 +76,7 @@ onMounted(async () => {
 <style scoped>
 button {
   width: 100%;
+  margin-top: 10px;
 }
 
 .card-title {
@@ -84,21 +87,29 @@ button {
 
 .reservation .started-on {
   font-size: 0.8em;
-  color: #666;
+  color: var(--text-color);
+
   opacity: 0.5;
 }
 
 .owner {
   font-size: 0.8em;
   font-style: italic;
-  color: #666;
+  color: var(--text-color);
   opacity: 0.5;
 }
 
 .reservation {
+  display: block;
   max-width: 300px;
   padding: 10px;
+  color: black;
+  text-decoration: none;
   background: #f0f0f0;
   border-radius: 10px;
+}
+
+.reservation:hover {
+  background: #e0e0e0;
 }
 </style>
