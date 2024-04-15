@@ -1,6 +1,7 @@
 <template>
   <button
     v-if="true"
+    class="button"
     @click="connectWallet()"
   >
     Connect Wallet

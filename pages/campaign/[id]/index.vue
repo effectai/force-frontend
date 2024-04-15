@@ -24,7 +24,7 @@
             :is-loading="loading"
             :disabled="!isLoggedIn"
             class="button"
-            @click="doReserveTask"
+            @click="mutate(campaignId)"
           >
             Start
           </ForceButton>
@@ -70,16 +70,13 @@
 <script setup lang="ts">
 import markdownParser from "@nuxt/content/transformers/markdown";
 
-const { useCampaign, useReserveTask, isLoggedIn } = useEffectClient();
+const { useCampaign, isLoggedIn } = useEffectClient();
 
-const { notify } = useNotification();
-
-const route = useRoute();
-const router = useRouter();
 const modal = ref(null);
 
+const route = useRoute();
 const campaignId = Number(route.params.id);
-const { data: campaign } = useCampaign(campaignId);
+const { data: campaign } = useCampaign(campaignId, ref(true));
 
 const parsedInstructions = computedAsync(() => {
   if (campaign && campaign.value?.info && campaign.value.info.instructions) {
@@ -92,34 +89,7 @@ const parsedInstructions = computedAsync(() => {
   return "";
 });
 
-/* Reserving task logic */
-
-const { mutateAsync: reserveTask } = useReserveTask();
-const loading = ref(false);
-const doReserveTask = async () => {
-  try {
-    loading.value = true;
-    const reservation = await reserveTask(campaignId, {
-      onError: (error) => {
-        notify({
-          type: "error",
-          message: "Failed to reserve task",
-        });
-      },
-    });
-
-    if (reservation && reservation.id) {
-      await router.push(`/campaign/${campaignId}/task/`);
-    }
-  } catch (e) {
-    notify({
-      type: "error",
-      message: "Failed to reserve task",
-    });
-  } finally {
-    loading.value = false;
-  }
-};
+const { mutate, loading } = useReserveTask();
 </script>
 
 <style scoped>

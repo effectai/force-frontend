@@ -15,27 +15,36 @@
         waves using <u>access keys.</u>
       </p>
 
-      <input
-        v-model="key"
-        placeholder="xxx-xxx-xxx"
-      >
+      <div v-if="!userName">
+        <p>First, lets connect your EOS wallet.</p>
 
-      <button
-        class="button"
-        @click="verifyAccessKey"
-      >
-        submit
-      </button>
-      <a
-        href="#"
-        class="apply-link"
-      >how can i get a key?</a>
+        <ConnectWallet />
+      </div>
+      <div v-else>
+        <input
+          v-model="key"
+          placeholder="xxx-xxx-xxx"
+        >
+
+        <button
+          class="button"
+          @click="verifyAccessKey"
+        >
+          verify
+        </button>
+        <a
+          href="#"
+          class="apply-link"
+        >how can i get a key?</a>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import MdiCheck from "~/components/icons/MdiCheck.vue";
+
+const { userName } = useEffectClient();
 
 const { notify } = useNotification();
 const key = ref();
@@ -46,21 +55,35 @@ definePageMeta({
   layout: "preview",
 });
 
+const config = useRuntimeConfig();
 const router = useRouter();
 
-// 🤫🤫🤫
-const validKeys = ["EFX-A4L-8J3", "EFX-LPA-44X", "EFX-AR1-SZL", "EFX-LAP-4X3"];
-
-const verifyAccessKey = () => {
-  if (validKeys.includes(key.value)) {
-    notify({
-      type: "success",
-      message: "Access granted",
-      icon: MdiCheck,
+const verifyAccessKey = async () => {
+  try {
+    const result = await fetch(config.public.BACKEND_URL + "/grant-access", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ key: key.value, username: userName.value }),
     });
-    accessKey.value = key.value;
-    router.push("/");
-  } else {
+
+    const data = await result.json();
+
+    if (!result.ok) {
+      throw new Error("Access denied", data);
+    }
+
+    if (data.key) {
+      accessKey.value = key.value;
+      notify({
+        type: "success",
+        message: "Access granted",
+        icon: MdiCheck,
+      });
+      router.push("/");
+    }
+  } catch (e) {
     shake.value = true;
     setTimeout(() => {
       shake.value = false;

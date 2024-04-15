@@ -36,7 +36,6 @@ defineExpose({ setHtml });
 const postHtml = async () => {
   await nextTick();
   // wait for the iframe to load before sending the template
-
   if (!mediaFrame.value) return;
 
   mediaFrame.value.contentWindow?.postMessage(
@@ -59,7 +58,6 @@ const onMessage = (event: any) => {
 
   switch (event.data.event) {
     case "proxy-loaded":
-      console.log("loaded!");
       isIframeLoaded.value = true;
       emit("ready");
       break;

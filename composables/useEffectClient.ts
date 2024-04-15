@@ -23,6 +23,10 @@ import {
   getAccountById,
   getForceSettings,
 } from "@effectai/effect-js";
+import type { GetTableRowsResponse } from "@effectai/effect-js/dist/types/helpers";
+
+import { experimental_createPersister } from "@tanstack/query-persist-client-core";
+
 
 import {
   type UseMutationReturnType,
@@ -30,12 +34,19 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
+  type UseInfiniteQueryReturnType,
+  type InfiniteData,
+  useInfiniteQuery,
 } from "@tanstack/vue-query";
 
 import type { Name, Session } from "@wharfkit/session";
 import { ClientNotInitializedError } from "~/errors/errors";
 
 let effectClient: ClientStore | null;
+
+export const persister = experimental_createPersister({
+  storage: window?.localStorage ? localStorage : undefined,
+});
 
 export interface ClientStore {
   client: Ref<Client>;
@@ -48,8 +59,17 @@ export interface ClientStore {
 
   useForceSettings: () => UseQueryReturnType<ForceSettings, unknown>;
 
-  useCampaigns: () => UseQueryReturnType<Campaign[], any>;
-  useCampaign: (campaignId: number) => UseQueryReturnType<Campaign, any>;
+  useCampaigns: (
+    {
+      page,
+      limit,
+    }: {
+      page?: Ref<number>;
+      limit?: Ref<number>;
+    }
+  ) => UseInfiniteQueryReturnType<InfiniteData<GetTableRowsResponse<unknown, Campaign>>, Error>;
+
+  useCampaign: (campaignId: number, enabled: Ref<boolean | undefined>) => UseQueryReturnType<Campaign, any>;
 
   useGetAccountById: (accountId: number) => UseQueryReturnType<VAccount, any>;
 
@@ -270,18 +290,50 @@ export const createEffectClient = (): ClientStore => {
     });
   };
 
-  const useCampaigns = () => {
-    return useQuery({
-      queryKey: ["campaigns"],
-      queryFn: async () => {
-        return await getCampaigns(client.value);
+  const useCampaigns = ({
+    page = ref(1),
+    limit = 10
+  }: {
+    page: Ref<number>;
+    limit?: number
+  }) => {
+    const config = useRuntimeConfig();
+
+    return useInfiniteQuery({
+      persister: experimental_createPersister({
+        storage: window.localStorage,
+      }),
+      staleTime: config.public.CAMPAIGN_CACHE_DURATION,
+      gcTime: config.public.CAMPAIGN_CACHE_DURATION,
+      queryKey: ["campagnes"],
+      initialPageParam: 1,
+      getNextPageParam: (lastPage, allPages, lastPageParam) => {
+        if (lastPage && lastPage.rows.length === 0) {
+          return undefined;
+        }
+        return lastPageParam + 1;
+      },
+      getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
+        if (firstPageParam <= 1) {
+          return undefined;
+        }
+        return firstPageParam - 1;
+      },
+      queryFn: async ({ pageParam = 0 }) => {
+        return getCampaigns({
+          client: client.value,
+          limit,
+          page: pageParam,
+        });
       },
     });
+
   };
 
-  const useCampaign = (campaignId: number) => {
+  const useCampaign = (campaignId: number, enabled: Ref<boolean | undefined>) => {
     return useQuery({
       queryKey: ["campaign", campaignId],
+      enabled,
       queryFn: async () => {
         return await getCampaign(client.value, campaignId);
       },

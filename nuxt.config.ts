@@ -12,6 +12,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
+      CAMPAIGN_CACHE_DURATION: parseInt(process.env.CAMPAIGN_CACHE_DURATION ?? "0") || 600_000,
+      BACKEND_URL: process.env.BACKEND_URL ?? "http://localhost:8888",  
       ALTERNATIVE_FRONTEND_URL:
         process.env.ALTERNATIVE_FRONTEND_URL ?? "http://localhost:3000",
       BASE_EXPLORER_URL:

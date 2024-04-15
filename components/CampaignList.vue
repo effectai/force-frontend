@@ -3,11 +3,11 @@
     <div v-if="loading">
       <slot name="loading" />
     </div>
-    <div v-else-if="campaigns && campaigns.length === 0">
+    <div v-else-if="campaigns && allCampaigns.length === 0">
       <slot name="empty" />
     </div>
     <div
-      v-else-if="campaigns && campaigns.length > 0"
+      v-else-if="campaigns && allCampaigns.length > 0"
       class="table-container"
     >
       <table>
@@ -22,7 +22,7 @@
         </thead>
         <tbody>
           <tr
-            v-for="campaign in campaigns"
+            v-for="campaign in allCampaigns"
             :key="campaign.id"
             @click="router.push(`/campaign/${campaign.id}`)"
           >
@@ -60,25 +60,55 @@
           </tr>
         </tbody>
       </table>
+      <div class="campaign-pagination">
+        <button
+          :disabled="!hasNextPage"
+          class="button"
+          @click="nextPage"
+        >
+          Load more
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Campaign } from "@effectai/effect-js";
+import type { GetTableRowsResponse } from "@effectai/effect-js/dist/types/helpers";
+import type { InfiniteData } from "@tanstack/vue-query";
 
 const props = defineProps<{
-  campaigns: Campaign[] | undefined;
+  campaigns: InfiniteData<GetTableRowsResponse<any, Campaign>> | undefined;
   loading: boolean;
+  hasNextPage?: boolean;
+  currentPage?: number;
+  more?: boolean;
 }>();
+
+const allCampaigns = computed(
+  () => props.campaigns?.pages.flatMap((p) => p.rows) ?? [],
+);
 
 const router = useRouter();
 
 const { useReservations } = useEffectClient();
 const { isReserved } = useReservations();
+
+const emits = defineEmits(["next-page"]);
+
+const nextPage = () => {
+  emits("next-page");
+};
 </script>
 
 <style scoped>
+.campaign-pagination {
+  display: inline-flex;
+  gap: 5px;
+  margin-top: 20px;
+}
+
 .campaign-user {
   display: flex;
   gap: 0.5rem;

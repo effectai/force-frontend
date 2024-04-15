@@ -1575,23 +1575,30 @@
   dependencies:
     remove-accents "0.4.2"
 
-"@tanstack/query-core@5.28.6":
-  version "5.28.6"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.28.6.tgz#a3bdb108f9f8d4e2ba3163068dbe6ff55b905a81"
-  integrity sha512-hnhotV+DnQtvtR3jPvbQMPNMW4KEK0J4k7c609zJ8muiNknm+yoDyMHmxTWM5ZnlZpsz0zOxYFr+mzRJNHWJsA==
+"@tanstack/query-core@5.29.0":
+  version "5.29.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.29.0.tgz#d0b3d12c07d5a47f42ab0c1ed4f317106f3d4b20"
+  integrity sha512-WgPTRs58hm9CMzEr5jpISe8HXa3qKQ8CxewdYZeVnA54JrPY9B1CZiwsCoLpLkf0dGRZq+LcX5OiJb0bEsOFww==
+
+"@tanstack/query-persist-client-core@^5.29.0":
+  version "5.29.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-5.29.0.tgz#772e60a04f995715f333aa608a7d38cdbf16712b"
+  integrity sha512-aQpXqHQIg/GFtsQKUx/g3cMS/P9CFTWITXPlhrICW14E16gmQ+GMwnoXHAnu/kBV4MucfwUFKhVl4rzryltORQ==
+  dependencies:
+    "@tanstack/query-core" "5.29.0"
 
 "@tanstack/virtual-core@3.2.0":
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/@tanstack/virtual-core/-/virtual-core-3.2.0.tgz#874d36135e4badce2719e7bdc556ce240cbaff14"
   integrity sha512-P5XgYoAw/vfW65byBbJQCw+cagdXDT/qH6wmABiLt4v4YBT2q2vqCOhihe+D1Nt325F/S/0Tkv6C5z0Lv+VBQQ==
 
-"@tanstack/vue-query@^5.28.7":
-  version "5.28.7"
-  resolved "https://registry.yarnpkg.com/@tanstack/vue-query/-/vue-query-5.28.7.tgz#ac215873365007dc710a9410a0c7782c255bf75c"
-  integrity sha512-mFr5EKH7ve8mxRW9uvICqLtX4nO9wWFJf6xJadUuY2gZv8irDj7zyLywlKoRvSm4SxjOF43+V3q3/DPS/IruQA==
+"@tanstack/vue-query@^5.29.0":
+  version "5.29.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/vue-query/-/vue-query-5.29.0.tgz#69add3291cd46cabe4ca9cf0e7dccf3bc33951e2"
+  integrity sha512-EYayEeVA4JwJrs3vPuDOd+4jVxvUJV1vAxsv7aflvBml6qR7EB9EkN8hW6MI7ciIJZORPiBye5VyveHR5SOlKg==
   dependencies:
     "@tanstack/match-sorter-utils" "^8.11.8"
-    "@tanstack/query-core" "5.28.6"
+    "@tanstack/query-core" "5.29.0"
     "@vue/devtools-api" "^6.5.1"
     vue-demi "^0.14.6"
 
@@ -2273,6 +2280,14 @@
     "@wharfkit/antelope" "^1.0.4"
     "@wharfkit/contract" "^1.1.4"
     bn.js "^4.11.9"
+    tslib "^2.1.0"
+
+"@wharfkit/transact-plugin-autocorrect@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@wharfkit/transact-plugin-autocorrect/-/transact-plugin-autocorrect-1.1.1.tgz#209ab409058c390a8681771274d95ec529a41a0c"
+  integrity sha512-Exxgg7thnYgp8MT13I4cM56VmUOHR4H8zLsMf4ZUYMl/e0J/mVmJTZ73CownuPpxIRWQZhI5OimX7DamFvYqmQ==
+  dependencies:
+    "@wharfkit/resources" "^1.1.0"
     tslib "^2.1.0"
 
 "@wharfkit/wallet-plugin-anchor@^1.0.0":
