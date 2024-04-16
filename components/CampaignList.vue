@@ -15,7 +15,7 @@
           <tr>
             <th>Dataset</th>
             <th>Title</th>
-            <th>Tasks available</th>
+            <th>Tasks</th>
             <th>Reward Per Task</th>
             <th>Actions</th>
           </tr>
@@ -45,7 +45,7 @@
                 {{ "No description" }}
               </div>
             </td>
-            <td>{{ campaign.total_tasks - campaign.tasks_done }}</td>
+            <td>{{ campaign.total_tasks - campaign.reservations_done }}/{{ campaign.total_tasks }} left</td>
             <td class="quantity">
               {{ campaign.reward.quantity }}
             </td>

@@ -22,11 +22,12 @@ import {
   payout,
   getAccountById,
   getForceSettings,
+  getAccTaskIdx,
 } from "@effectai/effect-js";
+import type { AccTaskIdx } from "@effectai/effect-js/dist/types/campaign";
 import type { GetTableRowsResponse } from "@effectai/effect-js/dist/types/helpers";
 
 import { experimental_createPersister } from "@tanstack/query-persist-client-core";
-
 
 import {
   type UseMutationReturnType,
@@ -59,17 +60,21 @@ export interface ClientStore {
 
   useForceSettings: () => UseQueryReturnType<ForceSettings, unknown>;
 
-  useCampaigns: (
-    {
-      page,
-      limit,
-    }: {
-      page?: Ref<number>;
-      limit?: Ref<number>;
-    }
-  ) => UseInfiniteQueryReturnType<InfiniteData<GetTableRowsResponse<unknown, Campaign>>, Error>;
+  useCampaigns: ({
+    page,
+    limit,
+  }: {
+    page?: Ref<number>;
+    limit?: Ref<number>;
+  }) => UseInfiniteQueryReturnType<
+    InfiniteData<GetTableRowsResponse<unknown, Campaign>>,
+    Error
+  >;
 
-  useCampaign: (campaignId: number, enabled: Ref<boolean | undefined>) => UseQueryReturnType<Campaign, any>;
+  useCampaign: (
+    campaignId: number,
+    enabled: Ref<boolean | undefined>,
+  ) => UseQueryReturnType<Campaign, any>;
 
   useGetAccountById: (accountId: number) => UseQueryReturnType<VAccount, any>;
 
@@ -82,6 +87,11 @@ export interface ClientStore {
   useReservation: (
     campaignId: Ref<number>,
   ) => UseQueryReturnType<Reservation | null, any>;
+
+  useAccTaskIdx: (
+    accountId: Ref<number>,
+    campaignId: Ref<number>,
+  ) => UseQueryReturnType<AccTaskIdx | null, any>;
 
   useTaskData: (
     reservation: Ref<Reservation | null | undefined>,
@@ -145,12 +155,16 @@ export const createEffectClient = (): ClientStore => {
   /* --------- CLIENT --------- */
 
   const client = shallowRef(
-    createClient({network: jungle4, options: {
-      fetchProviderOptions: {
-        fetch,
+    createClient({
+      network: jungle4,
+      options: {
+        fetchProviderOptions: {
+          fetch,
+        },
+        ipfsCacheDurationInMs: 600000,
       },
-      ipfsCacheDurationInMs: 600000,
-    }}));
+    }),
+  );
 
   /* --------- REACTIVE DATA --------- */
 
@@ -183,7 +197,7 @@ export const createEffectClient = (): ClientStore => {
         if (!userName.value || !permission.value)
           throw new Error("User not logged in");
 
-        return await payout({client: client.value,  actor: userName.value});
+        return await payout({ client: client.value, actor: userName.value });
       },
       onSuccess() {
         notify({
@@ -203,7 +217,7 @@ export const createEffectClient = (): ClientStore => {
   const useReserveTask = () => {
     return useMutation({
       mutationFn: async (campaignId: number) => {
-        return await reserveTask({client: client.value, campaignId});
+        return await reserveTask({ client: client.value, campaignId });
       },
     });
   };
@@ -217,7 +231,7 @@ export const createEffectClient = (): ClientStore => {
         reservation: Reservation;
         data: Record<string, unknown>;
       }) => {
-        return await submitTask({client: client.value, reservation, data});
+        return await submitTask({ client: client.value, reservation, data });
       },
     });
   };
@@ -228,7 +242,7 @@ export const createEffectClient = (): ClientStore => {
     return useQuery({
       queryKey: ["forceSettings"],
       queryFn: async () => {
-        return await getForceSettings({client: client.value});
+        return await getForceSettings({ client: client.value });
       },
     });
   };
@@ -239,7 +253,7 @@ export const createEffectClient = (): ClientStore => {
       enabled: !!account.value,
       queryFn: async () => {
         if (!account.value) throw new Error("Account not found");
-        return await getBalance({client: client.value, actor: account.value});
+        return await getBalance({ client: client.value, actor: account.value });
       },
     });
   };
@@ -275,7 +289,10 @@ export const createEffectClient = (): ClientStore => {
       ],
       enabled: computed(() => !!vAccount.value?.id),
       queryFn: async () => {
-        return await getPendingPayments({client: client.value,  vAccountId: vAccount.value!.id});
+        return await getPendingPayments({
+          client: client.value,
+          vAccountId: vAccount.value!.id,
+        });
       },
     });
   };
@@ -291,10 +308,10 @@ export const createEffectClient = (): ClientStore => {
 
   const useCampaigns = ({
     page = ref(1),
-    limit = 10
+    limit = 10,
   }: {
     page: Ref<number>;
-    limit?: number
+    limit?: number;
   }) => {
     const config = useRuntimeConfig();
 
@@ -326,15 +343,35 @@ export const createEffectClient = (): ClientStore => {
         });
       },
     });
-
   };
 
-  const useCampaign = (campaignId: number, enabled: Ref<boolean | undefined>) => {
+  const useCampaign = (
+    campaignId: number,
+    enabled: Ref<boolean | undefined>,
+  ) => {
     return useQuery({
       queryKey: ["campaign", campaignId],
       enabled,
       queryFn: async () => {
-        return await getCampaignById({client: client.value, id: campaignId});
+        return await getCampaignById({ client: client.value, id: campaignId });
+      },
+    });
+  };
+
+  const useAccTaskIdx = (accountId: Ref<number>, campaignId: Ref<number>) => {
+    return useQuery({
+      queryKey: [
+        "acctaskidx",
+        computed(() => accountId.value),
+        computed(() => campaignId.value),
+      ],
+      queryFn: async () => {
+        console.log("getting acctaskidx..");
+        return await getAccTaskIdx({
+          client: client.value,
+          campaignId: campaignId.value,
+          accountId: accountId.value,
+        });
       },
     });
   };
@@ -349,15 +386,15 @@ export const createEffectClient = (): ClientStore => {
       ],
       enabled: computed(
         () =>
-          (!!vAccount.value) && !!campaignId.value || campaignId.value === 0,
+          (!!vAccount.value && !!campaignId.value) || campaignId.value === 0,
       ),
       queryFn: async () => {
-        console.log("getting reservation..")
+        console.log("getting reservation..");
         return await getReservationForCampaign({
           client: client.value,
           campaignId: campaignId.value,
           vAccountId: vAccount.value!.id,
-      });
+        });
       },
     });
   };
@@ -395,7 +432,7 @@ export const createEffectClient = (): ClientStore => {
         return await getReservationsForVAccount({
           client: client.value,
           vAccountId: vAccount.value!.id,
-      });
+        });
       },
     });
 
@@ -420,7 +457,7 @@ export const createEffectClient = (): ClientStore => {
       isWalletConnecting.value = true;
       const sessionToUse = _session || (await sessionKit.login()).session;
 
-      await setSession({client:client.value, session: sessionToUse});
+      await setSession({ client: client.value, session: sessionToUse });
       session.value = client.value.session;
     } catch (error) {
       console.error(error);
@@ -436,7 +473,7 @@ export const createEffectClient = (): ClientStore => {
   const disconnectWallet = async (): Promise<void> => {
     try {
       await sessionKit.logout();
-      await setSession({client: client.value,session: null});
+      await setSession({ client: client.value, session: null });
       session.value = null;
     } catch (e) {
       console.error(e);
@@ -470,6 +507,7 @@ export const createEffectClient = (): ClientStore => {
     useReservations,
     usePendingPayments,
     useEfxPrice,
+    useAccTaskIdx,
 
     // mutations
     useReserveTask,
