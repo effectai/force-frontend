@@ -8,7 +8,7 @@
       <span class="started-on">
         started {{ formatDateStringToTimeAgo(props.reservedOn) }}</span>
       <h2 class="card-title">
-        <span>{{ campaign.info.title }}</span>
+        <span>{{ campaign.info?.title }}</span>
       </h2>
       <span class="owner">owner: {{ campaign?.owner[1] }}</span>
 

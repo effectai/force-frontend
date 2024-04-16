@@ -70,13 +70,17 @@
 <script setup lang="ts">
 import markdownParser from "@nuxt/content/transformers/markdown";
 
-const { useCampaign, isLoggedIn } = useEffectClient();
+const { useCampaign, isLoggedIn, useReservation } = useEffectClient();
 
 const modal = ref(null);
+
 
 const route = useRoute();
 const campaignId = Number(route.params.id);
 const { data: campaign } = useCampaign(campaignId, ref(true));
+
+const {data: reservation} = useReservation(ref(campaignId));
+
 
 const parsedInstructions = computedAsync(() => {
   if (campaign && campaign.value?.info && campaign.value.info.instructions) {

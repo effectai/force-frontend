@@ -179,6 +179,10 @@ p {
   display: inline-flex;
 }
 
+.mb-0 {
+  margin-bottom: 0;
+}
+
 /* Loader */
 
 .lds-ellipsis,

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div v-if="isLoggedIn">
-      <h2 class="title">
+      <h2 class="title mb-0">
         Your active Datasets ({{ reservations?.length }})
       </h2>
       <p>
@@ -16,12 +16,12 @@
     </div>
 
     <div>
-      <h2 class="title text-3xl my-2">
+      <h2 class="title mb-0">
         All Datasets
       </h2>
 
       <p class="my-3">
-        These are all the tasks on the platform, you might need to qualify
+        These are all the campaigns on the platform, you might need to qualify
         first.
       </p>
       <CampaignList
