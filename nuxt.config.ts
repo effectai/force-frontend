@@ -12,6 +12,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
+      REQUIRE_ACCESS_KEY: process.env.REQUIRE_ACCESS_KEY === "true",
       CAMPAIGN_CACHE_DURATION: parseInt(process.env.CAMPAIGN_CACHE_DURATION ?? "0") || 600_000,
       BACKEND_URL: process.env.BACKEND_URL ?? "http://localhost:8888",  
       ALTERNATIVE_FRONTEND_URL:

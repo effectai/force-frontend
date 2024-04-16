@@ -26,7 +26,8 @@
             class="button"
             @click="mutate(campaignId)"
           >
-            Start
+            <span v-if="reservation">Continue</span>
+            <span v-else>Start Task</span>
           </ForceButton>
           <button
             class="button"
@@ -35,6 +36,7 @@
             Show Instructions
           </button>
         </div>
+
 
         <div v-if="campaign && campaign.info && campaign.info.instructions">
           <dialog
@@ -73,14 +75,11 @@ import markdownParser from "@nuxt/content/transformers/markdown";
 const { useCampaign, isLoggedIn, useReservation } = useEffectClient();
 
 const modal = ref(null);
-
-
 const route = useRoute();
 const campaignId = Number(route.params.id);
 const { data: campaign } = useCampaign(campaignId, ref(true));
 
 const {data: reservation} = useReservation(ref(campaignId));
-
 
 const parsedInstructions = computedAsync(() => {
   if (campaign && campaign.value?.info && campaign.value.info.instructions) {
