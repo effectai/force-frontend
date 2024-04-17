@@ -7,7 +7,6 @@ import {
 	createClient,
 	jungle4,
 	setSession,
-	getCampaigns,
 	reserveTask,
 	submitTask,
 	getSubmissions,
@@ -29,12 +28,9 @@ import {
 import {
 	type UseMutationReturnType,
 	type UseQueryReturnType,
-	type UseInfiniteQueryReturnType,
-	type InfiniteData,
 	useMutation,
 	useQuery,
 	useQueryClient,
-	useInfiniteQuery,
 } from "@tanstack/vue-query";
 import { experimental_createPersister } from "@tanstack/query-persist-client-core";
 
@@ -449,9 +445,7 @@ export const createEffectClient = (): ClientStore => {
 		/* Utility function to check if a campaign is reserved */
 		const isReserved = (campaignId: number) => {
 			if (query.data?.value?.length) {
-				return query.data.value.some(
-					(r: Reservation) => r.campaign_id === campaignId,
-				);
+				return query.data.value.some((r) => r.campaign_id === campaignId);
 			}
 
 			return false;
