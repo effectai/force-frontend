@@ -450,7 +450,7 @@ export const createEffectClient = (): ClientStore => {
 		const isReserved = (campaignId: number) => {
 			if (query.data?.value?.length) {
 				return query.data.value.some(
-					(r: Reservation) => r.campaign_id.toNumber() === campaignId,
+					(r: Reservation) => r.campaign_id === campaignId,
 				);
 			}
 
@@ -522,6 +522,7 @@ export const createEffectClient = (): ClientStore => {
 		// mutations
 		useReserveTask,
 		useSubmitTask,
+
 		useAccountAssets,
 
 		// methods
