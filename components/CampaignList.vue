@@ -24,7 +24,9 @@
           <CampaignTableRow 
             v-for="campaign in campaigns"
             :key="campaign.id"
-            :campaign="campaign"/>
+            :campaign="campaign"
+            :accTaskIndex="accTaskIdx?.find(ati => ati.campaign_id === campaign.id)?.value"
+            />
         </tbody>
       </table>
     </div>
@@ -33,6 +35,10 @@
 
 <script setup lang="ts">
 import type { Campaign } from "@effectai/effect-js";
+const { useAccTaskIdx } = useEffectClient();
+
+const { data: accTaskIdx, isLoading: isLoadingAccTaskIdx } = useAccTaskIdx();
+
 
 const props = defineProps<{
 	campaigns: Campaign[] | undefined;

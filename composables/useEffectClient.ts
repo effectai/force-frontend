@@ -1,36 +1,38 @@
 import {
-	type VAccount,
-	type Client,
-	type EffectSession,
-	type TaskIpfsError,
-	type ForceSettings,
-	createClient,
-	jungle4,
-	setSession,
-	reserveTask,
-	submitTask,
-	getSubmissions,
-	getPendingPayments,
-	getCampaignById,
-	getReservationsForVAccount,
-	getTaskDataByReservation,
-	getReservationForCampaign,
-	getPrice,
-	getBalance,
-	payout,
-	getAccountById,
-	getForceSettings,
-	getAccTaskIdx,
-	getAccountAssets,
-	getAllCampaigns,
+  type VAccount,
+  type Client,
+  type EffectSession,
+  type TaskIpfsError,
+  type ForceSettings,
+  createClient,
+  jungle4,
+  setSession,
+  reserveTask,
+  submitTask,
+  getSubmissions,
+  getPendingPayments,
+  getCampaignById,
+  getReservationsForVAccount,
+  getTaskDataByReservation,
+  getReservationForCampaign,
+  getReservationsForCampaign,
+  getPrice,
+  getBalance,
+  payout,
+  getAccountById,
+  getForceSettings,
+  getAccTaskIdx,
+  getAccountAssets,
+  getAllCampaigns,
+  getBatchById,
 } from "@effectai/effect-js";
 
 import {
-	type UseMutationReturnType,
-	type UseQueryReturnType,
-	useMutation,
-	useQuery,
-	useQueryClient,
+  type UseMutationReturnType,
+  type UseQueryReturnType,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from "@tanstack/vue-query";
 import { experimental_createPersister } from "@tanstack/query-persist-client-core";
 
@@ -40,487 +42,523 @@ import type { Reservation } from "@effectai/effect-js/dist/@generated/types/effe
 let effectClient: ClientStore | null;
 
 export const persister = experimental_createPersister({
-	storage: window?.localStorage ? localStorage : undefined,
+  storage: window?.localStorage ? localStorage : undefined,
 });
 
 export interface ClientStore {
-	client: Ref<Client>;
-	isLoggedIn: Ref<boolean>;
-	isWalletConnecting: Ref<boolean>;
+  client: Ref<Client>;
+  isLoggedIn: Ref<boolean>;
+  isWalletConnecting: Ref<boolean>;
 
-	userName: Ref<Name | null>;
-	permission: Ref<Name | null>;
-	vAccount: Ref<VAccount | null>;
+  userName: Ref<Name | null>;
+  permission: Ref<Name | null>;
+  vAccount: Ref<VAccount | null>;
 
-	useForceSettings: () => UseQueryReturnType<ForceSettings, Error>;
+  useForceSettings: () => UseQueryReturnType<ForceSettings, Error>;
 
-	useCampaigns: () => UseQueryReturnType<
-		Awaited<ReturnType<typeof getAllCampaigns>>,
-		Error
-	>;
+  useCampaigns: () => UseQueryReturnType<
+    Awaited<ReturnType<typeof getAllCampaigns>>,
+    Error
+  >;
 
-	useCampaign: (
-		campaignId: number,
-		enabled: Ref<boolean | undefined>,
-	) => UseQueryReturnType<Awaited<ReturnType<typeof getCampaignById>>, Error>;
+  useCampaign: (
+    campaignId: number,
+    enabled: Ref<boolean | undefined>
+  ) => UseQueryReturnType<Awaited<ReturnType<typeof getCampaignById>>, Error>;
 
-	useGetAccountById: (accountId: number) => UseQueryReturnType<VAccount, Error>;
+  useBatch: (
+    batchId: number,
+    enabled: Ref<boolean | undefined>
+  ) => UseQueryReturnType<Awaited<ReturnType<typeof getBatchById>>, Error>;
 
-	useEfxPrice: () => UseQueryReturnType<number, Error>;
+  useGetAccountById: (accountId: number) => UseQueryReturnType<VAccount, Error>;
 
-	useReservations: () => UseQueryReturnType<
-		Awaited<ReturnType<typeof getReservationsForVAccount>>,
-		Error
-	> & {
-		isReserved: (campaignId: number) => boolean;
-	};
+  useEfxPrice: () => UseQueryReturnType<number, Error>;
 
-	useReservation: (
-		campaignId: Ref<number>,
-	) => UseQueryReturnType<
-		Awaited<ReturnType<typeof getReservationForCampaign>>,
-		Error
-	>;
+  useReservations: () => UseQueryReturnType<
+    Awaited<ReturnType<typeof getReservationsForVAccount>>,
+    Error
+  > & {
+    isReserved: (campaignId: number) => boolean;
+  };
 
-	useAccTaskIdx: (
-		campaignId: Ref<number>,
-	) => UseQueryReturnType<Awaited<ReturnType<typeof getAccTaskIdx>>, Error>;
+  useReservation: (
+    campaignId: Ref<number>
+  ) => UseQueryReturnType<
+    Awaited<ReturnType<typeof getReservationForCampaign>>,
+    Error
+  >;
 
-	useTaskData: (
-		reservation: Ref<Reservation | null | undefined>,
-	) => UseQueryReturnType<
-		Awaited<ReturnType<typeof getTaskDataByReservation>>,
-		Error
-	>;
+  useReservationsCampaign: (
+    campaignId: Ref<number>
+  ) => UseQueryReturnType<
+    Awaited<ReturnType<typeof getReservationsForCampaign>>,
+    Error
+  >;
 
-	usePendingPayments: () => UseQueryReturnType<
-		Awaited<ReturnType<typeof getPendingPayments>>,
-		Error
-	>;
+  useAccTaskIdx: (
+    campaignId?: Ref<number>
+  ) => UseQueryReturnType<Awaited<ReturnType<typeof getAccTaskIdx>>, Error>;
 
-	useAccountAssets: () => UseQueryReturnType<
-		Awaited<ReturnType<typeof getAccountAssets>>,
-		Error
-	>;
+  useTaskData: (
+    reservation: Ref<Reservation | null | undefined>
+  ) => UseQueryReturnType<
+    Awaited<ReturnType<typeof getTaskDataByReservation>>,
+    Error
+  >;
 
-	useReserveTask: () => UseMutationReturnType<
-		Awaited<ReturnType<typeof reserveTask>>,
-		Error,
-		number,
-		unknown
-	>;
+  usePendingPayments: () => UseQueryReturnType<
+    Awaited<ReturnType<typeof getPendingPayments>>,
+    Error
+  >;
 
-	useSubmitTask: () => UseMutationReturnType<
-		Awaited<ReturnType<typeof submitTask>>,
-		Error,
-		Parameters<typeof submitTask>[0],
-		unknown
-	>;
+  useAccountAssets: () => UseQueryReturnType<
+    Awaited<ReturnType<typeof getAccountAssets>>,
+    Error
+  >;
 
-	useSubmissions: () => UseQueryReturnType<
-		Awaited<ReturnType<typeof getSubmissions>>,
-		Error
-	>;
+  useReserveTask: () => UseMutationReturnType<
+    Awaited<ReturnType<typeof reserveTask>>,
+    Error,
+    number,
+    unknown
+  >;
 
-	useGetBalance: (
-		account: Ref<Name | null>,
-	) => UseQueryReturnType<Awaited<ReturnType<typeof getBalance>>, Error>;
+  useSubmitTask: () => UseMutationReturnType<
+    Awaited<ReturnType<typeof submitTask>>,
+    Error,
+    Parameters<typeof submitTask>[0],
+    unknown
+  >;
 
-	usePayoutEfx: () => UseMutationReturnType<
-		Awaited<ReturnType<typeof payout>>,
-		Error,
-		void,
-		unknown
-	>;
-	// useWithdrawEfx: () => UseMutationReturnType<any, Error, void, unknown>;
+  useSubmissions: () => UseQueryReturnType<
+    Awaited<ReturnType<typeof getSubmissions>>,
+    Error
+  >;
 
-	connectWallet: (session?: Session) => Promise<void>;
-	disconnectWallet: () => Promise<void>;
+  useGetBalance: (
+    account: Ref<Name | null>
+  ) => UseQueryReturnType<Awaited<ReturnType<typeof getBalance>>, Error>;
+
+  usePayoutEfx: () => UseMutationReturnType<
+    Awaited<ReturnType<typeof payout>>,
+    Error,
+    void,
+    unknown
+  >;
+  // useWithdrawEfx: () => UseMutationReturnType<any, Error, void, unknown>;
+
+  connectWallet: (session?: Session) => Promise<void>;
+  disconnectWallet: () => Promise<void>;
 }
 
 export const useEffectClient = () => {
-	if (effectClient) return effectClient;
-	throw new Error(
-		"Client not initialized. Please use the `initClient` method to initialize the client.",
-	);
+  if (effectClient) return effectClient;
+  throw new Error(
+    "Client not initialized. Please use the `initClient` method to initialize the client."
+  );
 };
 
 export const initClient = (): void => {
-	effectClient = createEffectClient();
+  effectClient = createEffectClient();
 };
 
 export const createEffectClient = (): ClientStore => {
-	const { notify } = useNotification();
+  const { notify } = useNotification();
 
-	/* --------- SESSION LOGIC --------- */
-	const { sessionKit } = useSessionKit();
+  /* --------- SESSION LOGIC --------- */
+  const { sessionKit } = useSessionKit();
 
-	sessionKit.restore().then((restoreSession) => {
-		if (restoreSession) {
-			connectWallet(restoreSession).catch(console.error);
-		}
-	});
+  sessionKit.restore().then((restoreSession) => {
+    if (restoreSession) {
+      connectWallet(restoreSession).catch(console.error);
+    }
+  });
 
-	const { fetch } = sessionKit;
+  const { fetch } = sessionKit;
 
-	/* --------- CLIENT --------- */
+  /* --------- CLIENT --------- */
 
-	const client = shallowRef(
-		createClient({
-			network: jungle4,
-			options: {
-				fetchProviderOptions: {
-					fetch,
-				},
-				ipfsCacheDurationInMs: 600000,
-			},
-		}),
-	);
+  const client = shallowRef(
+    createClient({
+      network: jungle4,
+      options: {
+        fetchProviderOptions: {
+          fetch,
+        },
+        ipfsCacheDurationInMs: 600000,
+      },
+    })
+  );
 
-	/* --------- REACTIVE DATA --------- */
+  /* --------- REACTIVE DATA --------- */
 
-	const session: Ref<EffectSession | null> = ref(null);
+  const session: Ref<EffectSession | null> = ref(null);
 
-	const userName: Ref<Name | null> = computed(
-		() => session.value?.actor || null,
-	);
+  const userName: Ref<Name | null> = computed(
+    () => session.value?.actor || null
+  );
 
-	const permission: Ref<Name | null> = computed(
-		() => session.value?.permission || null,
-	);
+  const permission: Ref<Name | null> = computed(
+    () => session.value?.permission || null
+  );
 
-	const vAccount: Ref<VAccount | null> = computed(
-		() => session.value?.vAccount || null,
-	);
+  const vAccount: Ref<VAccount | null> = computed(
+    () => session.value?.vAccount || null
+  );
 
-	/* --------- REACTIVE BOOLEANS --------- */
+  /* --------- REACTIVE BOOLEANS --------- */
 
-	const isWalletConnecting: Ref<boolean> = ref(false);
-	const isLoggedIn = computed(() => !!session.value);
+  const isWalletConnecting: Ref<boolean> = ref(false);
+  const isLoggedIn = computed(() => !!session.value);
 
-	/* --------- MUTATIONS --------- */
+  /* --------- MUTATIONS --------- */
 
-	const usePayoutEfx = () => {
-		const queryClient = useQueryClient();
+  const usePayoutEfx = () => {
+    const queryClient = useQueryClient();
 
-		return useMutation({
-			mutationFn: async () => {
-				if (!userName.value || !permission.value)
-					throw new Error("User not logged in");
+    return useMutation({
+      mutationFn: async () => {
+        if (!userName.value || !permission.value)
+          throw new Error("User not logged in");
 
-				return await payout({ client: client.value, actor: userName.value });
-			},
-			onSuccess() {
-				notify({
-					type: "success",
-					message: "Payout successful",
-				});
+        return await payout({ client: client.value, actor: userName.value });
+      },
+      onSuccess() {
+        notify({
+          type: "success",
+          message: "Payout successful",
+        });
 
-				//rerun balance query
-				//TODO:: use optimistic updates
-				queryClient.invalidateQueries({
-					queryKey: ["balance", userName.value],
-				});
-			},
-		});
-	};
+        //rerun balance query
+        //TODO:: use optimistic updates
+        queryClient.invalidateQueries({
+          queryKey: ["balance", userName.value],
+        });
+      },
+    });
+  };
 
-	const useReserveTask = () => {
-		return useMutation({
-			mutationFn: async (campaignId: number) => {
-				return await reserveTask({ client: client.value, campaignId });
-			},
-		});
-	};
+  const useReserveTask = () => {
+    return useMutation({
+      mutationFn: async (campaignId: number) => {
+        return await reserveTask({ client: client.value, campaignId });
+      },
+    });
+  };
 
-	const useSubmitTask = () => {
-		return useMutation({
-			mutationFn: async ({
-				reservation,
-				data,
-			}: {
-				reservation: Reservation;
-				data: Record<string, unknown>;
-			}) => {
-				return await submitTask({ client: client.value, reservation, data });
-			},
-		});
-	};
+  const useSubmitTask = () => {
+    return useMutation({
+      mutationFn: async ({
+        reservation,
+        data,
+      }: {
+        reservation: Reservation;
+        data: Record<string, unknown>;
+      }) => {
+        return await submitTask({ client: client.value, reservation, data });
+      },
+    });
+  };
 
-	/* --------- HOOKS --------- */
+  /* --------- HOOKS --------- */
 
-	const useAccountAssets = () => {
-		return useQuery({
-			queryKey: ["accountAssets", computed(() => userName.value)],
-			enabled: computed(() => !!userName.value),
-			queryFn: async () => {
-				if (!userName.value) throw new Error("User not logged in");
+  const useAccountAssets = () => {
+    return useQuery({
+      queryKey: ["accountAssets", computed(() => userName.value)],
+      enabled: computed(() => !!userName.value),
+      queryFn: async () => {
+        if (!userName.value) throw new Error("User not logged in");
 
-				return await getAccountAssets({
-					client: client.value,
-					account: userName.value,
-				});
-			},
-		});
-	};
+        return await getAccountAssets({
+          client: client.value,
+          account: userName.value,
+        });
+      },
+    });
+  };
 
-	const useForceSettings = () => {
-		return useQuery({
-			queryKey: ["forceSettings"],
-			queryFn: async () => {
-				return await getForceSettings({ client: client.value });
-			},
-		});
-	};
+  const useForceSettings = () => {
+    return useQuery({
+      queryKey: ["forceSettings"],
+      queryFn: async () => {
+        return await getForceSettings({ client: client.value });
+      },
+    });
+  };
 
-	const useGetBalance = (account: Ref<Name | null>) => {
-		return useQuery({
-			queryKey: ["balance", computed(() => account.value)],
-			enabled: !!account.value,
-			queryFn: async () => {
-				if (!account.value) throw new Error("Account not found");
-				return await getBalance({ client: client.value, actor: account.value });
-			},
-		});
-	};
+  const useGetBalance = (account: Ref<Name | null>) => {
+    return useQuery({
+      queryKey: ["balance", computed(() => account.value)],
+      enabled: !!account.value,
+      queryFn: async () => {
+        if (!account.value) throw new Error("Account not found");
+        return await getBalance({ client: client.value, actor: account.value });
+      },
+    });
+  };
 
-	const useGetAccountById = (accountId: number) => {
-		return useQuery({
-			queryKey: ["account", accountId],
-			queryFn: async () => {
-				return await getAccountById({ client: client.value, accountId });
-			},
-		});
-	};
+  const useGetAccountById = (accountId: number) => {
+    return useQuery({
+      queryKey: ["account", accountId],
+      queryFn: async () => {
+        return await getAccountById({ client: client.value, accountId });
+      },
+    });
+  };
 
-	const useSubmissions = () => {
-		return useQuery({
-			queryKey: ["tasks"],
-			queryFn: async () => {
-				return await getSubmissions({
-					client: client.value,
-					reverse: true,
-				});
-			},
-		});
-	};
+  const useSubmissions = () => {
+    return useQuery({
+      queryKey: ["tasks"],
+      queryFn: async () => {
+        return await getSubmissions({
+          client: client.value,
+          reverse: true,
+        });
+      },
+    });
+  };
 
-	const usePendingPayments = () => {
-		return useQuery({
-			queryKey: [
-				"pendingPayments",
-				computed(() => userName.value),
-				computed(() => vAccount.value?.id),
-			],
-			enabled: computed(() => !!vAccount.value?.id),
-			queryFn: async () => {
-				if (!vAccount.value) throw new Error("Account not found");
+  const usePendingPayments = () => {
+    return useQuery({
+      queryKey: [
+        "pendingPayments",
+        computed(() => userName.value),
+        computed(() => vAccount.value?.id),
+      ],
+      enabled: computed(() => !!vAccount.value?.id),
+      queryFn: async () => {
+        if (!vAccount.value) throw new Error("Account not found");
 
-				return await getPendingPayments({
-					client: client.value,
-					vAccountId: vAccount.value.id,
-				});
-			},
-		});
-	};
+        return await getPendingPayments({
+          client: client.value,
+          vAccountId: vAccount.value.id,
+        });
+      },
+    });
+  };
 
-	const useEfxPrice = () => {
-		return useQuery({
-			queryKey: ["efxPrice"],
-			queryFn: async () => {
-				return await getPrice();
-			},
-		});
-	};
+  const useEfxPrice = () => {
+    return useQuery({
+      queryKey: ["efxPrice"],
+      queryFn: async () => {
+        return await getPrice();
+      },
+    });
+  };
 
-	const useCampaigns = () => {
-		const config = useRuntimeConfig();
-		return useQuery({
-			staleTime: config.public.CAMPAIGN_CACHE_DURATION,
-			gcTime: config.public.CAMPAIGN_CACHE_DURATION,
-			queryKey: ["campaigns"],
-			queryFn: async () => {
-				return getAllCampaigns({
-					client: client.value,
-				});
-			},
-		});
-	};
+  const useCampaigns = () => {
+    const config = useRuntimeConfig();
+    return useQuery({
+      staleTime: config.public.CAMPAIGN_CACHE_DURATION,
+      gcTime: config.public.CAMPAIGN_CACHE_DURATION,
+      queryKey: ["campaigns"],
+      queryFn: async () => {
+        return getAllCampaigns({
+          client: client.value,
+        });
+      },
+    });
+  };
 
-	const useCampaign = (
-		campaignId: number,
-		enabled: Ref<boolean | undefined>,
-	) => {
-		return useQuery({
-			queryKey: ["campaign", campaignId],
-			enabled,
-			queryFn: async () => {
-				return await getCampaignById({ client: client.value, id: campaignId });
-			},
-		});
-	};
+  const useCampaign = (
+    campaignId: number,
+    enabled: Ref<boolean | undefined>
+  ) => {
+    return useQuery({
+      queryKey: ["campaign", campaignId],
+      enabled,
+      queryFn: async () => {
+        return await getCampaignById({ client: client.value, id: campaignId });
+      },
+    });
+  };
 
-	const useAccTaskIdx = (campaignId: Ref<number>) => {
-		return useQuery({
-			queryKey: [
-				"acctaskidx",
-				computed(() => vAccount.value?.id),
-				computed(() => campaignId.value),
-			],
-			queryFn: async () => {
-				if (!vAccount.value) throw new Error("Account not found");
+  const useBatch = (batchId: number, enabled: Ref<boolean | undefined>) => {
+    return useQuery({
+      queryKey: ["batch", batchId],
+      enabled,
+      queryFn: async () => {
+        return await getBatchById({ client: client.value, id: batchId });
+      },
+    });
+  };
 
-				return await getAccTaskIdx({
-					client: client.value,
-					campaignId: campaignId.value,
-					accountId: vAccount.value.id,
-				});
-			},
-		});
-	};
+  const useAccTaskIdx = (campaignId?: Ref<number>) => {
+    return useQuery({
+      queryKey: [
+        "acctaskidx",
+        computed(() => vAccount.value?.id),
+        computed(() => campaignId?.value),
+      ],
+      queryFn: async () => {
+        if (!vAccount.value) throw new Error("Account not found");
 
-	const useReservation = (campaignId: Ref<number>) => {
-		return useQuery({
-			queryKey: [
-				"reservation",
-				computed(() => userName.value),
-				computed(() => vAccount.value?.id),
-				computed(() => campaignId.value),
-			],
-			enabled: computed(
-				() =>
-					(!!vAccount.value && !!campaignId.value) || campaignId.value === 0,
-			),
-			queryFn: async () => {
-				if (!vAccount.value) throw new Error("Account not found");
+        return await getAccTaskIdx({
+          client: client.value,
+          campaignId: campaignId?.value,
+          accountId: vAccount.value.id,
+        });
+      },
+    });
+  };
 
-				return await getReservationForCampaign({
-					client: client.value,
-					campaignId: campaignId.value,
-					vAccountId: vAccount.value.id,
-				});
-			},
-		});
-	};
+  const useReservation = (campaignId: Ref<number>) => {
+    return useQuery({
+      queryKey: [
+        "reservation",
+        computed(() => userName.value),
+        computed(() => vAccount.value?.id),
+        computed(() => campaignId.value),
+      ],
+      enabled: computed(
+        () => (!!vAccount.value && !!campaignId.value) || campaignId.value === 0
+      ),
+      queryFn: async () => {
+        if (!vAccount.value) throw new Error("Account not found");
 
-	const useTaskData = (reservation: Ref<Reservation | null | undefined>) => {
-		return useQuery({
-			queryKey: ["taskData", computed(() => reservation.value)],
-			enabled: computed(() => !!reservation.value),
-			retry: (failureCount, error: TaskIpfsError | Error) =>
-				"retry" in error && failureCount < error.retry,
-			queryFn: async () => {
-				try {
-					if (!reservation.value) throw new Error("Reservation not found");
+        return await getReservationForCampaign({
+          client: client.value,
+          campaignId: campaignId.value,
+          vAccountId: vAccount.value.id,
+        });
+      },
+    });
+  };
 
-					return await getTaskDataByReservation(
-						client.value,
-						reservation.value,
-					);
-				} catch (e) {
-					notify({
-						type: "error",
-						message: "Failed to fetch task data",
-					});
-					throw e;
-				}
-			},
-		});
-	};
+  const useTaskData = (reservation: Ref<Reservation | null | undefined>) => {
+    return useQuery({
+      queryKey: ["taskData", computed(() => reservation.value)],
+      enabled: computed(() => !!reservation.value),
+      retry: (failureCount, error: TaskIpfsError | Error) =>
+        "retry" in error && failureCount < error.retry,
+      queryFn: async () => {
+        try {
+          if (!reservation.value) throw new Error("Reservation not found");
 
-	const useReservations = () => {
-		const query = useQuery({
-			queryKey: ["reservations", computed(() => userName.value)],
-			enabled: isLoggedIn,
-			queryFn: async () => {
-				if (!vAccount.value) throw new Error("Account not found");
+          return await getTaskDataByReservation(
+            client.value,
+            reservation.value
+          );
+        } catch (e) {
+          notify({
+            type: "error",
+            message: "Failed to fetch task data",
+          });
+          throw e;
+        }
+      },
+    });
+  };
 
-				return await getReservationsForVAccount({
-					client: client.value,
-					vAccountId: vAccount.value.id,
-				});
-			},
-		});
+  const useReservations = () => {
+    const query = useQuery({
+      queryKey: ["reservations", computed(() => userName.value)],
+      enabled: isLoggedIn,
+      queryFn: async () => {
+        if (!vAccount.value) throw new Error("Account not found");
 
-		/* Utility function to check if a campaign is reserved */
-		const isReserved = (campaignId: number) => {
-			if (query.data?.value?.length) {
-				return query.data.value.some((r) => r.campaign_id === campaignId);
-			}
+        return await getReservationsForVAccount({
+          client: client.value,
+          vAccountId: vAccount.value.id,
+        });
+      },
+    });
 
-			return false;
-		};
+    /* Utility function to check if a campaign is reserved */
+    const isReserved = (campaignId: number) => {
+      if (query.data?.value?.length) {
+        return query.data.value.some((r) => r.campaign_id === campaignId);
+      }
 
-		return { ...query, isReserved };
-	};
+      return false;
+    };
 
-	/* --------- METHODS ------- */
+    return { ...query, isReserved };
+  };
 
-	const connectWallet = async (_session?: Session) => {
-		try {
-			isWalletConnecting.value = true;
-			const sessionToUse = _session || (await sessionKit.login()).session;
+  const useReservationsCampaign = (campaignId: Ref<number>) => {
+    return useQuery({
+      queryKey: ["reservation", computed(() => campaignId.value)],
+      enabled: computed(() => !!campaignId.value || campaignId.value === 0),
+      queryFn: async () => {
+        return await getReservationsForCampaign({
+          client: client.value,
+          campaignId: campaignId.value,
+        });
+      },
+    });
+  };
 
-			await setSession({ client: client.value, session: sessionToUse });
-			session.value = client.value.session;
-		} catch (error) {
-			console.error(error);
-			notify({
-				type: "error",
-				message: "Failed to connect wallet",
-			});
-		} finally {
-			isWalletConnecting.value = false;
-		}
-	};
+  /* --------- METHODS ------- */
 
-	const disconnectWallet = async (): Promise<void> => {
-		try {
-			await sessionKit.logout();
-			await setSession({ client: client.value, session: null });
-			session.value = null;
-		} catch (e) {
-			console.error(e);
-		}
-	};
+  const connectWallet = async (_session?: Session) => {
+    try {
+      isWalletConnecting.value = true;
+      const sessionToUse = _session || (await sessionKit.login()).session;
 
-	return {
-		// client
-		client,
+      await setSession({ client: client.value, session: sessionToUse });
+      session.value = client.value.session;
+    } catch (error) {
+      console.error(error);
+      notify({
+        type: "error",
+        message: "Failed to connect wallet",
+      });
+    } finally {
+      isWalletConnecting.value = false;
+    }
+  };
 
-		// booleans
-		isLoggedIn,
-		isWalletConnecting,
+  const disconnectWallet = async (): Promise<void> => {
+    try {
+      await sessionKit.logout();
+      await setSession({ client: client.value, session: null });
+      session.value = null;
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-		// data
-		userName,
-		permission,
-		vAccount,
+  return {
+    // client
+    client,
 
-		// hooks
-		usePayoutEfx,
+    // booleans
+    isLoggedIn,
+    isWalletConnecting,
 
-		useGetAccountById,
-		useForceSettings,
-		useGetBalance,
-		useCampaigns,
-		useCampaign,
-		useSubmissions,
-		useTaskData,
-		useReservation,
-		useReservations,
-		usePendingPayments,
-		useEfxPrice,
-		useAccTaskIdx,
+    // data
+    userName,
+    permission,
+    vAccount,
 
-		// mutations
-		useReserveTask,
-		useSubmitTask,
+    // hooks
+    usePayoutEfx,
 
-		useAccountAssets,
+    useGetAccountById,
+    useForceSettings,
+    useGetBalance,
+    useCampaigns,
+    useCampaign,
+    useBatch,
+    useSubmissions,
+    useTaskData,
+    useReservation,
+    useReservations,
+    useReservationsCampaign,
+    usePendingPayments,
+    useEfxPrice,
+    useAccTaskIdx,
 
-		// methods
-		connectWallet,
-		disconnectWallet,
-	};
+    // mutations
+    useReserveTask,
+    useSubmitTask,
+
+    useAccountAssets,
+
+    // methods
+    connectWallet,
+    disconnectWallet,
+  };
 };
