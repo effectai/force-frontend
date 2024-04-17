@@ -1,7 +1,5 @@
 import {
 	type VAccount,
-	type Campaign,
-	type Reservation,
 	type Client,
 	type EffectSession,
 	type TaskIpfsError,
@@ -41,6 +39,7 @@ import {
 import { experimental_createPersister } from "@tanstack/query-persist-client-core";
 
 import type { Name, Session } from "@wharfkit/session";
+import type { Reservation } from "@effectai/effect-js/dist/@generated/types/effecttasks2";
 
 let effectClient: ClientStore | null;
 
@@ -67,23 +66,29 @@ export interface ClientStore {
 	useCampaign: (
 		campaignId: number,
 		enabled: Ref<boolean | undefined>,
-	) => UseQueryReturnType<Campaign, Error>;
+	) => UseQueryReturnType<Awaited<ReturnType<typeof getCampaignById>>, Error>;
 
 	useGetAccountById: (accountId: number) => UseQueryReturnType<VAccount, Error>;
 
 	useEfxPrice: () => UseQueryReturnType<number, Error>;
 
-	useReservations: () => UseQueryReturnType<Reservation[], Error> & {
+	useReservations: () => UseQueryReturnType<
+		Awaited<ReturnType<typeof getReservationsForVAccount>>,
+		Error
+	> & {
 		isReserved: (campaignId: number) => boolean;
 	};
 
 	useReservation: (
 		campaignId: Ref<number>,
-	) => UseQueryReturnType<Reservation | null, Error>;
+	) => UseQueryReturnType<
+		Awaited<ReturnType<typeof getReservationForCampaign>>,
+		Error
+	>;
 
 	useAccTaskIdx: (
 		campaignId: Ref<number>,
-	) => UseQueryReturnType<AccTaskIdx | null, Error>;
+	) => UseQueryReturnType<Awaited<ReturnType<typeof getAccTaskIdx>>, Error>;
 
 	useTaskData: (
 		reservation: Ref<Reservation | null | undefined>,
@@ -112,7 +117,7 @@ export interface ClientStore {
 	useSubmitTask: () => UseMutationReturnType<
 		Awaited<ReturnType<typeof submitTask>>,
 		Error,
-		{ reservation: Reservation; data: unknown },
+		Parameters<typeof submitTask>[0],
 		unknown
 	>;
 
@@ -253,9 +258,11 @@ export const createEffectClient = (): ClientStore => {
 			queryKey: ["accountAssets", computed(() => userName.value)],
 			enabled: computed(() => !!userName.value),
 			queryFn: async () => {
+				if (!userName.value) throw new Error("User not logged in");
+
 				return await getAccountAssets({
 					client: client.value,
-					account: userName.value!,
+					account: userName.value,
 				});
 			},
 		});
@@ -294,11 +301,10 @@ export const createEffectClient = (): ClientStore => {
 		return useQuery({
 			queryKey: ["tasks"],
 			queryFn: async () => {
-				const data = await getSubmissions({
+				return await getSubmissions({
 					client: client.value,
 					reverse: true,
 				});
-				return data.rows;
 			},
 		});
 	};
@@ -312,9 +318,11 @@ export const createEffectClient = (): ClientStore => {
 			],
 			enabled: computed(() => !!vAccount.value?.id),
 			queryFn: async () => {
+				if (!vAccount.value) throw new Error("Account not found");
+
 				return await getPendingPayments({
 					client: client.value,
-					vAccountId: vAccount.value!.id,
+					vAccountId: vAccount.value.id,
 				});
 			},
 		});
@@ -388,10 +396,12 @@ export const createEffectClient = (): ClientStore => {
 					(!!vAccount.value && !!campaignId.value) || campaignId.value === 0,
 			),
 			queryFn: async () => {
+				if (!vAccount.value) throw new Error("Account not found");
+
 				return await getReservationForCampaign({
 					client: client.value,
 					campaignId: campaignId.value,
-					vAccountId: vAccount.value!.id,
+					vAccountId: vAccount.value.id,
 				});
 			},
 		});
@@ -427,9 +437,11 @@ export const createEffectClient = (): ClientStore => {
 			queryKey: ["reservations", computed(() => userName.value)],
 			enabled: isLoggedIn,
 			queryFn: async () => {
+				if (!vAccount.value) throw new Error("Account not found");
+
 				return await getReservationsForVAccount({
 					client: client.value,
-					vAccountId: vAccount.value!.id,
+					vAccountId: vAccount.value.id,
 				});
 			},
 		});
@@ -438,7 +450,7 @@ export const createEffectClient = (): ClientStore => {
 		const isReserved = (campaignId: number) => {
 			if (query.data?.value?.length) {
 				return query.data.value.some(
-					(r: Reservation) => r.campaign_id === campaignId,
+					(r: Reservation) => r.campaign_id.toNumber() === campaignId,
 				);
 			}
 
