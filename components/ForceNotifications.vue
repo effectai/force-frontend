@@ -27,7 +27,7 @@
 const { notifications, removeNotification } = useNotification();
 
 const doRemoveNotification = (created: Date) => {
-  removeNotification(notifications.value.find((n) => n.created === created)!);
+	removeNotification(notifications.value.find((n) => n.created === created)!);
 };
 </script>
 

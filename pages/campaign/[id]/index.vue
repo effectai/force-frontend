@@ -79,17 +79,17 @@ const route = useRoute();
 const campaignId = Number(route.params.id);
 const { data: campaign } = useCampaign(campaignId, ref(true));
 
-const {data: reservation} = useReservation(ref(campaignId));
+const { data: reservation } = useReservation(ref(campaignId));
 
 const parsedInstructions = computedAsync(() => {
-  if (campaign && campaign.value?.info && campaign.value.info.instructions) {
-    return markdownParser.parse!(
-      campaign.value.id.toString(),
-      campaign.value.info.instructions,
-      {},
-    );
-  }
-  return "";
+	if (campaign && campaign.value?.info && campaign.value.info.instructions) {
+		return markdownParser.parse!(
+			campaign.value.id.toString(),
+			campaign.value.info.instructions,
+			{},
+		);
+	}
+	return "";
 });
 
 const { mutate, loading } = useReserveTask();

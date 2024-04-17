@@ -22,53 +22,53 @@ const alternativeFrontendUrl = config.public.ALTERNATIVE_FRONTEND_URL;
 const isIframeLoaded = ref(false);
 
 const emit = defineEmits<{
-  (e: "submit", data: unknown): void;
-  (e: "ready"): void;
+	(e: "submit", data: unknown): void;
+	(e: "ready"): void;
 }>();
 
 const setHtml = (newHtml: string) => {
-  html.value = newHtml;
+	html.value = newHtml;
 };
 
 //expose the setting of html to the parent component
 defineExpose({ setHtml });
 
 const postHtml = async () => {
-  await nextTick();
-  // wait for the iframe to load before sending the template
-  if (!mediaFrame.value) return;
+	await nextTick();
+	// wait for the iframe to load before sending the template
+	if (!mediaFrame.value) return;
 
-  mediaFrame.value.contentWindow?.postMessage(
-    {
-      event: "proxy-load",
-      data: html.value,
-    },
-    "*",
-  );
+	mediaFrame.value.contentWindow?.postMessage(
+		{
+			event: "proxy-load",
+			data: html.value,
+		},
+		"*",
+	);
 };
 
 const onMessage = (event: any) => {
-  const data = event.data;
+	const data = event.data;
 
-  switch (event.data.task) {
-    case "submit":
-      emit("submit", data);
-      break;
-  }
+	switch (event.data.task) {
+		case "submit":
+			emit("submit", data);
+			break;
+	}
 
-  switch (event.data.event) {
-    case "proxy-loaded":
-      isIframeLoaded.value = true;
-      emit("ready");
-      break;
-    case "proxy-ready":
-      postHtml();
-      break;
-  }
+	switch (event.data.event) {
+		case "proxy-loaded":
+			isIframeLoaded.value = true;
+			emit("ready");
+			break;
+		case "proxy-ready":
+			postHtml();
+			break;
+	}
 };
 
 onMounted(() => {
-  window.addEventListener("message", onMessage);
+	window.addEventListener("message", onMessage);
 });
 </script>
 

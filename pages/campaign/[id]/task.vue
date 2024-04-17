@@ -36,17 +36,17 @@ import { Template as EffectTemplate } from "@effectai/effect-js";
 import type TaskTemplate from "~/components/TaskTemplate.vue";
 
 definePageMeta({
-  middleware: "auth",
-  layout: "template",
+	middleware: "auth",
+	layout: "template",
 });
 
 const {
-  vAccount,
-  useCampaign,
-  useReservation,
-  useReserveTask,
-  useSubmitTask,
-  useTaskData,
+	vAccount,
+	useCampaign,
+	useReservation,
+	useReserveTask,
+	useSubmitTask,
+	useTaskData,
 } = useEffectClient();
 
 const router = useRouter();
@@ -57,97 +57,97 @@ const templateRef: Ref<InstanceType<typeof TaskTemplate> | null> = ref(null);
 
 const { data: campaign } = useCampaign(campaignId.value);
 const {
-  data: reservation,
-  error: errorReservation,
-  refetch: refetchReservation,
+	data: reservation,
+	error: errorReservation,
+	refetch: refetchReservation,
 } = useReservation(campaignId);
 
 const {
-  data: taskData,
-  error: errorTaskData,
-  isLoading: isLoadingTaskData,
+	data: taskData,
+	error: errorTaskData,
+	isLoading: isLoadingTaskData,
 } = useTaskData(reservation);
 
 const error = computed(() => errorReservation.value || errorTaskData.value);
 
 const isTemplateLoading = computed(
-  () =>
-    isLoadingTaskData.value ||
-    isReservingTask.value ||
-    isSubmittingTask.value ||
-    !isTemplateReady.value,
+	() =>
+		isLoadingTaskData.value ||
+		isReservingTask.value ||
+		isSubmittingTask.value ||
+		!isTemplateReady.value,
 );
 
 const { mutateAsync: reserveTask, isPending: isReservingTask } =
-  useReserveTask();
+	useReserveTask();
 
 const { mutateAsync: submitTask, isPending: isSubmittingTask } =
-  useSubmitTask();
+	useSubmitTask();
 
 const renderTask = async (): Promise<void> => {
-  try {
-    if (!reservation.value) {
-      throw new Error("No reservation found");
-    }
+	try {
+		if (!reservation.value) {
+			throw new Error("No reservation found");
+		}
 
-    const task = {
-      accountId: vAccount.value?.id,
-      campaignId: reservation.value?.campaign_id,
-      batchId: reservation.value?.batch_id,
-      submissionId: reservation.value?.id,
-    };
+		const task = {
+			accountId: vAccount.value?.id,
+			campaignId: reservation.value?.campaign_id,
+			batchId: reservation.value?.batch_id,
+			submissionId: reservation.value?.id,
+		};
 
-    const template = new EffectTemplate(
-      campaign.value?.info?.template!,
-      { id: 1, annotations: [], ...taskData.value },
-      {},
-      task,
-    );
+		const template = new EffectTemplate(
+			campaign.value?.info?.template!,
+			{ id: 1, annotations: [], ...taskData.value },
+			{},
+			task,
+		);
 
-    const html = template.render();
+		const html = template.render();
 
-    //wait for Ref template to be ready
-    await nextTick();
-    if (!templateRef.value) {
-      throw new Error("Template reference not found");
-    }
+		//wait for Ref template to be ready
+		await nextTick();
+		if (!templateRef.value) {
+			throw new Error("Template reference not found");
+		}
 
-    templateRef.value.setHtml(html);
-  } catch (error) {
-    console.error(error);
-  }
+		templateRef.value.setHtml(html);
+	} catch (error) {
+		console.error(error);
+	}
 };
 
 const doSubmitTask = async (data: any): Promise<void> => {
-  if (!reservation.value) {
-    throw new Error("No reservation found");
-  }
+	if (!reservation.value) {
+		throw new Error("No reservation found");
+	}
 
-  try {
-    // Submit the task.
-    await submitTask({ data, reservation: reservation.value });
+	try {
+		// Submit the task.
+		await submitTask({ data, reservation: reservation.value });
 
-    try {
-      // Try to reserve new task.
-      // TODO:: update reservation in cache; for now just refetch.
-      const newReservation = await reserveTask(campaignId.value);
-      await refetchReservation();
-    } catch (e) {
-      console.error("error while getting next reservation", e);
-    }
-  } catch (error) {
-    // something went wrong with the task submission
-    // let the user retry ?
-    console.error(error);
-  }
+		try {
+			// Try to reserve new task.
+			// TODO:: update reservation in cache; for now just refetch.
+			const newReservation = await reserveTask(campaignId.value);
+			await refetchReservation();
+		} catch (e) {
+			console.error("error while getting next reservation", e);
+		}
+	} catch (error) {
+		// something went wrong with the task submission
+		// let the user retry ?
+		console.error(error);
+	}
 };
 
 watchEffect(async () => {
-  if (!reservation.value || !taskData.value) return;
-  if (error.value) return;
-  isTemplateReady.value = false;
-  await nextTick();
-  renderTask();
+	if (!reservation.value || !taskData.value) return;
+	if (error.value) return;
+	isTemplateReady.value = false;
+	await nextTick();
+	renderTask();
 });
 </script>
 

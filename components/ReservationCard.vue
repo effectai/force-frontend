@@ -29,10 +29,10 @@ import type { GetTableRowsResponse } from "@effectai/effect-js/dist/types/helper
 import { useQueryClient, type InfiniteData } from "@tanstack/vue-query";
 
 const props = defineProps<{
-  id: number;
-  campaignId: number;
-  reservedOn: string;
-  taskIdx: number;
+	id: number;
+	campaignId: number;
+	reservedOn: string;
+	taskIdx: number;
 }>();
 
 const { useCampaign } = useEffectClient();
@@ -45,28 +45,27 @@ const campaign = computed(() => cachedCampaign.value ?? fetchedCampaign.value);
 const query = useQueryClient();
 
 const loadFromCache = async () => {
-  const cache = query.getQueriesData({
-    queryKey: ["campaigns"],
-  });
+	const cache = query.getQueriesData({
+		queryKey: ["campaigns"],
+	});
 
-  if (cache) {
-    const campaigns = cache[0][1] as Campaign[];
+	if (cache) {
+		const campaigns = cache[0][1] as Campaign[];
 
-    //find the campaign in the cache
-    const found = campaigns
-      .find((c) => c.id === props.campaignId);
+		//find the campaign in the cache
+		const found = campaigns.find((c) => c.id === props.campaignId);
 
-    return found ? (cachedCampaign.value = found) : null;
-  }
+		return found ? (cachedCampaign.value = found) : null;
+	}
 };
 
 onMounted(async () => {
-  // try to load the corresponding campaign from the cache
-  const cachedCampaign = loadFromCache();
-  if (!cachedCampaign) {
-    // if not found, enable the fetching of the campaign
-    enabled.value = true;
-  }
+	// try to load the corresponding campaign from the cache
+	const cachedCampaign = loadFromCache();
+	if (!cachedCampaign) {
+		// if not found, enable the fetching of the campaign
+		enabled.value = true;
+	}
 });
 </script>
 

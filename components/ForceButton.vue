@@ -19,11 +19,11 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  isLoading: boolean;
+	isLoading: boolean;
 }>();
 
 defineOptions({
-  inheritAttrs: false,
+	inheritAttrs: false,
 });
 
 const attrs = useAttrs();

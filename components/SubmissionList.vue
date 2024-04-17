@@ -37,13 +37,13 @@
 import type { Submission } from "@effectai/effect-js";
 
 const submissionsToShow = computed(() => {
-  return props.submissions?.slice(0, props.limit);
+	return props.submissions?.slice(0, props.limit);
 });
 
 const props = defineProps<{
-  submissions: Submission[] | undefined;
-  loading: boolean;
-  limit: number;
+	submissions: Submission[] | undefined;
+	loading: boolean;
+	limit: number;
 }>();
 
 const router = useRouter();

@@ -18,10 +18,10 @@ const { useGetAccountById, useCampaign } = useEffectClient();
 const config = useRuntimeConfig();
 
 const props = defineProps<{
-  id: number;
-  submittedOn: string;
-  accountId: number;
-  campaignId: number;
+	id: number;
+	submittedOn: string;
+	accountId: number;
+	campaignId: number;
 }>();
 
 const { data: account } = useGetAccountById(props.accountId);

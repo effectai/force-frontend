@@ -82,14 +82,14 @@ import { getTimeToClaim, type Payment } from "@effectai/effect-js";
 definePageMeta({ middleware: "auth" });
 
 const {
-  usePendingPayments,
-  disconnectWallet,
-  permission,
-  isLoggedIn,
-  userName,
-  usePayoutEfx,
-  useGetBalance,
-  useForceSettings,
+	usePendingPayments,
+	disconnectWallet,
+	permission,
+	isLoggedIn,
+	userName,
+	usePayoutEfx,
+	useGetBalance,
+	useForceSettings,
 } = useEffectClient();
 
 const router = useRouter();
@@ -97,7 +97,7 @@ const router = useRouter();
 const { data: balance } = useGetBalance(userName);
 
 const { data: forceSettings, isLoading: isLoadingForceSettings } =
-  useForceSettings();
+	useForceSettings();
 
 /**
  * Payments Logic
@@ -106,23 +106,23 @@ const { data: forceSettings, isLoading: isLoadingForceSettings } =
 const { data: payments, isLoading: isLoadingPayments } = usePendingPayments();
 
 const loadingPayments = computed(
-  () => isLoadingPayments.value || isLoadingForceSettings.value,
+	() => isLoadingPayments.value || isLoadingForceSettings.value,
 );
 
 const proccesedPayments: Ref<
-  | (Payment & {
-      claimableIn: number;
-    })[]
-  | []
+	| (Payment & {
+			claimableIn: number;
+	  })[]
+	| []
 > = ref([]);
 
 const processPayments = (payments: Payment[]) => {
-  return payments.map((payment) => {
-    return {
-      ...payment,
-      claimableIn: getTimeToClaim(payment, forceSettings.value),
-    };
-  });
+	return payments.map((payment) => {
+		return {
+			...payment,
+			claimableIn: getTimeToClaim(payment, forceSettings.value),
+		};
+	});
 };
 
 /**
@@ -130,20 +130,20 @@ const processPayments = (payments: Payment[]) => {
  */
 
 const paymentInterval = setInterval(() => {
-  if (payments.value) {
-    proccesedPayments.value = processPayments(payments.value.pendingPayments);
-  }
+	if (payments.value) {
+		proccesedPayments.value = processPayments(payments.value.pendingPayments);
+	}
 }, 1000);
 
 const { mutateAsync: payout } = usePayoutEfx();
 
 onUnmounted(() => {
-  clearInterval(paymentInterval);
+	clearInterval(paymentInterval);
 });
 
 const logout = () => {
-  disconnectWallet();
-  router.push("/");
+	disconnectWallet();
+	router.push("/");
 };
 </script>
 

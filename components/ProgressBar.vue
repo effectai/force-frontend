@@ -12,8 +12,8 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  progress: number;
-  reverse?: boolean;
+	progress: number;
+	reverse?: boolean;
 }>();
 </script>
 
