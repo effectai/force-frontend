@@ -46,17 +46,14 @@ const query = useQueryClient();
 
 const loadFromCache = async () => {
   const cache = query.getQueriesData({
-    queryKey: ["campagnes"],
+    queryKey: ["campaigns"],
   });
 
   if (cache) {
-    const campaign = cache[0][1] as InfiniteData<
-      GetTableRowsResponse<unknown, Campaign>
-    >;
+    const campaigns = cache[0][1] as Campaign[];
 
     //find the campaign in the cache
-    const found = campaign.pages
-      .flatMap((p) => p.rows)
+    const found = campaigns
       .find((c) => c.id === props.campaignId);
 
     return found ? (cachedCampaign.value = found) : null;

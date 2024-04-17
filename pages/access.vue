@@ -15,23 +15,30 @@
         waves using <u>access keys.</u>
       </p>
 
+
       <div v-if="!userName">
         <p>First, lets connect your EOS wallet.</p>
-
         <ConnectWallet />
       </div>
       <div v-else>
+        <p>
+          Hello, {{ userName }} | <button @click="disconnectWallet">
+            Logout
+          </button>
+        </p>
+
         <input
           v-model="key"
           placeholder="xxx-xxx-xxx"
         >
-
-        <button
+        
+        <ForceButton
+          :is-loading="isLoading"
           class="button"
           @click="verifyAccessKey"
         >
           verify
-        </button>
+        </ForceButton>
         <a
           href="#"
           class="apply-link"
@@ -44,55 +51,61 @@
 <script setup lang="ts">
 import MdiCheck from "~/components/icons/MdiCheck.vue";
 
-const { userName } = useEffectClient();
+const { userName, disconnectWallet } = useEffectClient();
+const { hasAccessNft } = useAuth();
 
 const { notify } = useNotification();
 const key = ref();
 const shake = ref(false);
 const accessKey = useLocalStorage("accessKey", null);
+const isLoading = ref(false);
 
 definePageMeta({
-  layout: "preview",
+	layout: "preview",
 });
 
 const config = useRuntimeConfig();
 const router = useRouter();
 
 const verifyAccessKey = async () => {
-  try {
-    const result = await fetch(config.public.BACKEND_URL + "/grant-access", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ key: key.value, username: userName.value }),
-    });
+	try {
+		isLoading.value = true;
 
-    const data = await result.json();
+		const result = await fetch(`${config.public.BACKEND_URL}/grant-access`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ key: key.value, username: userName.value }),
+		});
 
-    if (!result.ok) {
-      throw new Error("Access denied", data);
-    }
+		const data = await result.json();
 
-    if (data.key) {
-      accessKey.value = key.value;
-      notify({
-        type: "success",
-        message: "Access granted",
-        icon: MdiCheck,
-      });
-      router.push("/");
-    }
-  } catch (e) {
-    shake.value = true;
-    setTimeout(() => {
-      shake.value = false;
-    }, 500);
-    notify({
-      type: "error",
-      message: "Access denied",
-    });
-  }
+		if (!result.ok) {
+			throw new Error("Access denied", data);
+		}
+
+		if (data.key) {
+			accessKey.value = key.value;
+			notify({
+				type: "success",
+				message: "Access granted",
+				icon: MdiCheck,
+			});
+			router.push("/");
+		}
+	} catch (e) {
+		shake.value = true;
+		setTimeout(() => {
+			shake.value = false;
+		}, 500);
+		notify({
+			type: "error",
+			message: "Access denied",
+		});
+	} finally {
+		isLoading.value = false;
+	}
 };
 </script>
 

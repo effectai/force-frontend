@@ -4,7 +4,7 @@
       Loading..
     </div>
     <div v-else-if="reservations">
-      <Reservation
+      <ReservationCard
         v-for="reservation in reservations"
         :id="reservation.id"
         :key="reservation.id"
@@ -20,8 +20,8 @@
 import type { Reservation } from "@effectai/effect-js";
 
 const props = defineProps<{
-  loading: boolean;
-  reservations?: Reservation[];
+	loading: boolean;
+	reservations?: Reservation[];
 }>();
 </script>
 

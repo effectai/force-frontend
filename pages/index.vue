@@ -1,11 +1,6 @@
 <template>
   <div class="container">
-    <div v-if="isLoadingAccTaskIdx">
-      Loading account 21 task index for campaign 0..
-    </div>
-    <div v-else>
-      {{ accTaskIdx }}
-    </div>
+   
     <div v-if="isLoggedIn">
       <h2 class="title mb-0">
         Your active Datasets ({{ reservations?.length }})
@@ -32,9 +27,6 @@
       <CampaignList
         :loading="isLoadingCampaigns"
         :campaigns="campaigns"
-        :current-page="page"
-        :has-next-page="hasNextPage"
-        @next-page="fetchNextPage"
       >
         <template #empty>
           <div>No campaigns found.</div>
@@ -48,24 +40,12 @@
 </template>
 
 <script setup lang="ts">
-const { useCampaigns, useReservations, isLoggedIn, useAccTaskIdx } = useEffectClient();
+const { useCampaigns, useReservations, isLoggedIn } = useEffectClient();
 
-const page = ref(1);
-
-const {
-  data: campaigns,
-  isLoading: isLoadingCampaigns,
-  fetchNextPage,
-  hasNextPage,
-} = useCampaigns({
-  page,
-});
-
-const { data: accTaskIdx, isLoading: isLoadingAccTaskIdx } =
-useAccTaskIdx(ref(21), ref(0));
+const { data: campaigns, isLoading: isLoadingCampaigns } = useCampaigns();
 
 const { data: reservations, isLoading: isLoadingReservations } =
-  useReservations();
+	useReservations();
 </script>
 
 <style></style>
