@@ -6,7 +6,7 @@
         <span>{{ campaign.owner.at(1) }}</span>
       </div>
     </td>
-    <td v-if="campaign && campaign.info">
+    <td v-if="campaign && campaign">
       {{ campaign.info?.title }}
     </td>
     <td v-else>
@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang='ts'>
-import type { Campaign, Batch } from "@effectai/effect-js";
+import type { CampaignWithInfo } from "@effectai/effect-js";
 
 const {
 	useReservations,
@@ -61,7 +61,7 @@ const {
 const { isReserved } = useReservations();
 
 const props = defineProps<{
-	campaign: Campaign;
+	campaign: CampaignWithInfo;
 	accTaskIndex: number;
 }>();
 

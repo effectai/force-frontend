@@ -25,8 +25,7 @@
 
 <script setup lang="ts">
 import type { Campaign } from "@effectai/effect-js";
-import type { GetTableRowsResponse } from "@effectai/effect-js/dist/types/helpers";
-import { useQueryClient, type InfiniteData } from "@tanstack/vue-query";
+import { useQueryClient } from "@tanstack/vue-query";
 
 const props = defineProps<{
 	id: number;

@@ -39,7 +39,6 @@ const { useAccTaskIdx } = useEffectClient();
 
 const { data: accTaskIdx, isLoading: isLoadingAccTaskIdx } = useAccTaskIdx();
 
-
 const props = defineProps<{
 	campaigns: Campaign[] | undefined;
 	loading: boolean;
