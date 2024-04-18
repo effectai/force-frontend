@@ -3,7 +3,7 @@
     <div v-if="loading">
       Loading..
     </div>
-    <div v-else-if="reservations">
+    <div v-else-if="reservations" class="reservation-container">
       <ReservationCard
         v-for="reservation in reservations"
         :id="reservation.id"
@@ -25,4 +25,10 @@ const props = defineProps<{
 }>();
 </script>
 
-<style></style>
+<style>
+.reservation-container{
+  display:flex;
+  flex-wrap:wrap;
+  gap:1rem;
+}
+</style>
