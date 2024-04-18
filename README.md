@@ -9,29 +9,30 @@
 
 2. [Install bun](https://bun.sh/docs/installation)
 
-3. Install dependencies 
-`bun install`
+3. Install dependencies
+```bash
+bun install
+```
 
-4. Run
-`bun dev`
+4. Run 
+```bash
+bun dev
+```
 
-### Link SDK
+### Add Local Version of Effect SDK
 
-In order to develop efficiently, it's recommended to locally build the SDK and link it using before proceeding.
+1. Clone the GitHub repository: https://github.com/effectai/effect-js/
+2. Install & build SDK: ```bun install && bun build```
+3. Run inside the SDK folder:
 
-1. Clone The [SDK](https://github.com/effectai/effect-js)
+```bash 
+bun link
+```
 
-2. Install dependencies 
-`bun install`
+4.Navigate back to frontend folder:
 
-3. Build the SDK
-`bun build`
-or
-`bun dev`
+```bash 
+bun link @effectai/effect-js
+```
 
-4. Create a link
-`bun link`
-
-5. Navigate back to the frontend folder:
-`cd force-frontend && bun link @effectai/effect-js`
- 
+Running the sdk with `bun dev` will automatically build & reload whenever a change occurs.
