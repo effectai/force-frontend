@@ -37,7 +37,6 @@
       {{ campaign.reward.quantity }}
     </td>
     <td>
-      {{ accTaskIndex }}
       <div v-if="isReserved(campaign.id)">
         <NuxtLink :to="`campaign/${campaign.id}`">
           continue
