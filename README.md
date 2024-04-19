@@ -13,8 +13,7 @@
 ```bash
 bun install
 ```
-
-4. Run 
+4. Run in dev mode
 ```bash
 bun dev
 ```
@@ -29,10 +28,12 @@ bun dev
 bun link
 ```
 
-4.Navigate back to frontend folder:
+4. Navigate back to frontend folder:
 
 ```bash 
 bun link @effectai/effect-js
 ```
 
-Running the sdk with `bun dev` will automatically build & reload whenever a change occurs.
+Running the sdk with `bun dev` will automatically build & reload whenever a change occurs. 
+
+Note: if you've ran the frontend before without linking, it's important to clear the cache inside of the node_modules & .nuxt folders.
