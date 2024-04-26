@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 	if (
 		to.path !== "/access" &&
 		!hasAccessNft.value &&
-		config.public.REQUIRE_ACCESS_NFT_TEMPLATE_ID
+		config.public.EARLY_ALPHA_ACCESS_TEMPLATE_ID
 	) {
 		return navigateTo("/access");
 	}

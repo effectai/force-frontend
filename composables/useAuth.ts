@@ -7,7 +7,7 @@ export const useAuth = () => {
 	watch(assets, () => {
 		hasAccessNft.value = assets.value?.some(
 			(asset) =>
-				asset.template_id === config.public.REQUIRE_ACCESS_NFT_TEMPLATE_ID,
+				asset.template_id === config.public.EARLY_ALPHA_ACCESS_TEMPLATE_ID,
 		);
 	});
 

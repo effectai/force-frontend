@@ -12,9 +12,9 @@ export default defineNuxtConfig({
 	},
 	runtimeConfig: {
 		public: {
-			REQUIRE_ACCESS_NFT_TEMPLATE_ID:
+			EARLY_ALPHA_ACCESS_TEMPLATE_ID:
 				Number.parseInt(
-					process.env.REQUIRE_ACCESS_NFT_TEMPLATE_ID ?? "false",
+					process.env.EARLY_ALPHA_ACCESS_TEMPLATE_ID ?? "false",
 				) || 0,
 			CAMPAIGN_CACHE_DURATION:
 				Number.parseInt(process.env.CAMPAIGN_CACHE_DURATION ?? "0") || 600_000,

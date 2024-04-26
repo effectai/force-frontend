@@ -8,7 +8,9 @@
         src="/img/logo.svg"
         alt="Effect Force Logo"
       >
+     <div v-if="!userName">
       <h1>Force V2 Early Alpha</h1>
+
       <p class="keys-description">
         Welcome to the early alpha version of <b>Effect Force V2</b>. To ensure
         a seamless experience for everyone, we'll be granting access to V2 in
@@ -16,16 +18,22 @@
       </p>
 
 
-      <div v-if="!userName">
+      <div>
         <p>First, lets connect your EOS wallet.</p>
         <ConnectWallet />
       </div>
-      <div v-else>
+    </div>
+      <div>
         <p>
-          Hello, {{ userName }} | <button @click="disconnectWallet">
+          Welcome, {{ userName }} | <span class="logout-button" @click="disconnectWallet">
             Logout
-          </button>
+          </span>
         </p>
+
+        <h2>
+          Ready to dive into the Force platform? 
+        </h2>
+        <p>Just enter your access code to unlock access to Effect Force. Once you're in, you'll snag a special NFT token, giving you VIP access to all the awesome features waiting for you.</p>
 
         <input
           v-model="key"
@@ -52,7 +60,6 @@
 import MdiCheck from "~/components/icons/MdiCheck.vue";
 
 const { userName, disconnectWallet } = useEffectClient();
-const { hasAccessNft } = useAuth();
 
 const { notify } = useNotification();
 const key = ref();
@@ -85,13 +92,15 @@ const verifyAccessKey = async () => {
 			throw new Error("Access denied", data);
 		}
 
-		if (data.key) {
+		if (data) {
 			accessKey.value = key.value;
+
 			notify({
 				type: "success",
 				message: "Access granted",
 				icon: MdiCheck,
 			});
+
 			router.push("/");
 		}
 	} catch (e) {
@@ -145,4 +154,10 @@ input {
     transform: translateX(0);
   }
 }
+
+.logout-button{
+  color: #007bff;
+  cursor: pointer;
+}
+
 </style>
