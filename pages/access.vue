@@ -23,7 +23,7 @@
         <ConnectWallet />
       </div>
     </div>
-      <div>
+      <div v-if="userName">
         <p>
           Welcome, {{ userName }} | <span class="logout-button" @click="disconnectWallet">
             Logout
