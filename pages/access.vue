@@ -64,7 +64,8 @@ const { userName, disconnectWallet } = useEffectClient();
 const { notify } = useNotification();
 const key = ref();
 const shake = ref(false);
-const accessKey = useLocalStorage("accessKey", null);
+const accessKey = useLocalStorage("hasAccessNft", null);
+
 const isLoading = ref(false);
 
 definePageMeta({
@@ -73,6 +74,10 @@ definePageMeta({
 
 const config = useRuntimeConfig();
 const router = useRouter();
+
+if (accessKey.value) {
+	router.push("/");
+}
 
 const verifyAccessKey = async () => {
 	try {

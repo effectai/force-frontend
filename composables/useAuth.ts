@@ -2,7 +2,11 @@ export const useAuth = () => {
 	const { useAccountAssets } = useEffectClient();
 	const { data: assets } = useAccountAssets();
 	const config = useRuntimeConfig();
-	const hasAccessNft = useLocalStorage("hasAccessNft", null);
+
+	const hasAccessNft: Ref<boolean | null | undefined> = useLocalStorage(
+		"hasAccessNft",
+		null,
+	);
 
 	watch(assets, () => {
 		hasAccessNft.value = assets.value?.some(

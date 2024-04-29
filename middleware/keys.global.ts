@@ -2,6 +2,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 	const { hasAccessNft } = useAuth();
 	const config = useRuntimeConfig();
 
+	console.log(hasAccessNft.value);
+
 	if (
 		to.path !== "/access" &&
 		!hasAccessNft.value &&
