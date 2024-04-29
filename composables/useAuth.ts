@@ -5,7 +5,7 @@ export const useAuth = () => {
 
 	const hasAccessNft: Ref<boolean | null | undefined> = useLocalStorage(
 		"hasAccessNft",
-		null,
+		false,
 	);
 
 	watch(assets, () => {
