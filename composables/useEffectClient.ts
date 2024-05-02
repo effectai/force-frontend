@@ -4,6 +4,7 @@ import {
 	type EffectSession,
 	type TaskIpfsError,
 	type Settings,
+	type Reservation,
 	createClient,
 	jungle4,
 	setSession,
@@ -25,7 +26,7 @@ import {
 	getAccountAssets,
 	getAllCampaigns,
 	getBatchById,
-} from "@effectai/effect-js";
+} from "@effectai/sdk";
 
 import {
 	type UseMutationReturnType,
@@ -37,7 +38,6 @@ import {
 import { experimental_createPersister } from "@tanstack/query-persist-client-core";
 
 import type { Name, Session } from "@wharfkit/session";
-import type { Reservation } from "@effectai/effect-js/dist/@generated/types/effecttasks2";
 
 let effectClient: ClientStore | null;
 

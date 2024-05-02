@@ -12,7 +12,7 @@
         <span>{{ campaign.info?.title }}</span>
       </h2>
       <span class="owner">owner: {{ campaign?.owner[1] }}</span>
-    </div>
+  </div>
       <ForceButton
         :is-loading="loading"
         class="button"
