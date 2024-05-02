@@ -4,14 +4,15 @@
     :to="`/campaign/${campaign.id}`"
     class="card reservation"
   >
-    <div>
+    <div class="reservation-container">
+      <div>
       <span class="started-on">
         started {{ formatDateStringToTimeAgo(props.reservedOn) }}</span>
       <h2 class="card-title">
         <span>{{ campaign.info?.title }}</span>
       </h2>
       <span class="owner">owner: {{ campaign?.owner[1] }}</span>
-
+    </div>
       <ForceButton
         :is-loading="loading"
         class="button"
@@ -71,7 +72,7 @@ onMounted(async () => {
 <style scoped>
 button {
   width: 100%;
-  margin-top: 10px;
+  margin-top: auto;
 }
 
 .card-title {
@@ -85,6 +86,12 @@ button {
   color: var(--text-color);
 
   opacity: 0.5;
+}
+
+.reservation-container{
+  display:flex;
+  flex-direction:column;
+  height:100%;
 }
 
 .owner {

@@ -5,7 +5,7 @@
     </div>
     <div v-else-if="reservations" class="reservation-container">
       <ReservationCard
-        v-for="reservation in reservations"
+        v-for="reservation in sortedReservations"
         :id="reservation.id"
         :key="reservation.id"
         :task-idx="reservation.task_idx"
@@ -22,7 +22,17 @@ import type { Reservation } from "@effectai/effect-js";
 const props = defineProps<{
 	loading: boolean;
 	reservations?: Reservation[];
+	max?: number;
 }>();
+
+const sortedReservations = computed(() => {
+	return props.reservations
+		?.toSorted(
+			(a, b) =>
+				new Date(b.reserved_on).getTime() - new Date(a.reserved_on).getTime(),
+		)
+		.slice(0, props.max);
+});
 </script>
 
 <style>

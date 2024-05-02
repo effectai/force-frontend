@@ -1,7 +1,5 @@
 <template>
   <div class="container">
-   
-
     <div v-if="isLoggedIn">
       <h2 class="title mb-0">
         Your active Datasets ({{ reservations?.length }})
@@ -12,6 +10,7 @@
       </p>
       <ReservationsList
         v-if="campaigns"
+        :max="3"
         :loading="isLoadingReservations"
         :reservations="reservations"
       />
