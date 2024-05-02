@@ -12,6 +12,8 @@ export default defineNuxtConfig({
 	},
 	runtimeConfig: {
 		public: {
+			AUTHORIZED_REQUESTERS:
+				process.env.AUTHORIZED_REQUESTERS?.split(",") ?? [],
 			EARLY_ALPHA_ACCESS_TEMPLATE_ID:
 				Number.parseInt(
 					process.env.EARLY_ALPHA_ACCESS_TEMPLATE_ID ?? "false",

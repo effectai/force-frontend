@@ -1,73 +1,53 @@
 <template>
-  <div
-    id="keys-container"
-    class="container flex-center"
-  >
+  <section id="keys-container" class="container flex-center">
     <div :class="{ 'horizontal-shake': shake }">
-      <img
-        src="/img/logo.svg"
-        width="350"
-        alt="Effect Force Logo"
-      >
-     <div v-if="!userName">
-      <h1 class="title">Effect Force V2</h1>
+      <img src="/img/effect-logo.svg" width="250" alt="Effect Force Logo">
+      <div v-if="!userName">
+        <h1 class="title">Effect Force V2</h1>
 
-      <p class="keys-description">
-        Welcome to the early alpha version of Effect Force V2<br/> a <span class="text-hightlights">100% Decentralized</span> and <span class="text-hightlights">Transparent</span> AI Training platform. <br/> To ensure
-        a good experience for everyone, we'll be granting access to V2 in
-        waves using <u>access keys.</u>
-      </p>
+        <div>
+          <p>
+            Welcome to the early alpha version of Effect Force V2:<br /> a <span class="text-hightlights">100%
+              Decentralized</span> and <span class="text-hightlights">Transparent</span> AI Training platform. <br />
+          </p>
 
+          <p>To ensure a good experience for everyone, we'll be granting access to V2 in
+            waves using <u>access keys.</u></p>
+        </div>
 
-      <div>
-        <p>First, lets connect your EOS wallet.</p>
-        <ConnectWallet class="mt-1" />
+        <div>
+          <p>First, lets connect your EOS wallet.</p>
+          <ConnectWallet class="mt-1" />
+        </div>
       </div>
-    </div>
       <div v-if="userName">
-      
         <h2 class="title">
-          Ready to dive into the Force platform? 
+          Ready to dive into the Force platform?
         </h2>
 
         <p>
-          Welcome 
-          <div class="dropdown">
+          Welcome
+        <div class="dropdown">
           <a href="#" @click="showDropdown">{{ userName }}</a>
           <div id="myDropdown" class="dropdown-content">
-          <a href="#home">logout</a>
-        </div>
+            <a @click="disconnectWallet" href="#home">logout</a>
+          </div>
         </div>,<span class="logout-button" @click="disconnectWallet">
-          </span>
-        </p>
+        </span></p>
 
-        <p>Just enter your access code to unlock access to Effect Force. Once you're in, you'll snag a special NFT token, giving you VIP access to all the awesome features waiting for you.</p>
+        <p>Just enter your access code to unlock access to Effect Force. Once you're in, you'll snag a special NFT
+          token, giving you VIP access to all the awesome features waiting for you.</p>
 
+        <input v-model="key" placeholder="xxx-xxx-xxx">
 
-
-        <input
-          v-model="key"
-          placeholder="xxx-xxx-xxx"
-        >
-        
-        <ForceButton
-          :is-loading="isLoading"
-          class="button"
-          @click="verifyAccessKey"
-        >
+        <ForceButton :is-loading="isLoading" class="button" @click="verifyAccessKey">
           verify
         </ForceButton>
 
-        <a
-          href="#"
-          class="apply-link"
-        >how can i get a key?</a>
-       
-
-
+        <a href="#" class="apply-link">how can i get a key?</a>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -96,7 +76,7 @@ watchEffect(() => {
 });
 
 const showDropdown = () => {
-	document.getElementById("myDropdown").classList.toggle("show");
+	document.getElementById("myDropdown")?.classList.toggle("show");
 };
 
 const verifyAccessKey = async () => {
@@ -126,7 +106,9 @@ const verifyAccessKey = async () => {
 				icon: MdiCheck,
 			});
 
-			router.push("/");
+			setTimeout(() => {
+				router.push("/");
+			}, 2000);
 		}
 	} catch (e) {
 		shake.value = true;
@@ -144,14 +126,17 @@ const verifyAccessKey = async () => {
 </script>
 
 <style scoped>
+
 .apply-link {
-  display: block;
+  display:block;
+  color: #007bff;
+  cursor: pointer;
 }
 
 #keys-container {
   max-width: 750px;
   min-height: 100vh;
-  font-size:20px;
+  font-size: 20px;
 }
 
 input {
@@ -167,21 +152,25 @@ input {
   0% {
     transform: translateX(0);
   }
+
   25% {
     transform: translateX(5px);
   }
+
   50% {
     transform: translateX(-5px);
   }
+
   75% {
     transform: translateX(5px);
   }
+
   100% {
     transform: translateX(0);
   }
 }
 
-.logout-button{
+.logout-button {
   color: #007bff;
   cursor: pointer;
 }
@@ -190,5 +179,4 @@ input {
   font-weight: bold;
   color: #007bff;
 }
-
 </style>

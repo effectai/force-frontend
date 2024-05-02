@@ -2,9 +2,9 @@
   <div class="container">
     <div v-if="campaign">
       <div>
-        <h1 class="title">
+        <h2 class="title">
           {{ campaign.info?.title }}
-        </h1>
+        </h2>
         <div class="campaign-details">
           <div class="campaign-info">
             <label>Reward per task</label>
@@ -36,7 +36,6 @@
             Show Instructions
           </button>
         </div>
-
 
         <div v-if="campaign && campaign.info && campaign.info.instructions">
           <dialog
@@ -82,8 +81,8 @@ const { data: campaign } = useCampaign(campaignId, ref(true));
 const { data: reservation } = useReservation(ref(campaignId));
 
 const parsedInstructions = computedAsync(() => {
-	if (campaign && campaign.value?.info && campaign.value.info.instructions) {
-		return markdownParser.parse!(
+	if (campaign?.value?.info?.instructions) {
+		return markdownParser.parse?.(
 			campaign.value.id.toString(),
 			campaign.value.info.instructions,
 			{},

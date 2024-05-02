@@ -3,7 +3,7 @@ import {
 	type Client,
 	type EffectSession,
 	type TaskIpfsError,
-	type ForceSettings,
+	type Settings,
 	createClient,
 	jungle4,
 	setSession,
@@ -54,7 +54,7 @@ export interface ClientStore {
 	permission: Ref<Name | null>;
 	vAccount: Ref<VAccount | null>;
 
-	useForceSettings: () => UseQueryReturnType<ForceSettings, Error>;
+	useForceSettings: () => UseQueryReturnType<Settings, Error>;
 
 	useCampaigns: () => UseQueryReturnType<
 		Awaited<ReturnType<typeof getAllCampaigns>>,
@@ -349,8 +349,14 @@ export const createEffectClient = (): ClientStore => {
 			gcTime: config.public.CAMPAIGN_CACHE_DURATION,
 			queryKey: ["campaigns"],
 			queryFn: async () => {
-				return getAllCampaigns({
+				const campaigns = await getAllCampaigns({
 					client: client.value,
+				});
+
+				const authorizedRequesters = ["efxefxefxefx"];
+
+				return campaigns.filter((campaign) => {
+					return authorizedRequesters.includes(campaign.owner[1]);
 				});
 			},
 		});
