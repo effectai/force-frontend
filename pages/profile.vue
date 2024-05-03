@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { getTimeToClaim, type Payment } from "@effectai/effect-js";
+import { getTimeToClaim, type Payment } from "@effectai/sdk";
 
 definePageMeta({ middleware: "auth" });
 

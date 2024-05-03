@@ -31,7 +31,7 @@ bun link
 4. Navigate back to frontend folder:
 
 ```bash 
-bun link @effectai/effect-js
+bun link @effectai/sdk
 ```
 
 Running the sdk with `bun dev` will automatically build & reload whenever a change occurs. 

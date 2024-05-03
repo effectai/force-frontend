@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Campaign } from "@effectai/effect-js";
+import type { Campaign } from "@effectai/sdk";
 import { useQueryClient } from "@tanstack/vue-query";
 
 const props = defineProps<{

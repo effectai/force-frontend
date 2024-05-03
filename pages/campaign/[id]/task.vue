@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { Template as EffectTemplate } from "@effectai/effect-js";
+import { Template as EffectTemplate } from "@effectai/sdk";
 import type TaskTemplate from "~/components/TaskTemplate.vue";
 
 definePageMeta({

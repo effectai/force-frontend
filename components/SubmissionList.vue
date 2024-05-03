@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Submission } from "@effectai/effect-js";
+import type { Submission } from "@effectai/sdk";
 
 const submissionsToShow = computed(() => {
 	return props.submissions?.slice(0, props.limit);

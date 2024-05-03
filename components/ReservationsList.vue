@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Reservation } from "@effectai/effect-js";
+import type { Reservation } from "@effectai/sdk";
 
 const props = defineProps<{
 	loading: boolean;

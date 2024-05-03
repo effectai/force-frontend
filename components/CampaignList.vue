@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Campaign } from "@effectai/effect-js";
+import type { Campaign } from "@effectai/sdk";
 const { useAccTaskIdx } = useEffectClient();
 
 const { data: accTaskIdx, isLoading: isLoadingAccTaskIdx } = useAccTaskIdx();

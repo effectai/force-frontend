@@ -1,5 +1,5 @@
 import {
-	type VAccount,
+	type Account,
 	type Client,
 	type EffectSession,
 	type TaskIpfsError,
@@ -52,7 +52,7 @@ export interface ClientStore {
 
 	userName: Ref<Name | null>;
 	permission: Ref<Name | null>;
-	vAccount: Ref<VAccount | null>;
+	vAccount: Ref<Account | null>;
 
 	useForceSettings: () => UseQueryReturnType<Settings, Error>;
 
@@ -71,7 +71,7 @@ export interface ClientStore {
 		enabled: Ref<boolean | undefined>,
 	) => UseQueryReturnType<Awaited<ReturnType<typeof getBatchById>>, Error>;
 
-	useGetAccountById: (accountId: number) => UseQueryReturnType<VAccount, Error>;
+	useGetAccountById: (accountId: number) => UseQueryReturnType<Account, Error>;
 
 	useEfxPrice: () => UseQueryReturnType<number, Error>;
 
@@ -198,7 +198,7 @@ export const createEffectClient = (): ClientStore => {
 		() => session.value?.permission || null,
 	);
 
-	const vAccount: Ref<VAccount | null> = computed(
+	const vAccount: Ref<Account | null> = computed(
 		() => session.value?.vAccount || null,
 	);
 

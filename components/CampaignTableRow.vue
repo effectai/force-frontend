@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang='ts'>
-import type { CampaignWithInfo } from "@effectai/effect-js";
+import type { CampaignWithInfo } from "@effectai/sdk";
 
 const {
 	useReservations,
