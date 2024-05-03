@@ -1,11 +1,14 @@
 <template>
   <div class="fullwidth">
     <TheHeader />
+    <ModalsContainer />
     <slot />
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ModalsContainer } from "vue-final-modal";
+</script>
 
 <style>
 .fullwidth .container {

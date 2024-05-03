@@ -15,9 +15,9 @@
             waves using <u>access keys.</u></p>
         </div>
 
-        <div>
+        <div class="">
           <p>First, lets connect your EOS wallet.</p>
-          <ConnectWallet class="mt-1" />
+          <ConnectWallet class="mt-2" />
         </div>
       </div>
       <div v-if="userName">
@@ -38,7 +38,7 @@
         <p>Just enter your access code to unlock access to Effect Force. Once you're in, you'll snag a special NFT
           token, giving you VIP access to all the awesome features waiting for you.</p>
 
-        <input v-model="key" placeholder="xxx-xxx-xxx">
+        <input class="input" v-model="key" placeholder="xxx-xxx-xxx">
 
         <ForceButton :is-loading="isLoading" class="button" @click="verifyAccessKey">
           verify

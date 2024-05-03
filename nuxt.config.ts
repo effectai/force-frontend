@@ -4,6 +4,7 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineNuxtConfig({
 	ssr: false,
+
 	devtools: {
 		enabled: true,
 		timeline: {
@@ -43,5 +44,5 @@ export default defineNuxtConfig({
 			}),
 		],
 	},
-	css: ["@/assets/css/global.css"],
+	css: ["@/assets/css/global.css", "vue-final-modal/style.css"],
 });
