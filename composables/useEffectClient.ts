@@ -5,6 +5,8 @@ import {
 	type TaskIpfsError,
 	type Settings,
 	type Reservation,
+	type Session,
+	type Name,
 	createClient,
 	jungle4,
 	setSession,
@@ -36,8 +38,6 @@ import {
 	useQueryClient,
 } from "@tanstack/vue-query";
 import { experimental_createPersister } from "@tanstack/query-persist-client-core";
-
-import type { Name, Session } from "@wharfkit/session";
 
 let effectClient: ClientStore | null;
 
@@ -127,7 +127,7 @@ export interface ClientStore {
 	useSubmitTask: () => UseMutationReturnType<
 		Awaited<ReturnType<typeof submitTask>>,
 		Error,
-		Parameters<typeof submitTask>[0],
+		Omit<Parameters<typeof submitTask>[0], "client">,
 		unknown
 	>;
 
@@ -166,7 +166,8 @@ export const initClient = (): void => {
 export const createEffectClient = (): ClientStore => {
 	const { notify } = useNotification();
 
-	/* --------- SESSION LOGIC --------- */
+	/* --------- SESSION KIT --------- */
+
 	const { sessionKit } = useSessionKit();
 
 	sessionKit.restore().then((restoreSession) => {
@@ -536,8 +537,7 @@ export const createEffectClient = (): ClientStore => {
 		vAccount,
 
 		// hooks
-		usePayoutEfx,
-
+		useAccountAssets,
 		useGetAccountById,
 		useForceSettings,
 		useGetBalance,
@@ -556,8 +556,7 @@ export const createEffectClient = (): ClientStore => {
 		// mutations
 		useReserveTask,
 		useSubmitTask,
-
-		useAccountAssets,
+		usePayoutEfx,
 
 		// methods
 		connectWallet,

@@ -29,6 +29,7 @@
           @click="router.push('/profile')"
         >
           {{ userName }}@{{ permission }}
+          <!-- <span class="network"><small>connected {{ network }}</small></span> -->
         </NuxtLink>
       </div>
     </div>
@@ -77,4 +78,9 @@ nav a.logo {
   color: var(--color-main);
   text-decoration: none;
 }
+
+.network {
+  display:block;
+}
 </style>
+

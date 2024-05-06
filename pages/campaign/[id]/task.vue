@@ -1,34 +1,37 @@
 <template>
-  <div>
-    <div v-if="error">
-      error: {{ error }}
-    </div>
+	<div>
+		<div v-if="error" class="error">
+			<div class="error-container flex-center flex-col">
+				<IconsEmoticonDead class="icon" />
+				<h3>Uh oh, something went wrong</h3>
+				<p>{{ error }}</p>
+				<div class="error-buttons">
+					<button class="button mt-2" @click="router.push('/')">Go back</button>
+					<button class="button mt-2" @click="notifyTeamName">Notify <u>{{ randomName }}</u></button>
+				</div>
+			</div>
+		</div>
 
-    <div v-else-if="isTemplateLoading">
-      <div class="backdrop-loader">
-        <div class="backdrop-loading-container">
-          <img src="/img/logo.svg">
-          <p class="flex-center">
-            Loading Task Data
-          </p>
-          <div class="lds-ellipsis">
-            <div />
-            <div />
-            <div />
-            <div />
-          </div>
-        </div>
-      </div>
-    </div>
+		<div v-else-if="isTemplateLoading">
+			<div class="backdrop-loader">
+				<div class="backdrop-loading-container">
+					<img src="/img/logo.svg">
+					<p class="flex-center">
+						Loading Task Data
+					</p>
+					<div class="lds-ellipsis">
+						<div />
+						<div />
+						<div />
+						<div />
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <TaskTemplate
-      v-if="!error"
-      v-show="!isTemplateLoading"
-      ref="templateRef"
-      @submit="doSubmitTask"
-      @ready="isTemplateReady = true"
-    />
-  </div>
+		<TaskTemplate v-if="!error" v-show="!isTemplateLoading" ref="templateRef" @submit="doSubmitTask"
+			@ready="isTemplateReady = true" />
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -90,6 +93,10 @@ const renderTask = async (): Promise<void> => {
 			throw new Error("No reservation found");
 		}
 
+		if (!campaign.value?.info?.template) {
+			throw new Error("No template found");
+		}
+
 		const task = {
 			accountId: vAccount.value?.id,
 			campaignId: reservation.value?.campaign_id,
@@ -98,7 +105,7 @@ const renderTask = async (): Promise<void> => {
 		};
 
 		const template = new EffectTemplate(
-			campaign.value?.info?.template!,
+			campaign.value.info.template,
 			{ id: 1, annotations: [], ...taskData.value },
 			{},
 			task,
@@ -118,7 +125,7 @@ const renderTask = async (): Promise<void> => {
 	}
 };
 
-const doSubmitTask = async (data: any): Promise<void> => {
+const doSubmitTask = async (data: Record<string, unknown>): Promise<void> => {
 	if (!reservation.value) {
 		throw new Error("No reservation found");
 	}
@@ -149,10 +156,41 @@ watchEffect(async () => {
 	await nextTick();
 	renderTask();
 });
+
+/* Feat: Notify Random Team Member */
+const { notify } = useNotification();
+const randomTeamName = ["Jeffrey", "Jesse", "Rochelle", "Laurens", "David"];
+const randomName =
+	randomTeamName[Math.floor(Math.random() * randomTeamName.length)];
+const notifyTeamName = () => {
+	notify({
+		type: "success",
+		message: `Notified ${randomName}`,
+	});
+};
+/* End Feat */
 </script>
 
 <style>
 .template {
-  padding: 2rem 1rem;
+	padding: 2rem 1rem;
+}
+
+.error .icon {
+	margin: 1rem;
+	font-size: 20rem;
+}
+
+.error-container {
+	padding: 2rem;
+	background-color: #f8f8f8;
+	border-radius: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.error-buttons {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
 }
 </style>
