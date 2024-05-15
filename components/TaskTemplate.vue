@@ -111,10 +111,9 @@ const { open: openFlagModal, close: closeFlagModal } = useModal({
 .template-wrapper {
   position:relative;
   box-sizing: border-box;
-  width: calc(100% - 20px);
-  height: calc(100dvh - 67.45px - 20px);
+  width: calc(100%);
+  height: calc(100dvh - 67.45px);
   padding: 0px;
-  margin: 10px;
   overflow: hidden;
   border: 3px solid #616060;
 }
