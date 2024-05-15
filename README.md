@@ -25,7 +25,7 @@ bun dev
 3. Run inside the SDK folder:
 
 ```bash 
-bun link
+bun run link
 ```
 
 4. Navigate back to frontend folder:
