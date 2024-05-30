@@ -349,12 +349,12 @@ p {
 /* Dropdown */
 
 .dropbtn {
-  background-color: #3498db;
-  color: white;
   padding: 16px;
   font-size: 16px;
-  border: none;
+  color: white;
   cursor: pointer;
+  background-color: #3498db;
+  border: none;
 }
 
 .dropbtn:hover,
@@ -368,20 +368,20 @@ p {
 }
 
 .dropdown-content {
-  display: none;
   position: absolute;
-  background-color: #f1f1f1;
+  z-index: 1;
+  display: none;
   min-width: 160px;
   overflow: auto;
+  background-color: #f1f1f1;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
 }
 
 .dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
   display: block;
+  padding: 12px 16px;
+  color: black;
+  text-decoration: none;
 }
 
 .dropdown a:hover {
@@ -395,8 +395,8 @@ p {
 /* Form Styling */
 
 input {
+  height: 40px;
   padding: 0.5rem;
   font-size: var(--font-size);
   border: 1px solid var(--border-color);
-  height: 40px;
 }
