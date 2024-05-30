@@ -1,8 +1,13 @@
 @import url("normalize.css");
 
 @font-face {
-  font-family: "Inter";
+  font-family: "inter-regular";
   src: url("@/assets/fonts/Inter-Regular.ttf");
+}
+
+@font-face {
+  font-family: "inter-medium";
+  src: url("@/assets/fonts/Inter-Medium.ttf");
 }
 
 *,
@@ -20,8 +25,8 @@
   --color-gray-300: #dee2e6;
   --color-gray-400: #ced4da;
 
-  --font-family-body: "Arial", sans-serif;
-  --font-family-header: "Inter", sans-serif;
+  --font-family-body: "inter-regular", "Arial", sans-serif;
+  --font-family-header: "inter-medium", sans-serif;
 
   --font-size-sm: 0.8em;
   --font-size: 1em;
@@ -30,6 +35,12 @@
   --font-size-2xl: 2em;
   --font-size-3xl: 3em;
   --font-size-4xl: 4em;
+
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 1rem;
+  --spacing-4: 1.5rem;
+  --spacing-5: 3rem;
 
   --line-height: 1.5;
 
@@ -44,6 +55,8 @@
   --border-color: #dee2e6;
   --border-light-color: #f8f9fa;
   --border-dark-color: #343a40;
+
+  --sidebar-width: 18rem;
 }
 
 html {
@@ -51,6 +64,7 @@ html {
   font-family: var(--font-family-body);
   font-size: var(--font-size);
   color: var(--text-color);
+  background: #f3f3f3;
 }
 
 h1,
@@ -80,29 +94,43 @@ h3 {
 
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-spacing: 0rem 0.25rem;
+  border-collapse: separate;
+  border: none;
 }
 
 .table-container {
   overflow-x: auto;
 }
 
-th,
 td {
-  padding: 8px;
+  padding: 18px 10px;
   text-align: left;
-  border: 1px solid var(--border-color);
 }
 
-th {
-  background-color: var(--bg-light-color);
+td:nth-child(1) {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
 }
 
-tr:nth-child(even) {
-  background-color: var(--bg-light-color);
+td:nth-last-child(1) {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
-tr:hover {
+thead th {
+  padding-bottom: 0.5rem;
+
+  color: black;
+  text-align: left;
+}
+
+tbody tr {
+  background: white;
+  border-radius: 4px;
+}
+
+tbody tr:hover {
   cursor: pointer;
   background: var(--color-gray-200);
 }
@@ -132,10 +160,8 @@ tr:hover {
 
 .container {
   width: 100%;
-
   max-width: 1200px;
-  padding: 1rem 1rem;
-  margin: 0 auto;
+  padding: 1rem;
 }
 
 /* MODAL */

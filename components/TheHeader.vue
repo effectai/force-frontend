@@ -1,14 +1,16 @@
 <template>
   <nav>
     <div class="container">
-      <NuxtLink
-        to="/"
-        class="logo"
-      >
-        <img src="/img/effect-logo-black.png">
-        <span>Effect AI</span>
-      </NuxtLink>
-
+      <div class="burger-button">
+        <button @click="emits('openSidebar')" type="button" class="button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+            aria-hidden="true" data-slot="icon" class="" width="20">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5">
+            </path>
+          </svg></button>
+      </div>
+   
       <div v-if="!isLoggedIn">
         <button
           class="button"
@@ -37,15 +39,32 @@
 </template>
 
 <script setup lang="ts">
+
 const { connectWallet, isLoggedIn, userName, permission } = useEffectClient();
+
+const emits = defineEmits(['openSidebar']);
 
 const router = useRouter();
 </script>
 
 <style scoped>
+
+@media screen and (min-width: 1440px) {
+  .burger-button {
+    display: none;
+  }
+
+  nav .container {
+    justify-content: flex-end !important;
+  }
+}
+
 nav {
-  background-color: var(--white-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top:0;
+  z-index: 1;
+  width: 100%;
+  margin-bottom:20px;
 }
 
 nav .container {

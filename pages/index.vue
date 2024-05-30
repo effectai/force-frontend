@@ -1,29 +1,27 @@
 <template>
   <div class="container">
+
+    <TasksAvailableBanner/>
+
     <div v-if="isLoggedIn">
       <h2 class="title mb-0">
         Your active Datasets ({{ reservations?.length }})
       </h2>
-      <p>
-        These are the tasks you have started working on or that you have a
-        reservation for.
-      </p>
+
       <ReservationsList
         v-if="campaigns"
         :max="3"
         :loading="isLoadingReservations"
         :reservations="reservations"
       />
+      
     </div>
 
     <div>
       <h2 class="title mb-0">
         All Datasets
       </h2>
-      <p class="my-3">
-        These are all the campaigns on the platform, you might need to qualify
-        first.
-      </p>
+   
       <CampaignList
         :loading="isLoadingCampaigns"
         :campaigns="campaigns"

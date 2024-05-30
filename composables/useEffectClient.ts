@@ -159,11 +159,11 @@ export const useEffectClient = () => {
 	);
 };
 
-export const initClient = (): void => {
-	effectClient = createEffectClient();
+export const initClient = async (): Promise<void> => {
+	effectClient = await createEffectClient();
 };
 
-export const createEffectClient = (): ClientStore => {
+export const createEffectClient = async (): Promise<ClientStore> => {
 	const { notify } = useNotification();
 
 	/* --------- SESSION KIT --------- */
@@ -179,13 +179,14 @@ export const createEffectClient = (): ClientStore => {
 	/* --------- CLIENT --------- */
 
 	const client = shallowRef(
-		createClient({
+		await createClient({
 			network: jungle4,
 			options: {
 				ipfsCacheDurationInMs: 600000,
 			},
-		}),
-	);
+		}
+	));
+
 
 	/* --------- REACTIVE DATA --------- */
 

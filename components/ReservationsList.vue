@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="reservation-list">
     <div v-if="loading">
       Loading..
     </div>
@@ -36,6 +36,11 @@ const sortedReservations = computed(() => {
 </script>
 
 <style>
+
+.reservation-list{
+  margin-top: var(--spacing-4);
+}
+
 .reservation-container{
   display:flex;
   flex-wrap:wrap;

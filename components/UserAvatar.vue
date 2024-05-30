@@ -1,9 +1,9 @@
 <template>
   <div class="avatar">
     <img
-      :src="`https://i.pravatar.cc/100?img=${props.id}`"
+      :src="`/img/default-avatar.webp`"
       alt="Rounded avatar"
-    >
+    />
   </div>
 </template>
 
@@ -12,6 +12,13 @@ const props = defineProps<{ id: string | number }>();
 </script>
 
 <style>
+
+.avatar img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .avatar {
   display: flex;
   align-items: center;
