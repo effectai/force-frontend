@@ -1,86 +1,85 @@
 <template>
-  <div 
-    class="main"
-  >
+  <div class="main">
+    <Teleport v-if="showSidebar" :to="'body'">
+      <div class="popover-container">
+        <div class="modal-backdrop"></div>
+        <div class="popover">
+          <Sidebar />
+          <div>
+            <button @click="closeSidebar">close</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
     <div class="layout-container">
-      <aside class="sidebar">
-        <TheLogo/>
-
-        <nav class="main-menu">
-          <h4>Main Menu</h4>
-          
-          <ul>
-            <li>
-              <nuxt-link to="/">My Dashboard</nuxt-link>
-            </li>
-            <li>
-              <nuxt-link to="/profile">My Profile</nuxt-link>
-            </li>
-          </ul>
-        </nav>
-      </aside>
+      <Sidebar />
       <div class="main-content">
+        <TheHeader @open-sidebar="openSidebar"/>
         <slot />
       </div>
     </div>
   </div>
 </template>
 
+<script setup lang="ts">
+
+const showSidebar = ref(false)
+
+const openSidebar = () => {
+  showSidebar.value = true
+  // add overflow hidden to html
+  document.documentElement.style.overflow = 'hidden'
+}
+
+const closeSidebar = () => {
+  showSidebar.value = false
+
+  // remove overflow hidden from html
+  document.documentElement.style.overflow = 'auto'
+}
+</script>
 
 <style scoped>
 
-h4{
-  font-weight:bold !important;
-  color:black;
+@media screen and (min-width: 1440px) {
+  .burger-button {
+    display: none;
+  }
+
+  .popover-container {
+    display: none;
+  }
 }
 
-.sidebar .main-menu {
+.popover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
   display: flex;
-  flex-direction: column;
-  margin-top:30px;  
+  width: 100vw;
+  height: 100vh;
 }
 
-.sidebar .main-menu ul {
-  padding: 0;
-  margin:0;
-  list-style: none;
+.popover-container .popover .sidebar {
+  display: block;
+  width: 250px;
+  padding: 20px;
+  background-color: white;
 }
 
-.sidebar .main-menu ul li {
-  margin-top: 30px;
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
-.sidebar .main-menu ul li a {
+h4 {
+  font-weight: bold !important;
   color: black;
-  text-decoration: none;
 }
 
-.sidebar .main-menu .router-link-active.router-link-exact-active{
-  padding:12px 15px 12px 15px;
-  color:white;
-  background:black;
-  border-radius: 4px;
-}
-
-
-.main {
-  padding-top:40px;
-}
-
-@media screen and (min-width: 1440px){
-  .sidebar {
-    position:fixed;
-    top:0;
-    left:0;
-    display:flex;
-    flex-direction: column;
-    min-width: var(--sidebar-width);
-    padding-top:40px;
-    padding-left:35px;
-    background: var(--secondary);
-  }
-  .main-content {
-    padding-left:var(--sidebar-width);
-  }
-}
 </style>

@@ -1,7 +1,7 @@
 <template>
 <div class="tasks-available-banner">
     <p>You have 5 new tasks available!</p>
-    <button>View tasks</button>
+    <button class="button">View tasks</button>
 </div>
 </template>
 
@@ -9,6 +9,12 @@
 </script>
 
 <style scoped>
+p{
+    margin: 0;
+    font-weight:bold;
+    color:black;
+}
+
 .tasks-available-banner {
     display: flex;
     align-items: center;

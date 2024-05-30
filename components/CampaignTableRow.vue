@@ -18,9 +18,6 @@
 			</div>
 		</td>
 		<td>
-			<TaskCategory :category="campaign.info?.category" />
-		</td>
-		<td>
 			<span v-if="tasksAvailable.campaignTasksAvailable === null">
 				{{ campaign.total_tasks }} tasks
 			</span>

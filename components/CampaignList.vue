@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="campaign-list">
     <div v-if="loading">
       <slot name="loading" />
     </div>
@@ -15,7 +15,6 @@
           <tr>
             <th>Dataset</th>
             <th>Title</th>
-            <th>Category</th>
             <th>Tasks</th>
             <th>Reward Per Task</th>
           </tr>
@@ -50,6 +49,10 @@ const props = defineProps<{
   display: inline-flex;
   gap: 5px;
   margin-top: 20px;
+}
+
+.campaign-list {
+  margin-top: var(--spacing-4);
 }
 
 

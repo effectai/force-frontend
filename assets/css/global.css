@@ -36,6 +36,12 @@
   --font-size-3xl: 3em;
   --font-size-4xl: 4em;
 
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 1rem;
+  --spacing-4: 1.5rem;
+  --spacing-5: 3rem;
+
   --line-height: 1.5;
 
   --bg-color: #fff;
@@ -155,6 +161,7 @@ tbody tr:hover {
 .container {
   width: 100%;
   max-width: 1200px;
+  padding: 1rem;
 }
 
 /* MODAL */

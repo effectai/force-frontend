@@ -11,8 +11,8 @@
       <h2 class="card-title">
         <span>{{ campaign.info?.title }}</span>
       </h2>
-      <span class="owner">owner: {{ campaign?.owner[1] }}</span>
-  </div>
+      <p>{{ campaign.info?.description }}</p>
+    </div>
       <ForceButton
         :is-loading="loading"
         class="button"
@@ -84,7 +84,6 @@ button {
 .reservation .started-on {
   font-size: 0.8em;
   color: var(--text-color);
-
   opacity: 0.5;
 }
 
@@ -94,21 +93,17 @@ button {
   height:100%;
 }
 
-.owner {
-  font-size: 0.8em;
-  font-style: italic;
-  color: var(--text-color);
-  opacity: 0.5;
-}
 
 .reservation {
   display: block;
+  min-width:auto;
   max-width: 300px;
-  padding: 10px;
+  padding: 20px;
   color: black;
   text-decoration: none;
   background: #f0f0f0;
-  border-radius: 10px;
+  background:white;
+  border-radius: 4px;
 }
 
 .reservation:hover {
