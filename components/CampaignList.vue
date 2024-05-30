@@ -15,9 +15,9 @@
           <tr>
             <th>Dataset</th>
             <th>Title</th>
+            <th>Category</th>
             <th>Tasks</th>
             <th>Reward Per Task</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>

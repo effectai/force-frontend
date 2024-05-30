@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+
+    <TasksAvailableBanner/>
+
     <div v-if="isLoggedIn">
       <h2 class="title mb-0">
         Your active Datasets ({{ reservations?.length }})
