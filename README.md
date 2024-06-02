@@ -36,10 +36,11 @@ This command will:
 ### Add Local Version of Effect SDK
 
 1. Clone the GitHub repository: https://github.com/effectai/effect-js/
-2. Install & build SDK: ```bun install && bun build```
-3. Run inside the SDK folder:
+2. Install & build SDK: ```bun install && bun sdk:build```
+3. Run inside the SDK (`src`) folder:
 
 ```bash 
+cd src
 bun run link
 ```
 
