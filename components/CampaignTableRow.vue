@@ -54,7 +54,7 @@ const {
 	vAccount,
 } = useEffectClient();
 const { isReserved } = useReservations();
-
+const emit = defineEmits(['tasks-counted']);
 
 const efxPrice = await getPrice();
 
@@ -128,6 +128,9 @@ const tasksAvailable = computed(() => {
 		batchTaskAvailable,
 	};
 });
+
+emit('tasks-counted', tasksAvailable.value.campaignTasksAvailable);
+
 </script>
 
 <style scoped>

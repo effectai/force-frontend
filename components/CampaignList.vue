@@ -1,4 +1,9 @@
 <template>
+  <TasksAvailableBanner :totalTasks="totalTasks"/>
+
+  <h2 class="title mb-0">
+    All Datasets
+  </h2>
   <div class="campaign-list">
     <div v-if="loading">
       <slot name="loading" />
@@ -25,6 +30,7 @@
             :key="campaign.id"
             :campaign="campaign"
             :accTaskIndex="accTaskIdx?.find(ati => ati.campaign_id === campaign.id)?.value"
+            @tasks-counted="updateTotalTasks"
             />
         </tbody>
       </table>
@@ -34,6 +40,7 @@
 
 <script setup lang="ts">
 import type { Campaign } from "@effectai/sdk";
+import TasksAvailableBanner from "./TasksAvailableBanner.vue";
 const { useAccTaskIdx } = useEffectClient();
 
 const { data: accTaskIdx, isLoading: isLoadingAccTaskIdx } = useAccTaskIdx();
@@ -42,6 +49,11 @@ const props = defineProps<{
 	campaigns: Campaign[] | undefined;
 	loading: boolean;
 }>();
+
+const totalTasks = ref(0)
+const updateTotalTasks = (tasks: number) => {
+      totalTasks.value += tasks;
+    };
 </script>
 
 <style scoped>
@@ -54,6 +66,5 @@ const props = defineProps<{
 .campaign-list {
   margin-top: var(--spacing-4);
 }
-
 
 </style>

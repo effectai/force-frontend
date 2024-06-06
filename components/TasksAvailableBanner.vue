@@ -1,11 +1,14 @@
 <template>
 <div class="tasks-available-banner">
-    <p>You have 5 new tasks available!</p>
+    <p>You have {{ totalTasks }} new tasks available!</p>
     <button class="button">View tasks</button>
 </div>
 </template>
 
 <script setup lang="ts">
+const props = defineProps<{
+	totalTasks: number;
+}>();
 </script>
 
 <style scoped>
