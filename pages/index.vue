@@ -1,7 +1,7 @@
 <template>
   <div class="container">
 
-    <TasksAvailableBanner/>
+    <!-- <TasksAvailableBanner/> -->
 
     <div v-if="isLoggedIn">
       <h2 class="title mb-0">
@@ -18,9 +18,9 @@
     </div>
 
     <div>
-      <h2 class="title mb-0">
+      <!-- <h2 class="title mb-0">
         All Datasets
-      </h2>
+      </h2> -->
    
       <CampaignList
         :loading="isLoadingCampaigns"
