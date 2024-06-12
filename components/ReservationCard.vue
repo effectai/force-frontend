@@ -6,13 +6,17 @@
   >
     <div class="reservation-container">
       <div>
-      <span class="started-on">
-        started {{ formatDateStringToTimeAgo(props.reservedOn) }}</span>
-      <h2 class="card-title">
-        <span>{{ campaign.info?.title }}</span>
-      </h2>
-      <p>{{ campaign.info?.description }}</p>
-    </div>
+        <span class="started-on">
+          started {{ formatDateStringToTimeAgo(props.reservedOn) }}</span>
+        <h2 class="card-title">
+          <span>{{ campaign.info?.title }}</span>
+        </h2>
+        <p>{{ campaign.info?.description }}</p>
+      </div>
+      <ProgressBar
+        :reverse="false"
+        :progress= getProgress(campaign)
+      />
       <ForceButton
         :is-loading="loading"
         class="button"
@@ -58,6 +62,14 @@ const loadFromCache = async () => {
 		return found ? (cachedCampaign.value = found) : null;
 	}
 };
+
+//this is temporary until the logic is added to "useCampaigns"
+const getProgress = (campaign) => {
+  if (((campaign.reservations_done) / campaign.total_tasks) > 1) {
+    return 100
+  }
+  return (campaign.reservations_done / campaign.total_tasks)*100
+}
 
 onMounted(async () => {
 	// try to load the corresponding campaign from the cache
