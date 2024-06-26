@@ -4,16 +4,15 @@
       <div :class="{ 'horizontal-shake': shake }">
 	<img src="/img/logo-black.png" width="190" alt="Effect Force Logo">
 	<div v-if="!userName">
-	  <h1 class="title">Effect V2</h1>
-
 	  <div>
+            <h2 class="title">Welcome to Effect V2</h2>
 	    <p>
-	      Welcome to the early alpha version of Effect Force V2:<br /> a <span class="text-hightlights">100%
-		Decentralized</span> and <span class="text-hightlights">Transparent</span> AI Training platform. <br />
+	      This is the early access platform of Effect AI: a <span class="text-hightlights">100%
+		decentralized</span> and <span class="text-hightlights">transparent</span> AI Training platform. <br />
 	    </p>
 
 	    <p>To ensure a good experience for everyone, we'll be granting access to V2 in
-	      waves using <u>access keys.</u></p>
+	      waves using <u>access keys</u>.</p>
 	  </div>
 
 	  <div class="">
