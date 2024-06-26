@@ -9,8 +9,8 @@
 		"preview": "nuxt preview",
 		"lint": "bun biome lint --apply .",
 		"format": "biome format --write .",
-		"check": "bun biome check --apply ."
-	        "build:digitalocean": "npx -y bun install && nuxt generate",
+		"check": "bun biome check --apply .",
+		"build:digitalocean": "npx -y bun install && nuxt generate"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.7.0",
