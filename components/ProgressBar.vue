@@ -26,12 +26,16 @@ const props = defineProps<{
   position: relative;
   width: 100%;
   background-color: #f1f1f1;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .bar {
   width: 0;
-  height: 100%;
+  height: 10px;
   background-color: #4caf50;
-  transition: 0.5s;
+  /* height: 100%; */
+  border-radius: 10px;
+  transition: 0.5s
 }
 </style>
