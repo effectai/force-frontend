@@ -12,7 +12,7 @@
 	    </p>
 
 	    <p>To ensure a good experience for everyone, we'll be granting access to V2 in
-	      waves using <u>access keys</u>.</p>
+	    waves using <a class="subtle" href="https://docs.google.com/forms/d/1T2WR74yDcZM-w3ZMxB95We0Quo438VeTIP9pbii7-1s">access keys</a>.</p>
 	  </div>
 
 	  <div class="">
@@ -22,7 +22,7 @@
 	</div>
 	<div v-if="userName">
 	  <h2 class="title">
-	    Ready to dive into the Force platform?
+	    Ready to dive into the Effect platform?
 	  </h2>
 
 	  <p>
@@ -44,7 +44,7 @@
 	    verify
 	  </ForceButton>
 
-	  <a href="#" class="apply-link">how can i get a key?</a>
+	  <a href="https://docs.google.com/forms/d/1T2WR74yDcZM-w3ZMxB95We0Quo438VeTIP9pbii7-1s" class="apply-link">how can i get a key?</a>
 	</div>
       </div>
     </section>
@@ -185,4 +185,6 @@ input {
   font-weight: bold;
   color: #007bff;
 }
+
+a.subtle { color: var(--text-color) !important; }
 </style>
