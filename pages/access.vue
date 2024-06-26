@@ -1,53 +1,55 @@
 <template>
-  <section id="keys-container" class="container flex-center">
-    <div :class="{ 'horizontal-shake': shake }">
-      <img src="/img/effect-logo.svg" width="250" alt="Effect Force Logo">
-      <div v-if="!userName">
-        <h1 class="title">Effect Force V2</h1>
+  <div id="page-container">
+    <section id="keys-container" class="container flex-center">
+      <div :class="{ 'horizontal-shake': shake }">
+	<img src="/img/logo-black.png" width="190" alt="Effect Force Logo">
+	<div v-if="!userName">
+	  <h1 class="title">Effect V2</h1>
 
-        <div>
-          <p>
-            Welcome to the early alpha version of Effect Force V2:<br /> a <span class="text-hightlights">100%
-              Decentralized</span> and <span class="text-hightlights">Transparent</span> AI Training platform. <br />
-          </p>
+	  <div>
+	    <p>
+	      Welcome to the early alpha version of Effect Force V2:<br /> a <span class="text-hightlights">100%
+		Decentralized</span> and <span class="text-hightlights">Transparent</span> AI Training platform. <br />
+	    </p>
 
-          <p>To ensure a good experience for everyone, we'll be granting access to V2 in
-            waves using <u>access keys.</u></p>
-        </div>
+	    <p>To ensure a good experience for everyone, we'll be granting access to V2 in
+	      waves using <u>access keys.</u></p>
+	  </div>
 
-        <div class="">
-          <p>First, lets connect your EOS wallet.</p>
-          <ConnectWallet class="mt-2" />
-        </div>
+	  <div class="">
+	    <p>First, lets connect your EOS wallet.</p>
+	    <ConnectWallet class="mt-2" />
+	  </div>
+	</div>
+	<div v-if="userName">
+	  <h2 class="title">
+	    Ready to dive into the Force platform?
+	  </h2>
+
+	  <p>
+	    Welcome
+	  <div class="dropdown">
+	    <a href="#" @click="showDropdown">{{ userName }}</a>
+	    <div id="myDropdown" class="dropdown-content">
+	      <a @click="disconnectWallet" href="#home">logout</a>
+	    </div>
+	  </div>,<span class="logout-button" @click="disconnectWallet">
+	  </span></p>
+
+	  <p>Enter your access code to unlock access to Effect V2. Once you're in, you'll snag a special NFT
+	    token, giving you VIP access to all the awesome features waiting for you.</p>
+
+	  <input class="input" v-model="key" placeholder="xxx-xxx-xxx">
+
+	  <ForceButton :is-loading="isLoading" class="button" @click="verifyAccessKey">
+	    verify
+	  </ForceButton>
+
+	  <a href="#" class="apply-link">how can i get a key?</a>
+	</div>
       </div>
-      <div v-if="userName">
-        <h2 class="title">
-          Ready to dive into the Force platform?
-        </h2>
-
-        <p>
-          Welcome
-        <div class="dropdown">
-          <a href="#" @click="showDropdown">{{ userName }}</a>
-          <div id="myDropdown" class="dropdown-content">
-            <a @click="disconnectWallet" href="#home">logout</a>
-          </div>
-        </div>,<span class="logout-button" @click="disconnectWallet">
-        </span></p>
-
-        <p>Just enter your access code to unlock access to Effect Force. Once you're in, you'll snag a special NFT
-          token, giving you VIP access to all the awesome features waiting for you.</p>
-
-        <input class="input" v-model="key" placeholder="xxx-xxx-xxx">
-
-        <ForceButton :is-loading="isLoading" class="button" @click="verifyAccessKey">
-          verify
-        </ForceButton>
-
-        <a href="#" class="apply-link">how can i get a key?</a>
-      </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -126,11 +128,16 @@ const verifyAccessKey = async () => {
 </script>
 
 <style scoped>
-
 .apply-link {
   display:block;
+  font-size: var(--font-size-sm);
   color: #007bff;
   cursor: pointer;
+}
+
+#page-container {
+  max-width: 1200px;
+  margin: auto;
 }
 
 #keys-container {

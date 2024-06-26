@@ -74,11 +74,11 @@ h4,
 h5,
 h6 {
   font-family: var(--font-family-header);
-  font-weight: 400 !important;
+  font-weight: 400;
 }
 
 h1 {
-  font-size: var(--font-size-4xl) !important;
+  font-size: var(--font-size-4xl);
   line-height: 87px;
 }
 
