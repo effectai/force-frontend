@@ -9,6 +9,7 @@ import {
 	type Name,
 	createClient,
 	jungle4,
+	eos,
 	setSession,
 	reserveTask,
 	submitTask,
@@ -178,9 +179,11 @@ export const createEffectClient = async (): Promise<ClientStore> => {
 
 	/* --------- CLIENT --------- */
 
+	const config = useRuntimeConfig();
+	const netw = config.public.EOS_NETWORK == 'eos' ? eos : jungle4;
 	const client = shallowRef(
 		await createClient({
-			network: jungle4,
+			network: netw,
 			options: {
 				ipfsCacheDurationInMs: 600000,
 			},
