@@ -182,7 +182,6 @@ input {
 }
 
 .text-hightlights {
-  font-weight: bold;
   color: #007bff;
 }
 
