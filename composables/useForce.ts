@@ -13,7 +13,7 @@ export const useReserveTask = () => {
 			loading.value = true;
 			const reservation = await reserveTask(campaignId);
 
-			if (reservation?.id) {
+			if (reservation?.id || reservation?.id === 0) {
 				await router.push(`/campaign/${campaignId}/task/`);
 			}
 		} catch (e) {

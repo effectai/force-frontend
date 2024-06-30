@@ -358,7 +358,8 @@ export const createEffectClient = async (): Promise<ClientStore> => {
 					client: client.value,
 				});
 
-				const authorizedRequesters = ["efxefxefxefx"];
+				const config = useRuntimeConfig();
+				const authorizedRequesters = config.public.AUTHORIZED_REQUESTERS;
 
 				return campaigns.filter((campaign) => {
 					return authorizedRequesters.includes(campaign.owner[1]);
