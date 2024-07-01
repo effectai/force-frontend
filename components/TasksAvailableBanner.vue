@@ -1,14 +1,13 @@
 <template>
 <div class="tasks-available-banner">
     <p>You have {{ totalTasksAvailable }} new tasks available!</p>
-    <button class="button">View tasks</button>
 </div>
 </template>
 
 <script setup lang="ts">
     const {useCampaigns} = useEffectClient();
 
-    const { totalTasksAvailable } = useCampaigns({
+    const { totalTasksAvailable, data: campaigns } = useCampaigns({
         calculateAvailableTasks: true
     });
 

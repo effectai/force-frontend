@@ -31,6 +31,7 @@ import {
 	getBatchById,
 	type CampaignWithInfo,
 	type Campaign,
+	type NameType,
 } from "@effectai/sdk";
 
 import {
@@ -58,8 +59,8 @@ export interface ClientStore {
 	isLoggedIn: Ref<boolean>;
 	isWalletConnecting: Ref<boolean>;
 
-	userName: Ref<Name | null>;
-	permission: Ref<Name | null>;
+	userName: Ref<NameType | null>;
+	permission: Ref<NameType | null>;
 	vAccount: Ref<Account | null>;
 
 	useForceSettings: () => UseQueryReturnType<Settings, Error>;
@@ -208,11 +209,11 @@ export const createEffectClient = async (): Promise<ClientStore> => {
 
 	const session: Ref<EffectSession | null> = ref(null);
 
-	const userName: Ref<Name | null> = computed(
+	const userName: Ref<NameType | null> = computed(
 		() => session.value?.actor || null,
 	);
 
-	const permission: Ref<Name | null> = computed(
+	const permission: Ref<NameType | null> = computed(
 		() => session.value?.permission || null,
 	);
 
@@ -376,7 +377,7 @@ export const createEffectClient = async (): Promise<ClientStore> => {
 			queryFn: async () => {
 				const campaigns = await getAllCampaigns({
 					client: client.value,
-				}) as CampaignWithTasks[];
+				}) as Campaign[];
 
 				const config = useRuntimeConfig();
 				const authorizedRequesters = config.public.AUTHORIZED_REQUESTERS;

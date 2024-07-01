@@ -34,7 +34,6 @@ const props = defineProps<{
   width: 0;
   height: 10px;
   background-color: #4caf50;
-  /* height: 100%; */
   border-radius: 10px;
   transition: 0.5s
 }
