@@ -11,7 +11,7 @@
 		"format": "biome format --write .",
 		"check": "bun biome check --apply ."
 	},
-	"devDependencies": {
+	"dependencies": {
 		"@biomejs/biome": "1.7.0",
 		"normalize.css": "^8.0.1",
 		"postcss": "^8.4.38",
@@ -23,9 +23,7 @@
 		"stylelint-config-recommended": "^14.0.0",
 		"stylelint-config-recommended-vue": "^1.5.0",
 		"stylelint-prettier": "^5.0.0",
-		"vite-plugin-inspect": "^0.8.3"
-	},
-	"dependencies": {
+		"vite-plugin-inspect": "^0.8.3",
 		"vite-plugin-stylelint": "^5.3.1",
 		"@effectai/sdk": "2.0.1",
 		"@nuxt/content": "^2.12.1",
