@@ -27,7 +27,7 @@ export default defineNuxtConfig({
 			BASE_EXPLORER_URL:
 				process.env.BASE_EXPLORER_URL ?? "https://jungle4.eosq.eosnation.io",
 
-				EOS_NETWORK: process.env.EOS_NETWORK ?? 'jungle4'
+			EOS_NETWORK: process.env.EOS_NETWORK ?? 'jungle4'
 		},
 	},
 	build: {
