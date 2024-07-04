@@ -143,6 +143,7 @@ onUnmounted(() => {
 
 const logout = () => {
 	disconnectWallet();
+  localStorage.removeItem("access_token");
 	router.push("/");
 };
 </script>
