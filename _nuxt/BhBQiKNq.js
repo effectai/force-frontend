@@ -1,1 +1,0 @@
-import{_ as a}from"./CYVKd2LE.js";import{g as s,o as n,c as r,b as e,k as _,aI as c,G as m}from"./Bk7_z8zR.js";import"./D8_oxPFk.js";const p={class:"fullwidth"},h=s({__name:"template",setup(l){return(o,d)=>{const t=a;return n(),r("div",p,[e(t),e(_(c)),m(o.$slots,"default")])}}});export{h as default};
