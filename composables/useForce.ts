@@ -52,6 +52,7 @@ export const getTaskAvailableForCampaign = async (
 
 	if (vAccount) {
 		if (campaignTasksAvailable || batch_reservations.length) {
+
 			const batch = await getBatchById({ client, id: campaign.active_batch });
 
 			if (!batch) {
@@ -64,23 +65,26 @@ export const getTaskAvailableForCampaign = async (
 				campaignId: campaign.id,
 			})
 
-			const userDidTaskInBatch = accTaskidx[0].value >= batch.start_task_idx;
+			if(accTaskidx.length > 0){
+				const userDidTaskInBatch = accTaskidx[0].value >= batch.start_task_idx;
 
-			if (userDidTaskInBatch) {
-				if (accTaskidx[0].value > current_task_idx) {
-					current_task_idx = accTaskidx[0].value;
+				if (userDidTaskInBatch) {
+					if (accTaskidx[0].value > current_task_idx) {
+						current_task_idx = accTaskidx[0].value;
+					}
 				}
-			}
-
-			batchTaskAvailable =
-				batch.start_task_idx +
-				batch.num_tasks -
-				1 -
-				current_task_idx;
-			if (userDidTaskInBatch) {
-				// Also lower the campaign available tasks if user already did tasks in active batch that are not completed yet
-				campaignTasksAvailable -=
-					current_task_idx - (campaign.reservations_done - 1);
+	
+				batchTaskAvailable =
+					batch.start_task_idx +
+					batch.num_tasks -
+					1 -
+					current_task_idx;
+					
+				if (userDidTaskInBatch) {
+					// Also lower the campaign available tasks if user already did tasks in active batch that are not completed yet
+					campaignTasksAvailable -=
+						current_task_idx - (campaign.reservations_done - 1);
+				}
 			}
 		}
 	}
@@ -101,8 +105,6 @@ export const getTaskAvailableForCampaign = async (
 			}
 		}
 	}
-
-
 
 
 	return { campaignTasksAvailable, batchTaskAvailable };

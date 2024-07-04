@@ -104,6 +104,10 @@ const renderTask = async (): Promise<void> => {
 			submissionId: reservation.value?.id,
 		};
 
+		console.log("Reservation", reservation.value)	
+		console.log("Task", task)
+		console.log("Task Data", taskData.value);
+
 		const template = new EffectTemplate(
 			campaign.value.info.template,
 			{ id: 1, annotations: [], ...taskData.value },
