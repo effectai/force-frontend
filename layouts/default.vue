@@ -1,161 +1,102 @@
 <template>
-  <div id="app">
-    <bsc-wallet />
-    <eos-wallet />
-    <error-modal />
-    <div style="position: fixed; bottom:5px; left:5px; z-index:2;">
-      <div v-if="!allCampaignsLoaded" class="notification has-border">
-        <span :class="{ 'loading-text': campaignsLoading }">Campaigns loading: {{ campaigns ? campaigns.length : 0
-        }}</span>
-      </div>
-      <div v-else-if="campaignsLoading" class="notification has-border">
-        <span class="loading-text">Refreshing {{ campaigns.length }} campaigns</span>
-      </div>
-      <div v-if="!allBatchesLoaded" class="notification has-border">
-        <span :class="{ 'loading-text': batchesLoading }">Batches loading: {{ batches ? batches.length : 0 }}</span>
-      </div>
-      <div v-else-if="batchesLoading" class="notification has-border">
-        <span class="loading-text">Refreshing {{ batches.length }} batches</span>
-      </div>
-      <div v-if="submissionsLoading" class="notification has-border">
-        <span class="loading-text">Refreshing {{ submissions ? submissions.length : 0 }} submissions</span>
-      </div>
-      <div v-if="!allQualificationsLoaded" class="notification has-border">
-        <span :class="{ 'loading-text': qualificationsLoading }">
-          Qualifications loading: {{ qualifications ? qualifications.length : 0 }}
-        </span>
-      </div>
-      <div v-else-if="qualificationsLoading" class="notification has-border">
-        <span class="loading-text">Refreshing {{ qualifications.length }} qualifications</span>
-      </div>
-      <div v-if="!allAssignedQualificationsLoaded" class="notification has-border">
-        <span :class="{ 'loading-text': assignedQualificationsLoading }">
-          Assigned Qualifications loading: {{ assignedQualifications ? assignedQualifications.length : 0 }}
-        </span>
-      </div>
-      <div v-else-if="assignedQualificationsLoading" class="notification has-border">
-        <span class="loading-text">Refreshing {{ assignedQualifications.length }} assigned qualifications</span>
-      </div>
-    </div>
-    <chain-status v-if="$auth && $auth.loggedIn" />
-    <div class="notif-banner is-size-6">
-      <div class="container">
-        <div class="columns">
-          <nuxt-link to="/security" class="column has-text-centered warning">
-            ⚠️ This is a beta release, know the risks »
-          </nuxt-link>
+  <div class="main">
+    <Teleport v-if="showSidebar" :to="'body'">
+      <div class="popover-container">
+        <div class="modal-backdrop"></div>
+        <div class="popover">
+        <Transition name="fade" mode="out-in" appear>
+          <Sidebar  v-if="showSidebar"/>
+        </Transition>
+          <div>
+            <button @click="closeSidebar" class="button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 383 512" fill="white" stroke-width="1.5" stroke="currentColor"
+                aria-hidden="true" data-slot="icon" class="" width="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-    <div v-if="resourceIsLow" class="resource-banner is-size-6">
-      <div class="container">
-        <div class="columns">
-          <nuxt-link to="/status" class="column has-text-centered warning is-light">
-            🔋 Effect Network Resources low, please donate »
-          </nuxt-link>
-        </div>
+    </Teleport>
+    <div class="layout-container">
+      <Sidebar />
+      <div class="main-content">
+        <TheHeader @open-sidebar="openSidebar"/>
+        <slot />
       </div>
     </div>
-    <nav-bar />
-    <div id="content">
-      <Nuxt />
-    </div>
-    <Foot id="footer" />
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
+<script setup lang="ts">
 
-import BscWallet from '@/components/BscWallet'
+const showSidebar = ref(false)
 
-import EosWallet from '@/components/EosWallet'
-import NavBar from '@/components/NavBar'
-import Foot from '@/components/Footer.vue'
-import ErrorModal from '@/components/ErrorModal'
-import ChainStatus from '~/components/chainStatus.vue'
+const openSidebar = () => {
+  showSidebar.value = true
+  // add overflow hidden to html
+  document.documentElement.style.overflow = 'hidden'
+}
 
-export default {
-  components: {
-    ErrorModal,
-    BscWallet,
-    EosWallet,
-    NavBar,
-    Foot,
-    ChainStatus
-  },
-  data () {
-    return {
-    }
-  },
-  head () {
-    return {
-      bodyAttrs: {
-        class: 'has-navbar-fixed-top'
-      }
-    }
-  },
-  computed: {
-    ...mapState({
-      campaigns: state => state.campaign.campaigns,
-      campaignsLoading: state => state.campaign.loading,
-      allCampaignsLoaded: state => state.campaign.allCampaignsLoaded,
-      batches: state => state.campaign.batches,
-      batchesLoading: state => state.campaign.loadingBatch,
-      allBatchesLoaded: state => state.campaign.allBatchesLoaded,
-      submissions: state => state.campaign.submissions,
-      allSubmissionsLoaded: state => state.campaign.allSubmissionsLoaded,
-      submissionsLoading: state => state.campaign.loadingSubmissions,
-      qualifications: state => state.qualification.qualifications,
-      allQualificationsLoaded: state => state.qualification.allQualificationsLoaded,
-      qualificationsLoading: state => state.qualification.loading,
-      assignedQualifications: state => state.qualification.assignedQualifications,
-      allAssignedQualificationsLoaded: state => state.qualification.allAssignedQualificationsLoaded,
-      assignedQualificationsLoading: state => state.qualification.loadingAssigned
-    }),
-    percentageRam () {
-      return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.ram_usage / this.$blockchain.relayerStatus.ram_quota * 100, 10) : 0
-    },
-    leftOverRam  () {
-      return this.$blockchain.relayerStatus ? this.$blockchain.relayerStatus.ram_quota - this.$blockchain.relayerStatus.ram_usage : 0
-    },
-    percentageNet () {
-      return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.net_limit.used / this.$blockchain.relayerStatus.net_limit.max * 100, 10) : 0
-    },
-    percentageCpu () {
-      return this.$blockchain.relayerStatus ? parseInt(this.$blockchain.relayerStatus.cpu_limit.used / this.$blockchain.relayerStatus.cpu_limit.max * 100, 10) : 0
-    },
-    resourceIsLow () {
-      // return (this.percentageCpu > 90) || (this.percentageNet > 90) || (this.percentageRam > 95)
-      return (this.percentageCpu > 90) || (this.percentageNet > 90) || (this.leftOverRam < 10e3)
-    }
-  },
-  created () {
-  },
-  methods: {
-  }
+const closeSidebar = () => {
+  showSidebar.value = false
+
+  // remove overflow hidden from html
+  document.documentElement.style.overflow = 'auto'
 }
 </script>
-<style lang="scss">
-.notif-banner {
-  background-color: $yellow;
-  padding: 0.4rem 0;
+
+<style scoped>
+
+@media screen and (min-width: 1440px) {
+  .burger-button {
+    display: none;
+  }
+
+  .popover-container {
+    display: none;
+  }
 }
 
-.resource-banner {
-  background-color: $yellow;
-  padding: 0.4rem 0;
-}
-</style>
-
-<style lang="scss" scoped>
-#app {
+.popover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
   display: flex;
-  min-height: calc(100vh - 80px);
-  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
 }
 
-#content {
-  flex-grow: 1;
+.popover-container .popover .sidebar {
+  display: block;
+  width: 250px;
+  padding: 20px;
+  background-color: white;
 }
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+h4 {
+  font-weight: bold !important;
+  color: black;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.2s ease-out;
+}
+
+.fade-enter-from {
+  opacity: 1;
+  transform: translateX(-100%);
+}
+
 </style>

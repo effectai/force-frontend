@@ -1,0 +1,13 @@
+{
+	"extends": [
+		"stylelint-config-html",
+		"stylelint-config-recommended",
+		"stylelint-config-recommended-vue",
+		"stylelint-config-recess-order",
+		"stylelint-prettier/recommended"
+	],
+	"rules": {
+		"no-descending-specificity": null,
+		"at-rule-no-unknown": null
+	}
+}

@@ -1,0 +1,23 @@
+# Dockerfile
+FROM oven/bun:1.1.10
+
+# Create app directory
+WORKDIR /nuxt
+
+# Install app dependencies
+COPY package*.json ./
+COPY bun.lockb ./
+RUN bun install
+
+# Bundle app source
+COPY . .
+
+# Expose port and start app
+ENV NITRO_HOST=0.0.0.0
+ENV NITRO_PORT=3000
+
+# EXPOSE 3000
+# EXPOSE 24678
+
+# CMD [ "npm", "run", "prod" ]
+CMD [ "bun", "run", "dev" ]

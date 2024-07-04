@@ -1,0 +1,16 @@
+# docker-compose.yml
+version: '3.3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
+    volumes:
+      - .:/nuxt
+      - /nuxt/node_modules
+    ports:
+      - 3000:3000
+      - 24678:24678
+    environment:
+      HOST: 0.0.0.0
+      NITRO_PORT: 3000
