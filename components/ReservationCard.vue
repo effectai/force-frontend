@@ -15,7 +15,7 @@
       </div>
       <ProgressBar
         :reverse="false"
-        :progress= getProgress(campaign)
+        :progress="getProgress(campaign)"
       />
       <ForceButton
         :is-loading="loading"
@@ -82,11 +82,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-button {
-  width: 100%;
-  margin-top: auto;
-}
-
 .card-title {
   margin: 10px 0 5px 0;
   font-size: 1.2em;
@@ -104,7 +99,6 @@ button {
   flex-direction:column;
   height:100%;
 }
-
 
 .reservation {
   display: block;

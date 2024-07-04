@@ -1,14 +1,16 @@
 <template>
 <div class="tasks-available-banner">
-    <p>You have {{ totalTasks }} new tasks available!</p>
-    <button class="button">View tasks</button>
+    <p>You have {{ totalTasksAvailable }} new tasks available!</p>
 </div>
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
-	totalTasks: number;
-}>();
+    const {useCampaigns} = useEffectClient();
+
+    const { totalTasksAvailable, data: campaigns } = useCampaigns({
+        calculateAvailableTasks: true
+    });
+
 </script>
 
 <style scoped>

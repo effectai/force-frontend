@@ -12,7 +12,7 @@
       v-show="isIframeLoaded"
       id="mediaFrame"
       ref="mediaFrame"
-      :src="`${alternativeFrontendUrl}/template-proxy.html`"
+      :src="`/template-proxy.html`"
       name="mediaFrame"
       sandbox="allow-scripts allow-modals allow-downloads allow-forms allow-popups allow-popups-to-escape-sandbox allow-pointer-lock allow-same-origin"
       allow="geolocation; microphone; camera; autoplay; fullscreen"

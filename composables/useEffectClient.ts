@@ -29,6 +29,9 @@ import {
 	getAccountAssets,
 	getAllCampaigns,
 	getBatchById,
+	type CampaignWithInfo,
+	type Campaign,
+	type NameType,
 } from "@effectai/sdk";
 
 import {
@@ -46,21 +49,32 @@ export const persister = experimental_createPersister({
 	storage: window?.localStorage ? localStorage : undefined,
 });
 
+export interface CampaignWithTasks extends Campaign {
+	campaignTasksAvailable?: number | null;
+	batchTaskAvailable?: number | null;
+}
+
 export interface ClientStore {
 	client: Ref<Client>;
 	isLoggedIn: Ref<boolean>;
 	isWalletConnecting: Ref<boolean>;
 
-	userName: Ref<Name | null>;
-	permission: Ref<Name | null>;
+	userName: Ref<NameType | null>;
+	permission: Ref<NameType | null>;
 	vAccount: Ref<Account | null>;
 
 	useForceSettings: () => UseQueryReturnType<Settings, Error>;
 
-	useCampaigns: () => UseQueryReturnType<
-		Awaited<ReturnType<typeof getAllCampaigns>>,
+	useCampaigns: ({
+		calculateAvailableTasks,
+	}: {
+		calculateAvailableTasks: boolean
+	}) => UseQueryReturnType<
+		Awaited<ReturnType<typeof getAllCampaigns> | CampaignWithTasks>,
 		Error
-	>;
+	> & {
+		totalTasksAvailable: Ref<number | false | undefined>;
+	}
 
 	useCampaign: (
 		campaignId: number,
@@ -188,18 +202,18 @@ export const createEffectClient = async (): Promise<ClientStore> => {
 				ipfsCacheDurationInMs: 600000,
 			},
 		}
-	));
+		));
 
 
 	/* --------- REACTIVE DATA --------- */
 
 	const session: Ref<EffectSession | null> = ref(null);
 
-	const userName: Ref<Name | null> = computed(
+	const userName: Ref<NameType | null> = computed(
 		() => session.value?.actor || null,
 	);
 
-	const permission: Ref<Name | null> = computed(
+	const permission: Ref<NameType | null> = computed(
 		() => session.value?.permission || null,
 	);
 
@@ -346,26 +360,54 @@ export const createEffectClient = async (): Promise<ClientStore> => {
 			},
 		});
 	};
-
-	const useCampaigns = () => {
+	
+	const useCampaigns = ({
+		calculateAvailableTasks,
+	}: {
+		calculateAvailableTasks: boolean
+	} = {
+		calculateAvailableTasks: false
+	}) => {
 		const config = useRuntimeConfig();
-		return useQuery({
+
+		const query = useQuery({
 			staleTime: config.public.CAMPAIGN_CACHE_DURATION,
 			gcTime: config.public.CAMPAIGN_CACHE_DURATION,
 			queryKey: ["campaigns"],
 			queryFn: async () => {
 				const campaigns = await getAllCampaigns({
 					client: client.value,
-				});
+				}) as Campaign[];
 
 				const config = useRuntimeConfig();
 				const authorizedRequesters = config.public.AUTHORIZED_REQUESTERS;
 
-				return campaigns.filter((campaign) => {
+				const filteredCampaigns = campaigns.filter((campaign) => {
 					return authorizedRequesters.includes(campaign.owner[1]);
 				});
+
+				// add available tasks to the campaign
+				if (calculateAvailableTasks) {
+					for (const campaign of filteredCampaigns as CampaignWithTasks[]) {
+						const availableTask = await getTaskAvailableForCampaign(client.value, campaign, vAccount.value);
+						campaign.campaignTasksAvailable = availableTask.campaignTasksAvailable;
+						campaign.batchTaskAvailable = availableTask.batchTaskAvailable;
+					}
+				}
+
+				return filteredCampaigns;
 			},
 		});
+
+		const totalTasksAvailable = computed(() => calculateAvailableTasks && query.data.value && query.data.value.reduce((acc, campaign) => {
+			if(!campaign.campaignTasksAvailable) return false;
+			return acc + campaign.campaignTasksAvailable;
+		}, 0));
+
+		return {
+			...query,
+			totalTasksAvailable,
+		}
 	};
 
 	const useCampaign = (

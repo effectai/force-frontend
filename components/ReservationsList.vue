@@ -38,7 +38,7 @@ const sortedReservations = computed(() => {
 <style>
 
 .reservation-list{
-  margin-top: var(--spacing-4);
+  margin: var(--spacing-4) 0;
 }
 
 .reservation-container{
