@@ -1,9 +1,4 @@
 <template>
-  <TasksAvailableBanner :totalTasks="totalTasks"/>
-
-  <h2 class="title mb-0">
-    All Datasets
-  </h2>
   <div class="campaign-list">
     <div v-if="loading">
       <slot name="loading" />
@@ -57,6 +52,7 @@ const updateTotalTasks = (tasks: number) => {
 </script>
 
 <style scoped>
+
 .campaign-pagination {
   display: inline-flex;
   gap: 5px;
