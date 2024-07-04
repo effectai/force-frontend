@@ -22,7 +22,7 @@
       <div>
         <label>EFX</label>
         <div class="text-lg">
-          {{ balance ?? 0 }}
+          {{ balances?.efxBalance ?? 0 }}
         </div>
       </div>
     </div>
@@ -94,7 +94,7 @@ const {
 
 const router = useRouter();
 
-const { data: balance } = useGetBalance(userName);
+const { data: balances } = useGetBalance(userName);
 
 const { data: forceSettings, isLoading: isLoadingForceSettings } =
 	useForceSettings();
