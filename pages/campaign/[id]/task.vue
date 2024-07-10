@@ -100,13 +100,9 @@ const renderTask = async (): Promise<void> => {
 		const task = {
 			accountId: vAccount.value?.id,
 			campaignId: reservation.value?.campaign_id,
-			batchId: reservation.value?.batch_id,
+			batchId: reservation.value?.batch_idx,
 			submissionId: reservation.value?.id,
 		};
-
-		console.log("Reservation", reservation.value)	
-		console.log("Task", task)
-		console.log("Task Data", taskData.value);
 
 		const template = new EffectTemplate(
 			campaign.value.info.template,
@@ -156,8 +152,9 @@ const doSubmitTask = async (data: Record<string, unknown>): Promise<void> => {
 watchEffect(async () => {
 	if (!reservation.value || !taskData.value) return;
 	if (error.value) return;
-	isTemplateReady.value = false;
+
 	await nextTick();
+
 	renderTask();
 });
 
