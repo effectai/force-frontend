@@ -33,7 +33,7 @@ const props = defineProps<{
 .bar {
   width: 0;
   height: 10px;
-  background-color: #4caf50;
+  background-color: #000;
   border-radius: 10px;
   transition: 0.5s
 }
