@@ -25,7 +25,7 @@
 		"stylelint-prettier": "^5.0.0",
 		"vite-plugin-inspect": "^0.8.3",
 		"vite-plugin-stylelint": "^5.3.1",
-		"@effectai/sdk": "2.0.1",
+		"@effectai/sdk": "^2.0.2",
 		"@nuxt/content": "^2.12.1",
 		"@nuxt/image": "1.4.0",
 		"@tanstack/query-persist-client-core": "^5.29.0",
