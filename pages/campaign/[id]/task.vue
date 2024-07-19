@@ -4,7 +4,6 @@
 			<div class="error-container flex-center flex-col">
 				<IconsEmoticonDead class="icon" />
 				<h3>Uh oh, something went wrong</h3>
-				<p>{{ error }}</p>
 				<div class="error-buttons">
 					<button class="button mt-2" @click="router.push('/')">Go back</button>
 					<button class="button mt-2" @click="notifyTeamName">Notify <u>{{ randomName }}</u></button>
@@ -35,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { Template as EffectTemplate } from "@effectai/sdk";
+import { Template as EffectTemplate, type Campaign, type CampaignWithInfo, type Reservation } from "@effectai/sdk";
 import type TaskTemplate from "~/components/TaskTemplate.vue";
 
 definePageMeta({
@@ -87,43 +86,52 @@ const { mutateAsync: reserveTask, isPending: isReservingTask } =
 const { mutateAsync: submitTask, isPending: isSubmittingTask } =
 	useSubmitTask();
 
-const renderTask = async (): Promise<void> => {
+
+const renderTask = async (reservation: Reservation, rawHtml: string): Promise<void> => {
 	try {
-		if (!reservation.value) {
-			throw new Error("No reservation found");
-		}
-
-		if (!campaign.value?.info?.template) {
-			throw new Error("No template found");
-		}
-
 		const task = {
 			accountId: vAccount.value?.id,
-			campaignId: reservation.value?.campaign_id,
-			batchId: reservation.value?.batch_idx,
-			submissionId: reservation.value?.id,
+			campaignId: reservation.campaign_id,
+			batchId: reservation.batch_idx,
+			submissionId: reservation?.id,
 		};
 
 		const template = new EffectTemplate(
-			campaign.value.info.template,
+			rawHtml,
 			{ id: 1, annotations: [], ...taskData.value },
 			{},
 			task,
 		);
 
-		const html = template.render();
-
-		//wait for Ref template to be ready
+		const renderedTemplate = template.render();
 		await nextTick();
-		if (!templateRef.value) {
-			throw new Error("Template reference not found");
-		}
-
-		templateRef.value.setHtml(html);
+		isTemplateReady.value = false;
+		templateRef.value?.setHtml(renderedTemplate);
 	} catch (error) {
 		console.error(error);
 	}
 };
+
+// Rerender the task when the reservation or task data changes.
+
+watchEffect(() => {
+	// Trigger on reservation or task data change
+	if (!reservation.value || !taskData.value) return;
+
+	// wait for the template to be ready
+	if(!templateRef.value) return;
+
+	// if there is an error, do not rerender
+	if (error.value) return;
+
+	if(!campaign.value?.info?.template){
+		console.error("No template found in campaign");
+		return;
+	}
+	
+	renderTask(reservation.value, campaign.value?.info?.template);
+});
+
 
 const doSubmitTask = async (data: Record<string, unknown>): Promise<void> => {
 	if (!reservation.value) {
@@ -149,14 +157,6 @@ const doSubmitTask = async (data: Record<string, unknown>): Promise<void> => {
 	}
 };
 
-watchEffect(async () => {
-	if (!reservation.value || !taskData.value) return;
-	if (error.value) return;
-
-	await nextTick();
-
-	renderTask();
-});
 
 /* Feat: Notify Random Team Member */
 const { notify } = useNotification();

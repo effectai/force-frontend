@@ -39,8 +39,13 @@ const emit = defineEmits<{
 	(e: "ready"): void;
 }>();
 
-const setHtml = (newHtml: string) => {
+const setHtml = async (newHtml: string) => {
+	// reset the iframe html to null to force a reload
+	html.value = null;
+	await nextTick();
 	html.value = newHtml;
+	await nextTick();
+	emit("ready");
 };
 
 //expose the setting of html to the parent component
